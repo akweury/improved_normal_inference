@@ -1,0 +1,20 @@
+1. Get familiar with the Unity project and create synthetic data set for evaluation and training. You may change as much as you want.
+	- Maybe in a later step the project needs to be extended to render the basecolor/albedo (maybe also write a special shader, see examples on depth shader and phase shader in project).
+	- written depth maps, normal maps and calibration can be checked for correctness by the given matlab code 'testData.m'.
+	  It writes the point cloud from given depth map and calibration and writes to ply-file that can be viewed in meshlab. ALso a visualization of the camera and the light source can be written with this script.
+	  You can also do it in python, its just an example on how to read, load and test the data...
+
+2. Implement standard ways on normal estimation.
+	- A standard way to compute normals directly from point clouds. Find a paper and implement an easy way based on neighbors, there should exist tonns of papers,... 
+	  An easy method uses neighbors in image space of specific size and fits a normal to these points. Just use an easy way here to have a comparison.
+
+3. Use neural networks for normal estimation.
+	- Try to find an architecture that predicts normals using depth + known projector illumination (1 projector illumination only as in our data set, not multiples like shape from shading)
+	- Look if there are papers, that already do this.
+	- Test own ideas.
+	
+4. Tell me if you have ideas, I'm always curious.
+
+5. Compare everything on synthetic test data.
+
+6. Test on real data.
