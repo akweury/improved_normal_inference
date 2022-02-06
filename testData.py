@@ -102,7 +102,7 @@ def lightVisualization():
     for px in range(-5, 6):
         for py in range(-5, 6):
             for pz in range(-5, 6):
-                p = np.array([px, py, pz]).astype(np.float) / 10
+                p = np.array([px, py, pz]).astype(np.float32) / 10
                 if np.linalg.norm(p) > 0:
                     points.append(p / np.linalg.norm(p))
     return points
@@ -132,7 +132,7 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
 
     for i in range(vertex.shape[0]):
         for j in range(vertex.shape[1]):
-            if mask[i, j] is True:
+            if mask[i, j]:
                 ply_file.write(f"{' '.join(map(str, vertex[i, j, :]))} "
                                f"{' '.join(map(str, normal[i, j, :]))} "
                                f"{' '.join(map(str, image[i, j, :].repeat(3).astype(np.int32)))}\n")
