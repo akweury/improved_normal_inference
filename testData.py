@@ -1,3 +1,5 @@
+import os.path
+
 import numpy as np
 import cv2
 import torch
@@ -108,68 +110,72 @@ def lightVisualization():
 
 def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoints=None):
     numPoints = np.sum(mask)
-    if cameraPoints != None:
+    if cameraPoints is not None:
         numPoints += len(cameraPoints)
-    if lightPoints != None:
+    if lightPoints is not None:
         numPoints += len(lightPoints)
 
-    file = open(filename, "w")
-    file.write('ply\n')
-    file.write('format ascii 1.0\n')
-    file.write('element vertex ' + str(numPoints) + '\n')
-    file.write('property float x\n')
-    file.write('property float y\n')
-    file.write('property float z\n')
-    file.write('property float nx\n')
-    file.write('property float ny\n')
-    file.write('property float nz\n')
-    file.write('property uchar red\n')
-    file.write('property uchar green\n')
-    file.write('property uchar blue\n')
-    file.write('end_header\n')
+    ply_file = open(filename, "w")
+    ply_file.write('ply\n')
+    ply_file.write('format ascii 1.0\n')
+    ply_file.write('element vertex ' + str(numPoints) + '\n')
+    ply_file.write('property float x\n')
+    ply_file.write('property float y\n')
+    ply_file.write('property float z\n')
+    ply_file.write('property float nx\n')
+    ply_file.write('property float ny\n')
+    ply_file.write('property float nz\n')
+    ply_file.write('property uchar red\n')
+    ply_file.write('property uchar green\n')
+    ply_file.write('property uchar blue\n')
+    ply_file.write('end_header\n')
 
     for i in range(vertex.shape[0]):
         for j in range(vertex.shape[1]):
-            if mask[i, j] == True:
-                file.write(str(vertex[i, j, 0]) + ' ' + str(vertex[i, j, 1]) + ' ' + str(vertex[i, j, 2]) + ' ')
-                file.write(str(normal[i, j, 0]) + ' ' + str(normal[i, j, 1]) + ' ' + str(normal[i, j, 2]) + ' ')
-                file.write(
-                    str(int(image[i, j, 0])) + ' ' + str(int(image[i, j, 0])) + ' ' + str(int(image[i, j, 0])) + '\n')
-    if cameraPoints != None:
+            if mask[i, j] is True:
+                ply_file.write(f"{' '.join(map(str, vertex[i, j, :]))} "
+                               f"{' '.join(map(str, normal[i, j, :]))} "
+                               f"{' '.join(map(str, image[i, j, :].repeat(3).astype(np.int32)))}\n")
+    if cameraPoints is not None:
         for i in range(len(cameraPoints)):
-            file.write(str(cameraPoints[i][0]) + ' ' + str(cameraPoints[i][1]) + ' ' + str(cameraPoints[i][2]) + ' ')
-            file.write(str(0.0) + ' ' + str(0.0) + ' ' + str(0.0) + ' ')
-            file.write(str(int(255)) + ' ' + str(int(0)) + ' ' + str(int(0)) + '\n')
-    if lightPoints != None:
+            ply_file.write(f"{' '.join(map(str, cameraPoints[i]))} 0.0 0.0 0.0 255 0 0\n")
+    if lightPoints is not None:
         for i in range(len(lightPoints)):
-            file.write(str(lightPoints[i][0]) + ' ' + str(lightPoints[i][1]) + ' ' + str(lightPoints[i][2]) + ' ')
-            file.write(str(0.0) + ' ' + str(0.0) + ' ' + str(0.0) + ' ')
-            file.write(str(int(255)) + ' ' + str(int(255)) + ' ' + str(int(0)) + '\n')
+            ply_file.write(f"{' '.join(map(str, lightPoints[i]))} 0.0 0.0 0.0 255 255 0\n")
 
-    file.close()
+    ply_file.close()
 
 
 # ----------------------------------------------------------------------------------
-path = 'SyntheticDataSet/CapturedData/00000.'
-# path = 'RealDataSet/00000.'
+path = 'SyntheticDataSet/CapturedData/0000'
+# path = 'RealDataSet/0000.'
 
-f = open(path + 'data0.json')
-data = json.load(f)
-f.close()
+file_idx = 0
+file = path + str(file_idx) + ".data0" + ".json"
 
-image = load_8bitImage(path + 'image0.png')
-depth = load_scaled16bitImage(path + 'depth0.png', data['minDepth'], data['maxDepth'])
-vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1), torch.tensor(data['K']), torch.tensor(data['R']),
-                      torch.tensor(data['t']))
-normal = load_24bitNormal(path + 'normal0.png', torch.tensor(data['R']))
-mask = np.sum(np.abs(vertex), axis=2) != 0
+while os.path.isfile(file):
+    f = open(file)
+    data = json.load(f)
+    f.close()
 
-cameraPoints = cameraVisualization()
-for i in range(len(cameraPoints)):
-    cameraPoints[i] = np.array(data['R']).transpose() @ cameraPoints[i] / 4 - np.array(
-        data['R']).transpose() @ np.array(data['t'])
-lightPoints = lightVisualization()
-for i in range(len(lightPoints)):
-    lightPoints[i] = lightPoints[i] / 8 + np.array(data['lightPos'])
+    image = load_8bitImage(path + str(file_idx) + f'.image0.png')
+    depth = load_scaled16bitImage(path + str(file_idx) + f'.depth0.png', data['minDepth'], data['maxDepth'])
+    vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1), torch.tensor(data['K']), torch.tensor(data['R']),
+                          torch.tensor(data['t']))
+    normal = load_24bitNormal(path + str(file_idx) + f'.normal0.png', torch.tensor(data['R']))
+    # mask = np.sum(np.abs(vertex), axis=2) != 0
+    mask = np.sum(np.abs(depth), axis=2) != 0
+    cameraPoints = cameraVisualization()
+    for i in range(len(cameraPoints)):
+        cameraPoints[i] = np.array(data['R']).transpose() @ cameraPoints[i] / 4 - np.array(
+            data['R']).transpose() @ np.array(data['t'])
+    lightPoints = lightVisualization()
+    for i in range(len(lightPoints)):
+        lightPoints[i] = lightPoints[i] / 8 + np.array(data['lightPos'])
 
-writePLY(vertex, normal, image, mask, path + 'pointCloud0.ply', cameraPoints=cameraPoints, lightPoints=lightPoints)
+    writePLY(vertex, normal, image, mask, path + str(file_idx) + f'.pointCloud0.ply',
+             cameraPoints=cameraPoints,
+             lightPoints=lightPoints)
+
+    file_idx += 1
+    file = path + str(file_idx) + ".data0" + ".json"
