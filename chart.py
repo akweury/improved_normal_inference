@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def line_chart(data, title=None, x_scale=None, y_scale=None):
+def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None):
     if y_scale is None:
         y_scale = [1, 1]
     if x_scale is None:
@@ -15,4 +15,10 @@ def line_chart(data, title=None, x_scale=None, y_scale=None):
 
     if title is not None:
         plt.title(title)
+
+    if x_label is not None:
+        plt.xlabel(x_label)
+    if y_label is not None:
+        plt.ylabel(y_label)
+
     plt.show()

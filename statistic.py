@@ -10,8 +10,11 @@ data_type = "synthetic"
 
 # data_type = "real"
 
+def get_valid_pixels(img):
+    return np.count_nonzero(np.sum(img, axis=2) > 0)
 
-def mse(img_1, img_2):
+
+def mse(img_1, img_2, valid_pixels=None):
     """
 
     :param img_1: np_array of image with shape height*width*channel
@@ -23,7 +26,14 @@ def mse(img_1, img_2):
         raise ValueError
 
     h, w, c = img_1.shape
-    diff = np.sum(np.abs(img_1 - img_2)) / (h * w * c * 255)
+    diff = np.sum(np.abs(img_1 - img_2))
+    if valid_pixels is not None:
+        # only calculate the difference of valid pixels
+        diff /= (valid_pixels * c)
+    else:
+        # calculate the difference of whole image
+        diff /= (h * w * c)
+
     return diff
 
 
@@ -32,6 +42,7 @@ for i in range(3):
     gt = config.get_file_name(i, "normal", data_type)
     if os.path.exists(gt):
         normal_gt = cv.imread(gt)
+        valid_pixels = get_valid_pixels(normal_gt)
     else:
         continue
 
@@ -44,8 +55,12 @@ for i in range(3):
             diffs[i, j - 3] = 0
             continue
     print(f"data {i}: mse {diffs}")
-chart.line_chart(diffs[:, :np.where(diffs[0, :] == 0)[0][0]-1],
+# remove 0 elements
+diffs = diffs[:, :np.where(diffs[0, :] == 0)[0][0] - 1]
+# visualisation
+chart.line_chart(diffs,
                  title="knn performance",
                  x_scale=[3, 1],
-                 y_scale=[1, 1])
-
+                 y_scale=[1, 1],
+                 x_label="k value",
+                 y_label="RGB difference")
