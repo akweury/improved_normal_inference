@@ -5,13 +5,15 @@ import numpy as np
 from plyfile import PlyData, PlyElement
 from sklearn.neighbors import KDTree
 
-k = 8
+import config
 
-file_path = "./SyntheticDataSet/CapturedData/"
-output_path = "./SyntheticDataSet/knn/"
+k = 8
+data_type = "synthetic"
+# data_type = "real"
+
 for k_idx in range(3, k):
     file_idx = 0
-    file_name = file_path + "0000" + str(file_idx) + ".pointcloud0.ply"
+    file_name = config.get_file_name(file_idx, "pointcloud", data_type)
     while path.exists(file_name):
         if file_idx > 2:
             break
@@ -22,16 +24,13 @@ for k_idx in range(3, k):
         vertexs_neighbors = vertex[ind]
         normals = np.zeros(shape=vertex.shape)
         for i in range(vertexs_neighbors.shape[0]):
-            # u, s, vh = np.linalg.svd(vertexs_neighbors[i] - np.mean(vertexs_neighbors[i], axis=1, keepdims=True))
             u, s, vh = np.linalg.svd(vertexs_neighbors[i])
-
-            v = vh.T
-            normal = v[:, -1]
-            normals[i] = normal * 0.5 + 0.5
+            normal = vh.T[:, -1]
+            normals[i] = normal * 0.5 + 0.5  # shift the range from [-1,1] to [0,1]
             normals[i][1] = 1 - normals[i][1]
             normals[i] = (normals[i] * 255).astype(np.int32)
-        normal_image = cv.imread(file_path + "0000" + str(file_idx) + ".normal0.png")
-        # normal_image = cv.imread(file_path + "OIP.jpg")
+        normal_image = cv.imread(config.get_file_name(file_idx, "normal", data_type))
+
         normal_idx = 0
         for i in range(normal_image.shape[0]):
             for j in range(normal_image.shape[1]):
@@ -39,6 +38,6 @@ for k_idx in range(3, k):
                     normal_image[i][j] = normals[normal_idx]
                     normal_idx += 1
 
-        cv.imwrite(output_path + "0000" + str(file_idx) + ".normal_knn_k" + str(k_idx) + ".png", normal_image)
+        cv.imwrite(config.get_output_file_name(file_idx, "knn", k_idx), normal_image)
         file_idx += 1
-        file_name = file_path + "0000" + str(file_idx) + ".pointcloud0.ply"
+        file_name = config.get_file_name(file_idx, "pointcloud", data_type)
