@@ -1,5 +1,8 @@
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+
+time_now = datetime.datetime.today()
 
 
 def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None):
@@ -21,4 +24,5 @@ def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_lab
     if y_label is not None:
         plt.ylabel(y_label)
 
+    plt.savefig(f"line_{title}_{x_label}_{y_label}_{time_now}.png")
     plt.show()

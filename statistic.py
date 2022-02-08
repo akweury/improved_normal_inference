@@ -1,14 +1,5 @@
-import os
 import numpy as np
-import cv2 as cv
 
-import config
-import chart
-
-data_type = "synthetic"
-
-
-# data_type = "real"
 
 def get_valid_pixels(img):
     return np.count_nonzero(np.sum(img, axis=2) > 0)
@@ -35,5 +26,3 @@ def mse(img_1, img_2, valid_pixels=None):
         diff /= (h * w * c)
 
     return diff
-
-
