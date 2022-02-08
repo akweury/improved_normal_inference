@@ -5,6 +5,8 @@ import cv2
 import torch
 import json
 
+import config
+
 
 def load_8bitImage(root):
     img = cv2.imread(root, -1)
@@ -147,22 +149,24 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
 
 
 # ----------------------------------------------------------------------------------
-path = 'SyntheticDataSet/CapturedData/0000'
-# path = 'RealDataSet/0000.'
-
 file_idx = 0
-file = path + str(file_idx) + ".data0" + ".json"
+file = config.get_file_name(file_idx, "data", "synthetic")
 
 while os.path.isfile(file):
+
     f = open(file)
     data = json.load(f)
     f.close()
 
-    image = load_8bitImage(path + str(file_idx) + f'.image0.png')
-    depth = load_scaled16bitImage(path + str(file_idx) + f'.depth0.png', data['minDepth'], data['maxDepth'])
-    vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1), torch.tensor(data['K']), torch.tensor(data['R']),
+    image = load_8bitImage(config.get_file_name(file_idx, "image", "synthetic"))
+    depth = load_scaled16bitImage(config.get_file_name(file_idx, "depth", "synthetic"),
+                                  data['minDepth'],
+                                  data['maxDepth'])
+    vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                          torch.tensor(data['K']),
+                          torch.tensor(data['R']),
                           torch.tensor(data['t']))
-    normal = load_24bitNormal(path + str(file_idx) + f'.normal0.png', torch.tensor(data['R']))
+    normal = load_24bitNormal(config.get_output_file_name(file_idx, "normal", "gt"), torch.tensor(data['R']))
     # mask = np.sum(np.abs(vertex), axis=2) != 0
     mask = np.sum(np.abs(depth), axis=2) != 0
     cameraPoints = cameraVisualization()
@@ -173,9 +177,10 @@ while os.path.isfile(file):
     for i in range(len(lightPoints)):
         lightPoints[i] = lightPoints[i] / 8 + np.array(data['lightPos'])
 
-    writePLY(vertex, normal, image, mask, path + str(file_idx) + f'.pointCloud0.ply',
+    point_cloud_file = config.get_file_name(file_idx, "pointcloud", "synthetic")
+    writePLY(vertex, normal, image, mask, point_cloud_file,
              cameraPoints=cameraPoints,
              lightPoints=lightPoints)
-
+    print(f"Saved {file_idx}-th ply file {point_cloud_file}...")
     file_idx += 1
-    file = path + str(file_idx) + ".data0" + ".json"
+    file = config.get_file_name(file_idx, "data", "synthetic")

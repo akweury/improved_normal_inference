@@ -37,30 +37,3 @@ def mse(img_1, img_2, valid_pixels=None):
     return diff
 
 
-diffs = np.zeros((3, 100 - 3))
-for i in range(3):
-    gt = config.get_file_name(i, "normal", data_type)
-    if os.path.exists(gt):
-        normal_gt = cv.imread(gt)
-        valid_pixels = get_valid_pixels(normal_gt)
-    else:
-        continue
-
-    for j in range(3, 100):
-        knn = config.get_output_file_name(i, "knn", j)
-        if os.path.exists(knn):
-            normal_knn = cv.imread(knn)
-            diffs[i, j - 3] = mse(normal_gt, normal_knn)
-        else:
-            diffs[i, j - 3] = 0
-            continue
-    print(f"data {i}: mse {diffs}")
-# remove 0 elements
-diffs = diffs[:, :np.where(diffs[0, :] == 0)[0][0] - 1]
-# visualisation
-chart.line_chart(diffs,
-                 title="knn performance",
-                 x_scale=[3, 1],
-                 y_scale=[1, 1],
-                 x_label="k value",
-                 y_label="RGB difference")
