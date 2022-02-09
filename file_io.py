@@ -173,7 +173,7 @@ def get_file_name(idx, file_type, data_type):
     return file_name
 
 
-def get_output_file_name(idx, file_type, method, data_type, param=0):
+def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
     if file_type == "normal":
         if method == "gt":
             if data_type == "synthetic_captured":
@@ -191,3 +191,11 @@ def get_output_file_name(idx, file_type, method, data_type, param=0):
 
     file_name = str(file_path / str(idx).zfill(5)) + f".{file_type}_{method}_{param}.png"
     return file_name
+
+
+def get_valid_pixels_idx(img):
+    h, w, c = img.shape
+    img_flatten = img.reshape((h * w, c))
+    mask = np.sum(img, axis=2) != 0
+
+    return mask

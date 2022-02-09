@@ -2,7 +2,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 
-time_now = datetime.datetime.today()
+time_now = datetime.datetime.today().date()
 
 
 def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None):

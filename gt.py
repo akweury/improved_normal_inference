@@ -29,7 +29,7 @@ while os.path.isfile(file):
                           torch.tensor(data['t']))
     normal = load_24bitNormal(get_output_file_name(file_idx, "normal", "gt", data_type), torch.tensor(data['R']))
     # mask = np.sum(np.abs(vertex), axis=2) != 0
-    mask = np.sum(np.abs(depth), axis=2) != 0
+    mask = np.sum(np.abs(normal), axis=2) != 0
     cameraPoints = cameraVisualization()
     for i in range(len(cameraPoints)):
         cameraPoints[i] = np.array(data['R']).transpose() @ cameraPoints[i] / 4 - np.array(
