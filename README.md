@@ -1,2 +1,8 @@
-# improved_normal_inference
-The project about a set of method to implement normal inference.
+# Improved Normal Inference
+
+TODO List:
+- A proper evaluation metric
+- A standard basic model dataset for very first validation of algorithms
+
+
+
