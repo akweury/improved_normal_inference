@@ -1,4 +1,5 @@
 import cv2
+import cv2 as cv
 import numpy as np
 import torch
 
@@ -54,7 +55,9 @@ def load_8bitImage(root):
     return img.astype(np.float32)
 
 
-def load_24bitNormal(root, R):
+def load_24bitNormal(root):
+    R = torch.tensor(np.identity(3)).float()
+
     nml = cv2.imread(root, -1)
     nml = np.array(nml, dtype=np.float32)
     nml = np.array(nml)
@@ -86,6 +89,8 @@ def load_scaled16bitImage(root, minVal, maxVal):
 
 
 def depth2vertex(depth, K, R, t):
+    c, h, w = depth.shape
+
     camOrig = -R.transpose(0, 1) @ t.unsqueeze(1)
 
     X = torch.arange(0, depth.size(2)).repeat(depth.size(1), 1) - K[0, 2]
@@ -95,7 +100,7 @@ def depth2vertex(depth, K, R, t):
 
     vertex = Dir * (depth.squeeze(0) / torch.norm(Dir, dim=2)).unsqueeze(2).repeat(1, 1, 3)
     vertex = R.transpose(0, 1) @ vertex.permute(2, 0, 1).reshape(3, -1)
-    vertex = camOrig.unsqueeze(1).repeat(1, 512, 512) + vertex.reshape(3, 512, 512)
+    vertex = camOrig.unsqueeze(1).repeat(1, h, w) + vertex.reshape(3, h, w)
     vertex = vertex.permute(1, 2, 0)
     return np.array(vertex)
 
@@ -175,6 +180,7 @@ def get_file_name(idx, file_type, data_type):
 
 def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
     if file_type == "normal":
+        suffix = ".png"
         if method == "gt":
             if data_type == "synthetic_captured":
                 file_path = gt_captured_output_path
@@ -186,10 +192,23 @@ def get_output_file_name(idx, file_type=None, method=None, data_type=None, param
             file_path = knn_output_path
         else:
             raise ValueError
+    elif file_type == 'pointcloud':
+        suffix = ".ply"
+        if method == "gt":
+            if data_type == "synthetic_captured":
+                file_path = synthetic_captured_data
+            elif data_type == "synthetic_basic":
+                file_path = synthetic_basic_data
+            else:
+                raise ValueError
+        elif method == "knn":
+            file_path = knn_output_path
+        else:
+            raise ValueError
     else:
         raise ValueError
 
-    file_name = str(file_path / str(idx).zfill(5)) + f".{file_type}_{method}_{param}.png"
+    file_name = str(file_path / str(idx).zfill(5)) + f".{file_type}_{method}_{param}{suffix}"
     return file_name
 
 
@@ -199,3 +218,16 @@ def get_valid_pixels_idx(img):
     mask = np.sum(img, axis=2) != 0
 
     return mask
+
+
+def copy_make_border(img, patch_width):
+    """
+    This function applies cv.copyMakeBorder to extend the image by patch_width/2
+    in top, bottom, left and right part of the image
+    Patches/windows centered at the border of the image need additional padding of size patch_width/2
+    """
+    offset = np.int32(patch_width / 2.0)
+    return cv.copyMakeBorder(img,
+                             top=offset, bottom=offset,
+                             left=offset, right=offset,
+                             borderType=cv.BORDER_REFLECT)
