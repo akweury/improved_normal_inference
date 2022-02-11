@@ -2,9 +2,9 @@ import cv2
 import cv2 as cv
 import numpy as np
 import torch
+from PIL import Image
 
-from improved_normal_inference.config import synthetic_basic_data, synthetic_captured_data, real_data, \
-    gt_basic_output_path, gt_captured_output_path, knn_output_path
+from improved_normal_inference.config import synthetic_basic_data, synthetic_captured_data, real_data, output_path
 
 
 def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoints=None):
@@ -88,6 +88,12 @@ def load_scaled16bitImage(root, minVal, maxVal):
     return img.astype(np.float32)
 
 
+def write_np2img(np_array, img_name):
+    img = Image.fromarray(np_array.astype(np.uint8), "RGB")
+    img.save(img_name)
+    return img
+
+
 def depth2vertex(depth, K, R, t):
     c, h, w = depth.shape
 
@@ -151,7 +157,7 @@ def lightVisualization():
     return points
 
 
-def get_file_name(idx, file_type, data_type):
+def get_file_name(idx, data_type):
     if data_type == "synthetic_basic":
         file_path = synthetic_basic_data
     elif data_type == "synthetic_captured":
@@ -161,50 +167,22 @@ def get_file_name(idx, file_type, data_type):
     else:
         raise ValueError
 
-    if file_type == "data":
-        suffix = ".json"
-    elif file_type == "image":
-        suffix = "Gray.png"
-    elif file_type == "depth":
-        suffix = ".png"
-    elif file_type == "pointcloud":
-        suffix = ".ply"
-    else:
-        print("File type not exist.")
-        raise ValueError
+    image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
+    ply_file = str(file_path / str(idx).zfill(5)) + ".pointcloud0.ply"
+    json_file = str(file_path / str(idx).zfill(5)) + f".data0.json"
+    depth_file = str(file_path / str(idx).zfill(5)) + f".depth0.png"
+    normal_file = str(file_path / str(idx).zfill(5)) + f".normal0.png"
 
-    file_name = str(file_path / str(idx).zfill(5)) + f".{file_type}0" + suffix
-
-    return file_name
+    return image_file, ply_file, json_file, depth_file, normal_file
 
 
 def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
+    file_path = output_path
+
     if file_type == "normal":
         suffix = ".png"
-        if method == "gt":
-            if data_type == "synthetic_captured":
-                file_path = gt_captured_output_path
-            elif data_type == "synthetic_basic":
-                file_path = gt_basic_output_path
-            else:
-                raise ValueError
-        elif method == "knn":
-            file_path = knn_output_path
-        else:
-            raise ValueError
     elif file_type == 'pointcloud':
         suffix = ".ply"
-        if method == "gt":
-            if data_type == "synthetic_captured":
-                file_path = synthetic_captured_data
-            elif data_type == "synthetic_basic":
-                file_path = synthetic_basic_data
-            else:
-                raise ValueError
-        elif method == "knn":
-            file_path = knn_output_path
-        else:
-            raise ValueError
     else:
         raise ValueError
 
@@ -213,11 +191,7 @@ def get_output_file_name(idx, file_type=None, method=None, data_type=None, param
 
 
 def get_valid_pixels_idx(img):
-    h, w, c = img.shape
-    img_flatten = img.reshape((h * w, c))
-    mask = np.sum(img, axis=2) != 0
-
-    return mask
+    return np.sum(img, axis=2) != 0
 
 
 def copy_make_border(img, patch_width):
