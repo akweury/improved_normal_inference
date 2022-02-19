@@ -1,5 +1,12 @@
 \begin{thebibliography}{1}
 
+\bibitem{Ben-Shabat_2019_CVPR}
+Yizhak Ben-Shabat, Michael Lindenbaum, and Anath Fischer.
+\newblock Nesti-net: Normal estimation for unstructured 3d point clouds using
+  convolutional neural networks.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, June 2019.
+
 \bibitem{Holzer.S}
 S.~Holzer, R.~B. Rusu, M.~Dixon, S.~Gedikli, and N.~Navab.
 \newblock Adaptive neighborhood selection for real-time surface normal

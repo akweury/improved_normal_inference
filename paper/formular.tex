@@ -2,16 +2,13 @@ RGB image will be stored as gray value Scene using following equation:
 \[ gray: \frac{r+2g+b}{4}  \]
 
 
-
-Capture Depth:
-\[   \]
-
-
 \subsection{Normal from k neighbors}
 
 Given a point $ p $ locating on plane $ \Pi $, calculate the normal $ n $ of plane $ \Pi $. 
 
-First, find the nearest $ k $ neighbors $ p_1,p_2,...,p_k $ of point $ p $ using KNN-algorithms. The plane $ \Pi $ containing point $ p $ can be fitted using the neighbors of point $ p $. Then the normal is available immediately.
+First, find the nearest $ k $ neighbors $ p_1,p_2,...,p_k $ of point $ p $ using KNN-algorithms. 
+The plane $ \Pi $ containing point $ p $ can be fitted using the neighbors of point $ p $. 
+Then the normal is available immediately.
 
 Assume all the neighbors of point $ p $ are in plane $ \Pi = ax+by+cz+d=0 $. Since we only need calculate the normal, thus with out loss of generation, we can set displacement $ d = 0 $. Then the normal $  \bn = (a,b,c)^T  $.
 
@@ -34,5 +31,10 @@ In order to calculate a valid normal, 3 points are required at least. For the sa
 	\end{array}
 \end{equation}
 Let the decomposition of $ P=U\Sigma V^T $, The solution i.e. normal is the last column of $ V $.
+
+
+\subsection{Normalized Convolution}
+
+
 
 

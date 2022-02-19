@@ -1,5 +1,5 @@
+import PIL.Image
 import cv2
-import cv2 as cv
 import numpy as np
 import torch
 from PIL import Image
@@ -88,86 +88,29 @@ def load_scaled16bitImage(root, minVal, maxVal):
     return img.astype(np.float32)
 
 
-def write_np2img(np_array, img_name):
-    img = Image.fromarray(np_array.astype(np.uint8), "RGB")
-    img.save(img_name)
-    return img
+def save_scaled16bitImage(img, img_name, minVal, maxVal):
+    img = img.reshape(512, 512)
+    img[np.isnan(img)] = 0
+    mask = (img == 0)
 
-
-def depth2vertex(depth, K, R, t):
-    c, h, w = depth.shape
-
-    camOrig = -R.transpose(0, 1) @ t.unsqueeze(1)
-
-    X = torch.arange(0, depth.size(2)).repeat(depth.size(1), 1) - K[0, 2]
-    Y = torch.transpose(torch.arange(0, depth.size(1)).repeat(depth.size(2), 1), 0, 1) - K[1, 2]
-    Z = torch.ones(depth.size(1), depth.size(2)) * K[0, 0]
-    Dir = torch.cat((X.unsqueeze(2), Y.unsqueeze(2), Z.unsqueeze(2)), 2)
-
-    vertex = Dir * (depth.squeeze(0) / torch.norm(Dir, dim=2)).unsqueeze(2).repeat(1, 1, 3)
-    vertex = R.transpose(0, 1) @ vertex.permute(2, 0, 1).reshape(3, -1)
-    vertex = camOrig.unsqueeze(1).repeat(1, h, w) + vertex.reshape(3, h, w)
-    vertex = vertex.permute(1, 2, 0)
-    return np.array(vertex)
-
-
-def cameraVisualization():
-    points = []
-    for p in range(-50, 51):
-        ps = float(p) / 100.0
-        points.append([ps, 0.5, 0.5])
-        points.append([ps, -0.5, 0.5])
-        points.append([ps, 0.5, -0.5])
-        points.append([ps, -0.5, -0.5])
-        points.append([0.5, ps, 0.5])
-        points.append([-0.5, ps, 0.5])
-        points.append([0.5, ps, -0.5])
-        points.append([-0.5, ps, -0.5])
-        points.append([0.5, 0.5, ps])
-        points.append([0.5, -0.5, ps])
-        points.append([-0.5, 0.5, ps])
-        points.append([-0.5, -0.5, ps])
-
-    for p in range(-30, 31):
-        ps = float(p) / 100.0
-        points.append([ps, 0.3, 0.3 + 0.8])
-        points.append([ps, -0.3, 0.3 + 0.8])
-        points.append([ps, 0.3, -0.3 + 0.8])
-        points.append([ps, -0.3, -0.3 + 0.8])
-        points.append([0.3, ps, 0.3 + 0.8])
-        points.append([-0.3, ps, 0.3 + 0.8])
-        points.append([0.3, ps, -0.3 + 0.8])
-        points.append([-0.3, ps, -0.3 + 0.8])
-        points.append([0.3, 0.3, ps + 0.8])
-        points.append([0.3, -0.3, ps + 0.8])
-        points.append([-0.3, 0.3, ps + 0.8])
-        points.append([-0.3, -0.3, ps + 0.8])
-
-    return points
-
-
-def lightVisualization():
-    points = []
-    for px in range(-5, 6):
-        for py in range(-5, 6):
-            for pz in range(-5, 6):
-                p = np.array([px, py, pz]).astype(np.float32) / 10
-                if np.linalg.norm(p) > 0:
-                    points.append(p / np.linalg.norm(p))
-    return points
+    img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
+    img = np.array(img, dtype=np.int32)
+    write_np2img(img, img_name)
 
 
 def get_file_name(idx, data_type):
     if data_type == "synthetic_basic":
         file_path = synthetic_basic_data
+        image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
     elif data_type == "synthetic_captured":
         file_path = synthetic_captured_data
+        image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
     elif data_type == "real":
         file_path = real_data
+        image_file = str(file_path / str(idx).zfill(5)) + ".image0.png"
     else:
         raise ValueError
 
-    image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
     ply_file = str(file_path / str(idx).zfill(5)) + ".pointcloud0.ply"
     json_file = str(file_path / str(idx).zfill(5)) + f".data0.json"
     depth_file = str(file_path / str(idx).zfill(5)) + f".depth0.png"
@@ -179,7 +122,7 @@ def get_file_name(idx, data_type):
 def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
     file_path = output_path
 
-    if file_type == "normal":
+    if file_type in ["normal", "depth"]:
         suffix = ".png"
     elif file_type == 'pointcloud':
         suffix = ".ply"
@@ -190,18 +133,7 @@ def get_output_file_name(idx, file_type=None, method=None, data_type=None, param
     return file_name
 
 
-def get_valid_pixels_idx(img):
-    return np.sum(img, axis=2) != 0
-
-
-def copy_make_border(img, patch_width):
-    """
-    This function applies cv.copyMakeBorder to extend the image by patch_width/2
-    in top, bottom, left and right part of the image
-    Patches/windows centered at the border of the image need additional padding of size patch_width/2
-    """
-    offset = np.int32(patch_width / 2.0)
-    return cv.copyMakeBorder(img,
-                             top=offset, bottom=offset,
-                             left=offset, right=offset,
-                             borderType=cv.BORDER_REFLECT)
+def write_np2img(np_array, img_name):
+    img = Image.fromarray(np_array.astype(np.uint32))
+    img.save(img_name)
+    return img

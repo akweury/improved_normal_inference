@@ -4,49 +4,51 @@ The top-level auxiliary file: template_Report.aux
 Reallocating 'name_of_file' (item size: 1) to 17 items.
 A level-1 auxiliary file: related_work.aux
 Reallocating 'name_of_file' (item size: 1) to 13 items.
+A level-1 auxiliary file: approach.aux
+Reallocating 'name_of_file' (item size: 1) to 13 items.
 A level-1 auxiliary file: formular.aux
 Reallocating 'name_of_file' (item size: 1) to 6 items.
 The style file: plain.bst
 Reallocating 'name_of_file' (item size: 1) to 10 items.
 Database file #1: reference.bib
-You've used 2 entries,
+You've used 3 entries,
             2118 wiz_defined-function locations,
-            510 strings with 4507 characters,
-and the built_in function-call counts, 949 in all, are:
-= -- 83
-> -- 61
+            517 strings with 4809 characters,
+and the built_in function-call counts, 1254 in all, are:
+= -- 108
+> -- 79
 < -- 1
-+ -- 24
-- -- 22
-* -- 67
-:= -- 152
-add.period$ -- 5
-call.type$ -- 2
-change.case$ -- 17
++ -- 31
+- -- 28
+* -- 87
+:= -- 203
+add.period$ -- 8
+call.type$ -- 3
+change.case$ -- 23
 chr.to.int$ -- 0
-cite$ -- 2
-duplicate$ -- 32
-empty$ -- 67
-format.name$ -- 22
-if$ -- 202
+cite$ -- 3
+duplicate$ -- 46
+empty$ -- 95
+format.name$ -- 28
+if$ -- 266
 int.to.chr$ -- 0
-int.to.str$ -- 2
-missing$ -- 1
-newline$ -- 12
-num.names$ -- 4
-pop$ -- 25
+int.to.str$ -- 3
+missing$ -- 2
+newline$ -- 17
+num.names$ -- 6
+pop$ -- 35
 preamble$ -- 1
-purify$ -- 15
+purify$ -- 20
 quote$ -- 0
-skip$ -- 31
+skip$ -- 38
 stack$ -- 0
-substring$ -- 46
-swap$ -- 14
+substring$ -- 51
+swap$ -- 16
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
+type$ -- 12
 warning$ -- 0
-while$ -- 6
-width$ -- 3
-write$ -- 21
+while$ -- 8
+width$ -- 4
+write$ -- 31

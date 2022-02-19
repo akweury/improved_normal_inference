@@ -4,18 +4,15 @@ import cv2 as cv
 import numpy as np
 import torch
 
+import improved_normal_inference.help_funs.file_io
+import improved_normal_inference.help_funs.mu
 from improved_normal_inference.help_funs import file_io, mu
-from improved_normal_inference.help_funs.file_io import copy_make_border
-from improved_normal_inference.help_funs.mu import normal2RGB
-from ply_generator import generate_ply
-
-k_min, k_max = 2, 3
-data_type = "synthetic_basic"
+from improved_normal_inference.help_funs.mu import normal2RGB, copy_make_border
+from improved_normal_inference.help_funs.ply_generator import generate_ply
 
 
 # data_type = "synthetic_captured"
 # data_type = "real"
-
 
 def compute_normal(vertex, mask, k):
     normals = np.zeros(shape=vertex.shape)
@@ -60,10 +57,10 @@ def knn_normal(file_idx, k_min=1, k_max=3):
         data['t'] = np.zeros(3)
 
         # calculate vertex from depth map
-        vertex = file_io.depth2vertex(torch.tensor(depth_padded).permute(2, 0, 1),
-                                      torch.tensor(data['K']),
-                                      torch.tensor(data['R']).float(),
-                                      torch.tensor(data['t']).float())
+        vertex = improved_normal_inference.help_funs.mu.depth2vertex(torch.tensor(depth_padded).permute(2, 0, 1),
+                                                                     torch.tensor(data['K']),
+                                                                     torch.tensor(data['R']).float(),
+                                                                     torch.tensor(data['t']).float())
         mask = np.sum(np.abs(depth_padded), axis=2) != 0
 
         # compute normals from neighbors
@@ -71,7 +68,7 @@ def knn_normal(file_idx, k_min=1, k_max=3):
         normals_rgb = normal2RGB(normals, mask)
         # generate point clouds, save calculated normal image and ground truth image
         generate_ply(file_idx, normals, data_type=data_type, param=k_idx)
-        file_io.write_np2img(normals_rgb, file_io.get_output_file_name(file_idx, "normal", "knn", data_type, k_idx))
+        improved_normal_inference.help_funs.file_io.write_np2img(normals_rgb, file_io.get_output_file_name(file_idx, "normal", "knn", data_type, k_idx))
         cv.imwrite(file_io.get_output_file_name(file_idx, "normal", "knn", data_type, 0), normal_gt)
 
         # # calculate the difference between calculated image and ground truth image
@@ -82,6 +79,7 @@ def knn_normal(file_idx, k_min=1, k_max=3):
 
         print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', data_type, k_idx)}")
         print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', data_type, 0)}")
+
 
 # --------------------------- visualisation -------------------------------- #
 # if k_max - k_min < 2:
@@ -121,5 +119,7 @@ def knn_normal(file_idx, k_min=1, k_max=3):
 #                  y_label="RGB_difference")
 
 if __name__ == '__main__':
-    file_idx = 1
+    k_min, k_max = 2, 3
+    data_type = "real"
+    file_idx = 0
     knn_normal(file_idx, k_min, k_max)
