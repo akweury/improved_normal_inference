@@ -14,8 +14,10 @@ def create_dataloader(args, eval_mode=False):
     print('==> Loading dataset "{}" .. \n'.format(args.dataset))
     if args.dataset_path == 'machine':
         get_data_set_path(args)
-
-    train_loader, val_loader = create_synthetic_depth_dataloader(args, eval_mode)
+    if args.dataset == "synthetic":
+        train_loader, val_loader = create_synthetic_depth_dataloader(args, eval_mode)
+    else:
+        raise ValueError
     val_set = args.val_ds
 
     if not eval_mode:
@@ -27,7 +29,7 @@ def create_dataloader(args, eval_mode=False):
     return train_loader, val_loader
 
 
-################### KITTI DEPTH ###################
+################### Synthetic DEPTH ###################
 def create_synthetic_depth_dataloader(args, eval_mode=False):
     # Input images are 16-bit, but only 15-bits are utilized, so we normalized the data to [0:1] using a normalization factor
     norm_factor = args.norm_factor

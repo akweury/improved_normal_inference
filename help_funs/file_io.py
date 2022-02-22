@@ -1,10 +1,10 @@
-import PIL.Image
 import cv2
 import numpy as np
 import torch
 from PIL import Image
+from pathlib import Path
 
-from improved_normal_inference.config import synthetic_basic_data, synthetic_captured_data, real_data, output_path
+from improved_normal_inference import config
 
 
 def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoints=None):
@@ -55,6 +55,11 @@ def load_8bitImage(root):
     return img.astype(np.float32)
 
 
+def load_16bitImage(root):
+    img = cv2.imread(root, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+    return img
+
+
 def load_24bitNormal(root):
     R = torch.tensor(np.identity(3)).float()
 
@@ -95,33 +100,23 @@ def save_scaled16bitImage(img, img_name, minVal, maxVal):
 
     img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
     img = np.array(img, dtype=np.int32)
-    write_np2img(img, img_name)
+    img = write_np2img(img, img_name)
+    return img
 
 
-def get_file_name(idx, data_type):
-    if data_type == "synthetic_basic":
-        file_path = synthetic_basic_data
-        image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
-    elif data_type == "synthetic_captured":
-        file_path = synthetic_captured_data
-        image_file = str(file_path / str(idx).zfill(5)) + ".image0Gray.png"
-    elif data_type == "real":
-        file_path = real_data
-        image_file = str(file_path / str(idx).zfill(5)) + ".image0.png"
-    else:
-        raise ValueError
+def get_file_name(idx, data_path):
+    image_file = str(data_path / str(idx).zfill(5)) + ".image0.png"
+    ply_file = str(data_path / str(idx).zfill(5)) + ".pointcloud0.ply"
+    json_file = str(data_path / str(idx).zfill(5)) + f".data0.json"
+    depth_file = str(data_path / str(idx).zfill(5)) + f".depth0_noise.png"
+    depth_gt_file = str(data_path / str(idx).zfill(5)) + f".depth0_gt.png"
 
-    ply_file = str(file_path / str(idx).zfill(5)) + ".pointcloud0.ply"
-    json_file = str(file_path / str(idx).zfill(5)) + f".data0.json"
-    depth_file = str(file_path / str(idx).zfill(5)) + f".depth0.png"
-    normal_file = str(file_path / str(idx).zfill(5)) + f".normal0.png"
+    normal_file = str(data_path / str(idx).zfill(5)) + f".normal0.png"
 
-    return image_file, ply_file, json_file, depth_file, normal_file
+    return image_file, ply_file, json_file, depth_file, depth_gt_file, normal_file
 
 
 def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
-    file_path = output_path
-
     if file_type in ["normal", "depth"]:
         suffix = ".png"
     elif file_type == 'pointcloud':
@@ -129,11 +124,18 @@ def get_output_file_name(idx, file_type=None, method=None, data_type=None, param
     else:
         raise ValueError
 
-    file_name = str(file_path / str(idx).zfill(5)) + f".{file_type}_{method}_{param}{suffix}"
-    return file_name
+    folder_path = config.output_path
+    file_name = str(idx).zfill(5) + f".{file_type}_{method}_{param}{suffix}"
+    file_path = file_path_abs(folder_path, file_name)
+
+    return file_path
 
 
 def write_np2img(np_array, img_name):
     img = Image.fromarray(np_array.astype(np.uint32))
     img.save(img_name)
     return img
+
+
+def file_path_abs(folder_path, file_name):
+    return str(Path(folder_path) / str(file_name))
