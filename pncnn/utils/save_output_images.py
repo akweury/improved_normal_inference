@@ -48,7 +48,8 @@ class SyntheticOutputImageSaver(OutputImageSaver):
         else:
             cout = None
             cin = None
-        d_out_folder = self.exp_dir / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_output'
+        outimg_path = self.exp_dir / "output"
+        d_out_folder = outimg_path / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_output'
         if not os.path.exists(d_out_folder):
             os.mkdir(d_out_folder)
         d_out_path = d_out_folder / f'{str(i * d_out.shape[0] + i).zfill(5)}.png'
@@ -58,7 +59,7 @@ class SyntheticOutputImageSaver(OutputImageSaver):
         file_io.save_scaled16bitImage(d_out, d_out_path, d_min, d_max)
 
         if cout is not None:
-            cout_folder = self.exp_dir / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_cout'
+            cout_folder = outimg_path / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_cout'
             if not os.path.exists(cout_folder):
                 os.mkdir(cout_folder)
 
@@ -68,7 +69,7 @@ class SyntheticOutputImageSaver(OutputImageSaver):
             # self.save_torch2rbgimg(cout, cout_path)
 
         if cin is not None:
-            cin_folder = self.exp_dir / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_cin'
+            cin_folder = outimg_path / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_cin'
             if not os.path.exists(cin_folder):
                 os.mkdir(cin_folder)
             cin_path = cin_folder / f'{str(i * cin.shape[0] + i).zfill(5)}.png'

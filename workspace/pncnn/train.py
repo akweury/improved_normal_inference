@@ -74,8 +74,7 @@ def train_epoch(model_param, epoch):
         err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
         if (i + 1) % model_param['args'].print_freq == 0 or i == len(model_param['train_loader']) - 1:
-            print('[Train] Epoch ({}) [{}/{}]: '.format(
-                epoch, i + 1, len(model_param['train_loader'])), end='')
+            print(f"[Train] Epoch ({epoch}) [{i + 1}/{len(model_param['train_loader'])}]: ", end='')
             print(err_avg)
 
         # Log to Tensorboard if enabled
