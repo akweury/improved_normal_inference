@@ -4,7 +4,7 @@ import torch
 from PIL import Image
 from pathlib import Path
 
-from improved_normal_inference import config
+import config
 
 
 def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoints=None):

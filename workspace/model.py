@@ -1,20 +1,23 @@
 import datetime
 import importlib
-import os
+import os, sys
+from os.path import dirname
+
+sys.path.append(dirname(__file__))
 
 import torch
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 
-from improved_normal_inference import config
-from improved_normal_inference.pncnn.utils import args_parser
-from improved_normal_inference.pncnn.utils.save_output_images import colored_depthmap_tensor
-from improved_normal_inference.pncnn.dataloaders import my_creator
-from improved_normal_inference.pncnn.utils import checkpoints
-from improved_normal_inference.pncnn.utils import eval_uncertainty
-from improved_normal_inference.pncnn.utils import error_metrics
-from improved_normal_inference.pncnn.common import losses
-from improved_normal_inference.pncnn.utils import args_parser
+import config
+from pncnn.utils import args_parser
+from pncnn.utils.save_output_images import colored_depthmap_tensor
+from pncnn.dataloaders import my_creator
+from pncnn.utils import checkpoints
+from pncnn.utils import eval_uncertainty
+from pncnn.utils import error_metrics
+from pncnn.common import losses
+from pncnn.utils import args_parser
 
 
 def save_best_model(model_param, test_err_avg, epoch):

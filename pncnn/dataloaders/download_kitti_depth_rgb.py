@@ -3,7 +3,7 @@
 
 import os
 import requests
-import improved_normal_inference.config as config
+import config
 download_rgb = False
 
 # Where you want to download kitti-depth

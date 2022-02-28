@@ -9,8 +9,8 @@ import argparse
 import os
 import json
 
-from improved_normal_inference.pncnn.common.losses import get_loss_list
-from improved_normal_inference import config
+from pncnn.common.losses import get_loss_list
+import config
 
 # Lists for args which have mandatory selections
 datasets_list = ['nyudepthv2', 'kitti_depth', 'synthetic', 'kitti_odo', 'flat']
@@ -96,7 +96,7 @@ def args_parser():
                         help='number of sparse depth samples (default: 0)')
     parser.add_argument('--max-depth', default=-1.0, type=float, metavar='D',
                         help='cut-off depth of sparsifier, negative values means infinity (default: inf [m])')
-    from improved_normal_inference.pncnn.dataloaders.nyu_transforms import UniformSampling, SimulatedStereo
+    from pncnn.dataloaders.nyu_transforms import UniformSampling, SimulatedStereo
     sparsifier_names = [x.name for x in [UniformSampling, SimulatedStereo]]
     parser.add_argument('--sparsifier', metavar='SPARSIFIER', default=UniformSampling.name, choices=sparsifier_names,
                         help='sparsifier: ' + ' | '.join(sparsifier_names) + ' (default: ' + UniformSampling.name + ')')

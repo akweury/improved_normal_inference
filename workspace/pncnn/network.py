@@ -5,12 +5,15 @@ __version__ = "0.1"
 __maintainer__ = "Abdelrahman Eldesokey"
 __email__ = "abdo.eldesokey@gmail.com"
 ########################################
+import os, sys
+from os.path import dirname
+sys.path.append(dirname(__file__))
 
 import torch
 import torch.nn as nn
 
-from improved_normal_inference.pncnn.common.unet import UNetSP
-from improved_normal_inference.pncnn.common.nconv import NConvUNet
+from pncnn.common.unet import UNetSP
+from pncnn.common.nconv import NConvUNet
 
 
 class CNN(nn.Module):

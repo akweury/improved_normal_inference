@@ -1,13 +1,10 @@
-import os
+
 import numpy as np
-from torchvision import transforms
 from torch.utils.data import DataLoader
 
-import improved_normal_inference.pncnn.dataloaders as dataloaders
-from improved_normal_inference import config
 # Kitti_dept
-from improved_normal_inference.pncnn.dataloaders.SyntheticDepthDataset import SyntheticDepthDataset
-from improved_normal_inference import config
+from pncnn.dataloaders.SyntheticDepthDataset import SyntheticDepthDataset
+import config
 
 
 def create_dataloader(args, eval_mode=False):

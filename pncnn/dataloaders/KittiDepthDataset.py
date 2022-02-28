@@ -15,7 +15,7 @@ import glob
 import os
 from torchvision import transforms
 
-from improved_normal_inference import config
+import config
 
 
 class KittiDepthDataset(Dataset):

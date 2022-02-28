@@ -3,8 +3,8 @@ import numpy as np
 import argparse
 import os
 import sys
-from improved_normal_inference.pncnn.dataloaders.dataloader_creator import create_dataloader
-from improved_normal_inference.pncnn.utils.sparsification_plot import sparsification_plot
+from pncnn.dataloaders.dataloader_creator import create_dataloader
+from pncnn.utils.sparsification_plot import sparsification_plot
 import matplotlib.pylab as plt
 
 

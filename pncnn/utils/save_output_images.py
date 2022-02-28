@@ -4,7 +4,7 @@ import os
 import cv2 as cv
 import torch
 from PIL import Image
-from improved_normal_inference.help_funs import file_io
+from help_funs import file_io
 
 cmap = plt.cm.viridis
 

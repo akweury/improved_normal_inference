@@ -15,8 +15,9 @@ import glob
 import os
 import json
 from torchvision import transforms
-from improved_normal_inference import config
-from improved_normal_inference.help_funs import file_io
+
+import config
+from help_funs import file_io
 
 
 class SyntheticDepthDataset(Dataset):

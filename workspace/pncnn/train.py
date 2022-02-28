@@ -9,16 +9,17 @@ Created on Mon Feb 25 14:16:29 2019
 """
 import os, sys
 from os.path import dirname
+
 sys.path.append(dirname(__file__))
 
 import time
 import torch
 
-from improved_normal_inference.workspace.pncnn import network
-from improved_normal_inference.pncnn.utils.error_metrics import create_error_metric, AverageMeter
-from improved_normal_inference.workspace import model
-from improved_normal_inference.pncnn.utils import save_output_images
-from improved_normal_inference.pncnn.utils import checkpoints
+from workspace import model
+from workspace.pncnn import network
+from pncnn.utils.error_metrics import create_error_metric, AverageMeter
+from pncnn.utils import save_output_images
+from pncnn.utils import checkpoints
 
 
 ############ TRAINING FUNCTION ############
@@ -49,7 +50,7 @@ def train_epoch(model_param, epoch):
     for i, (input, target) in enumerate(model_param['train_loader']):
         input, target = input.to(model_param['device']), target.to(model_param['device'])
 
-        # torch.cuda.synchronize()  # Wait for all kernels to finish
+        torch.cuda.synchronize()  # Wait for all kernels to finish
 
         data_time = time.time() - start
 
@@ -178,8 +179,8 @@ def evaluate_epoch(model_param, epoch):
     return err_avg, out_image, ause, ause_fig
 
 
-def main():
-    model_param = model.init_env(network)
+def main(model_param):
+
 
     ############ TRAINING LOOP ############
     for epoch in range(model_param['start_epoch'], model_param['args'].epochs):

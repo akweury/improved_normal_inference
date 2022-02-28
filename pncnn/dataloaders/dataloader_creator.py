@@ -3,18 +3,17 @@ import numpy as np
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
-
-import improved_normal_inference.pncnn.dataloaders as dataloaders
+import pncnn.dataloaders as dataloaders
 
 # Kitti_dept
-from improved_normal_inference.pncnn.dataloaders.KittiDepthDataset import KittiDepthDataset
+from pncnn.dataloaders.KittiDepthDataset import KittiDepthDataset
 
 # vKitti
 from .vKittiDataset import VKittiDataset, VkittiDatasetWrapper
 from torch.utils.data import RandomSampler
 
 # NYU
-from improved_normal_inference.pncnn.dataloaders.nyu_transforms import UniformSampling, SimulatedStereo
+from pncnn.dataloaders.nyu_transforms import UniformSampling, SimulatedStereo
 
 
 def create_dataloader(args, eval_mode=False):

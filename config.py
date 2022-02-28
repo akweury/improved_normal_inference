@@ -1,8 +1,7 @@
 import os
 from pathlib import Path
 
-root = Path(os.getcwd())
-
+root = Path(__file__).parents[0]
 dataset = root / "dataset"
 ws_path = root / "workspace"
 output_path = root / "output"
