@@ -68,7 +68,7 @@ def init_env(network):
     args = args_parser.args_parser()
     model_param['args'] = args
 
-    if args.gpu == -1:
+    if args.cpu:
         device = "cpu"
     else:
         device = args.gpu

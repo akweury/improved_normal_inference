@@ -1,4 +1,5 @@
-{"args": "json",
+{"cpu": true,
+"args": "json",
 "exp": "pncnn",
 "workspace": "synthetic",
 "resume": null,

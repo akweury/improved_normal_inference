@@ -49,6 +49,8 @@ class SyntheticOutputImageSaver(OutputImageSaver):
             cout = None
             cin = None
         outimg_path = self.exp_dir / "output"
+        if not os.path.exists(outimg_path):
+            os.mkdir(outimg_path)
         d_out_folder = outimg_path / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_output'
         if not os.path.exists(d_out_folder):
             os.mkdir(d_out_folder)

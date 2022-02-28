@@ -37,6 +37,10 @@ def args_parser():
     parser = argparse.ArgumentParser(description='NConv')
 
     # Mode selection
+
+    parser.add_argument('--cpu', '-c', type=bool, default='', choices=[False, True],
+                        help='Use CPU for training?')
+
     parser.add_argument('--args', '-a', type=str, default='', choices=['defaults', 'json'],
                         help='How to read args? (json file or dataset defaults)')
 

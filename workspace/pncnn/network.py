@@ -27,7 +27,7 @@ class CNN(nn.Module):
     def forward(self, x0):  
 
         c0 = self.conf_estimator(x0) #  estimate the input confidence
-        xout, cout = self.nconv(x0, c0) # estimated value of depth
+        xout, cout = self.nconv(x0, c0, cpu=True) # estimated value of depth
         cout = self.var_estimator(cout) #
         out = torch.cat((xout, cout, c0), 1)
         return out
