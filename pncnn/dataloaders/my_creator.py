@@ -4,7 +4,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 
 import improved_normal_inference.pncnn.dataloaders as dataloaders
-
+from improved_normal_inference import config
 # Kitti_dept
 from improved_normal_inference.pncnn.dataloaders.SyntheticDepthDataset import SyntheticDepthDataset
 from improved_normal_inference import config
@@ -49,12 +49,14 @@ def create_synthetic_depth_dataloader(args, eval_mode=False):
     train_loader = []
     val_loader = []
 
+    ds_dir = eval(f"config.{ds_dir}")
+
     if eval_mode is not True:
         ###### Training Set ######
         # trans_list = [transforms.CenterCrop((352, 1216))]
         # train_transform = transforms.Compose(trans_list)
         train_dataset = SyntheticDepthDataset(ds_dir, setname='train', invert_depth=invert_depth,
-                                              load_rgb=load_rgb, synthetic_rgb_path=rgb_dir, rgb2gray=rgb2gray,
+                                              load_rgb=load_rgb, rgb2gray=rgb2gray,
                                               hflip=data_aug)
 
         # Select the desired number of images from the training set
@@ -67,11 +69,11 @@ def create_synthetic_depth_dataloader(args, eval_mode=False):
         train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size, num_workers=args.workers)
 
     # Validation set
-    if val_set == 'val':
+    if val_set == 'selval':
         ###### Validation Set ######
-        val_dataset = SyntheticDepthDataset(ds_dir, setname='val', transform=None,
+        val_dataset = SyntheticDepthDataset(ds_dir, setname='selval', transform=None,
                                             invert_depth=invert_depth,
-                                            load_rgb=load_rgb, synthetic_rgb_path=rgb_dir, rgb2gray=rgb2gray)
+                                            load_rgb=load_rgb, rgb2gray=rgb2gray)
 
         val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
 
@@ -79,15 +81,15 @@ def create_synthetic_depth_dataloader(args, eval_mode=False):
         ###### Selected Validation set ######
         val_dataset = SyntheticDepthDataset(ds_dir, setname='selval', transform=None,
                                             invert_depth=invert_depth,
-                                            load_rgb=load_rgb, synthetic_rgb_path=rgb_dir, rgb2gray=rgb2gray)
+                                            load_rgb=load_rgb, rgb2gray=rgb2gray)
 
         val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
 
     elif val_set == 'test':
         ###### Test set ######
         val_dataset = SyntheticDepthDataset(ds_dir, setname='test', transform=None,
-                                            norm_factor=norm_factor, invert_depth=invert_depth,
-                                            load_rgb=load_rgb, synthetic_rgb_path=rgb_dir, rgb2gray=rgb2gray)
+                                            invert_depth=invert_depth,
+                                            load_rgb=load_rgb, rgb2gray=rgb2gray)
 
         val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
 
@@ -95,5 +97,4 @@ def create_synthetic_depth_dataloader(args, eval_mode=False):
 
 
 def get_data_set_path(args):
-    args.dataset_path = config.synthetic_captured_data_noise
-    args.raw_kitti_path = config.synthetic_captured_data_noise
+    args.dataset_path = config.synthetic_data

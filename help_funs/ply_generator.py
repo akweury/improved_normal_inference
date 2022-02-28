@@ -5,10 +5,10 @@ import json
 from improved_normal_inference.help_funs.file_io import writePLY, load_8bitImage, load_24bitNormal, load_scaled16bitImage, \
     get_file_name, get_output_file_name
 from improved_normal_inference.help_funs.mu import lightVisualization, cameraVisualization, depth2vertex
+from improved_normal_inference import config
 
-
-def generate_ply(file_idx, normal, data_type, param=0):
-    image_file, ply_file, json_file, depth_file, normal_file = get_file_name(file_idx, data_type)
+def generate_ply(file_idx, normal, data_path, param=0):
+    image_file, ply_file, json_file, depth_file, normal_file = get_file_name(file_idx, data_path)
 
     f = open(json_file)
     data = json.load(f)
@@ -41,8 +41,8 @@ def generate_ply(file_idx, normal, data_type, param=0):
 
 if __name__ == '__main__':
     file_idx = 0
-    data_type = "synthetic_basic"
+    data_path = config.synthetic_data / 'train'
 
-    image_file, ply_file, json_file, depth_file, normal_file = get_file_name(file_idx, data_type)
+    image_file, ply_file, json_file, depth_file, normal_file = get_file_name(file_idx, data_path)
     normal = load_24bitNormal(normal_file)
-    generate_ply(file_idx, normal, data_type=data_type)
+    generate_ply(file_idx, normal, data_path=data_path)

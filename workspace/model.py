@@ -33,11 +33,11 @@ def save_best_model(model_param, test_err_avg, epoch):
 def log_to_tensorboard(tb_writer, test_err_avg, ause, ause_fig, out_image, epoch):
     if tb_writer is not None:
         avg_meter = test_err_avg.get_avg()
-        tb_writer.add_scalar('Loss/val', avg_meter.loss, epoch)
-        tb_writer.add_scalar('MAE/val', avg_meter.metrics['mae'], epoch)
-        tb_writer.add_scalar('RMSE/val', avg_meter.metrics['rmse'], epoch)
+        tb_writer.add_scalar('Loss/selval', avg_meter.loss, epoch)
+        tb_writer.add_scalar('MAE/selval', avg_meter.metrics['mae'], epoch)
+        tb_writer.add_scalar('RMSE/selval', avg_meter.metrics['rmse'], epoch)
         if ause is not None:
-            tb_writer.add_scalar('AUSE/val', ause, epoch)
+            tb_writer.add_scalar('AUSE/selval', ause, epoch)
         # TODO: change colored depthmap tensor function to a correct one.
         tb_writer.add_images('Prediction', colored_depthmap_tensor(out_image[:, :1, :, :]), epoch)
         tb_writer.add_images('Input_Conf_Log_Scale', colored_depthmap_tensor(torch.log(out_image[:, 2:, :, :] + 1)),

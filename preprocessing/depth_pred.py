@@ -11,7 +11,7 @@ from improved_normal_inference import config
 from improved_normal_inference.preprocessing import data_preprocess
 
 
-def denoise(depth):
+def median_filter(depth):
     # TODO: pred the depth of each pixel
     # use a simple CNN to predict depth in each pixel
     padding = 2  # 2 optimal
@@ -36,49 +36,20 @@ def denoise(depth):
 
     return pred_depth.reshape(512, 512)
 
-
-# def repair_depth_map(data, depth, method=None):
-#     # get file names from dataset
-#
-#     data['R'] = np.identity(3)
-#     data['t'] = np.zeros(3)
-#
-#     mask = np.sum(np.abs(depth), axis=2) != 0
-#     h, w, c = depth.shape
-#
-#     pred_depth = pred(depth, ~mask)
-#     depth_mended = np.zeros(shape=depth.shape)
-#     for i in range(h):
-#         for j in range(w):
-#             if mask[i, j]:
-#                 depth_mended[i, j] = depth[i, j]
-#             elif mask[i, j]:
-#                 depth_mended[i, j] = pred_depth[i, j]
-#
-#     # img = cv.imread(image_file)
-#     # sobelx = cv.Sobel(img, cv.CV_64F, 1, 0, ksize=5)
-#     # sobely = cv.Sobel(img, cv.CV_64F, 0, 1, ksize=5)
-#     # laplacian = cv.Laplacian(img, cv.CV_64F)
-#     # cv.imshow('sobelx', sobelx)
-#     # cv.imshow('sobely', sobely)
-#     # cv.imshow('laplacian', laplacian)
-#     # cv.waitKey(0)
-#     # cv.destroyAllWindows()
-#     return depth_mended.reshape(512, 512), pred_depth.reshape(512, 512)
-
-
 if __name__ == '__main__':
-    img_path = str(config.dataset / "gradual2d_512.png")  # basic image
+    # img_path = str(config.dataset / "gradual2d_512.png")  # basic image
     # img_path = str(config.data_3 / "00003.depth0_gt.png")  # basic image
-    # img_path = str(config.synthetic_data / "TrainData" / "00000.depth0.png") # synthetic image
+    img_path = str(config.synthetic_data / "TrainData" / "00000.depth0.png")  # synthetic image
 
     original_16bit = file_io.load_16bitImage(img_path)
     original_noise_16bit = data_preprocess.noisy_1channel(original_16bit)
 
     original = cv.normalize(original_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     original_noise = cv.normalize(original_noise_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    original_denoise = denoise(original_noise)
-    difference = original - original_denoise
+    original_denoise = median_filter(original_noise)
+    difference_16bit = original - original_denoise
+    difference = cv.normalize(difference_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+
     diff_noise = np.sum(original).astype(np.int64) - np.sum(original_noise).astype(np.int64)
     diff_denoise = np.sum(original).astype(np.int64) - np.sum(original_denoise).astype(np.int64)
 

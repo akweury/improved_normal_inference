@@ -23,22 +23,21 @@ class SyntheticDepthDataset(Dataset):
 
     def __init__(self, synthetic_depth_path,
                  setname='train', transform=None, invert_depth=False, load_rgb=False,
-                 synthetic_rgb_path=None, rgb2gray=False, hflip=False):
+                 rgb2gray=False, hflip=False):
 
-        self.synthetic_depth_path = config.synthetic_captured_data_noise
+        self.synthetic_depth_path = synthetic_depth_path
         self.setname = setname
         self.transform = transform
         self.invert_depth = invert_depth
         self.load_rgb = load_rgb
-        self.synthetic_rgb_path = config.synthetic_captured_data_noise
         self.rgb2gray = rgb2gray
         self.hflip = hflip
 
-        if setname in ['train', 'val']:
+        if setname in ['train', 'selval']:
             depth_path = self.synthetic_depth_path
             self.depth = np.array(
                 sorted(glob.glob(str(depth_path / "train" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0_gt.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "train" / "*data0.json"), recursive=True)))
 
             self.gt = self.gt[:10]
@@ -47,7 +46,7 @@ class SyntheticDepthDataset(Dataset):
         elif setname == 'selval':
             depth_path = self.synthetic_depth_path
             self.depth = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0_gt.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "eval" / "*data0.json"), recursive=True)))
 
             self.gt = self.gt[:10]
@@ -58,7 +57,7 @@ class SyntheticDepthDataset(Dataset):
         elif setname == 'test':
             depth_path = self.synthetic_depth_path
             self.depth = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0_gt.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
 
             self.gt = self.gt[:10]
@@ -89,6 +88,9 @@ class SyntheticDepthDataset(Dataset):
         # Normalize the depth
         depth = depth.reshape(512, 512)
         gt = gt.reshape(512, 512)
+
+        # gt = gt.reshape(512, 512,3)
+
         depth = depth / data['maxDepth']  # [0,1]
         gt = gt / data['maxDepth']
 

@@ -7,19 +7,22 @@ dataset = root / "dataset"
 ws_path = root / "workspace"
 output_path = root / "output"
 pncnn_path = root / "pncnn"
-real_data = root / "RealDataSet"
-synthetic_data = root / "SyntheticDataSet"
-
 
 # basic dataset path
-data_3 = synthetic_data / "BasicData" / "3"
-data_3_noise = synthetic_data / "BasicData" / "3_noise"
+geo_data = dataset / "data_geometrical_body"
 
 # synthetic dataset path
-synthetic_basic_data = synthetic_data / "BasicData"
-synthetic_captured_data = synthetic_data / "TrainData"
-synthetic_captured_data_test = synthetic_data / "TestData"
-synthetic_captured_data_noise = synthetic_data / "DataNoise"
+synthetic_data = dataset / "data_synthetic"
+synthetic_data_noise = dataset / "data_synthetic_noise"
+
+# real dataset path
+real_data = dataset / "data_real"
+
+# # synthetic dataset path
+# synthetic_basic_data = synthetic_data / "BasicData"
+# synthetic_captured_data = synthetic_data / "TrainData"
+# synthetic_captured_data_test = synthetic_data / "TestData"
+# synthetic_captured_data_noise = synthetic_data / "DataNoise"
 
 # kitti dataset path
 gt_path_kitti = dataset / "data_depth_annotated" / "train" / "2011_09_26_drive_0001_sync"

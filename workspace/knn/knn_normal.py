@@ -9,6 +9,7 @@ import improved_normal_inference.help_funs.mu
 from improved_normal_inference.help_funs import file_io, mu
 from improved_normal_inference.help_funs.mu import normal2RGB, copy_make_border
 from improved_normal_inference.help_funs.ply_generator import generate_ply
+from improved_normal_inference import config
 
 
 # data_type = "synthetic_captured"
@@ -42,7 +43,7 @@ def knn_normal(file_idx, k_min=1, k_max=3):
         print(f"k={k_idx} ")
 
         # get file names from dataset
-        image_file, ply_file, json_file, depth_file, normal_file = file_io.get_file_name(file_idx, data_type)
+        image_file, ply_file, json_file, depth_file, normal_file = file_io.get_file_name(file_idx, data_path)
         f = open(json_file)
         data = json.load(f)
         normal_gt = cv.imread(normal_file)
@@ -50,26 +51,26 @@ def knn_normal(file_idx, k_min=1, k_max=3):
         depth = file_io.load_scaled16bitImage(depth_file, data['minDepth'], data['maxDepth'])
         if file_idx == 0 and not path.exists(ply_file):
             print("No '.ply' file available, generate now...")
-            generate_ply(file_idx, normal_gt, data_type=data_type)
+            generate_ply(file_idx, normal_gt, data_path=data_path)
 
         depth_padded = np.expand_dims(copy_make_border(depth, k_idx), axis=2)
         data['R'] = np.identity(3)
         data['t'] = np.zeros(3)
 
         # calculate vertex from depth map
-        vertex = improved_normal_inference.help_funs.mu.depth2vertex(torch.tensor(depth_padded).permute(2, 0, 1),
-                                                                     torch.tensor(data['K']),
-                                                                     torch.tensor(data['R']).float(),
-                                                                     torch.tensor(data['t']).float())
+        vertex = mu.depth2vertex(torch.tensor(depth_padded).permute(2, 0, 1),
+                                 torch.tensor(data['K']),
+                                 torch.tensor(data['R']).float(),
+                                 torch.tensor(data['t']).float())
         mask = np.sum(np.abs(depth_padded), axis=2) != 0
 
         # compute normals from neighbors
         normals = compute_normal(vertex, mask, k_idx)
         normals_rgb = normal2RGB(normals, mask)
         # generate point clouds, save calculated normal image and ground truth image
-        generate_ply(file_idx, normals, data_type=data_type, param=k_idx)
-        improved_normal_inference.help_funs.file_io.write_np2img(normals_rgb, file_io.get_output_file_name(file_idx, "normal", "knn", data_type, k_idx))
-        cv.imwrite(file_io.get_output_file_name(file_idx, "normal", "knn", data_type, 0), normal_gt)
+        generate_ply(file_idx, normals, data_path=data_path, param=k_idx)
+        file_io.write_np2img(normals_rgb, file_io.get_output_file_name(file_idx, "normal", "knn", k_idx))
+        cv.imwrite(file_io.get_output_file_name(file_idx, "normal", "knn", 0), normal_gt)
 
         # # calculate the difference between calculated image and ground truth image
         # angle_difference = np.zeros(normal_gt.shape[:2])
@@ -77,8 +78,8 @@ def knn_normal(file_idx, k_min=1, k_max=3):
         #     for j in range(angle_difference.shape[1]):
         #         angle_difference[i, j] = mu.angle_between(normals[i, j], normal_gt[i, j])
 
-        print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', data_type, k_idx)}")
-        print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', data_type, 0)}")
+        print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', k_idx)}")
+        print(f"Saved {file_io.get_output_file_name(file_idx, 'normal', 'knn', 0)}")
 
 
 # --------------------------- visualisation -------------------------------- #
@@ -120,6 +121,6 @@ def knn_normal(file_idx, k_min=1, k_max=3):
 
 if __name__ == '__main__':
     k_min, k_max = 2, 3
-    data_type = "real"
+    data_path = config.real_data
     file_idx = 0
     knn_normal(file_idx, k_min, k_max)

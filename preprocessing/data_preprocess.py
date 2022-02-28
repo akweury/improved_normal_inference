@@ -11,6 +11,7 @@ from improved_normal_inference.help_funs import file_io
 
 
 def noisy_1channel(img):
+    img = img.reshape(512, 512)
     h, w = img.shape
     noise = np.random.randint(2, size=(h, w))
     noise_img = img * noise
@@ -27,8 +28,8 @@ def noisy(img):
 
 
 def noisy_a_folder(folder_path, output_path):
-    idx = 3
-    image_file, ply_file, json_file, depth_file, depth_gt_file, normal_file = file_io.get_file_name(idx, folder_path)
+    idx = 10
+    image_file, ply_file, json_file, depth_gt_file, normal_file = file_io.get_file_name(idx, folder_path)
     while path.exists(image_file):
         f = open(json_file)
         data = json.load(f)
@@ -36,28 +37,28 @@ def noisy_a_folder(folder_path, output_path):
         depth = file_io.load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
 
         # add noise
-        noise_depth = noisy(depth)
+        noise_depth = noisy_1channel(depth)
 
         # save files to the new folders
         file_io.save_scaled16bitImage(noise_depth,
                                       str(output_path / (str(idx).zfill(5) + ".depth0_noise.png")),
                                       data['minDepth'], data['maxDepth'])
-        shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0_gt.png")))
+        shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
         shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
         shutil.copyfile(json_file, str(output_path / (str(idx).zfill(5) + ".data0.json")))
         shutil.copyfile(normal_file, str(output_path / (str(idx).zfill(5) + ".normal0.png")))
 
         print(f'File {idx} added noise.')
         idx += 1
-        image_file, ply_file, json_file, depth_file, depth_gt_file, normal_file = file_io.get_file_name(idx,
-                                                                                                        folder_path)
+        image_file, ply_file, json_file, depth_gt_file, normal_file = file_io.get_file_name(idx,
+                                                                                            folder_path)
 
 
 if __name__ == '__main__':
     # # noisy a folder test code
     # noisy_a_folder(config.synthetic_captured_data, config.synthetic_captured_data_noise)
-    original_folder = config.data_3
-    noisy_folder = config.data_3_noise
+    original_folder = config.synthetic_data / "selval"
+    noisy_folder = config.synthetic_data_noise / "selval"
     noisy_a_folder(original_folder, noisy_folder)
 
     # # noisy test code

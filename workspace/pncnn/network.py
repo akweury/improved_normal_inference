@@ -22,6 +22,7 @@ class CNN(nn.Module):
         self.conf_estimator = UNetSP(1, 1)
         self.nconv = NConvUNet(1, 1)
         self.var_estimator = UNetSP(1, 1)
+        # self.var_estimator = UNetSP(3, 3)
 
     def forward(self, x0):  
 

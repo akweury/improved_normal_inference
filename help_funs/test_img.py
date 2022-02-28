@@ -1,3 +1,8 @@
+"""
+This file is used to generate test images.
+These images can be used to evaluate the basic performance of the image processing.
+"""
+
 import numpy as np
 import file_io
 from improved_normal_inference import config

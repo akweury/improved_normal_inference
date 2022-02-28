@@ -16,15 +16,13 @@ from torch.optim import SGD, Adam
 from torch.optim import lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 
-from utils.args_parser import args_parser, save_args, print_args, initialize_args, compare_args_w_json
-from dataloaders.my_creator import create_dataloader
+from improved_normal_inference.pncnn.utils import args_parser
+from improved_normal_inference.pncnn.dataloaders.my_creator import create_dataloader
 # from dataloaders.dataloader_creator import create_dataloader
 
-from utils.error_metrics import AverageMeter, create_error_metric, LogFile
-from utils.save_output_images import create_out_image_saver, colored_depthmap_tensor
-from utils.checkpoints import save_checkpoint
-from common.losses import get_loss_fn
-from utils.eval_uncertainty import eval_ause
+from improved_normal_inference.pncnn.utils.error_metrics import AverageMeter, create_error_metric
+from improved_normal_inference.pncnn.utils.save_output_images import create_out_image_saver
+from improved_normal_inference.pncnn.common.losses import get_loss_fn
 
 from improved_normal_inference import config
 
@@ -34,7 +32,7 @@ def main():
     global args, train_csv, test_csv, exp_dir, best_result, device, tb_writer, tb_freq
 
     # Args parser
-    args = args_parser()
+    args = args_parser.args_parser()
 
     start_epoch = 0
     ############ EVALUATE MODE ############
@@ -67,7 +65,7 @@ def main():
         print('- Checkpoint was loaded successfully.')
 
         # Compare the checkpoint args with the json file in case I wanted to change some args
-        compare_args_w_json(args, exp_dir, start_epoch + 1)
+        args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
         args.evaluate = chkpt_path
 
         # device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
@@ -75,7 +73,7 @@ def main():
 
         model = checkpoint['model'].to(device)
 
-        print_args(args)
+        args_parser.print_args(args)
 
         _, val_loader = create_dataloader(args, eval_mode=True)
 

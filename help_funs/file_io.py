@@ -95,7 +95,7 @@ def load_scaled16bitImage(root, minVal, maxVal):
 
 def save_scaled16bitImage(img, img_name, minVal, maxVal):
     img = img.reshape(512, 512)
-    img[np.isnan(img)] = 0
+    img[np.isnan(img) != 0] = 0
     mask = (img == 0)
 
     img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
@@ -104,19 +104,23 @@ def save_scaled16bitImage(img, img_name, minVal, maxVal):
     return img
 
 
+def normalize_rgb_image(img):
+    img = img.astype(np.int32)
+    max, min = img.max(), img.min()
+    img_norm = (img - min) / (max-min) * 255
+    return img_norm.astype(np.uint8)
+
 def get_file_name(idx, data_path):
     image_file = str(data_path / str(idx).zfill(5)) + ".image0.png"
     ply_file = str(data_path / str(idx).zfill(5)) + ".pointcloud0.ply"
     json_file = str(data_path / str(idx).zfill(5)) + f".data0.json"
-    depth_file = str(data_path / str(idx).zfill(5)) + f".depth0_noise.png"
-    depth_gt_file = str(data_path / str(idx).zfill(5)) + f".depth0_gt.png"
-
+    depth_gt_file = str(data_path / str(idx).zfill(5)) + f".depth0.png"
     normal_file = str(data_path / str(idx).zfill(5)) + f".normal0.png"
 
-    return image_file, ply_file, json_file, depth_file, depth_gt_file, normal_file
+    return image_file, ply_file, json_file, depth_gt_file, normal_file
 
 
-def get_output_file_name(idx, file_type=None, method=None, data_type=None, param=0):
+def get_output_file_name(idx, file_type=None, method=None, param=0):
     if file_type in ["normal", "depth"]:
         suffix = ".png"
     elif file_type == 'pointcloud':
@@ -130,6 +134,10 @@ def get_output_file_name(idx, file_type=None, method=None, data_type=None, param
 
     return file_path
 
+def write_np2rgbimg(img, img_name):
+    img = Image.fromarray(img.astype(np.uint8))
+    img.save(img_name)
+    return img
 
 def write_np2img(np_array, img_name):
     img = Image.fromarray(np_array.astype(np.uint32))

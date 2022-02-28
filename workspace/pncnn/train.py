@@ -15,6 +15,8 @@ from improved_normal_inference.pncnn.utils.error_metrics import create_error_met
 from improved_normal_inference.workspace import model
 from improved_normal_inference.pncnn.utils import save_output_images
 from improved_normal_inference.pncnn.utils import checkpoints
+
+
 ############ TRAINING FUNCTION ############
 def train_epoch(model_param, epoch):
     """
@@ -31,7 +33,6 @@ def train_epoch(model_param, epoch):
     Raises:
         KeyError: Raises an exception.
     """
-
 
     print('\n==> Training Epoch [{}] (lr={})'.format(epoch, model_param['optimizer'].param_groups[0]['lr']))
 
@@ -66,7 +67,10 @@ def train_epoch(model_param, epoch):
 
         # Calculate Error metrics
         err = create_error_metric(model_param['args'])
+
         err.evaluate(out[:, :1, :, :].data, target.data)
+        # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
+        # err.evaluate(out[:, :3, :, :].data, target.data)
         err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
         if (i + 1) % model_param['args'].print_freq == 0 or i == len(model_param['train_loader']) - 1:
@@ -116,9 +120,7 @@ def evaluate_epoch(model_param, epoch):
     model_param['model'].eval()  # Swith to evaluate mode
 
     # Save output images
-    out_img_saver = save_output_images.create_out_image_saver(model_param['exp_dir'],
-                                                                          model_param['args'],
-                                                                          epoch)
+    out_img_saver = save_output_images.create_out_image_saver(model_param['exp_dir'], model_param['args'], epoch)
     out_image = None
 
     start = time.time()
@@ -143,6 +145,8 @@ def evaluate_epoch(model_param, epoch):
             # Calculate Error metrics
             err = create_error_metric(model_param['args'])
             err.evaluate(out[:, :1, :, :].data, target.data)
+            # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
+            # err.evaluate(out[:, :3, :, :].data, target.data)
             err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
             # Save output images
@@ -162,7 +166,7 @@ def evaluate_epoch(model_param, epoch):
 
     # Evaluate Uncerainty
     ause, ause_fig = model.evaluate_uncertainty(model_param['args'],
-                                                          model_param['model'], model_param['val_loader'], epoch)
+                                                model_param['model'], model_param['val_loader'], epoch)
 
     # Update Log files
     model_param['test_csv'].update_log(err_avg, epoch, ause)
