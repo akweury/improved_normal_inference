@@ -7,6 +7,9 @@ Created on Mon Feb 25 14:16:29 2019
 @modified: J. Sha
 
 """
+import os, sys
+from os.path import dirname
+sys.path.append(dirname(__file__))
 
 import time
 import torch
