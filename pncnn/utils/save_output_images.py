@@ -30,10 +30,10 @@ class SyntheticOutputImageSaver(OutputImageSaver):
     def __init__(self, exp_dir, args, epoch):
         super(SyntheticOutputImageSaver, self).__init__(exp_dir, args, epoch)
 
-    def save_torch2rbgimg(self, torch_array, path):
-        img = torch.permute(torch_array, (2, 3, 1, 0)).sum(dim=-1).numpy().astype(np.uint32)
-        img = file_io.normalize_rgb_image(img)
-        file_io.write_np2rgbimg(img, path)
+    # def save_torch2rbgimg(self, torch_array, path):
+    #     img = torch.permute(torch_array, (2, 3, 1, 0)).sum(dim=-1).numpy().astype(np.uint32)
+    #     img = file_io.normalize_rgb_image(img)
+    #     file_io.write_np2rgbimg(img, path)
 
     # TODO: Evaluate on different sets or different dataset vkitti
     def update(self, i, out_img, input, pred, target):

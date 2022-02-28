@@ -1,5 +1,13 @@
+## usage
+ssh sha@pc-2103
+
+CUDA_VISIBLE_DEVICES=2 python train.py --ws synthetic --exp pncnn --args json
+
+
 # Improved Normal Inference
-ssh 
+
+
+
 ---
 ## Usage
 The output folder will save normal maps with a copy of ground truth

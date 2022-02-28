@@ -48,8 +48,8 @@ class NConvUNet(nn.Module):
         # Downsample 1
         ds = 2
         c1_ds, idx = F.max_pool2d(c1, ds, ds, return_indices=True)
-        # x1_ds = torch.zeros(c1_ds.size()).to(x0.get_device())
-        x1_ds = torch.zeros(c1_ds.size()).to("cpu")
+        x1_ds = torch.zeros(c1_ds.size()).to(x0.get_device())
+        # x1_ds = torch.zeros(c1_ds.size()).to("cpu")
         for i in range(x1_ds.size(0)):
             for j in range(x1_ds.size(1)):
                 x1_ds[i, j, :, :] = x1[i, j, :, :].view(-1)[idx[i, j, :, :].view(-1)].view(idx.size()[2:])
@@ -62,8 +62,8 @@ class NConvUNet(nn.Module):
         ds = 2
         c2_dss, idx = F.max_pool2d(c2_ds, ds, ds, return_indices=True)
 
-        # x2_dss = torch.zeros(c2_dss.size()).to(x0.get_device())
-        x2_dss = torch.zeros(c2_dss.size()).to("cpu")
+        x2_dss = torch.zeros(c2_dss.size()).to(x0.get_device())
+        # x2_dss = torch.zeros(c2_dss.size()).to("cpu")
 
         for i in range(x2_dss.size(0)):
             for j in range(x2_dss.size(1)):
@@ -76,8 +76,8 @@ class NConvUNet(nn.Module):
         ds = 2
         c3_dss, idx = F.max_pool2d(c3_ds, ds, ds, return_indices=True)
 
-        # x3_dss = torch.zeros(c3_dss.size()).to(x0.get_device())
-        x3_dss = torch.zeros(c3_dss.size()).to("cpu")
+        x3_dss = torch.zeros(c3_dss.size()).to(x0.get_device())
+        # x3_dss = torch.zeros(c3_dss.size()).to("cpu")
 
         for i in range(x3_dss.size(0)):
             for j in range(x3_dss.size(1)):

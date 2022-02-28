@@ -16,6 +16,7 @@ from improved_normal_inference.pncnn.utils import error_metrics
 from improved_normal_inference.pncnn.common import losses
 from improved_normal_inference.pncnn.utils import args_parser
 
+
 def save_best_model(model_param, test_err_avg, epoch):
     # Save best model
     # TODO: How to decide the best based on dataset?
@@ -59,15 +60,18 @@ def evaluate_uncertainty(args, model, val_loader, epoch):
     return ause, ause_fig
 
 
-def init_env(network, device):
+def init_env(network):
     # Make some variable global
     model_param = {}
-
-    # global args, train_csv, test_csv, exp_dir, best_result, device, tb_writer, tb_freq
 
     # Args parser
     args = args_parser.args_parser()
     model_param['args'] = args
+
+    if args.gpu == -1:
+        device = "cpu"
+    else:
+        device = args.gpu
 
     start_epoch = 0
     model_param['start_epoch'] = start_epoch

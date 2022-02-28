@@ -175,7 +175,7 @@ def evaluate_epoch(model_param, epoch):
 
 
 def main():
-    model_param = model.init_env(network, device="cpu")
+    model_param = model.init_env(network)
 
     ############ TRAINING LOOP ############
     for epoch in range(model_param['start_epoch'], model_param['args'].epochs):
