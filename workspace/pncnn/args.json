@@ -22,7 +22,7 @@
 "sparsifier": "uar",
 "shift": null,
 "rotate": null,
-"epochs": 50,
+"epochs": 200,
 "optimizer": "adam",
 "lr": 0.01,
 "momentum": 0.9,

@@ -41,8 +41,8 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "train" / "*data0.json"), recursive=True)))
 
-            self.gt = self.gt[:10]
-            self.depth = self.depth[:10]
+            # self.gt = self.gt[:10]
+            # self.depth = self.depth[:10]
 
         elif setname == 'selval':
             depth_path = self.synthetic_depth_path
@@ -50,8 +50,8 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "eval" / "*data0.json"), recursive=True)))
 
-            self.gt = self.gt[:10]
-            self.depth = self.depth[:10]
+            # self.gt = self.gt[:10]
+            # self.depth = self.depth[:10]
 
 
 
@@ -61,8 +61,8 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
 
-            self.gt = self.gt[:10]
-            self.depth = self.depth[:10]
+            # self.gt = self.gt[:10]
+            # self.depth = self.depth[:10]
 
         assert (len(self.gt) == len(self.depth))
 

@@ -1,7 +1,7 @@
 ## usage
 ssh sha@pc-2103
 
-CUDA_VISIBLE_DEVICES=2 python train.py --ws synthetic --exp pncnn --args json
+CUDA_VISIBLE_DEVICES=2 python3 main.py --ws synthetic --exp pncnn --args json
 
 
 # Improved Normal Inference
