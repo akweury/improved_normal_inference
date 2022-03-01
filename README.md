@@ -3,7 +3,7 @@ ssh sha@pc-2103
 
 CUDA_VISIBLE_DEVICES=2 python3 main.py --ws synthetic --exp pncnn --args json
 
-
+ scp C:\Users\shaji\TestProject\CapturedData\data_geometrical_body.zip sha@pc-2103:/home/sha/improved_normal_inference/dataset
 # Improved Normal Inference
 
 

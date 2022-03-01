@@ -6,8 +6,8 @@ import numpy as np
 import cv2 as cv
 import shutil
 
-from improved_normal_inference import config
-from improved_normal_inference.help_funs import file_io
+import config
+from help_funs import file_io
 
 
 def noisy_1channel(img):
@@ -57,9 +57,10 @@ def noisy_a_folder(folder_path, output_path):
 if __name__ == '__main__':
     # # noisy a folder test code
     # noisy_a_folder(config.synthetic_captured_data, config.synthetic_captured_data_noise)
-    original_folder = config.synthetic_data / "selval"
-    noisy_folder = config.synthetic_data_noise / "selval"
-    noisy_a_folder(original_folder, noisy_folder)
+    for folder in ["selval","test", "train" ]:
+        original_folder = config.synthetic_data / folder
+        noisy_folder = config.synthetic_data_noise / folder
+        noisy_a_folder(original_folder, noisy_folder)
 
     # # noisy test code
     # f = open(config.synthetic_captured_data / "00000.data0.json")
