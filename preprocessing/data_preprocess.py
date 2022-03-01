@@ -28,6 +28,8 @@ def noisy(img):
 
 
 def noisy_a_folder(folder_path, output_path):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     for idx in range(500):
         image_file, ply_file, json_file, depth_gt_file, normal_file = file_io.get_file_name(idx, folder_path)
         if path.exists(image_file):
