@@ -7,7 +7,6 @@ __email__ = "jingyuan@rhrk.uni-kl.de"
 
 ########################################
 
-from PIL import Image
 from torch.utils.data import Dataset
 import torch
 import numpy as np
@@ -41,19 +40,11 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "train" / "*data0.json"), recursive=True)))
 
-            # self.gt = self.gt[:10]
-            # self.depth = self.depth[:10]
-
         elif setname == 'selval':
             depth_path = self.synthetic_depth_path
             self.depth = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0_noise.png"), recursive=True)))
             self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "eval" / "*data0.json"), recursive=True)))
-
-            # self.gt = self.gt[:10]
-            # self.depth = self.depth[:10]
-
-
 
         elif setname == 'test':
             depth_path = self.synthetic_depth_path
@@ -61,8 +52,8 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
 
-            # self.gt = self.gt[:10]
-            # self.depth = self.depth[:10]
+        self.gt = self.gt[:10]
+        self.depth = self.depth[:10]
 
         assert (len(self.gt) == len(self.depth))
 
@@ -91,9 +82,11 @@ class SyntheticDepthDataset(Dataset):
         gt = gt.reshape(512, 512)
 
         # gt = gt.reshape(512, 512,3)
+        depth_mask = ~(depth == 0)
+        gt_mask = ~(gt == 0)
 
-        depth = depth / data['maxDepth']  # [0,1]
-        gt = gt / data['maxDepth']
+        depth[depth_mask] = (depth[depth_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])  # [0,1]
+        gt[gt_mask] = (gt[gt_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])
 
         # Expand dims into Pytorch format
         depth = np.expand_dims(depth, 0)

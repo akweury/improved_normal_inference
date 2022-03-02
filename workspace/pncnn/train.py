@@ -48,6 +48,7 @@ def train_epoch(model_param, epoch):
 
     start = time.time()
     for i, (input, target) in enumerate(model_param['train_loader']):
+
         input, target = input.to(model_param['device']), target.to(model_param['device'])
 
         torch.cuda.synchronize()  # Wait for all kernels to finish
