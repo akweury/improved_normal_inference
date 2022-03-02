@@ -7,17 +7,12 @@ Created on Mon Feb 25 14:16:29 2019
 """
 import os
 import sys
-import importlib
 import time
-import datetime
 
 import torch
-from torch.optim import SGD, Adam
-from torch.optim import lr_scheduler
-from torch.utils.tensorboard import SummaryWriter
 
-from improved_normal_inference.pncnn.utils import args_parser
-from improved_normal_inference.pncnn.dataloaders.my_creator import create_dataloader
+from pncnn.utils import args_parser
+from pncnn.dataloaders.my_creator import create_dataloader
 # from dataloaders.dataloader_creator import create_dataloader
 
 from improved_normal_inference.pncnn.utils.error_metrics import AverageMeter, create_error_metric
