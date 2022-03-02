@@ -10,7 +10,7 @@ from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 
 import config
-from pncnn.utils import args_parser
+
 from pncnn.utils.save_output_images import colored_depthmap_tensor
 from pncnn.dataloaders import my_creator
 from pncnn.utils import checkpoints
@@ -63,12 +63,12 @@ def evaluate_uncertainty(args, model, val_loader, epoch):
     return ause, ause_fig
 
 
-def init_env(network):
+def init_env(args, network):
     # Make some variable global
     model_param = {}
 
     # Args parser
-    args = args_parser.args_parser()
+    # args = args_parser.args_parser()
     model_param['args'] = args
 
     if args.cpu:

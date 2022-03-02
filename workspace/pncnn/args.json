@@ -1,4 +1,6 @@
-{"cpu": true,
+{"mode": "test",
+"noise": false,
+"cpu": true,
 "args": "json",
 "exp": "pncnn",
 "workspace": "synthetic",
@@ -39,5 +41,5 @@
 "setval_ds": "selval",
 "save_setval_imgs": false,
 "val_ds": "selval",
-"save_val_imgs": true,
+"save_val_imgs": false,
 "defaults": null}

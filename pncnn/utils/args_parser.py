@@ -38,6 +38,11 @@ def args_parser():
 
     # Mode selection
 
+    parser.add_argument('--mode',type=str, default='train', choices=['train','test'],
+                        help='train a model or test a mode')
+    parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
+                        help='add noise or not')
+
     parser.add_argument('--cpu', '-c', type=bool, default='', choices=[False, True],
                         help='Use CPU for training?')
 
