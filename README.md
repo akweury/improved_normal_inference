@@ -1,10 +1,10 @@
 ## usage
 ssh sha@pc-2103
 
-CUDA_VISIBLE_DEVICES=2 python3 main.py --ws synthetic --exp pncnn --args json --cpu False --mode test
+CUDA_VISIBLE_DEVICES=2 python3 main.py --ws synthetic --exp pncnn --args json --cpu False --mode train
 
 scp C:\Users\shaji\TestProject\CapturedData\data_geometrical_body.zip sha@pc-2103:/home/sha/improved_normal_inference/dataset
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/pncnn/checkpoint-154.pth.tar  C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/pncnn/checkpoint-99.pth.tar  C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
 scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/pncnn/output.zip C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
 
 # Improved Normal Inference

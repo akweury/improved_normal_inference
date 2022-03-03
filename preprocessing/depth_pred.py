@@ -58,6 +58,7 @@ if __name__ == '__main__':
 
     final_output = cv.hconcat([original, original_noise, original_denoise, difference])
 
+
     cv.imshow("original_noise", final_output)
     cv.waitKey(0)
     cv.destroyAllWindows()

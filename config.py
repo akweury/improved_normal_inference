@@ -1,6 +1,12 @@
 import os
 from pathlib import Path
 
+xout_channel = 3
+cout_in_channel = 3
+cout_out_channel = 6
+cin_channel = 6
+
+
 root = Path(__file__).parents[0]
 dataset = root / "dataset"
 ws_path = root / "workspace"
@@ -31,3 +37,4 @@ test_depth_path = dataset / "data_depth_selection" / "depth_selection" / "test_d
 
 # pncnn workspace path
 exper_kitti = pncnn_path / "workspace" / "kitti"
+

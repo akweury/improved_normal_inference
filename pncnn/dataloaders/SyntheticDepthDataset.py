@@ -13,10 +13,11 @@ import numpy as np
 import glob
 import os
 import json
-from torchvision import transforms
 
+import cv2 as cv
+from torchvision import transforms
 import config
-from help_funs import file_io
+from help_funs import file_io, mu
 
 
 class SyntheticDepthDataset(Dataset):
@@ -37,19 +38,19 @@ class SyntheticDepthDataset(Dataset):
             depth_path = self.synthetic_depth_path
             self.depth = np.array(
                 sorted(glob.glob(str(depth_path / "train" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "train" / "*data0.json"), recursive=True)))
 
         elif setname == 'selval':
             depth_path = self.synthetic_depth_path
             self.depth = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "eval" / "*data0.json"), recursive=True)))
 
         elif setname == 'test':
             depth_path = self.synthetic_depth_path
             self.depth = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0_noise.png"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0.png"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
 
         self.gt = self.gt[:10]
@@ -73,39 +74,43 @@ class SyntheticDepthDataset(Dataset):
         depth = file_io.load_scaled16bitImage(self.depth[item],
                                               data['minDepth'],
                                               data['maxDepth'])
-        gt = file_io.load_scaled16bitImage(self.gt[item],
-                                           data['minDepth'],
-                                           data['maxDepth'])
-
-        # Normalize the depth
-        depth = depth.reshape(512, 512)
-        gt = gt.reshape(512, 512)
-
-        # gt = gt.reshape(512, 512,3)
         depth_mask = ~(depth == 0)
-        gt_mask = ~(gt == 0)
-
         depth[depth_mask] = (depth[depth_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])  # [0,1]
-        gt[gt_mask] = (gt[gt_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])
+        vertex_input = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                                       torch.tensor(data['K']),
+                                       torch.tensor(data['R']).float(),
+                                       torch.tensor(data['t']).float())
+        vertex_input = torch.from_numpy(vertex_input)  # (depth, dtype=torch.float)
+        vertex_input = vertex_input.permute( 2, 0, 1)
 
-        # Expand dims into Pytorch format
-        depth = np.expand_dims(depth, 0)
-        gt = np.expand_dims(gt, 0)
 
-        # Convert to Pytorch Tensors
-        depth = torch.from_numpy(depth)  # (depth, dtype=torch.float)
-        gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
 
-        # Convert depth to disparity
-        if self.invert_depth:
-            depth[depth == 0] = -1
-            depth = 1 / depth
-            depth[depth == -1] = 0
+        # gt = file_io.load_scaled16bitImage(self.gt[item],
+        #                                    data['minDepth'],
+        #                                    data['maxDepth'])
+        # gt_mask = ~(gt == 0)
+        # gt[gt_mask] = (gt[gt_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])
+        # vertex_gt = mu.depth2vertex(torch.tensor(gt).permute(2, 0, 1),
+        #                             torch.tensor(data['K']),
+        #                             torch.tensor(data['R']).float(),
+        #                             torch.tensor(data['t']).float())
+        # vertex_gt = torch.from_numpy(vertex_gt)  # tensor(gt, dtype=torch.float)
+        # vertex_gt = vertex_gt.permute(2,0,1)
 
-            gt[gt == 0] = -1
-            gt = 1 / gt
-            gt[gt == -1] = 0
+        gt = file_io.load_24bitNormal(self.gt[item])
+        normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
+        normal_gt = normal_gt.permute(2,0,1)
 
-        input = depth
 
-        return input, gt
+
+        # # Convert depth to disparity
+        # if self.invert_depth:
+        #     depth[depth == 0] = -1
+        #     depth = 1 / depth
+        #     depth[depth == -1] = 0
+        #
+        #     gt[gt == 0] = -1
+        #     gt = 1 / gt
+        #     gt[gt == -1] = 0
+
+        return vertex_input, normal_gt

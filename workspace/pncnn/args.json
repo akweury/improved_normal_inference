@@ -10,7 +10,7 @@
 "dataset": "synthetic",
 "dataset_path": "synthetic_data_noise",
 "modality": "d",
-"batch_size": 4,
+"batch_size": 1,
 "train_on": "full",
 "workers": 1,
 "raw_kitti_path": "",
@@ -41,5 +41,5 @@
 "setval_ds": "selval",
 "save_setval_imgs": false,
 "val_ds": "selval",
-"save_val_imgs": false,
+"save_val_imgs": true,
 "defaults": null}

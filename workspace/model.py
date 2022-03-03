@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import config
 
-from pncnn.utils.save_output_images import colored_depthmap_tensor
+from pncnn.utils.save_output_images import colored_normal_tensor
 from pncnn.dataloaders import my_creator
 from pncnn.utils import checkpoints
 from pncnn.utils import eval_uncertainty
@@ -43,11 +43,11 @@ def log_to_tensorboard(tb_writer, test_err_avg, ause, ause_fig, out_image, epoch
         if ause is not None:
             tb_writer.add_scalar('AUSE/selval', ause, epoch)
         # TODO: change colored depthmap tensor function to a correct one.
-        tb_writer.add_images('Prediction', colored_depthmap_tensor(out_image[:, :1, :, :]), epoch)
-        tb_writer.add_images('Input_Conf_Log_Scale', colored_depthmap_tensor(torch.log(out_image[:, 2:, :, :] + 1)),
+        tb_writer.add_images('Prediction', colored_normal_tensor(out_image[:, :config.xout_channel, :, :]), epoch)
+        tb_writer.add_images('Input_Conf_Log_Scale', colored_normal_tensor(torch.log(out_image[:, config.cin_channel:, :, :] + 1)),
                              epoch)
         tb_writer.add_images('Output_Conf_Log_Scale',
-                             colored_depthmap_tensor(torch.log(out_image[:, 1:2, :, :] + 1)), epoch)
+                             colored_normal_tensor(torch.log(out_image[:, config.cout_in_channel:config.cout_out_channel, :, :] + 1)), epoch)
         tb_writer.add_figure('Sparsification_Plot', ause_fig, epoch)
 
 

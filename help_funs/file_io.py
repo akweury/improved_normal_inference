@@ -82,11 +82,14 @@ def load_24bitNormal(root):
 
 def load_scaled16bitImage(root, minVal, maxVal):
     img = cv2.imread(root, -1)
+    return scale16bitImage(img, minVal, maxVal)
+
+
+def scale16bitImage(img, minVal, maxVal):
     img = np.array(img, dtype=np.float32)
     mask = (img == 0)
     img = img / 65535 * (maxVal - minVal) + minVal
     img[np.isnan(img)] = 0
-
     img = torch.tensor((~mask) * img).unsqueeze(2)
     img = np.array(img)
 
@@ -107,8 +110,9 @@ def save_scaled16bitImage(img, img_name, minVal, maxVal):
 def normalize_rgb_image(img):
     img = img.astype(np.int32)
     max, min = img.max(), img.min()
-    img_norm = (img - min) / (max-min) * 255
+    img_norm = (img - min) / (max - min) * 255
     return img_norm.astype(np.uint8)
+
 
 def get_file_name(idx, data_path):
     image_file = str(data_path / str(idx).zfill(5)) + ".image0.png"
@@ -134,10 +138,12 @@ def get_output_file_name(idx, file_type=None, method=None, param=0):
 
     return file_path
 
+
 def write_np2rgbimg(img, img_name):
     img = Image.fromarray(img.astype(np.uint8))
     img.save(img_name)
     return img
+
 
 def write_np2img(np_array, img_name):
     img = Image.fromarray(np_array.astype(np.uint32))

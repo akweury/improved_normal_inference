@@ -10,7 +10,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
+xout_channel = 3
+cout_in_channel = 3
+cout_out_channel = 6
+cin_channel = 6
 def get_loss_list():
     return loss_list.keys()
 
@@ -25,7 +28,7 @@ class L1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         return F.l1_loss(outputs, target)
 
 
@@ -34,7 +37,7 @@ class L2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         return F.mse_loss(outputs, target)
 
 
@@ -43,7 +46,7 @@ class SmoothL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         return F.smooth_l1_loss(outputs, target)
 
 
@@ -52,7 +55,7 @@ class MaskedL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         val_pixels = torch.ne(target, 0).float().detach()
         return F.l1_loss(outputs*val_pixels, target*val_pixels)
 
@@ -62,7 +65,7 @@ class MaskedL2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         val_pixels = torch.ne(target, 0).float().detach()
         return F.mse_loss(outputs*val_pixels, target*val_pixels)
 
@@ -72,7 +75,7 @@ class MaskedSmoothL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:1,:,:]
+        outputs = outputs[:,:xout_channel,:,:]
         val_pixels = torch.ne(target, 0).float().detach()
         loss = F.smooth_l1_loss(outputs*val_pixels, target*val_pixels, reduction='none')
         return torch.mean(loss)
@@ -84,12 +87,12 @@ class MaskedProbLoss(nn.Module):
         super().__init__()
 
     def forward(self, out, targets):
-        means = out[:, :1, :, :]
+        # means = out[:, :1, :, :]
+        means = out[:, :xout_channel, :, :]
 
-        # means = out[:, :3, :, :]
         # means = torch.permute(means, (0, 2, 3, 1)).unsqueeze(1)
 
-        cout = out[:, 1:2, :, :]
+        cout = out[:, cout_in_channel:cout_out_channel, :, :]
         # cout = torch.permute(cout, (0, 2, 3, 1)).unsqueeze(1)
 
         res = cout
@@ -113,8 +116,8 @@ class MaskedProbExpLoss(nn.Module):
         super().__init__()
 
     def forward(self, out, targets):
-        means = out[:, :1, :, :]
-        cout = out[:, 1:2, :, :]
+        means = out[:, :xout_channel, :, :]
+        cout = out[:, cout_in_channel:cout_out_channel, :, :]
 
         res = torch.exp(cout)  # Residual term
         regl = torch.log(cout+1e-16)  # Regularization term

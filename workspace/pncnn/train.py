@@ -21,6 +21,10 @@ from pncnn.utils.error_metrics import create_error_metric, AverageMeter
 from pncnn.utils import save_output_images
 from pncnn.utils import checkpoints
 
+xout_channel = 3
+cout_in_channel = 3
+cout_out_channel = 6
+cin_channel = 6
 
 ############ TRAINING FUNCTION ############
 def train_epoch(model_param, epoch):
@@ -74,9 +78,9 @@ def train_epoch(model_param, epoch):
         # Calculate Error metrics
         err = create_error_metric(model_param['args'])
 
-        err.evaluate(out[:, :1, :, :].data, target.data)
+        err.evaluate(out[:, :xout_channel, :, :].data, target.data)
         # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
-        # err.evaluate(out[:, :3, :, :].data, target.data)
+
         err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
         if ((i + 1) % model_param['args'].print_freq == 0) or (i == len(model_param['train_loader']) - 1):
@@ -150,9 +154,8 @@ def evaluate_epoch(model_param, epoch):
 
             # Calculate Error metrics
             err = create_error_metric(model_param['args'])
-            err.evaluate(out[:, :1, :, :].data, target.data)
+            err.evaluate(out[:, :xout_channel, :, :].data, target.data)
             # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
-            # err.evaluate(out[:, :3, :, :].data, target.data)
             err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
             # Save output images

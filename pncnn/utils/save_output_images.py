@@ -5,8 +5,14 @@ import cv2 as cv
 import torch
 from PIL import Image
 from help_funs import file_io
+from help_funs import mu
 
 cmap = plt.cm.viridis
+
+xout_channel = 3
+cout_in_channel = 3
+cout_out_channel = 6
+cin_channel = 6
 
 
 def create_out_image_saver(exp_dir, args, epoch):
@@ -30,19 +36,19 @@ class SyntheticOutputImageSaver(OutputImageSaver):
     def __init__(self, exp_dir, args, epoch):
         super(SyntheticOutputImageSaver, self).__init__(exp_dir, args, epoch)
 
-    # def save_torch2rbgimg(self, torch_array, path):
-    #     img = torch.permute(torch_array, (2, 3, 1, 0)).sum(dim=-1).numpy().astype(np.uint32)
-    #     img = file_io.normalize_rgb_image(img)
-    #     file_io.write_np2rgbimg(img, path)
+    def save_torch2rbgimg(self, torch_array, path):
+        img = torch.permute(torch_array, (1, 2, 0)).numpy().astype(np.uint32)
+        img = file_io.normalize_rgb_image(img)
+        file_io.write_np2rgbimg(img, path)
 
-    # TODO: Evaluate on different sets or different dataset vkitti
+    # TODO: Save output image, convert normal to tengent space rgb normal
     def update(self, i, out_img, input, pred, target):
 
-        d_out = pred[:, :1, :, :] * self.args.norm_factor
+        d_out = pred[:, :xout_channel, :, :] * self.args.norm_factor
 
         if pred.shape[1] > 1:
-            cout = pred[:, 1:2, :, :]
-            cin = pred[:, 2:, :, :]
+            cout = pred[:, cout_in_channel:cout_out_channel, :, :]
+            cin = pred[:, cin_channel:, :, :]
             # cout = pred[:, 3:6, :, :]
             # cin = pred[:, 6:, :, :]
         else:
@@ -56,9 +62,17 @@ class SyntheticOutputImageSaver(OutputImageSaver):
             os.mkdir(d_out_folder)
         d_out_path = d_out_folder / f'{str(i * d_out.shape[0] + i).zfill(5)}.png'
 
+        mask = d_out[0, :, :, :].sum(dim=0) != 0
+        d_out = d_out[0, :, :, :].permute(1, 2, 0).numpy()
+        d_out = mu.normalize(d_out)
+
+        normal_rgb = mu.normal2RGB(d_out, mask)
+        img = file_io.normalize_rgb_image(normal_rgb)
+        file_io.write_np2rgbimg(img, d_out_path)
+
         # self.save_torch2rbgimg(d_out, d_out_path)
-        d_min, d_max = torch.min(d_out).item(), torch.max(d_out).item()
-        file_io.save_scaled16bitImage(d_out, d_out_path, d_min, d_max)
+        # d_min, d_max = torch.min(d_out).item(), torch.max(d_out).item()
+        # file_io.save_scaled16bitImage(d_out, d_out_path, d_min, d_max)
 
         if cout is not None:
             cout_folder = outimg_path / f'epoch_{str(self.epoch)}_{self.args.dataset}_{self.args.val_ds}_cout'
@@ -67,7 +81,13 @@ class SyntheticOutputImageSaver(OutputImageSaver):
 
             cout_path = cout_folder / f'{str(i * cout.shape[0] + i).zfill(5)}.png'
             cout_min, cout_max = torch.min(cout).item(), torch.max(cout).item()
-            file_io.save_scaled16bitImage(cout, cout_path, cout_min, cout_max)
+
+            mask = cout[0, :, :, :].sum(dim=0) != 0
+            cout = cout[0, :, :, :].permute(1, 2, 0).numpy()
+            cout_rgb = mu.array2RGB(cout, mask)
+            file_io.write_np2rgbimg(cout_rgb, cout_path)
+
+            # file_io.save_scaled16bitImage(cout, cout_path, cout_min, cout_max)
             # self.save_torch2rbgimg(cout, cout_path)
 
         if cin is not None:
@@ -77,8 +97,13 @@ class SyntheticOutputImageSaver(OutputImageSaver):
             cin_path = cin_folder / f'{str(i * cin.shape[0] + i).zfill(5)}.png'
             cin_min, cin_max = torch.min(cin).item(), torch.max(cin).item()
 
+            mask = cin[0, :, :, :].sum(dim=0) != 0
+            cin = cin[0, :, :, :].permute(1, 2, 0).numpy()
+            cin_rgb = mu.array2RGB(cin, mask)
+            file_io.write_np2rgbimg(cin_rgb, cin_path)
+
             # self.save_torch2rbgimg(cin, cin_path)
-            file_io.save_scaled16bitImage(cin, cin_path, cin_min, cin_max)
+            # file_io.save_scaled16bitImage(cin, cin_path, cin_min, cin_max)
 
         return pred
 
@@ -191,12 +216,17 @@ def colored_depthmap_tensor(depth, d_min=None, d_max=None):
         d_max = torch.max(depth).item()
     depth_relative = (depth - d_min) / (d_max - d_min)
 
-
     if depth_relative.size(1) == 1:
         depth_color = torch.from_numpy(cmap(depth_relative.cpu().numpy())).squeeze(1).permute((0, 3, 1, 2))[:, :3, :, :]
     else:
-        depth_color = depth_relative.permute((0,1,2, 3))
+        depth_color = depth_relative.permute((0, 1, 2, 3))
     return depth_color  # N, 3, H, W
+
+
+def colored_normal_tensor(normal):
+    max, min = normal.max(), normal.min()
+    normal_normalized = (normal - min) / (max - min)
+    return normal_normalized
 
 
 def colored_depthmap(depth, d_min=None, d_max=None):

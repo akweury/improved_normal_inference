@@ -3,6 +3,15 @@ import numpy as np
 import torch
 
 
+def binary(img):
+    # h, w = img.shape[:2]
+    c = torch.zeros(size=img.shape)
+    mask = ~(img == 0)
+    c[mask] = 1
+
+    return c
+
+
 def bi_interpolation(lower_left, lower_right, upper_left, upper_right, x, y):
     return lower_left * (1 - x) * (1 - y) + lower_right * x * (1 - y) + upper_left * (1 - x) * y + upper_right * x * y
 
@@ -66,6 +75,21 @@ def get_valid_pixels(img):
     return np.count_nonzero(np.sum(img, axis=2) > 0)
 
 
+def array2RGB(numpy_array, mask):
+    min, max = numpy_array.min(), numpy_array.max()
+
+    # convert normal to RGB color
+    # h, w, c = numpy_array.shape
+    numpy_array[mask] = ((numpy_array[mask] - min) / (max - min) * 255).astype(np.uint8)
+    # for i in range(h):
+    #     for j in range(w):
+    #         if mask[i, j]:
+    #             numpy_array[i, j] = (numpy_array[i, j] - min) / (max - min)
+    #             numpy_array[i, j] = (numpy_array[i, j] * 255).astype(np.uint8)
+
+    return numpy_array
+
+
 def normal2RGB(normals, mask):
     # convert normal to RGB color
     h, w, c = normals.shape
@@ -79,6 +103,12 @@ def normal2RGB(normals, mask):
                 normals[i, j] = (normals[i, j] * 255).astype(np.int32)
 
     return normals
+
+
+def normalize(numpy_array):
+    min, max = numpy_array.min(), numpy_array.max()
+    numpy_array = (numpy_array - min) / (max - min)
+    return numpy_array
 
 
 def copy_make_border(img, patch_width):
