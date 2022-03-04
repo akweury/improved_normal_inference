@@ -71,7 +71,7 @@ def args_parser():
     parser.add_argument('--modality', '-m', default='d', choices=modality_list,
                         help='Modalities to use: ' + ' | '.join(modality_list) + ' (default: d)')
 
-    parser.add_argument('--batch-size', '-b', default=8, type=int, help='Mini-batch size (default: 8)')
+    parser.add_argument('--batch_size', '-b', default=8, type=int, help='Mini-batch size (default: 8)')
 
     parser.add_argument('--train-on', default='full', type=str, help='The number of images to train on from the data.')
 
@@ -167,13 +167,7 @@ def initialize_args(args):
         load_args_from_file(args_path, args)
     elif args.args == 'json':
         # Path to the workspace directory
-        if args.workspace == "kitti":
-            ws_path = config.exper_kitti
-        elif args.workspace == "synthetic":
-            ws_path = config.ws_path
-        else:
-            raise ValueError
-
+        ws_path = config.ws_path
         args_path = ws_path / args.exp / 'args.json'
         load_args_from_file(args_path, args)
     return args

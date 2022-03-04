@@ -31,12 +31,12 @@ class CNN(nn.Module):
         # self.var_estimator = UNetSP(3, 3)
 
     def forward(self, x0):
-        # TODO: try binary input
+        # binary input
         # c0 = self.conf_estimator(x0) #  estimate the input confidence
         c0 = binary(x0)  # estimate the input confidence
         xout, cout = self.nconv(x0, c0, cpu=True)  # estimated value of depth
 
-        # TODO: add conv layer with kernal 1
+        # conv layer with kernal 1
 
         cout = self.var_estimator(cout)  #
         out = torch.cat((xout, cout, c0), 1)

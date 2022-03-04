@@ -13,19 +13,18 @@ import torch
 
 from pncnn.utils import args_parser
 from pncnn.dataloaders.my_creator import create_dataloader
-# from dataloaders.dataloader_creator import create_dataloader
-
 from pncnn.utils.error_metrics import AverageMeter, create_error_metric
 from pncnn.utils.save_output_images import create_out_image_saver
 from pncnn.common.losses import get_loss_fn
 
 import config
+from workspace.model import NeuralNetworkModel
 
 
-def main(model_param):
-    # Make some variable global
-    # global args, train_csv, test_csv, exp_dir, best_result, device, tb_writer, tb_freq
-    args = model_param['args']
+def main(args, network):
+    nn_model = NeuralNetworkModel(args, network)
+
+    args = nn_model.args
 
     start_epoch = 0
     ############ EVALUATE MODE ############
@@ -76,24 +75,24 @@ def main(model_param):
 
     loss = get_loss_fn(args).to(device)
 
-    model_param['loss'] = loss
+    nn_model.loss = loss
 
-    model_param['model'] = model
+    nn_model.model = model
 
-    model_param['val_loader'] = val_loader
+    nn_model.val_loader = val_loader
 
-    evaluate_epoch(model_param, start_epoch)
+    evaluate_epoch(nn_model, start_epoch)
 
     return  # End program
 
 
 ############ EVALUATION FUNCTION ############
-def evaluate_epoch(model_param, epoch):
+def evaluate_epoch(nn_model, epoch):
     """
     Evluation function
 
     Args:
-        dataloader: The dataloader object for the dataset
+        nn_model: The dataloader object for the dataset
         model: The model to be trained
         epoch: What epoch to start from
 
@@ -105,19 +104,19 @@ def evaluate_epoch(model_param, epoch):
     """
     print('\n==> Evaluating Epoch [{}]'.format(epoch))
 
-    err = create_error_metric(model_param['args'])
+    err = create_error_metric(nn_model.args)
     err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
 
-    model_param['model'].eval()  # Swith to evaluate mode
+    nn_model.model.eval()  # Swith to evaluate mode
 
     # Save output images
-    out_img_saver = create_out_image_saver(model_param['exp_dir'], model_param['args'], epoch)
+    out_img_saver = create_out_image_saver(nn_model.exp_dir, nn_model.args, epoch)
     out_image = None
 
     start = time.time()
     with torch.no_grad():  # Disable gradients computations
-        for i, (input, target) in enumerate(model_param['val_loader']):
-            input, target = input.to(model_param['device']), target.to(model_param['device'])
+        for i, (input, target) in enumerate(nn_model.val_loader):
+            input, target = input.to(nn_model.device), target.to(nn_model.device)
 
             torch.cuda.synchronize()
 
@@ -126,29 +125,31 @@ def evaluate_epoch(model_param, epoch):
             # Forward Pass
             start = time.time()
 
-            out = model_param['model'](input)
+            out = nn_model.model(input)
 
             # Check if there is cout There is Cout
-            loss = model_param['loss'](out, target)  # Compute the loss
+            loss = nn_model.loss(out, target)  # Compute the loss
 
             gpu_time = time.time() - start
 
             # Calculate Error metrics
-            err = create_error_metric(model_param['args'])
-            err.evaluate(out[:, :1, :, :].data, target.data)
-            err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
+            err = create_error_metric(nn_model.args)
+            err.evaluate(out[:, :config.xout_channel, :, :].data, target.data)
+            err_avg.update(err.get_results(),
+                           loss.item(), gpu_time,
+                           data_time, input.size(0))
 
             # Save output images
-            if model_param['args'].save_val_imgs:
+            if nn_model.args.save_val_imgs:
                 out_image = out_img_saver.update(i, out_image, input, out, target)
 
-            if model_param['args'].evaluate is None:
-                if model_param['tb_writer'] is not None and i == 1:  # Retrun batch 1 for tensorboard logging
+            if nn_model.args.evaluate is None:
+                if nn_model.tb_writer is not None and i == 1:  # Retrun batch 1 for tensorboard logging
                     out_image = out
 
-            if (i + 1) % model_param['args'].print_freq == 0 or i == len(model_param['val_loader']) - 1:
+            if (i + 1) % nn_model.args.print_freq == 0 or i == len(nn_model.val_loader) - 1:
                 print('[Eval] Epoch: ({0}) [{1}/{2}]: '.format(
-                    epoch, i + 1, len(model_param['val_loader'])), end='')
+                    epoch, i + 1, len(nn_model.val_loader)), end='')
                 print(err_avg)
 
             start = time.time()
@@ -157,4 +158,4 @@ def evaluate_epoch(model_param, epoch):
 
 
 if __name__ == '__main__':
-    main()
+    pass

@@ -6,13 +6,10 @@ import numpy as np
 import cv2 as cv
 from help_funs import file_io, mu
 import config
-from preprocessing import data_preprocess
 from workspace.knn import knn_normal
 
 
 def median_filter(depth):
-    # TODO: pred the depth of each pixel
-    # use a simple CNN to predict depth in each pixel
     padding = 2  # 2 optimal
 
     # add padding

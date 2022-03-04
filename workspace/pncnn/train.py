@@ -15,24 +15,25 @@ sys.path.append(dirname(__file__))
 import time
 import torch
 
-from workspace import model
+from workspace.model import NeuralNetworkModel
 from workspace.pncnn import network
 from pncnn.utils.error_metrics import create_error_metric, AverageMeter
 from pncnn.utils import save_output_images
-from pncnn.utils import checkpoints
+
 
 xout_channel = 3
 cout_in_channel = 3
 cout_out_channel = 6
 cin_channel = 6
 
+
 ############ TRAINING FUNCTION ############
-def train_epoch(model_param, epoch):
+def train_epoch(nn_model, epoch):
     """
     Training function
 
     Args:
-        model_param: icl. The dataloader object for the dataset,optimizer:
+        nn_model: icl. The dataloader object for the dataset,optimizer:
         The optimizer to be used; objective: The objective function, model: The model to be trained
         epoch: What epoch to start from
 
@@ -43,72 +44,77 @@ def train_epoch(model_param, epoch):
         KeyError: Raises an exception.
     """
 
-    print('\n==> Training Epoch [{}] (lr={})'.format(epoch, model_param['optimizer'].param_groups[0]['lr']))
+    print('\n==> Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
 
-    err = create_error_metric(model_param['args'])
+    err = create_error_metric(nn_model.args)
     err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
 
-    model_param['model'].train()  # switch to train mode
+    nn_model.model.train()  # switch to train mode
 
     start = time.time()
-    for i, (input, target) in enumerate(model_param['train_loader']):
+    for i, (input, target) in enumerate(nn_model.train_loader):
 
-        input, target = input.to(model_param['device']), target.to(model_param['device'])
+        # put input and target to device
+        input, target = input.to(nn_model.device), target.to(nn_model.device)
 
-        torch.cuda.synchronize()  # Wait for all kernels to finish
+        # Wait for all kernels to finish
+        torch.cuda.synchronize()
 
+        # record data load time
         data_time = time.time() - start
 
+        # start count the model time
         start = time.time()
 
-        model_param['optimizer'].zero_grad()  # Clear the gradients
+        # Clear the gradients
+        nn_model.optimizer.zero_grad()
 
         # Forward pass
-        out = model_param['model'](input)
+        out = nn_model.model(input)
 
-        loss = model_param['loss'](out, target)  # Compute the loss
+        # Compute the loss
+        loss = nn_model.loss(out, target)
 
         # Backward pass
         loss.backward()
 
-        model_param['optimizer'].step()  # Update the parameters
+        # Update the parameters
+        nn_model.optimizer.step()
 
+        # record model time
         gpu_time = time.time() - start
 
         # Calculate Error metrics
-        err = create_error_metric(model_param['args'])
-
+        err = create_error_metric(nn_model.args)
         err.evaluate(out[:, :xout_channel, :, :].data, target.data)
-        # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
-
         err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
-
-        if ((i + 1) % model_param['args'].print_freq == 0) or (i == len(model_param['train_loader']) - 1):
-            print(f"train_loader: {len(model_param['train_loader'])}")
-            print(f"[Train] Epoch ({epoch}) [{i + 1}/{len(model_param['train_loader'])}]: ", end='')
+        if ((i + 1) % nn_model.args.print_freq == 0) or (i == len(nn_model.train_loader) - 1):
+            print(f"train_loader: {len(nn_model.train_loader)}")
+            print(f"[Train] Epoch ({epoch}) [{i + 1}/{len(nn_model.train_loader)}]: ", end='')
             print(err_avg)
 
         # Log to Tensorboard if enabled
-        if model_param['tb_writer'] is not None:
-            if (i + 1) % model_param['tb_freq'] == 0:
+        if nn_model.tb_writer is not None:
+            if (i + 1) % nn_model.tb_freq == 0:
                 avg_meter = err_avg.get_avg()
-                model_param['tb_writer'].add_scalar('Loss/train', avg_meter.loss,
-                                                    epoch * len(model_param['train_loader']) + i)
-                model_param['tb_writer'].add_scalar('MAE/train', avg_meter.metrics['mae'],
-                                                    epoch * len(model_param['train_loader']) + i)
-                model_param['tb_writer'].add_scalar('RMSE/train', avg_meter.metrics['rmse'],
-                                                    epoch * len(model_param['train_loader']) + i)
+                nn_model.tb_writer.add_scalar('Loss/train', avg_meter.loss,
+                                              epoch * len(nn_model.train_loader) + i)
+                nn_model.tb_writer.add_scalar('MAE/train', avg_meter.metrics['mae'],
+                                              epoch * len(nn_model.train_loader) + i)
+                nn_model.tb_writer.add_scalar('RMSE/train', avg_meter.metrics['rmse'],
+                                              epoch * len(nn_model.train_loader) + i)
 
-        start = time.time()  # Start counting again for the next iteration
+        # Start counting again for the next iteration
+        start = time.time()
 
     # update log
-    model_param['train_csv'].update_log(err_avg, epoch)
+    nn_model.train_csv.update_log(err_avg, epoch)
 
     return err_avg
 
 
 # -------------- EVALUATION FUNCTION ----------------------
-def evaluate_epoch(model_param, epoch):
+def evaluate_epoch(nn_model, epoch):
     """
     Evluation function
 
@@ -124,19 +130,19 @@ def evaluate_epoch(model_param, epoch):
     """
     print('\n==> Evaluating Epoch [{}]'.format(epoch))
 
-    err = create_error_metric(model_param['args'])
+    err = create_error_metric(nn_model.args)
     err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
 
-    model_param['model'].eval()  # Swith to evaluate mode
+    nn_model.model.eval()  # Swith to evaluate mode
 
     # Save output images
-    out_img_saver = save_output_images.create_out_image_saver(model_param['exp_dir'], model_param['args'], epoch)
+    out_img_saver = save_output_images.create_out_image_saver(nn_model.exp_dir, nn_model.args, epoch)
     out_image = None
 
     start = time.time()
     with torch.no_grad():  # Disable gradients computations
-        for i, (input, target) in enumerate(model_param['val_loader']):
-            input, target = input.to(model_param['device']), target.to(model_param['device'])
+        for i, (input, target) in enumerate(nn_model.val_loader):
+            input, target = input.to(nn_model.device), target.to(nn_model.device)
 
             torch.cuda.synchronize()
 
@@ -145,67 +151,65 @@ def evaluate_epoch(model_param, epoch):
             # Forward Pass
             start = time.time()
 
-            out = model_param['model'](input)
+            out = nn_model.model(input)
 
             # Check if there is cout There is Cout
-            loss = model_param['loss'](out, target)  # Compute the loss
+            loss = nn_model.loss(out, target)  # Compute the loss
 
             gpu_time = time.time() - start
 
             # Calculate Error metrics
-            err = create_error_metric(model_param['args'])
+            err = create_error_metric(nn_model.args)
             err.evaluate(out[:, :xout_channel, :, :].data, target.data)
             # target.data = target.data.permute(0, 4, 2, 3, 1).sum(dim=-1)
             err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
 
             # Save output images
-            if model_param['args'].save_val_imgs:
+            if nn_model.args.save_val_imgs:
                 out_image = out_img_saver.update(i, out_image, input, out, target)
 
-            if model_param['args'].evaluate is None:
-                if model_param['tb_writer'] is not None and i == 1:  # Retrun batch 1 for tensorboard logging
+            if nn_model.args.evaluate is None:
+                if nn_model.tb_writer is not None and i == 1:  # Retrun batch 1 for tensorboard logging
                     out_image = out
 
-            if (i + 1) % model_param['args'].print_freq == 0 or i == len(model_param['val_loader']) - 1:
+            if (i + 1) % nn_model.args.print_freq == 0 or i == len(nn_model.val_loader) - 1:
                 print('[Eval] Epoch: ({0}) [{1}/{2}]: '.format(
-                    epoch, i + 1, len(model_param['val_loader'])), end='')
+                    epoch, i + 1, len(nn_model.val_loader)), end='')
                 print(err_avg)
 
             start = time.time()
 
     # Evaluate Uncerainty
-    ause, ause_fig = model.evaluate_uncertainty(model_param['args'],
-                                                model_param['model'], model_param['val_loader'], epoch)
+    ause, ause_fig = nn_model.evaluate_uncertainty(epoch)
 
     # Update Log files
-    model_param['test_csv'].update_log(err_avg, epoch, ause)
+    nn_model.test_csv.update_log(err_avg, epoch, ause)
 
     return err_avg, out_image, ause, ause_fig
 
 
-def main(model_param):
-
+def main(args, network):
+    nn_model = NeuralNetworkModel(args, network)
 
     ############ TRAINING LOOP ############
-    for epoch in range(model_param['start_epoch'], model_param['args'].epochs):
+    for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
-        train_epoch(model_param, epoch)
+        train_epoch(nn_model, epoch)
 
         # Learning rate scheduler
-        model_param['lr_decayer'].step()
+        nn_model.lr_decayer.step()
 
         # Save checkpoint in case evaluation crashed
-        checkpoints.save_checkpoint(model_param, False, epoch)
+        nn_model.save_checkpoint(False, epoch)
 
         # Evaluate the trained epoch
-        test_err_avg, out_image, ause, ause_fig = evaluate_epoch(model_param, epoch)  # evaluate on validation set
+        test_err_avg, out_image, ause, ause_fig = evaluate_epoch(nn_model, epoch)  # evaluate on validation set
 
         # Log to tensorboard if enabled
-        model.log_to_tensorboard(model_param['tb_writer'], test_err_avg, ause, ause_fig, out_image, epoch)
-
+        nn_model.log_to_tensorboard(test_err_avg, ause, ause_fig, out_image, epoch)
         # save the best model
-        model.save_best_model(model_param, test_err_avg, epoch)
+        nn_model.save_best_model(test_err_avg, epoch)
 
 
 if __name__ == '__main__':
-    main()
+    pass

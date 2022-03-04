@@ -1,156 +1,134 @@
 import datetime
-import importlib
 import os, sys
 from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
+import shutil
 import torch
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 
 import config
 
-from pncnn.utils.save_output_images import colored_normal_tensor
+from pncnn.common import losses
 from pncnn.dataloaders import my_creator
-from pncnn.utils import checkpoints
+from pncnn.utils.save_output_images import colored_normal_tensor
 from pncnn.utils import eval_uncertainty
 from pncnn.utils import error_metrics
-from pncnn.common import losses
 from pncnn.utils import args_parser
 
 
-def save_best_model(model_param, test_err_avg, epoch):
-    # Save best model
-    # TODO: How to decide the best based on dataset?
-    is_best = test_err_avg.metrics['rmse'] < model_param['best_result'].metrics['rmse']
-    if is_best:
-        best_result = test_err_avg  # Save the new best locally
-        test_err_avg.print_to_txt(model_param['best_txt'], epoch)  # Print to a text file
-    else:
-        best_result = model_param['best_result']
+class NeuralNetworkModel():
+    def __init__(self, args, network, start_epoch=0):
+        self.args = args
+        self.start_epoch = start_epoch
+        self.device = torch.device("cpu" if self.args.cpu else self.args.gpu)
+        self.exp_dir = config.ws_path / self.args.exp
+        self.train_loader, self.val_loader = my_creator.create_dataloader(self.args, eval_mode=False)
+        self.model = network.CNN().to(self.device)
+        self.parameters = filter(lambda p: p.requires_grad, self.model.parameters())
+        self.optimizer = self.init_optimizer()
+        self.best_result = error_metrics.create_error_metric(self.args)
+        self.best_result.set_to_worst()
+        self.tb = args.tb_log if hasattr(args, 'tb_log') else False
+        self.tb_freq = args.tb_freq if hasattr(args, 'tb_freq') else 1000
+        self.tb_writer = SummaryWriter(os.path.join(self.exp_dir, 'tb_log',
+                                                    datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
+        self.loss = losses.get_loss_fn(args).to(self.device)
+        self.lr_decayer = lr_scheduler.StepLR(self.optimizer,
+                                              step_size=args.lr_decay_step,
+                                              gamma=args.lr_decay_factor,
+                                              last_epoch=start_epoch - 1)
+        self.train_csv = error_metrics.LogFile(os.path.join(self.exp_dir, 'train.csv'), args)
+        self.test_csv = error_metrics.LogFile(os.path.join(self.exp_dir, 'test.csv'), args)
+        self.best_txt = os.path.join(self.exp_dir, 'best.txt')
 
-    # Save it again if it is best checkpoint
-    checkpoints.save_checkpoint(model_param, is_best, epoch)
+        args_parser.save_args(self.exp_dir, args)  # Save args to JSON file
+        self.print_info(args)
 
-
-def log_to_tensorboard(tb_writer, test_err_avg, ause, ause_fig, out_image, epoch):
-    if tb_writer is not None:
-        avg_meter = test_err_avg.get_avg()
-        tb_writer.add_scalar('Loss/selval', avg_meter.loss, epoch)
-        tb_writer.add_scalar('MAE/selval', avg_meter.metrics['mae'], epoch)
-        tb_writer.add_scalar('RMSE/selval', avg_meter.metrics['rmse'], epoch)
-        if ause is not None:
-            tb_writer.add_scalar('AUSE/selval', ause, epoch)
-        # TODO: change colored depthmap tensor function to a correct one.
-        tb_writer.add_images('Prediction', colored_normal_tensor(out_image[:, :config.xout_channel, :, :]), epoch)
-        tb_writer.add_images('Input_Conf_Log_Scale', colored_normal_tensor(torch.log(out_image[:, config.cin_channel:, :, :] + 1)),
-                             epoch)
-        tb_writer.add_images('Output_Conf_Log_Scale',
-                             colored_normal_tensor(torch.log(out_image[:, config.cout_in_channel:config.cout_out_channel, :, :] + 1)), epoch)
-        tb_writer.add_figure('Sparsification_Plot', ause_fig, epoch)
-
-
-def evaluate_uncertainty(args, model, val_loader, epoch):
-    if args.eval_uncert:
-        if args.loss == 'masked_prob_loss_var':
-            ause, ause_fig = eval_uncertainty.eval_ause(model, val_loader, args, epoch, uncert_type='v')
+    def init_optimizer(self):
+        if self.args.optimizer.lower() == 'sgd':
+            optimizer = SGD(self.parameters,
+                            lr=self.args.lr,
+                            momentum=self.args.momentum,
+                            weight_decay=self.args.weight_decay)
+        elif self.args.optimizer.lower() == 'adam':
+            optimizer = Adam(self.parameters,
+                             lr=self.args.lr,
+                             weight_decay=self.args.weight_decay,
+                             amsgrad=True)
         else:
-            ause, ause_fig = eval_uncertainty.eval_ause(model, val_loader, args, epoch, uncert_type='c')
-    else:
-        raise ValueError
+            raise ValueError
+        return optimizer
 
-    return ause, ause_fig
+    def print_info(self, args):
+        print(f'\n==> Starting a new experiment "{args.exp}" \n')
+        print(f'\n==> Model "{self.model.__name__}" was loaded successfully!')
+        args_parser.print_args(args)
 
+    def evaluate_uncertainty(self, epoch):
+        if self.args.eval_uncert:
+            if self.args.loss == 'masked_prob_loss_var':
+                ause, ause_fig = eval_uncertainty.eval_ause(self.model, self.val_loader, self.args, epoch,
+                                                            uncert_type='v')
+            else:
+                ause, ause_fig = eval_uncertainty.eval_ause(self.model, self.val_loader, self.args, epoch,
+                                                            uncert_type='c')
+        else:
+            raise ValueError
 
-def init_env(args, network):
-    # Make some variable global
-    model_param = {}
+        return ause, ause_fig
 
-    # Args parser
-    # args = args_parser.args_parser()
-    model_param['args'] = args
+    def log_to_tensorboard(self, test_err_avg, ause, ause_fig, out_image, epoch):
+        if self.tb_writer is not None:
+            avg_meter = test_err_avg.get_avg()
+            self.tb_writer.add_scalar('Loss/selval', avg_meter.loss, epoch)
+            self.tb_writer.add_scalar('MAE/selval', avg_meter.metrics['mae'], epoch)
+            self.tb_writer.add_scalar('RMSE/selval', avg_meter.metrics['rmse'], epoch)
+            if ause is not None:
+                self.tb_writer.add_scalar('AUSE/selval', ause, epoch)
+            # TODO: change colored depthmap tensor function to a correct one.
+            self.tb_writer.add_images('Prediction', colored_normal_tensor(out_image[:, :config.xout_channel, :, :]),
+                                      epoch)
+            self.tb_writer.add_images('Input_Conf_Log_Scale',
+                                      colored_normal_tensor(torch.log(out_image[:, config.cin_channel:, :, :] + 1)),
+                                      epoch)
+            self.tb_writer.add_images('Output_Conf_Log_Scale',
+                                      colored_normal_tensor(
+                                          torch.log(
+                                              out_image[:, config.cout_in_channel:config.cout_out_channel, :, :] + 1)),
+                                      epoch)
+            self.tb_writer.add_figure('Sparsification_Plot', ause_fig, epoch)
 
-    if args.cpu:
-        device = "cpu"
-    else:
-        device = args.gpu
+    def save_best_model(self, test_err_avg, epoch):
+        # Save best model
+        is_best = test_err_avg.metrics['rmse'] < self.best_result.metrics['rmse']
+        if is_best:
+            self.best_result = test_err_avg  # Save the new best locally
+            test_err_avg.print_to_txt(self.best_txt, epoch)  # Print to a text file
+        else:
+            self.best_result = self.best_result
 
-    start_epoch = 0
-    model_param['start_epoch'] = start_epoch
+        # Save it again if it is best checkpoint
+        self.save_checkpoint(is_best, epoch)
 
-    print('\n==> Starting a new experiment "{}" \n'.format(args.exp))
+    def save_checkpoint(self, is_best, epoch):
+        checkpoint_filename = os.path.join(self.exp_dir, 'checkpoint-' + str(epoch) + '.pth.tar')
 
-    # Which device to use
-    device = torch.device(device)
-    model_param['device'] = device
+        state = {'args': self.args,
+                 'epoch': epoch,
+                 'model': self.model,
+                 'best_result': self.best_result,
+                 'optimizer': self.optimizer}
 
-    args_parser.print_args(args)
-    exp_dir = config.ws_path / args.exp
-    model_param['exp_dir'] = exp_dir
+        torch.save(state, checkpoint_filename)
 
-    # Create dataloader
-    train_loader, val_loader = my_creator.create_dataloader(args, eval_mode=False)
-    model_param['train_loader'] = train_loader
-    model_param['val_loader'] = val_loader
+        if is_best:
+            best_filename = os.path.join(self.exp_dir, 'model_best.pth.tar')
+            shutil.copyfile(checkpoint_filename, best_filename)
 
-    # import the model
-    model = network.CNN().to(device)
-    model_param['model'] = model
-    print('\n==> Model "{}" was loaded successfully!'.format(model.__name__))
-
-    # Optimize only parameters that requires_grad
-    parameters = filter(lambda p: p.requires_grad, model.parameters())
-    model_param['parameters'] = parameters
-
-    # Create Optimizer
-    if args.optimizer.lower() == 'sgd':
-        optimizer = SGD(parameters, lr=args.lr, momentum=args.momentum,
-                        weight_decay=args.weight_decay)
-    elif args.optimizer.lower() == 'adam':
-        optimizer = Adam(parameters, lr=args.lr, weight_decay=args.weight_decay, amsgrad=True)
-    else:
-        raise ValueError
-    model_param['optimizer'] = optimizer
-
-    ############ IF RESUME/NEW EXP ############
-    # Error metrics that are set to the worst
-    best_result = error_metrics.create_error_metric(args)
-    best_result.set_to_worst()
-    model_param['best_result'] = best_result
-
-    # Tensorboard
-    tb = args.tb_log if hasattr(args, 'tb_log') else False
-    tb_freq = args.tb_freq if hasattr(args, 'tb_freq') else 1000
-
-    if tb:
-        tb_writer = SummaryWriter(
-            os.path.join(exp_dir, 'tb_log', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
-    else:
-        raise ValueError
-
-    model_param['tb'] = tb
-    model_param['tb_freq'] = tb_freq
-    model_param['tb_writer'] = tb_writer
-
-    # Create Loss
-    loss = losses.get_loss_fn(args).to(device)
-    model_param['loss'] = loss
-
-    # Define Learning rate decay
-    lr_decayer = lr_scheduler.StepLR(optimizer, step_size=args.lr_decay_step, gamma=args.lr_decay_factor,
-                                     last_epoch=start_epoch - 1)
-    model_param['lr_decayer'] = lr_decayer
-
-    # Create or Open Logging files
-    train_csv = error_metrics.LogFile(os.path.join(exp_dir, 'train.csv'), args)
-    test_csv = error_metrics.LogFile(os.path.join(exp_dir, 'test.csv'), args)
-    best_txt = os.path.join(exp_dir, 'best.txt')
-
-    model_param['train_csv'] = train_csv
-    model_param['test_csv'] = test_csv
-    model_param['best_txt'] = best_txt
-
-    args_parser.save_args(exp_dir, args)  # Save args to JSON file
-
-    return model_param
+        if epoch > 0:
+            prev_checkpoint_filename = os.path.join(self.exp_dir, 'checkpoint-' + str(epoch - 1) + '.pth.tar')
+            if os.path.exists(prev_checkpoint_filename):
+                os.remove(prev_checkpoint_filename)

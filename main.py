@@ -1,5 +1,5 @@
 import config
-from workspace import model
+from workspace.model import NeuralNetworkModel
 from workspace.pncnn import train, test
 from workspace.pncnn import network
 from preprocessing.data_preprocess import noisy_a_folder
@@ -7,7 +7,9 @@ from pncnn.utils import args_parser
 
 
 def main():
+    # load all the args
     args = args_parser.args_parser()
+
     if args.noise:
         for folder in ["selval", "test", "train"]:
             original_folder = config.synthetic_data / folder
@@ -15,11 +17,10 @@ def main():
             noisy_a_folder(original_folder, noisy_folder)
 
     if args.mode == "train":
-        model_param = model.init_env(args, network)
-        train.main(model_param)
+        train.main(args, network)
+
     elif args.mode == 'test':
-        model_param = model.init_env(args, network)
-        test.main(model_param)
+        test.main(args, network)
 
 
 if __name__ == '__main__':
