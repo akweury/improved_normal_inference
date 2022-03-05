@@ -1,11 +1,16 @@
 ## usage
 ssh sha@pc-2103
 
-CUDA_VISIBLE_DEVICES=2 python3 main.py --ws synthetic --exp pncnn --args json --cpu False --mode train
+# remote command
+CUDA_VISIBLE_DEVICES=2 python3 main.py --exp pncnn --args json --cpu False --mode train  --batch_size 4 --epochs 100
 
 scp C:\Users\shaji\TestProject\CapturedData\data_geometrical_body.zip sha@pc-2103:/home/sha/improved_normal_inference/dataset
 scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/pncnn/checkpoint-99.pth.tar  C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
 scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/pncnn/output.zip C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
+
+# local command 
+--exp pncnn --args json --mode train --cpu True --batch_size 1 --epochs 10
+--exp pncnn --args json --mode test --cpu True --batch_size 1
 
 # Improved Normal Inference
 

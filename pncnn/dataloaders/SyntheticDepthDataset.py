@@ -74,8 +74,10 @@ class SyntheticDepthDataset(Dataset):
         depth = file_io.load_scaled16bitImage(self.depth[item],
                                               data['minDepth'],
                                               data['maxDepth'])
-        depth_mask = ~(depth == 0)
-        depth[depth_mask] = (depth[depth_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])  # [0,1]
+        # depth_mask = ~(depth == 0)
+        # depth[depth_mask] = (depth[depth_mask] - data['minDepth']) / (data['maxDepth'] - data['minDepth'])  # [0,1]
+        data['R'] = np.identity(3)
+        data['t'] = np.zeros(3)
         vertex_input = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                        torch.tensor(data['K']),
                                        torch.tensor(data['R']).float(),

@@ -4,9 +4,11 @@ output: a complete depth map
 """
 import numpy as np
 import cv2 as cv
+
+import help_funs.mu
 from help_funs import file_io, mu
 import config
-from workspace.knn import knn_normal
+
 
 
 def median_filter(depth):
@@ -41,81 +43,47 @@ def pred_filter(img, pred_img):
     return img
 
 
-def concat_vh(list_2d):
-    # return final image
-    return cv.vconcat([cv.hconcat(list_h) for list_h in list_2d])
-
-
 if __name__ == '__main__':
     # img_path = str(config.dataset / "gradual2d_512.png")  # basic image
     # img_path = str(config.data_3 / "00003.depth0_gt.png")  # basic image
 
+    path = config.synthetic_data_noise / "train"
+    idx = 4
+    data, depth, depth_noise = file_io.load_single_data(path, idx)
+
     # original image
-    original_path = str(config.synthetic_data_noise / "train" / "00004.depth0.png")  # synthetic image
-    original_16bit = file_io.load_16bitImage(original_path)
-    original = cv.normalize(original_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    depth_8bit = mu.normalize2_8bit(depth, data)
+    normal_knn, normal_knn_8bit = help_funs.mu.depth2normal(depth, 2, data['K'], data['R'], data['t'])
 
     # noised image
-    noise_img_path = str(config.synthetic_data_noise / "train" / "00004.depth0_noise.png")  # synthetic image
-    # noise_img_16bit = data_preprocess.noisy_1channel(original_16bit)
-    noise_img_16bit = file_io.load_16bitImage(noise_img_path)
-    noise_img = cv.normalize(noise_img_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    depth_noise_8bit = mu.normalize2_8bit(depth_noise, data)
+    normal_noise_knn, normal_noise_knn_8bit = help_funs.mu.depth2normal(depth_noise, 2, data['K'], data['R'], data['t'])
 
-    # denoised image
-    pred_img_path = str(
-        config.ws_path / "pncnn" / "output" / "epoch_99_synthetic_selval_output" / "00008.png")  # synthetic image
-    pred_img_16bit = file_io.load_16bitImage(pred_img_path)
-    denoise_img_16_bit = pred_filter(original_16bit, pred_img_16bit)
-    denoise_img = cv.normalize(denoise_img_16_bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    # denoise_img = median_filter(noise_img)
-
-    # difference between original and denoised image
-    difference_16bit = original - denoise_img
-    difference = cv.normalize(difference_16bit, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-
-    diff_noise = np.sum(original).astype(np.int64) - np.sum(noise_img).astype(np.int64)
-    diff_denoise = np.sum(original).astype(np.int64) - np.sum(denoise_img).astype(np.int64)
-
-    print(diff_noise)
-    print(diff_denoise)
-
-    # normal ground truth
-    normals_gt_img, normals_pred_img = knn_normal.knn_normal_pred(config.synthetic_data_noise / "train",
-                                                                  4,
-                                                                  denoise_img_16_bit)
-    normals_gt_img = normals_gt_img[1:-1,1:-1,:]
-    normals_pred_img = normals_pred_img[1:-1,1:-1,:]
-
-
-    # text annotations
-
-    cv.putText(original, text='Original', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-    cv.putText(noise_img, text='Adding Noise', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-    cv.putText(denoise_img, text='Denoised', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-    cv.putText(difference, text='Original-Denoised', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-    cv.putText(normals_gt_img, text='Normal (Ground Truth)', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-    cv.putText(normals_pred_img, text='Normal (Prediction)', org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
-               thickness=1, lineType=cv.LINE_AA)
-
-    final_output_1 = cv.hconcat([original, noise_img, denoise_img, difference])
-    final_output_2 = cv.hconcat([normals_gt_img, normals_pred_img])
+    # # denoised image
+    # # denoise_path = str(config.ws_path / "pncnn" / "output" / "epoch_40_synthetic_selval_output" / "00002.png")
+    # # depth_denoise_8bit = depth16bit_2_8bit(denoise_path)
+    # # depth_denoise_8bit = pred_filter(depth_8bit, depth_denoise_8bit)
     #
-    # final_output = concat_vh([[original, noise_img, denoise_img],
-    #                           [difference, normals_gt_img, normals_pred_img]])
+    # # difference between original and denoised image
+    # depth_difference = depth_8bit - depth_denoise_8bit
+    #
+    # diff_noise = np.sum(depth_8bit).astype(np.int64) - np.sum(depth_noise_8bit).astype(np.int64)
+    # diff_denoise = np.sum(depth_8bit).astype(np.int64) - np.sum(depth_denoise_8bit).astype(np.int64)
+    #
+    # print(diff_noise)
+    # print(diff_denoise)
 
+    mu.addText(depth_8bit, "Original")
+    mu.addText(depth_noise_8bit, 'Adding Noise')
+    final_output_1 = cv.hconcat([depth_8bit, depth_noise_8bit])
     cv.imshow("original_noise", final_output_1)
-    cv.imshow("original_noise_2", final_output_2)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
+    mu.addText(normal_knn_8bit, 'Normal (Ground Truth)')
+    mu.addText(normal_noise_knn_8bit, "Original")
+    final_output_2 = cv.hconcat([normal_knn_8bit, normal_noise_knn_8bit])
+
+    cv.imshow("original_noise_2", final_output_2)
     cv.waitKey(0)
     cv.destroyAllWindows()

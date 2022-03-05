@@ -1,3 +1,4 @@
+import json
 import cv2
 import numpy as np
 import torch
@@ -5,7 +6,14 @@ from PIL import Image
 from pathlib import Path
 
 import config
+from help_funs.mu import scale16bitImage
 
+
+def file_path_abs(folder_path, file_name):
+    return str(Path(folder_path) / str(file_name))
+
+
+# --------------------------------------- write ----------------------------------------------------------------
 
 def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoints=None):
     numPoints = np.sum(mask)
@@ -44,6 +52,31 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
 
     ply_file.close()
 
+
+def save_scaled16bitImage(img, img_name, minVal, maxVal):
+    img = img.reshape(512, 512)
+    img[np.isnan(img) != 0] = 0
+    mask = (img == 0)
+
+    img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
+    img = np.array(img, dtype=np.int32)
+    img = write_np2img(img, img_name)
+    return img
+
+
+def write_np2rgbimg(img, img_name):
+    img = Image.fromarray(img.astype(np.uint8))
+    img.save(img_name)
+    return img
+
+
+def write_np2img(np_array, img_name):
+    img = Image.fromarray(np_array.astype(np.uint32))
+    img.save(img_name)
+    return img
+
+
+# --------------------------------------- read ----------------------------------------------------------------
 
 def load_8bitImage(root):
     img = cv2.imread(root, -1)
@@ -85,33 +118,19 @@ def load_scaled16bitImage(root, minVal, maxVal):
     return scale16bitImage(img, minVal, maxVal)
 
 
-def scale16bitImage(img, minVal, maxVal):
-    img = np.array(img, dtype=np.float32)
-    mask = (img == 0)
-    img = img / 65535 * (maxVal - minVal) + minVal
-    img[np.isnan(img)] = 0
-    img = torch.tensor((~mask) * img).unsqueeze(2)
-    img = np.array(img)
+def load_single_data(data_path, idx):
+    # get file names from dataset
+    image_file, ply_file, json_file, depth_gt_file, depth_noise_file, normal_file = get_file_name(idx, data_path)
 
-    return img.astype(np.float32)
+    f = open(json_file)
+    data = json.load(f)
 
+    data['R'] = np.identity(3)
+    data['t'] = np.zeros(3)
 
-def save_scaled16bitImage(img, img_name, minVal, maxVal):
-    img = img.reshape(512, 512)
-    img[np.isnan(img) != 0] = 0
-    mask = (img == 0)
-
-    img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
-    img = np.array(img, dtype=np.int32)
-    img = write_np2img(img, img_name)
-    return img
-
-
-def normalize_rgb_image(img):
-    img = img.astype(np.int32)
-    max, min = img.max(), img.min()
-    img_norm = (img - min) / (max - min) * 255
-    return img_norm.astype(np.uint8)
+    depth_gt = load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
+    depth_noise = load_scaled16bitImage(depth_noise_file, data['minDepth'], data['maxDepth'])
+    return data, depth_gt, depth_noise
 
 
 def get_file_name(idx, data_path):
@@ -119,9 +138,10 @@ def get_file_name(idx, data_path):
     ply_file = str(data_path / str(idx).zfill(5)) + ".pointcloud0.ply"
     json_file = str(data_path / str(idx).zfill(5)) + f".data0.json"
     depth_gt_file = str(data_path / str(idx).zfill(5)) + f".depth0.png"
+    depth_noise_file = str(data_path / str(idx).zfill(5)) + f".depth0_noise.png"
     normal_file = str(data_path / str(idx).zfill(5)) + f".normal0.png"
 
-    return image_file, ply_file, json_file, depth_gt_file, normal_file
+    return image_file, ply_file, json_file, depth_gt_file, depth_noise_file, normal_file
 
 
 def get_output_file_name(idx, file_type=None, method=None, param=0):
@@ -137,19 +157,3 @@ def get_output_file_name(idx, file_type=None, method=None, param=0):
     file_path = file_path_abs(folder_path, file_name)
 
     return file_path
-
-
-def write_np2rgbimg(img, img_name):
-    img = Image.fromarray(img.astype(np.uint8))
-    img.save(img_name)
-    return img
-
-
-def write_np2img(np_array, img_name):
-    img = Image.fromarray(np_array.astype(np.uint32))
-    img.save(img_name)
-    return img
-
-
-def file_path_abs(folder_path, file_name):
-    return str(Path(folder_path) / str(file_name))

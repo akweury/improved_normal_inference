@@ -33,7 +33,7 @@ def main(args, network):
 
     # Define paths
     # synthetic paths
-    chkpt_path = config.ws_path / args.exp / "checkpoint-99.pth.tar"
+    chkpt_path = config.ws_path / args.exp / "checkpoint-40.pth.tar"
     # kitti paths
     # chkpt_path = config.exper_kitti / args.evaluate / "checkpoint-154.pth.tar"
 

@@ -4,6 +4,8 @@ import os
 import cv2 as cv
 import torch
 from PIL import Image
+
+import help_funs.mu
 from help_funs import file_io
 from help_funs import mu
 
@@ -38,7 +40,7 @@ class SyntheticOutputImageSaver(OutputImageSaver):
 
     def save_torch2rbgimg(self, torch_array, path):
         img = torch.permute(torch_array, (1, 2, 0)).numpy().astype(np.uint32)
-        img = file_io.normalize_rgb_image(img)
+        img = mu.normalize2_8bit(img)
         file_io.write_np2rgbimg(img, path)
 
     # TODO: Save output image, convert normal to tengent space rgb normal
@@ -67,7 +69,7 @@ class SyntheticOutputImageSaver(OutputImageSaver):
         d_out = mu.normalize(d_out)
 
         normal_rgb = mu.normal2RGB(d_out, mask)
-        img = file_io.normalize_rgb_image(normal_rgb)
+        img = mu.normalize2_8bit(normal_rgb)
         file_io.write_np2rgbimg(img, d_out_path)
 
         # self.save_torch2rbgimg(d_out, d_out_path)

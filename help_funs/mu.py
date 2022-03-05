@@ -1,27 +1,10 @@
+import cv2
 import cv2 as cv
 import numpy as np
 import torch
 
 
-def binary(img):
-    # h, w = img.shape[:2]
-    c = torch.zeros(size=img.shape)
-    mask = ~(img == 0)
-    c[mask] = 1
-
-    return c
-
-
-def bi_interpolation(lower_left, lower_right, upper_left, upper_right, x, y):
-    return lower_left * (1 - x) * (1 - y) + lower_right * x * (1 - y) + upper_left * (1 - x) * y + upper_right * x * y
-
-
-def normal_point_to_view_point(normal, point, view_point):
-    if np.dot(normal, (point - view_point)) > 0:
-        normal = -normal
-
-    return normal
-
+# --------------------------- evaluate operations ----------------------------------------------------------------------
 
 # https://stackoverflow.com/a/13849249
 def unit_vector(vector):
@@ -75,39 +58,36 @@ def get_valid_pixels(img):
     return np.count_nonzero(np.sum(img, axis=2) > 0)
 
 
-def array2RGB(numpy_array, mask):
-    min, max = numpy_array.min(), numpy_array.max()
-
-    # convert normal to RGB color
-    # h, w, c = numpy_array.shape
-    numpy_array[mask] = ((numpy_array[mask] - min) / (max - min) * 255).astype(np.uint8)
-    # for i in range(h):
-    #     for j in range(w):
-    #         if mask[i, j]:
-    #             numpy_array[i, j] = (numpy_array[i, j] - min) / (max - min)
-    #             numpy_array[i, j] = (numpy_array[i, j] * 255).astype(np.uint8)
-
-    return numpy_array
+def get_valid_pixels_idx(img):
+    return np.sum(img, axis=2) != 0
 
 
-def normal2RGB(normals, mask):
-    # convert normal to RGB color
-    h, w, c = normals.shape
-    for i in range(h):
-        for j in range(w):
-            if mask[i, j]:
-                normals[i, j] = normals[i, j] * 0.5 + 0.5
-                normals[i, j, 2] = 1 - normals[i, j, 2]
-                # normals[i, j,2] = 1 - normals[i, j,2]
-                # normals[i, j,0] = 1 - normals[i, j,0]
-                normals[i, j] = (normals[i, j] * 255).astype(np.int32)
+# --------------------------- filter operations -----------------------------------------------------------------------
+def binary(img):
+    # h, w = img.shape[:2]
+    img_permuted = img.permute(2, 3, 1, 0)
 
-    return normals
+    mask = img_permuted.sum(dim=2).sum(dim=2) == 0
+    c_permute = torch.zeros(size=img_permuted.shape)
+
+    c_permute[~mask] = 1
+
+    c = c_permute.permute(3, 2, 0, 1)
+    return c
 
 
-def normalize(numpy_array):
-    min, max = numpy_array.min(), numpy_array.max()
-    numpy_array = (numpy_array - min) / (max - min)
+def bi_interpolation(lower_left, lower_right, upper_left, upper_right, x, y):
+    return lower_left * (1 - x) * (1 - y) + lower_right * x * (1 - y) + upper_left * (1 - x) * y + upper_right * x * y
+
+
+def normalize(numpy_array, data):
+    mask = numpy_array.sum(axis=2) == 0
+    if data is not None:
+        numpy_array[~mask] = (numpy_array[~mask] - data["minDepth"]) / (data["maxDepth"] - data["minDepth"])
+    else:
+        min, max = numpy_array[~mask].min(), numpy_array.max()
+        if min != max:
+            numpy_array[~mask] = (numpy_array[~mask] - min) / (max - min)
     return numpy_array
 
 
@@ -122,10 +102,6 @@ def copy_make_border(img, patch_width):
                              top=offset, bottom=offset,
                              left=offset, right=offset,
                              borderType=cv.BORDER_REFLECT)
-
-
-def get_valid_pixels_idx(img):
-    return np.sum(img, axis=2) != 0
 
 
 def lightVisualization():
@@ -174,6 +150,68 @@ def cameraVisualization():
     return points
 
 
+def normalize2_8bit(img_scaled, data=None):
+    normalized_img = normalize(img_scaled, data)
+    img_8bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return img_8bit
+
+
+# --------------------------- convert operations -----------------------------------------------------------------------
+
+
+def normal_point2view_point(normal, point, view_point):
+    if np.dot(normal, (point - view_point)) > 0:
+        normal = -normal
+
+    return normal
+
+
+def compute_normal(vertex, mask, k):
+    normals = np.zeros(shape=vertex.shape)
+    for i in range(k, vertex.shape[0]):
+        for j in range(k, vertex.shape[1]):
+            if mask[i, j]:
+                neighbors = vertex[i - k:i + k, j - k:j + k]  # get its k neighbors
+                neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
+                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)
+                plane_vectors = neighbors - vertex[i, j]
+
+                u, s, vh = np.linalg.svd(plane_vectors)
+                normal = vh.T[:, -1]
+                normal = normal_point2view_point(normal, vertex[i][j], np.array([0, 0, 0]))
+                if np.linalg.norm(normal) != 1:
+                    normal = normal / np.linalg.norm(normal)
+                normals[i, j] = normal
+
+    return normals
+
+
+# --------------------------- convert functions -----------------------------------------------------------------------
+
+def array2RGB(numpy_array, mask):
+    # convert normal to RGB color
+    min, max = numpy_array.min(), numpy_array.max()
+    if min != max:
+        numpy_array[mask] = ((numpy_array[mask] - min) / (max - min))
+
+    return (numpy_array * 255).astype(np.uint8)
+
+
+def normal2RGB(normals, mask):
+    # convert normal to RGB color
+    h, w, c = normals.shape
+    for i in range(h):
+        for j in range(w):
+            if mask[i, j]:
+                normals[i, j] = normals[i, j] * 0.5 + 0.5
+                normals[i, j, 2] = 1 - normals[i, j, 2]
+                # normals[i, j,2] = 1 - normals[i, j,2]
+                # normals[i, j,0] = 1 - normals[i, j,0]
+                normals[i, j] = (normals[i, j] * 255).astype(np.int32)
+
+    return normals
+
+
 def depth2vertex(depth, K, R, t):
     c, h, w = depth.shape
 
@@ -189,3 +227,91 @@ def depth2vertex(depth, K, R, t):
     vertex = camOrig.unsqueeze(1).repeat(1, h, w) + vertex.reshape(3, h, w)
     vertex = vertex.permute(1, 2, 0)
     return np.array(vertex)
+
+
+def vertex2normal(vertex, k_idx):
+    mask = np.sum(np.abs(vertex), axis=2) != 0
+    normals = compute_normal(vertex, mask, k_idx)
+    normals_rgb = normal2RGB(normals, mask).astype(np.uint8)
+    return normals, normals_rgb
+
+
+def depth2normal(depth, k_idx, K, R, t):
+    if depth.ndim == 2:
+        depth = np.expand_dims(depth, axis=2)
+    vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                          torch.tensor(K),
+                          torch.tensor(R).float(),
+                          torch.tensor(t).float())
+    return vertex2normal(vertex, k_idx)
+
+
+# -------------------------------------- openCV Utils ------------------------------------------
+def addText(img, text):
+    cv.putText(img, text=text, org=(10, 50),
+               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
+               thickness=1, lineType=cv.LINE_AA)
+
+
+def concat_vh(list_2d):
+    """
+    show image in a 2d array
+    :param list_2d: 2d array with image element
+    :return: concatenated 2d image array
+    """
+    # return final image
+    return cv.vconcat([cv.hconcat(list_h)
+                       for list_h in list_2d])
+
+
+def show_numpy(numpy_array, title):
+    if numpy_array.shape[2] == 3:
+        # rgb image
+        cv2.imshow(f"numpy_{title}", numpy_array)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        print(f"Unsupported input array shape.")
+
+
+def tenor2numpy(tensor):
+    if tensor.size() == (1, 3, 512, 512):
+        return tensor.permute(2, 3, 1, 0).sum(dim=3).numpy()
+    else:
+        print("Unsupported input tensor size.")
+
+
+def show_tensor(tensor, title):
+    numpy_array = tenor2numpy(tensor)
+    cv2.imshow(f"tensor_{title}", numpy_array)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def show_horizontal(array, title):
+    cv2.imshow(f"horizontal_{title}", cv2.hconcat(array))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def show_vertical(array, title):
+    cv2.imshow(f"vertical_{title}", cv2.vconcat(array))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def show_grid(grid, title):
+    cv2.imshow(f"grid_{title}", concat_vh(grid))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def scale16bitImage(img, minVal, maxVal):
+    img = np.array(img, dtype=np.float32)
+    mask = (img == 0)
+    img = img / 65535 * (maxVal - minVal) + minVal
+    img[np.isnan(img)] = 0
+    img = torch.tensor((~mask) * img).unsqueeze(2)
+    img = np.array(img)
+
+    return img.astype(np.float32)
