@@ -44,7 +44,7 @@ class NeuralNetworkModel():
         self.test_csv = error_metrics.LogFile(os.path.join(self.exp_dir, 'test.csv'), args)
         self.best_txt = os.path.join(self.exp_dir, 'best.txt')
 
-        args_parser.save_args(self.exp_dir, args)  # Save args to JSON file
+        # args_parser.save_args(self.exp_dir, args)  # Save args to JSON file
         self.print_info(args)
 
     def init_optimizer(self):
