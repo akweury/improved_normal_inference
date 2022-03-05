@@ -1,6 +1,6 @@
 {"mode": "train",
 "noise": false,
-"cpu": true,
+"cpu": false,
 "args": "json",
 "exp": "pncnn",
 "workspace": "",
@@ -10,7 +10,7 @@
 "dataset": "synthetic",
 "dataset_path": "synthetic_data_noise",
 "modality": "d",
-"batch_size": 1,
+"batch_size": 4,
 "train_on": "full",
 "workers": 1,
 "raw_kitti_path": "",
@@ -41,5 +41,5 @@
 "setval_ds": "selval",
 "save_setval_imgs": false,
 "val_ds": "selval",
-"save_val_imgs": true,
+"save_val_imgs": false,
 "defaults": null}

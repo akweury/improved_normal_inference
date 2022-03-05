@@ -68,7 +68,7 @@ class SyntheticOutputImageSaver(OutputImageSaver):
         d_out = d_out[0, :, :, :].permute(1, 2, 0).numpy()
         d_out = mu.normalize(d_out)
 
-        normal_rgb = mu.normal2RGB(d_out, mask)
+        normal_rgb = mu.normal2RGB(d_out)
         img = mu.normalize2_8bit(normal_rgb)
         file_io.write_np2rgbimg(img, d_out_path)
 

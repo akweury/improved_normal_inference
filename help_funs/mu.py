@@ -197,7 +197,8 @@ def array2RGB(numpy_array, mask):
     return (numpy_array * 255).astype(np.uint8)
 
 
-def normal2RGB(normals, mask):
+def normal2RGB(normals):
+    mask = np.sum(np.abs(normals), axis=2) != 0
     # convert normal to RGB color
     h, w, c = normals.shape
     for i in range(h):
@@ -205,11 +206,9 @@ def normal2RGB(normals, mask):
             if mask[i, j]:
                 normals[i, j] = normals[i, j] * 0.5 + 0.5
                 normals[i, j, 2] = 1 - normals[i, j, 2]
-                # normals[i, j,2] = 1 - normals[i, j,2]
-                # normals[i, j,0] = 1 - normals[i, j,0]
-                normals[i, j] = (normals[i, j] * 255).astype(np.int32)
+                normals[i, j] = (normals[i, j] * 255)
 
-    return normals
+    return normals.astype(np.uint8)
 
 
 def depth2vertex(depth, K, R, t):
@@ -232,7 +231,7 @@ def depth2vertex(depth, K, R, t):
 def vertex2normal(vertex, k_idx):
     mask = np.sum(np.abs(vertex), axis=2) != 0
     normals = compute_normal(vertex, mask, k_idx)
-    normals_rgb = normal2RGB(normals, mask).astype(np.uint8)
+    normals_rgb = normal2RGB(normals).astype(np.uint8)
     return normals, normals_rgb
 
 
@@ -276,7 +275,7 @@ def show_numpy(numpy_array, title):
 
 def tenor2numpy(tensor):
     if tensor.size() == (1, 3, 512, 512):
-        return tensor.permute(2, 3, 1, 0).sum(dim=3).numpy()
+        return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     else:
         print("Unsupported input tensor size.")
 
@@ -288,14 +287,8 @@ def show_tensor(tensor, title):
     cv2.destroyAllWindows()
 
 
-def show_horizontal(array, title):
-    cv2.imshow(f"horizontal_{title}", cv2.hconcat(array))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-def show_vertical(array, title):
-    cv2.imshow(f"vertical_{title}", cv2.vconcat(array))
+def show_images(array, title):
+    cv2.imshow(title, array)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

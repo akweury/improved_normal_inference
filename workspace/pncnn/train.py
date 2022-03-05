@@ -12,6 +12,7 @@ from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
+import cv2
 import time
 import torch
 
@@ -19,7 +20,7 @@ from workspace.model import NeuralNetworkModel
 from workspace.pncnn import network
 from pncnn.utils.error_metrics import create_error_metric, AverageMeter
 from pncnn.utils import save_output_images
-
+from help_funs import mu
 
 xout_channel = 3
 cout_in_channel = 3
@@ -70,7 +71,24 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        out = nn_model.model(input)
+        out, output_1 = nn_model.model(input)
+
+        # ------------------ visualize outputs ----------------------------------------------
+        cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
+        # mu.show_images(output_1, "train_x0-c0-normal_knn")
+
+        xout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, :xout_channel, :, :]))
+        mu.addText(xout_normalized_8bit, "xout")
+        cout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, cout_in_channel:cout_out_channel, :, :]))
+        mu.addText(cout_normalized_8bit, "cout")
+        normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target))
+        mu.addText(normal_gt_8bit, "normal(gt)")
+        output_2 = cv2.hconcat([xout_normalized_8bit, cout_normalized_8bit, normal_gt_8bit])
+
+        cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_out_c_out_normal_CNN_{epoch}.png"), output_2)
+        # mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
+
+        # ------------------------------------------------------------------------------------
 
         # Compute the loss
         loss = nn_model.loss(out, target)
@@ -151,7 +169,24 @@ def evaluate_epoch(nn_model, epoch):
             # Forward Pass
             start = time.time()
 
-            out = nn_model.model(input)
+            out, output_1 = nn_model.model(input)
+
+            # ------------------ visualize outputs ----------------------------------------------
+            cv2.imwrite(str(nn_model.exp_dir / "output" / f"eval_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
+            # mu.show_images(output_1, "train_x0-c0-normal_knn")
+
+            xout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, :xout_channel, :, :]))
+            mu.addText(xout_normalized_8bit, "xout")
+            cout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, cout_in_channel:cout_out_channel, :, :]))
+            mu.addText(cout_normalized_8bit, "cout")
+            normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target))
+            mu.addText(normal_gt_8bit, "normal(gt)")
+            output_2 = cv2.hconcat([xout_normalized_8bit, cout_normalized_8bit, normal_gt_8bit])
+
+            cv2.imwrite(str(nn_model.exp_dir / "output" / f"eval_x_out_c_out_normal_CNN_{epoch}.png"), output_2)
+            # mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
+
+            # ------------------------------------------------------------------------------------
 
             # Check if there is cout There is Cout
             loss = nn_model.loss(out, target)  # Compute the loss

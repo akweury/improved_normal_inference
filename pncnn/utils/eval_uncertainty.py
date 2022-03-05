@@ -7,6 +7,11 @@ from pncnn.dataloaders.dataloader_creator import create_dataloader
 from pncnn.utils.sparsification_plot import sparsification_plot
 import matplotlib.pylab as plt
 
+xout_channel = 3
+cout_in_channel = 3
+cout_out_channel = 6
+cin_channel = 6
+
 
 def eval_ause(model, dataloader, args, epoch, uncertainty_comp='a', show_plot=False, uncert_type='c', from_main=False):
 
@@ -28,7 +33,7 @@ def eval_ause(model, dataloader, args, epoch, uncertainty_comp='a', show_plot=Fa
 
             torch.cuda.synchronize()  # Wait for all kernels to finish
 
-            out = model(input)
+            out, output_img = model(input)
 
             if uncertainty_comp == 'a+e':
                 # Epistimic
@@ -52,19 +57,19 @@ def eval_ause(model, dataloader, args, epoch, uncertainty_comp='a', show_plot=Fa
             # err.evaluate(out[:, :1, :, :].data, target.data)
             for j in range(input.shape[0]):
                 #print('Processing image {}'.format(i * input.shape[0] + j))
-                t = target[j, 0:1, :, :]
-                pred = out[j, 0:1, :, :]
+                t = target[j, :xout_channel, :, :]
+                pred = out[j, :xout_channel, :, :]
                 # t = target[j, 0:3, :, :]
                 # pred = out[j, 0:3, :, :]
 
 
                 if uncertainty_comp == 'a+e':
                     # pred = mu[j,0,:,:].cpu().numpy()
-                    var_alea = 1/(out[j, 1, :, :]+eps) #1 - out[j, 1, :, :]
-                    var_epi = s2[j, 0, :, :]
+                    var_alea = 1/(out[j, cout_in_channel:cout_in_channel, :, :]+eps) #1 - out[j, 1, :, :]
+                    var_epi = s2[j, :xout_channel, :, :]
                     var = var_epi
                 else:
-                    var_alea = out[j, 1:2, :, :]
+                    var_alea = out[j, cout_in_channel:cout_out_channel, :, :]
                     var = var_alea
 
                 valid = (t != 0)
