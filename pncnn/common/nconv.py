@@ -42,7 +42,7 @@ class NConvUNet(nn.Module):
 
         # self.nconv8 = NConv2d(in_ch * num_channels, out_ch * num_channels, (1, 1), pos_fn, 'k')
 
-    def forward(self, x0, c0, cpu=False):
+    def forward(self, x0, c0, cpu):
         x1, c1 = self.nconv1(x0, c0)  # 2
         x1, c1 = self.nconv2(x1, c1)  # 2
         x1, c1 = self.nconv3(x1, c1)  # 2

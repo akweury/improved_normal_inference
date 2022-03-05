@@ -71,7 +71,7 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        out, output_1 = nn_model.model(input)
+        out, output_1 = nn_model.model(input, cpu=nn_model.args.cpu)
 
         # ------------------ visualize outputs ----------------------------------------------
         cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
@@ -169,7 +169,7 @@ def evaluate_epoch(nn_model, epoch):
             # Forward Pass
             start = time.time()
 
-            out, output_1 = nn_model.model(input)
+            out, output_1 = nn_model.model(input, cpu=nn_model.args.cpu)
 
             # ------------------ visualize outputs ----------------------------------------------
             cv2.imwrite(str(nn_model.exp_dir / "output" / f"eval_x_0_c_0_normal_KNN_{epoch}.png"), output_1)

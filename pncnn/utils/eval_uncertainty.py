@@ -33,7 +33,7 @@ def eval_ause(model, dataloader, args, epoch, uncertainty_comp='a', show_plot=Fa
 
             torch.cuda.synchronize()  # Wait for all kernels to finish
 
-            out, output_img = model(input)
+            out, output_img = model(input, cpu=args.cpu)
 
             if uncertainty_comp == 'a+e':
                 # Epistimic
