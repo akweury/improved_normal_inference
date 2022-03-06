@@ -27,7 +27,7 @@ xout_channel = 3
 cin_channel = 6
 
 
-def save_output(out, target, output_1, nn_model, epoch, i, prefix):
+def save_output(out, target, output_1, nn_model, epoch, i, prefix, loss):
     # ------------------ visualize outputs ----------------------------------------------
 
     # normalize output normal
@@ -40,8 +40,8 @@ def save_output(out, target, output_1, nn_model, epoch, i, prefix):
     output_2 = cv2.hconcat([normal_cnn_8bit, normal_gt_8bit])
     output = cv2.vconcat([output_1, output_2])
     output = cv2.resize(output, (512, 512))
-    cv2.imwrite(str(nn_model.exp_dir / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}.png"), output)
-    mu.show_images(output, f"{prefix}_NNN_epoch_{epoch}_{i}.png")
+    cv2.imwrite(str(nn_model.exp_dir / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss}.png"), output)
+    # mu.show_images(output, f"{prefix}_NNN_epoch_{epoch}_{i}.png")
 
 
 ############ TRAINING FUNCTION ############
@@ -88,9 +88,9 @@ def train_epoch(nn_model, epoch):
         out, output_1 = nn_model.model(input)
 
         # Compute the loss
-        # loss = nn_model.loss(out, target)
+        loss = nn_model.loss(out, target)
 
-        loss = nn_model.criterion(out, target)
+        # loss = nn_model.criterion(out, target)
 
         # Backward pass
         loss.backward()
@@ -106,7 +106,7 @@ def train_epoch(nn_model, epoch):
 
         # save output
         if i == 9:
-            save_output(out, target, output_1, nn_model, epoch, i, f"train_loss_{loss:.3f}")
+            save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
         # Start counting again for the next iteration
         start = time.time()
@@ -153,16 +153,16 @@ def evaluate_epoch(nn_model, epoch):
 
             out, output_1 = nn_model.model(input)
 
-            # ------------------ visualize outputs ----------------------------------------------
-            if i == 9:
-                save_output(out, target, output_1, nn_model, epoch, i, "eval")
-            # ------------------------------------------------------------------------------------
-
             # Check if there is cout There is Cout
-            loss = nn_model.criterion(out, target)  # Compute the loss
+            # loss = nn_model.criterion(out, target)  # Compute the loss
+            loss = nn_model.loss(out, target)
 
             gpu_time = time.time() - start
             print(f'eval: [{epoch + 1}, {i + 1:5d}] loss: {loss:.3f}')
+            # ------------------ visualize outputs ----------------------------------------------
+            if i == 9:
+                save_output(out, target, output_1, nn_model, epoch, i, "eval", f"{loss:.3f}")
+            # ------------------------------------------------------------------------------------
 
             start = time.time()
 
@@ -190,7 +190,7 @@ def main(args, network):
         nn_model.save_checkpoint(False, epoch)
 
         # Evaluate the trained epoch
-        evaluate_epoch(nn_model, epoch)  # evaluate on validation set
+        # evaluate_epoch(nn_model, epoch)  # evaluate on validation set
 
         # Log to tensorboard if enabled
         # nn_model.log_to_tensorboard(test_err_avg, out_image, epoch)
