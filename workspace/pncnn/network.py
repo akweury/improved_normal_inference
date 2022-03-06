@@ -45,11 +45,11 @@ class CNN(nn.Module):
         out = torch.cat((xout, cout, c0), 1)
 
         x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0))
-        mu.addText(x0_normalized_8bit, "x0")
+        mu.addText(x0_normalized_8bit, "Input")
         c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0))
-        mu.addText(c0_normalized_8bit, "c0")
-        _, normal_knn_8bit = mu.vertex2normal(mu.tenor2numpy(x0), k_idx=2)
-        mu.addText(normal_knn_8bit, "normal(knn)")
+        mu.addText(c0_normalized_8bit, "Input Confidence")
+        _, normal_knn_8bit = mu.vertex2normal(mu.tenor2numpy(x0), k_idx=5)
+        mu.addText(normal_knn_8bit, "normal = knn(Input)")
         output_img = cv2.hconcat([x0_normalized_8bit, c0_normalized_8bit, normal_knn_8bit])
 
         return out, output_img

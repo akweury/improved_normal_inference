@@ -8,8 +8,8 @@ __email__ = "abdo.eldesokey@gmail.com"
 
 import torch
 import torch.nn as nn
-from common.unet import UNet
-from common.nconv import NConvUNet
+from pncnn.common.unet import UNet
+from pncnn.common.nconv import NConvUNet
 
 
 class CNN(nn.Module):

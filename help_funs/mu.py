@@ -80,15 +80,32 @@ def bi_interpolation(lower_left, lower_right, upper_left, upper_right, x, y):
     return lower_left * (1 - x) * (1 - y) + lower_right * x * (1 - y) + upper_left * (1 - x) * y + upper_right * x * y
 
 
+def normalize3channel(numpy_array):
+    mins, maxs = [], []
+    if numpy_array.ndim != 3:
+        raise ValueError
+    h, w, c = numpy_array.shape
+    for i in range(c):
+        numpy_array[:, :, i], min, max = normalize(numpy_array[:, :, i], data=None)
+        mins.append(min)
+        maxs.append(max)
+    return numpy_array, mins, maxs
+
+
 def normalize(numpy_array, data):
-    mask = numpy_array.sum(axis=2) == 0
+    if numpy_array.ndim != 2:
+        raise ValueError
+
+    mask = numpy_array == 0
     if data is not None:
-        numpy_array[~mask] = (numpy_array[~mask] - data["minDepth"]) / (data["maxDepth"] - data["minDepth"])
+        min, max = data["minDepth"], data["maxDepth"]
     else:
         min, max = numpy_array[~mask].min(), numpy_array.max()
-        if min != max:
-            numpy_array[~mask] = (numpy_array[~mask] - min) / (max - min)
-    return numpy_array
+        if min == max:
+            return numpy_array, 0, 1
+
+    numpy_array[~mask] = (numpy_array[~mask] - min) / (max - min)
+    return numpy_array, min, max
 
 
 def copy_make_border(img, patch_width):
@@ -151,7 +168,16 @@ def cameraVisualization():
 
 
 def normalize2_8bit(img_scaled, data=None):
-    normalized_img = normalize(img_scaled, data)
+    if img_scaled.ndim == 2:
+        raise ValueError
+
+    if img_scaled.shape[2] == 1:
+        normalized_img = normalize(img_scaled, data)
+    elif img_scaled.shape[2] == 3:
+        normalized_img, mins, maxs = normalize3channel(img_scaled)
+    else:
+        raise ValueError
+
     img_8bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return img_8bit
 

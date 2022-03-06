@@ -78,14 +78,11 @@ def write_np2img(np_array, img_name):
 
 # --------------------------------------- read ----------------------------------------------------------------
 
-def load_8bitImage(root):
+def load_24bitImage(root):
     img = cv2.imread(root, -1)
-    img = np.array(img, dtype=np.float32)
-    img = torch.tensor(img).unsqueeze(2)
-    img = np.array(img)
     img[np.isnan(img)] = 0
 
-    return img.astype(np.float32)
+    return img
 
 
 def load_16bitImage(root):

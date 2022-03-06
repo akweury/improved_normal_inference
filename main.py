@@ -1,8 +1,11 @@
 import config
-from workspace.model import NeuralNetworkModel
-from workspace.pncnn import train, test
-from workspace.pncnn import network
-from preprocessing.data_preprocess import noisy_a_folder
+# from workspace.pncnn import train, test
+# from workspace.pncnn import network
+#
+from workspace.nnn import train, test
+from workspace.nnn import network
+
+from common.data_preprocess import noisy_a_folder
 from pncnn.utils import args_parser
 
 
@@ -18,6 +21,7 @@ def main():
 
     if args.mode == "train":
         train.main(args, network)
+
 
     elif args.mode == 'test':
         test.main(args, network)

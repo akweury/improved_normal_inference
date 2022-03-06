@@ -6,6 +6,7 @@ sys.path.append(dirname(__file__))
 
 import shutil
 import torch
+import torch.nn as nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 
@@ -23,7 +24,7 @@ class NeuralNetworkModel():
     def __init__(self, args, network, start_epoch=0):
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device("cpu" if self.args.cpu else"cuda")
+        self.device = torch.device("cpu" if self.args.cpu else "cuda")
         self.exp_dir = config.ws_path / self.args.exp
         self.train_loader, self.val_loader = my_creator.create_dataloader(self.args, eval_mode=False)
         self.model = network.CNN().to(self.device)
@@ -36,6 +37,8 @@ class NeuralNetworkModel():
         self.tb_writer = SummaryWriter(os.path.join(self.exp_dir, 'tb_log',
                                                     datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
         self.loss = losses.get_loss_fn(args).to(self.device)
+        self.criterion = nn.CrossEntropyLoss()
+
         self.lr_decayer = lr_scheduler.StepLR(self.optimizer,
                                               step_size=args.lr_decay_step,
                                               gamma=args.lr_decay_factor,

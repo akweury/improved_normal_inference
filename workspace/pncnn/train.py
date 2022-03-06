@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:16:29 2019
 @modified: J. Sha
 
 """
-import os, sys
+import sys
 from os.path import dirname
 
 sys.path.append(dirname(__file__))
@@ -15,9 +15,9 @@ sys.path.append(dirname(__file__))
 import cv2
 import time
 import torch
+import numpy as np
 
-from workspace.model import NeuralNetworkModel
-from workspace.pncnn import network
+from common.model import NeuralNetworkModel
 from pncnn.utils.error_metrics import create_error_metric, AverageMeter
 from pncnn.utils import save_output_images
 from help_funs import mu
@@ -71,22 +71,28 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
+        # out: xout=CNN(vertex)=normal, cout, cin
+        # output_1: input, input_confidence, normal=knn(input)
         out, output_1 = nn_model.model(input, cpu=nn_model.args.cpu)
 
         # ------------------ visualize outputs ----------------------------------------------
         cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
-        # mu.show_images(output_1, "train_x0-c0-normal_knn")
+        mu.show_images(output_1, "train_x0-c0-normal_knn")
 
-        xout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, :xout_channel, :, :]))
-        mu.addText(xout_normalized_8bit, "xout")
+        output_normal = mu.tenor2numpy(out[:, :xout_channel, :, :])
+        # normalize output normal
+        output_normal_0_1 = output_normal / np.sum(output_normal ** 2, axis=2, keepdims=True)
+        output_normal_n1_p1 = output_normal_0_1 * 2 - 1
+        xout_8bit = mu.normal2RGB(output_normal_n1_p1)
+        mu.addText(xout_8bit, "xout")
         cout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, cout_in_channel:cout_out_channel, :, :]))
         mu.addText(cout_normalized_8bit, "cout")
         normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target))
         mu.addText(normal_gt_8bit, "normal(gt)")
-        output_2 = cv2.hconcat([xout_normalized_8bit, cout_normalized_8bit, normal_gt_8bit])
+        output_2 = cv2.hconcat([xout_8bit, cout_normalized_8bit, normal_gt_8bit])
 
         cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_out_c_out_normal_CNN_{epoch}.png"), output_2)
-        # mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
+        mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
 
         # ------------------------------------------------------------------------------------
 
@@ -173,9 +179,9 @@ def evaluate_epoch(nn_model, epoch):
 
             # ------------------ visualize outputs ----------------------------------------------
             cv2.imwrite(str(nn_model.exp_dir / "output" / f"eval_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
-            # mu.show_images(output_1, "train_x0-c0-normal_knn")
+            mu.show_images(output_1, "train_x0-c0-normal_knn")
 
-            xout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, :xout_channel, :, :]))
+            xout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, :xout_channel, :, :]), nn_model.data)
             mu.addText(xout_normalized_8bit, "xout")
             cout_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:, cout_in_channel:cout_out_channel, :, :]))
             mu.addText(cout_normalized_8bit, "cout")
@@ -184,7 +190,7 @@ def evaluate_epoch(nn_model, epoch):
             output_2 = cv2.hconcat([xout_normalized_8bit, cout_normalized_8bit, normal_gt_8bit])
 
             cv2.imwrite(str(nn_model.exp_dir / "output" / f"eval_x_out_c_out_normal_CNN_{epoch}.png"), output_2)
-            # mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
+            mu.show_images(output_2, f"train_x_out_c_out_normal_CNN_{epoch}")
 
             # ------------------------------------------------------------------------------------
 

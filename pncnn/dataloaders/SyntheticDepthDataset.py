@@ -36,25 +36,24 @@ class SyntheticDepthDataset(Dataset):
 
         if setname in ['train', 'selval']:
             depth_path = self.synthetic_depth_path
-            self.depth = np.array(
-                sorted(glob.glob(str(depth_path / "train" / "*depth0_noise.png"), recursive=True)))
+            self.depth = np.array(sorted(glob.glob(str(depth_path / "train" / "*depth0.png"), recursive=True)))
             self.gt = np.array(sorted(glob.glob(str(depth_path / "train" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "train" / "*data0.json"), recursive=True)))
 
         elif setname == 'selval':
             depth_path = self.synthetic_depth_path
-            self.depth = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0_noise.png"), recursive=True)))
+            self.depth = np.array(sorted(glob.glob(str(depth_path / "eval" / "*depth0.png"), recursive=True)))
             self.gt = np.array(sorted(glob.glob(str(depth_path / "eval" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "eval" / "*data0.json"), recursive=True)))
 
         elif setname == 'test':
             depth_path = self.synthetic_depth_path
-            self.depth = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0_noise.png"), recursive=True)))
+            self.depth = np.array(sorted(glob.glob(str(depth_path / "test" / "*depth0.png"), recursive=True)))
             self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
-        #
-        # self.gt = self.gt[:10]
-        # self.depth = self.depth[:10]
+
+        self.gt = self.gt[:10]
+        self.depth = self.depth[:10]
 
         assert (len(self.gt) == len(self.depth))
 
@@ -82,10 +81,14 @@ class SyntheticDepthDataset(Dataset):
                                        torch.tensor(data['K']),
                                        torch.tensor(data['R']).float(),
                                        torch.tensor(data['t']).float())
+
+        # vertex_input, mins, maxs = mu.normalize3channel(vertex_input)
+        # mins, maxs = None, None
+        # mask = np.abs(vertex_input).sum(axis=2) == 0
+        # vertex_input[~mask] = vertex_input[~mask] + 1
+
         vertex_input = torch.from_numpy(vertex_input)  # (depth, dtype=torch.float)
-        vertex_input = vertex_input.permute( 2, 0, 1)
-
-
+        vertex_input = vertex_input.permute(2, 0, 1)
 
         # gt = file_io.load_scaled16bitImage(self.gt[item],
         #                                    data['minDepth'],
@@ -99,9 +102,11 @@ class SyntheticDepthDataset(Dataset):
         # vertex_gt = torch.from_numpy(vertex_gt)  # tensor(gt, dtype=torch.float)
         # vertex_gt = vertex_gt.permute(2,0,1)
 
-        gt = file_io.load_24bitNormal(self.gt[item])
+        # gt = file_io.load_24bitNormal(self.gt[item])
+        gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
+
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
-        normal_gt = normal_gt.permute(2,0,1)
+        normal_gt = normal_gt.permute(2, 0, 1)
 
-
+        # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
         return vertex_input, normal_gt
