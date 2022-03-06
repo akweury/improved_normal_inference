@@ -21,26 +21,29 @@ class NormalNN(nn.Module):
         super().__init__()
         self.__name__ = 'NormalNN'
         # self.nconv0 = NConv2d(in_ch, in_ch * 3, (5, 5), pos_fn, 'k', padding=(2, 2))
-
+        kernel_size = (5, 5)
+        kernel_3 = (3, 3)
+        padding_2 = (2, 2)
+        padding_1 = (1, 1)
         # input: 3 channel vertex
         # Problem: each channel has different range, which probably needed to be normalized
 
-        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, (3, 3), (1, 1), (1, 1))
+        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_size, (1, 1), padding_2)
         # self.conv1 = NConv2d(in_ch, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, (3, 3), (1, 1), (1, 1))
+        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_size, (1, 1), padding_2)
         # self.nconv2 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, (3, 3), (1, 1), (1, 1))
+        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_size, (1, 1), padding_2)
         # self.nconv3 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv4 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), (1, 1), (1, 1))
+        self.conv4 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.nconv4 = NConv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), pos_fn, 'k', padding=(1, 1))
 
-        self.conv5 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), (1, 1), (1,1))
+        self.conv5 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.nconv5 = NConv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), pos_fn, 'k', padding=(1, 1))
 
-        self.conv6 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), (1, 1), (1, 1))
+        self.conv6 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.nconv6 = NConv2d(2 * in_ch * num_channels, in_ch * num_channels, (3, 3), pos_fn, 'k', padding=(1, 1))
 
         self.conv7 = nn.Conv2d(in_ch * num_channels, out_ch, (1, 1), (1, 1), (0, 0))
@@ -121,24 +124,24 @@ class NormalNN(nn.Module):
         x4 = F.interpolate(x4_ds, x3_ds.size()[2:], mode='nearest')  # (1,18,128,128)
         # c4 = F.interpolate(c4_ds, c3_ds.size()[2:], mode='nearest')
 
-        x34_ds = self.conv4(torch.cat((x3_ds, x4), 1)) # (1, 9, 128, 128)
+        x34_ds = self.conv4(torch.cat((x3_ds, x4), 1))  # (1, 9, 128, 128)
         # x34_ds, c34_ds = self.nconv4(torch.cat((x3_ds, x4), 1), torch.cat((c3_ds, c4), 1))
 
         # Upsample 2
         x34 = F.interpolate(x34_ds, x2_ds.size()[2:], mode='nearest')
         # c34 = F.interpolate(c34_ds, c2_ds.size()[2:], mode='nearest')
 
-        x23_ds = self.conv5(torch.cat((x2_ds, x34), 1)) # (1, 9, 256, 256)
+        x23_ds = self.conv5(torch.cat((x2_ds, x34), 1))  # (1, 9, 256, 256)
         # x23_ds, c23_ds = self.nconv5(torch.cat((x2_ds, x34), 1), torch.cat((c2_ds, c34), 1))
 
         # # Upsample 3
-        x23 = F.interpolate(x23_ds, x0.size()[2:], mode='nearest') # (1, 9, 512, 512)
+        x23 = F.interpolate(x23_ds, x0.size()[2:], mode='nearest')  # (1, 9, 512, 512)
         # c23 = F.interpolate(c23_ds, c0.size()[2:], mode='nearest')
 
-        xout = self.conv6(torch.cat((x23, x1), 1)) # (1, 9, 512, 512)
+        xout = self.conv6(torch.cat((x23, x1), 1))  # (1, 9, 512, 512)
         # xout, cout = self.nconv6(torch.cat((x23, x1), 1), torch.cat((c23, c1), 1))
 
-        xout = self.conv7(xout) # (1, 3, 512, 512)
+        xout = self.conv7(xout)  # (1, 3, 512, 512)
         # xout, cout = self.nconv7(xout, cout)
 
         return xout

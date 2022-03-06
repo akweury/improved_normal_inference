@@ -4,6 +4,7 @@ __license__ = "GNU GPLv3"
 __version__ = "0.1"
 __maintainer__ = "Abdelrahman Eldesokey"
 __email__ = "abdo.eldesokey@gmail.com"
+
 ########################################
 
 import torch
@@ -14,12 +15,16 @@ xout_channel = 3
 cout_in_channel = 3
 cout_out_channel = 6
 cin_channel = 6
+
+
 def get_loss_list():
     return loss_list.keys()
 
 
 def get_loss_fn(args):
-    return loss_list[args.loss]
+    loss = []
+    for each in args.loss.split(","):
+        loss.append(loss_list[each])
     return loss
 
 
@@ -28,7 +33,7 @@ class L1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         return F.l1_loss(outputs, target)
 
 
@@ -37,7 +42,7 @@ class L2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         return F.mse_loss(outputs, target)
 
 
@@ -46,7 +51,7 @@ class SmoothL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         return F.smooth_l1_loss(outputs, target)
 
 
@@ -55,9 +60,9 @@ class MaskedL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         val_pixels = torch.ne(target, 0).float().detach()
-        return F.l1_loss(outputs*val_pixels, target*val_pixels)
+        return F.l1_loss(outputs * val_pixels, target * val_pixels)
 
 
 class MaskedL2Loss(nn.Module):
@@ -65,9 +70,9 @@ class MaskedL2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         val_pixels = torch.ne(target, 0).float().detach()
-        return F.mse_loss(outputs*val_pixels, target*val_pixels)
+        return F.mse_loss(outputs * val_pixels, target * val_pixels)
 
 
 class MaskedSmoothL1Loss(nn.Module):
@@ -75,9 +80,9 @@ class MaskedSmoothL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
-        outputs = outputs[:,:xout_channel,:,:]
+        outputs = outputs[:, :xout_channel, :, :]
         val_pixels = torch.ne(target, 0).float().detach()
-        loss = F.smooth_l1_loss(outputs*val_pixels, target*val_pixels, reduction='none')
+        loss = F.smooth_l1_loss(outputs * val_pixels, target * val_pixels, reduction='none')
         return torch.mean(loss)
 
 
@@ -96,7 +101,7 @@ class MaskedProbLoss(nn.Module):
         # cout = torch.permute(cout, (0, 2, 3, 1)).unsqueeze(1)
 
         res = cout
-        regl = torch.log(cout+1e-16)  # Regularization term
+        regl = torch.log(cout + 1e-16)  # Regularization term
 
         # Pick only valid pixels
         valid_mask = (targets > 0).detach()
@@ -120,7 +125,7 @@ class MaskedProbExpLoss(nn.Module):
         cout = out[:, cout_in_channel:cout_out_channel, :, :]
 
         res = torch.exp(cout)  # Residual term
-        regl = torch.log(cout+1e-16)  # Regularization term
+        regl = torch.log(cout + 1e-16)  # Regularization term
 
         # Pick only valid pixels
         valid_mask = (targets > 0).detach()
@@ -131,6 +136,7 @@ class MaskedProbExpLoss(nn.Module):
 
         loss = torch.mean(res * torch.pow(targets - means, 2) - regl)
         return loss
+
 
 loss_list = {
     'l1': L1Loss(),

@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 time_now = datetime.datetime.today().date()
 
 
-def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None):
+def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False):
+    if data.shape[1] <= 1:
+        return
+
     if y_scale is None:
         y_scale = [1, 1]
     if x_scale is None:
@@ -24,8 +27,10 @@ def line_chart(data, title=None, x_scale=None, y_scale=None, x_label=None, y_lab
     if y_label is not None:
         plt.ylabel(y_label)
 
-    plt.savefig(f"line_{title}_{x_label}_{y_label}_{time_now}.png")
-    plt.show()
+    plt.savefig(str(path / f"line_{title}_{x_label}_{y_label}_{time_now}.png"))
+
+    if show:
+        plt.show()
 # --------------------------- visualisation -------------------------------- #
 # if k_max - k_min < 2:
 #     exit()

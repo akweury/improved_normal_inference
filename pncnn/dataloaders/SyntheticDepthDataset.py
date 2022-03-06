@@ -52,8 +52,8 @@ class SyntheticDepthDataset(Dataset):
             self.gt = np.array(sorted(glob.glob(str(depth_path / "test" / "*normal0.png"), recursive=True)))
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
 
-        self.gt = self.gt[:10]
-        self.depth = self.depth[:10]
+        # self.gt = self.gt[:5]
+        # self.depth = self.depth[:5]
 
         assert (len(self.gt) == len(self.depth))
 

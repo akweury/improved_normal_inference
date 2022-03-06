@@ -36,19 +36,26 @@ class NeuralNetworkModel():
         self.tb_freq = args.tb_freq if hasattr(args, 'tb_freq') else 1000
         self.tb_writer = SummaryWriter(os.path.join(self.exp_dir, 'tb_log',
                                                     datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
-        self.loss = losses.get_loss_fn(args).to(self.device)
+        self.loss = losses.get_loss_fn(args)
+        self.losses = []
         self.criterion = nn.CrossEntropyLoss()
 
-        self.lr_decayer = lr_scheduler.StepLR(self.optimizer,
-                                              step_size=args.lr_decay_step,
-                                              gamma=args.lr_decay_factor,
-                                              last_epoch=start_epoch - 1)
+        # self.lr_decayer = lr_scheduler.StepLR(self.optimizer,
+        #                                       step_size=args.lr_decay_step,
+        #                                       gamma=args.lr_decay_factor,
+        #                                       last_epoch=start_epoch - 1)
+        self.init_lr_decayer()
         self.train_csv = error_metrics.LogFile(os.path.join(self.exp_dir, 'train.csv'), args)
         self.test_csv = error_metrics.LogFile(os.path.join(self.exp_dir, 'test.csv'), args)
         self.best_txt = os.path.join(self.exp_dir, 'best.txt')
 
         # args_parser.save_args(self.exp_dir, args)  # Save args to JSON file
         self.print_info(args)
+
+    def init_lr_decayer(self):
+        milestones = [int(x) for x in self.args.lr_scheduler.split(",")]
+        self.lr_decayer = lr_scheduler.MultiStepLR(self.optimizer, milestones=milestones,
+                                                   gamma=self.args.lr_decay_factor)
 
     def init_optimizer(self):
         if self.args.optimizer.lower() == 'sgd':
