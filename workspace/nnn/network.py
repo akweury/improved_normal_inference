@@ -18,7 +18,7 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         # self.conf_estimator = UNetSP(1, 1)
-        self.conv = NormalNN(3,3)
+        self.conv = NormalNN(3, 3)
         # self.nconv = NConvUNet(3, 3)
         # self.var_estimator = UNetSP(3, 3)
         # self.var_estimator = UNetSP(3, 3)
@@ -37,9 +37,9 @@ class CNN(nn.Module):
         # cout = self.var_estimator(cout)  #
         # out = torch.cat((xout, cout, c0), 1)
 
-        x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0))
+        x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
         mu.addText(x0_normalized_8bit, "Input")
-        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0))
+        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
         mu.addText(c0_normalized_8bit, "Input Confidence")
         # _, normal_knn_8bit = mu.vertex2normal(mu.tenor2numpy(x0), k_idx=5)
         # mu.addText(normal_knn_8bit, "normal = knn(Input)")

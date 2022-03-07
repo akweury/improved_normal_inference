@@ -30,10 +30,10 @@ def save_output(out, target, output_1, nn_model, epoch, i, prefix, loss):
     # ------------------ visualize outputs ----------------------------------------------
 
     # normalize output normal
-    normal_cnn_8bit = mu.tenor2numpy(out).astype(np.uint8)
+    normal_cnn_8bit = mu.tenor2numpy(out[:1, :, :, :]).astype(np.uint8)
     mu.addText(normal_cnn_8bit, "output")
 
-    normal_gt_8bit = mu.tenor2numpy(target).astype(np.uint8)
+    normal_gt_8bit = mu.tenor2numpy(target[:1, :, :, :]).astype(np.uint8)
     mu.addText(normal_gt_8bit, "normal(gt)")
 
     output_2 = cv2.hconcat([normal_cnn_8bit, normal_gt_8bit])
@@ -41,7 +41,7 @@ def save_output(out, target, output_1, nn_model, epoch, i, prefix, loss):
     output = cv2.resize(output, (512, 512))
     cv2.imwrite(str(nn_model.exp_dir / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss}.png"), output)
 
-    np_array1, np_array2 = mu.tenor2numpy(out), mu.tenor2numpy(target)
+    np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
     b1, g1, r1 = cv2.split(np_array1)
     b2, g2, r2 = cv2.split(np_array2)
     output_3 = mu.concat_vh([[b1, g1, r1], [b2, g2, r2]])
