@@ -122,6 +122,7 @@ def train_epoch(nn_model, epoch):
         # save output
         loss_total += loss
         if i == 4:
+            out, target = out.to("cpu"), target.to("cpu")
             save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
         # Start counting again for the next iteration
