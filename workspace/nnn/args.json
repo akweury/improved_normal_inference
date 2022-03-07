@@ -23,7 +23,7 @@
   "shift": null,
   "rotate": null,
   "epochs": 200,
-  "optimizer": "sgd",
+  "optimizer": "adam",
   "lr": 0.01,
   "lr_scheduler": "5, 80",
   "momentum": 0.9,
