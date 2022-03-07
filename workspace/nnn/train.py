@@ -116,12 +116,12 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
 
-        # print statistics
-        print(f'[epoch: {epoch}, idx:{i:5d}] loss: {loss:.3f}')
 
         # save output
         loss_total += loss
         if i == 4:
+            # print statistics
+            print(f'[epoch: {epoch}] loss: {nn_model.losses}')
             out, target = out.to("cpu"), target.to("cpu")
             save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 

@@ -65,14 +65,14 @@ def get_valid_pixels_idx(img):
 # --------------------------- filter operations -----------------------------------------------------------------------
 def binary(img):
     # h, w = img.shape[:2]
-    img_permuted = img.permute(2, 3, 1, 0)
+    img_permuted = img.permute(0, 2, 3, 1)
 
-    mask = img_permuted.sum(dim=2).sum(dim=2) == 0
+    mask = img_permuted.sum(dim=3) == 0
     c_permute = torch.zeros(size=img_permuted.shape)
 
     c_permute[~mask] = 1
 
-    c = c_permute.permute(3, 2, 0, 1)
+    c = c_permute.permute(0, 3, 1, 2)
     return c
 
 
