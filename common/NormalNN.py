@@ -28,13 +28,13 @@ class NormalNN(nn.Module):
         # input: 3 channel vertex
         # Problem: each channel has different range, which probably needed to be normalized
 
-        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_size, (1, 1), padding_2)
+        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.conv1 = NConv2d(in_ch, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_size, (1, 1), padding_2)
+        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.nconv2 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_size, (1, 1), padding_2)
+        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
         # self.nconv3 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
         self.conv4 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
