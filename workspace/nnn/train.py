@@ -129,7 +129,7 @@ def train_epoch(nn_model, epoch):
 
     # # update log
     # nn_model.train_csv.update_log(err_avg, epoch)
-    loss_avg = loss_total / (nn_model.train_loader.__len__()*nn_model.args.batch_size)
+    loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
     nn_model.losses.append(loss_avg.item())
 
     chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir / "output")
@@ -182,6 +182,7 @@ def evaluate_epoch(nn_model, epoch):
             print(f'eval: [{epoch + 1}, {i + 1:5d}] loss: {loss:.3f}')
             # ------------------ visualize outputs ----------------------------------------------
             if i == 4:
+                out, target = out.to("cpu"), target.to("cpu")
                 save_output(out, target, output_1, nn_model, epoch, i, "eval", f"{loss:.3f}")
             # ------------------------------------------------------------------------------------
 

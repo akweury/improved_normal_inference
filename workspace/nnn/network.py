@@ -37,9 +37,10 @@ class CNN(nn.Module):
         # cout = self.var_estimator(cout)  #
         # out = torch.cat((xout, cout, c0), 1)
 
-        x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
+        x0_cpu, c0_cpu = x0.to("cpu"), c0.to("cpu")
+        x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0_cpu[:1, :, :, :]))
         mu.addText(x0_normalized_8bit, "Input")
-        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
+        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0_cpu[:1, :, :, :]))
         mu.addText(c0_normalized_8bit, "Input Confidence")
         # _, normal_knn_8bit = mu.vertex2normal(mu.tenor2numpy(x0), k_idx=5)
         # mu.addText(normal_knn_8bit, "normal = knn(Input)")
