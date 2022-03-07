@@ -5,7 +5,7 @@
   "workspace": "",
   "resume": null,
   "evaluate": null,
-  "gpu": 2,
+  "gpu": 0,
   "dataset": "synthetic",
   "dataset_path": "synthetic_data_noise",
   "modality": "d",
