@@ -43,7 +43,7 @@ def args_parser():
     parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
                         help='add noise or not')
 
-    parser.add_argument('--cpu', '-c', type=bool, default='', choices=[False, True],
+    parser.add_argument('--cpu', '-c', action="store_true",
                         help='Use CPU for training?')
 
     parser.add_argument('--args', '-a', type=str, default='', choices=['defaults', 'json'],
