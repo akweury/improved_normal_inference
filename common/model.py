@@ -24,7 +24,7 @@ class NeuralNetworkModel():
     def __init__(self, args, network, start_epoch=0):
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device("cpu" if self.args.cpu else "cuda")
+        self.device = torch.device("cpu" if self.args.cpu else f"cuda:{self.args.gpu}")
         self.exp_dir = config.ws_path / self.args.exp
         self.train_loader, self.val_loader = my_creator.create_dataloader(self.args, eval_mode=False)
         self.model = network.CNN().to(self.device)

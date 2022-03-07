@@ -129,7 +129,7 @@ def train_epoch(nn_model, epoch):
 
     # # update log
     # nn_model.train_csv.update_log(err_avg, epoch)
-    loss_avg = loss_total / nn_model.train_loader.__len__()
+    loss_avg = loss_total / (nn_model.train_loader.__len__()*nn_model.args.batch_size)
     nn_model.losses.append(loss_avg.item())
 
     chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir / "output")
