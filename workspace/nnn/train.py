@@ -95,7 +95,8 @@ def train_epoch(nn_model, epoch):
         if i == 1:
             # print statistics
             print(f'[epoch: {epoch}] loss: {nn_model.losses}')
-            out, target, c0 = out.to("cpu"), target.to("cpu"), c0.to("cpu")
+            input, out, cout, target, c0 = input.to("cpu"), out.to("cpu"), cout.to("cpu"), target.to("cpu"), c0.to(
+                "cpu")
             chart.draw_output(input, c0, out, cout, target, nn_model.exp_dir, loss, epoch, i, "train")
             # save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
