@@ -91,13 +91,13 @@ class MaskedProbLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, out, targets):
+    def forward(self, out, cout, targets):
         # means = out[:, :1, :, :]
-        means = out[:, :xout_channel, :, :]
+        means = out
 
         # means = torch.permute(means, (0, 2, 3, 1)).unsqueeze(1)
 
-        cout = out[:, cout_in_channel:cout_out_channel, :, :]
+        cout = cout
         # cout = torch.permute(cout, (0, 2, 3, 1)).unsqueeze(1)
 
         res = cout
@@ -120,9 +120,9 @@ class MaskedProbExpLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, out, targets):
-        means = out[:, :xout_channel, :, :]
-        cout = out[:, cout_in_channel:cout_out_channel, :, :]
+    def forward(self, out, cout, targets):
+        means = out
+        cout = cout
 
         res = torch.exp(cout)  # Residual term
         regl = torch.log(cout + 1e-16)  # Regularization term

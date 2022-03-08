@@ -1,6 +1,8 @@
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+from help_funs import mu
+import cv2 as cv
 
 time_now = datetime.datetime.today().date()
 
@@ -31,6 +33,8 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 
     if show:
         plt.show()
+
+
 # --------------------------- visualisation -------------------------------- #
 # if k_max - k_min < 2:
 #     exit()
@@ -67,3 +71,42 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 #                  x_scale=[k_min, 1],
 #                  x_label="k_value",
 #                  y_label="RGB_difference")
+
+def draw_output(x0, c0, out, cout, target, exp_path, loss, epoch, i, prefix):
+    # ------------------ input ----------------------------------------------
+    x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
+    mu.addText(x0_normalized_8bit, "Input(Vertex)")
+
+    c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
+    mu.addText(c0_normalized_8bit, "Input Confidence")
+
+    input_img = [x0_normalized_8bit, c0_normalized_8bit]
+
+    # ------------------ output ----------------------------------------------
+
+    # normalize output normal
+    conf_cnn_8_bit = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
+    mu.addText(conf_cnn_8_bit, "cout")
+
+    normal_cnn_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:1, :, :, :]))
+    mu.addText(normal_cnn_8bit, "output")
+
+    normal_gt_8bit = mu.tenor2numpy(target[:1, :, :, :]).astype(np.uint8)
+    mu.addText(normal_gt_8bit, "gt")
+
+    output_img = [conf_cnn_8_bit, normal_cnn_8bit, normal_gt_8bit]
+
+    # ------------------ combine together ----------------------------------------------
+
+    output = mu.concat_tile_resize([input_img, output_img])
+    output = cv.resize(output, (1000, 1000))
+    cv.imwrite(str(exp_path / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+
+    # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
+    # b1, g1, r1 = cv2.split(np_array1)
+    # b2, g2, r2 = cv2.split(np_array2)
+    # output_3 = mu.concat_vh([[b1, g1, r1], [b2, g2, r2]])
+    # cv2.imwrite(str(nn_model.exp_dir / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss}_tensor.png"), output_3)
+
+    # mu.show_images(output_3, f"tensor_different")
+    # mu.show_images(output, f"{prefix}_NNN_epoch_{epoch}_{i}.png")

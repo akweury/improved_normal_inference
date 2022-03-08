@@ -41,7 +41,8 @@ class NConvUNet(nn.Module):
 
         self.nconv7 = NConv2d(in_ch * num_channels, out_ch, (1, 1), pos_fn, 'k')
 
-        self.fc = nn.Conv2d(out_ch, 3, (1, 1))
+        self.conv1 = nn.Conv2d(out_ch, 3, (1, 1))
+        self.conv2 = nn.Conv2d(out_ch, 3, (1, 1))
 
         # self.nconv8 = NConv2d(in_ch * num_channels, out_ch * num_channels, (1, 1), pos_fn, 'k')
 
@@ -115,7 +116,8 @@ class NConvUNet(nn.Module):
 
         xout, cout = self.nconv7(xout, cout)
 
-        xout = self.fc(xout)
+        xout = self.conv1(xout)
+        xout = self.conv2(xout)
 
         # xout, cout = self.nconv8(xout, cout)
         # x_o, c_o = self.nconv0(xout, cout)

@@ -278,6 +278,8 @@ def addText(img, text):
                thickness=1, lineType=cv.LINE_AA)
 
 
+# https://www.geeksforgeeks.org/concatenate-images-using-opencv-in-python/
+
 def concat_vh(list_2d):
     """
     show image in a 2d array
@@ -287,6 +289,29 @@ def concat_vh(list_2d):
     # return final image
     return cv.vconcat([cv.hconcat(list_h)
                        for list_h in list_2d])
+
+
+def vconcat_resize(img_list, interpolation):
+    w_min = min(img.shape[1] for img in img_list)
+    im_list_resize = [cv2.resize(img,
+                                 (w_min, int(img.shape[0] * w_min / img.shape[1])), interpolation=interpolation)
+                      for img in img_list]
+    return cv2.vconcat(im_list_resize)
+
+
+def hconcat_resize(img_list, interpolation):
+    h_min = min(img.shape[0] for img in img_list)
+    im_list_resize = [cv2.resize(img,
+                                 (int(img.shape[1] * h_min / img.shape[0]),
+                                  h_min), interpolation)
+                      for img in img_list]
+
+    return cv2.hconcat(im_list_resize)
+
+
+def concat_tile_resize(list_2d):
+    img_list_v = [hconcat_resize(list_h, cv2.INTER_CUBIC) for list_h in list_2d]
+    return vconcat_resize(img_list_v, cv2.INTER_CUBIC)
 
 
 def show_numpy(numpy_array, title):
