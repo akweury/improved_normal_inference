@@ -41,8 +41,8 @@ class NConvUNet(nn.Module):
 
         self.nconv7 = NConv2d(in_ch * num_channels, out_ch, (1, 1), pos_fn, 'k')
 
-        self.conv1 = nn.Conv2d(out_ch, 3, (1, 1))
-        self.conv2 = nn.Conv2d(out_ch, 3, (1, 1))
+        self.conv1 = nn.Conv2d(out_ch, out_ch, (1, 1))
+        self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1))
 
         # self.nconv8 = NConv2d(in_ch * num_channels, out_ch * num_channels, (1, 1), pos_fn, 'k')
 

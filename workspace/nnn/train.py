@@ -7,17 +7,19 @@ Created on Mon Feb 25 14:16:29 2019
 @modified: J. Sha
 
 """
-import sys
+import os, sys
 from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
+import glob
 import cv2
 import time
 import torch
 import torch.nn as nn
 import numpy as np
 
+from pprint import pprint
 from help_funs import mu, chart
 from common.model import NeuralNetworkModel
 from pncnn.utils.error_metrics import create_error_metric, AverageMeter
@@ -94,7 +96,7 @@ def train_epoch(nn_model, epoch):
         loss_total += loss
         if i == 1:
             # print statistics
-            print(f'[epoch: {epoch}] loss: {nn_model.losses}')
+            print(f'[epoch: {epoch}] loss: {nn_model.losses}, out_max:{out.max()}, out_min:{out.min()}')
             input, out, cout, target, c0 = input.to("cpu"), out.to("cpu"), cout.to("cpu"), target.to("cpu"), c0.to(
                 "cpu")
             chart.draw_output(input, c0, out, cout, target, nn_model.exp_dir, loss, epoch, i, "train")
@@ -175,7 +177,17 @@ def train_epoch(nn_model, epoch):
 
 def main(args, network):
     nn_model = NeuralNetworkModel(args, network)
+
+    # remove old output images
+    output_path = nn_model.exp_dir / "output" / "*"
+    files = glob.glob(str(output_path))
+    pprint(f"{files}\n will be deleted")
+    for f in files:
+        os.remove(f)
+
+    # init losses
     losses = []
+
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch

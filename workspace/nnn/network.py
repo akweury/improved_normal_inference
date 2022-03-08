@@ -19,8 +19,10 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         # self.conf_estimator = UNetSP(1, 1)
-        self.conv = NormalNN(3, 3)
-        self.nconv = NConvUNet(3, 3)
+        self.conv3_3 = NormalNN(3, 3)
+        self.nconv3_3 = NConvUNet(3, 3)
+        self.nconv1_1 = NConvUNet(1, 1)
+
         # self.var_estimator = UNetSP(3, 3)
         # self.var_estimator = UNetSP(3, 3)
 
@@ -29,21 +31,23 @@ class CNN(nn.Module):
         # c0: confidence of each element in x0
 
         # c0 = self.conf_estimator(x0) #  estimate the input confidence
-        c0 = mu.binary(x0).to(x0.get_device())
+
+        device = "cpu" if cpu else x0.get_device()
+        c0 = mu.binary(x0).to(device)
 
         # out = self.conv(x0)
-        out, cout = self.nconv(x0, c0, cpu)  # estimated value of depth
+        out_0, cout_0 = self.nconv1_1(x0[:, 0:1, :, :], c0[:, 0:1, :, :], cpu)  # estimated value of depth
+        out_1, cout_1 = self.nconv1_1(x0[:, 1:2, :, :], c0[:, 1:2, :, :], cpu)  # estimated value of depth
+        out_2, cout_2 = self.nconv1_1(x0[:, 2:3, :, :], c0[:, 2:3, :, :], cpu)  # estimated value of depth
 
-        # conv layer with kernal 1
-        # cout = self.var_estimator(cout)  #
-        # out = torch.cat((xout, cout, c0), 1)
+        out, cout = torch.cat((out_0, out_1, out_2), 1), torch.cat((cout_0, cout_1, cout_2), 1)
 
         # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
         cout = self.minor_filter(cout)
         return out, cout, c0
 
     def minor_filter(self, tensor):
-        eps = 0.01
+        eps = 0.001
         tensor[tensor < eps] = 0
 
         return tensor
