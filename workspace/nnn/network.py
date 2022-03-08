@@ -47,7 +47,7 @@ class CNN(nn.Module):
         return out, cout, c0
 
     def minor_filter(self, tensor):
-        eps = 0.001
+        eps = 0.1
         tensor[tensor < eps] = 0
 
         return tensor

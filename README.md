@@ -2,7 +2,7 @@
 ssh sha@pc-2103
 
 # remote command
-CUDA_VISIBLE_DEVICES=2 python3 main.py --exp nnn --args json --mode train  --batch_size 32 --epochs 200
+CUDA_VISIBLE_DEVICES=2 python3 main.py --exp nnn --args json --mode train  --batch_size 32 --epochs 50
 
 scp C:\Users\shaji\TestProject\CapturedData\data_geometrical_body.zip sha@pc-2103:/home/sha/improved_normal_inference/dataset
 scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnn/checkpoint-99.pth.tar  C:\Users\shaji\PycharmProjects\MA\improved_normal_inference\workspace\pncnn
