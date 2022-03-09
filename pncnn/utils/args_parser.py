@@ -189,7 +189,7 @@ def load_args_from_file(args_file_path, given_args):
 
         # Replace given_args with the loaded default values
         for key, value in loaded_args.items():
-            if key not in ['workspace', 'exp', 'evaluate', 'resume']:  # Do not overwrite these keys
+            if key not in ['workspace', 'exp', 'evaluate', 'resume', 'gpu']:  # Do not overwrite these keys
                 setattr(given_args, key, value)
 
         print('\n==> Args were loaded from file "{}".'.format(args_file_path))
