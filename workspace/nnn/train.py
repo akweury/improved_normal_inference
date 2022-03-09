@@ -101,14 +101,18 @@ def train_epoch(nn_model, epoch):
                 f'[epoch: {epoch}] loss: {nn_model.losses}, \n'
                 f'out_0_range:({out[:, :1, :, :].min().item():.3f}, {out[:, :1, :, :].max().item():.3f}), \t'
                 f'cout_0_range:({out[:, 3:4, :, :].min().item():.3f}, {out[:, 3:4, :, :].max().item():.3f}), \n'
-                f'out_1_range:({out[:, 1:2, :, :].min().item():.3f}, {out[:, 1:2, :, :].max().item():.3f}), \n'
+                f'out_1_range:({out[:, 1:2, :, :].min().item():.3f}, {out[:, 1:2, :, :].max().item():.3f}), \t'
                 f'cout_1_range:({out[:, 4:5, :, :].min().item():.3f}, {out[:, 4:5, :, :].max().item():.3f}), \n'
-                f'out_2_range:({out[:, 2:3, :, :].min().item():.3f}, {out[:, 2:3, :, :].max().item():.3f}), \n'
+                f'out_2_range:({out[:, 2:3, :, :].min().item():.3f}, {out[:, 2:3, :, :].max().item():.3f}), \t'
                 f'cout_2_range:({out[:, 5:6, :, :].min().item():.3f}, {out[:, 5:6, :, :].max().item():.3f}), \n'
 
                 f'target_range:{target.min().item(), target.max().item()}')
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            chart.draw_output(input, out, target, nn_model.exp_dir, loss, epoch, i, "train")
+
+            xout, cout, c0 = out[:, :3, :, :], out[:, 3:6, :, :], out[:, 6:, :, :]
+
+            chart.draw_output(input, xout=xout, cout=cout, c0=c0, target=target, exp_path=nn_model.exp_dir,
+                              loss=loss, epoch=epoch, i=i, prefix="train")
             # save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
         # Start counting again for the next iteration
@@ -190,7 +194,7 @@ def main(args, network):
     # remove old output images
     output_path = nn_model.exp_dir / "output" / "*"
     files = glob.glob(str(output_path))
-    pprint(f"{files}\n will be deleted")
+    pprint(f"{files}\n have been deleted")
     for f in files:
         os.remove(f)
 

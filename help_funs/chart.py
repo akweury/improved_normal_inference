@@ -72,38 +72,46 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 #                  x_label="k_value",
 #                  y_label="RGB_difference")
 
-def draw_output(x0, out, target, exp_path, loss, epoch, i, prefix):
-    c0 = out[:, 6:, :, :]
-    xout = out[:, :3, :, :]
-    cout = out[:, 3:6, :, :]
+def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
+    # c0 = out[:, 6:, :, :]
+    # xout = out[:, :3, :, :]
+    # cout = out[:, 3:6, :, :]
 
-    # ------------------ input ----------------------------------------------
     x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
-
-    c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
-    mu.addText(c0_normalized_8bit, "Input Confidence")
-
-    input_img = [x0_normalized_8bit, c0_normalized_8bit]
-
-    # ------------------ output ----------------------------------------------
-
-    # normalize output normal
-    conf_cnn_8_bit = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
-    mu.addText(conf_cnn_8_bit, "cout")
-
-    normal_cnn_8bit = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
-    mu.addText(normal_cnn_8bit, "output")
 
     normal_gt_8bit = mu.tenor2numpy(target[:1, :, :, :]).astype(np.uint8)
     mu.addText(normal_gt_8bit, "gt")
 
-    output_img = [conf_cnn_8_bit, normal_cnn_8bit, normal_gt_8bit]
+    # normalize output normal
+    normal_cnn_8bit = mu.tenor2numpy(xout[:1, :, :, :]).astype(np.uint8)
+    mu.addText(normal_cnn_8bit, "output")
+
+    first_row = [x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit]
+
+    normal_cnn_8bit_norm = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
+    mu.addText(normal_cnn_8bit_norm, "output_norm")
+
+    second_row = [normal_cnn_8bit_norm]
+
+    if c0 is not None:
+        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
+        mu.addText(c0_normalized_8bit, "Input Confidence")
+        second_row.append(c0_normalized_8bit)
+
+    if cout is not None:
+        conf_cnn_8_bit = mu.tenor2numpy(cout[:1, :, :, :]).astype(np.uint8)
+        mu.addText(conf_cnn_8_bit, "cout")
+        second_row.append(conf_cnn_8_bit)
+
+        conf_cnn_8_bit_norm = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
+        mu.addText(conf_cnn_8_bit_norm, "cout_norm")
+        second_row.append(conf_cnn_8_bit_norm)
 
     # ------------------ combine together ----------------------------------------------
 
-    output = mu.concat_tile_resize([input_img, output_img])
-    output = cv.resize(output, (1000, 1000))
+    output = mu.concat_tile_resize([first_row, second_row])
+    output = cv.resize(output, (1440,1080))
     cv.imwrite(str(exp_path / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
 
     # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])

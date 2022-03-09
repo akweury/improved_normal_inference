@@ -21,20 +21,20 @@ class NormalNN(nn.Module):
         super().__init__()
         self.__name__ = 'NormalNN'
         # self.nconv0 = NConv2d(in_ch, in_ch * 3, (5, 5), pos_fn, 'k', padding=(2, 2))
-        kernel_size = (5, 5)
+        kernel_5 = (5, 5)
         kernel_3 = (3, 3)
         padding_2 = (2, 2)
         padding_1 = (1, 1)
         # input: 3 channel vertex
         # Problem: each channel has different range, which probably needed to be normalized
 
-        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.conv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_5, (1, 1), padding_2)
         # self.conv1 = NConv2d(in_ch, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.conv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_5, (1, 1), padding_2)
         # self.nconv2 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
-        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.conv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_5, (1, 1), padding_2)
         # self.nconv3 = NConv2d(in_ch * num_channels, in_ch * num_channels, (5, 5), pos_fn, 'k', padding=(2, 2))
 
         self.conv4 = nn.Conv2d(2 * in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
@@ -49,7 +49,11 @@ class NormalNN(nn.Module):
         self.conv7 = nn.Conv2d(in_ch * num_channels, out_ch, (1, 1), (1, 1), (0, 0))
         # self.nconv7 = NConv2d(in_ch * num_channels, out_ch, (1, 1), pos_fn, 'k')
 
+        self.conv8 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
         # self.nconv8 = NConv2d(in_ch * num_channels, out_ch * num_channels, (1, 1), pos_fn, 'k')
+
+        self.conv9 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
+
 
     def forward(self, x0):
         # x1, c1 = self.nconv1(x0, c0)  # 2
@@ -144,6 +148,8 @@ class NormalNN(nn.Module):
         xout = self.conv7(xout)  # (1, 3, 512, 512)
         # xout, cout = self.nconv7(xout, cout)
 
+        xout = self.conv8(xout)
+        xout = self.conv9(xout)
         return xout
 
 
