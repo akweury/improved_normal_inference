@@ -47,8 +47,8 @@ def train_epoch(nn_model, epoch):
 
     print('\n==> Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
 
-    err = create_error_metric(nn_model.args)
-    err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
+    # err = create_error_metric(nn_model.args)
+    # err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
 
     nn_model.model.train()  # switch to train mode
 
@@ -73,8 +73,7 @@ def train_epoch(nn_model, epoch):
         # Forward pass
         # out: xout=CNN(vertex)=normal, cout, cin
         # output_1: input, input_confidence, normal=knn(input)
-        out, cout, c0 = nn_model.model(input, cpu=nn_model.args.cpu)
-        chart.draw_output(input, c0, out, cout)
+        out, out_img = nn_model.model(input, cpu=nn_model.args.cpu)
         # ------------------ visualize outputs ----------------------------------------------
         # cv2.imwrite(str(nn_model.exp_dir / "output" / f"train_x_0_c_0_normal_KNN_{epoch}.png"), output_1)
         # mu.show_images(output_1, "train_x0-c0-normal_knn")
@@ -97,7 +96,7 @@ def train_epoch(nn_model, epoch):
         # ------------------------------------------------------------------------------------
 
         # Compute the loss
-        loss = nn_model.loss(out, target)
+        loss = nn_model.loss[0](out, target)
 
         # Backward pass
         loss.backward()
@@ -108,33 +107,34 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
 
+        chart.draw_output(input, out, target, nn_model.exp_dir, loss, epoch, i, "train")
         # Calculate Error metrics
         err = create_error_metric(nn_model.args)
         err.evaluate(out[:, :xout_channel, :, :].data, target.data)
-        err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
-        if ((i + 1) % nn_model.args.print_freq == 0) or (i == len(nn_model.train_loader) - 1):
-            print(f"train_loader: {len(nn_model.train_loader)}")
-            print(f"[Train] Epoch ({epoch}) [{i + 1}/{len(nn_model.train_loader)}]: ", end='')
-            print(err_avg)
-
-        # Log to Tensorboard if enabled
-        if nn_model.tb_writer is not None:
-            if (i + 1) % nn_model.tb_freq == 0:
-                avg_meter = err_avg.get_avg()
-                nn_model.tb_writer.add_scalar('Loss/train', avg_meter.loss,
-                                              epoch * len(nn_model.train_loader) + i)
-                nn_model.tb_writer.add_scalar('MAE/train', avg_meter.metrics['mae'],
-                                              epoch * len(nn_model.train_loader) + i)
-                nn_model.tb_writer.add_scalar('RMSE/train', avg_meter.metrics['rmse'],
-                                              epoch * len(nn_model.train_loader) + i)
+        # err_avg.update(err.get_results(), loss.item(), gpu_time, data_time, input.size(0))
+        # if ((i + 1) % nn_model.args.print_freq == 0) or (i == len(nn_model.train_loader) - 1):
+        #     print(f"train_loader: {len(nn_model.train_loader)}")
+        #     print(f"[Train] Epoch ({epoch}) [{i + 1}/{len(nn_model.train_loader)}]: ", end='')
+        #     print(err_avg)
+        #
+        # # Log to Tensorboard if enabled
+        # if nn_model.tb_writer is not None:
+        #     if (i + 1) % nn_model.tb_freq == 0:
+        #         avg_meter = err_avg.get_avg()
+        #         nn_model.tb_writer.add_scalar('Loss/train', avg_meter.loss,
+        #                                       epoch * len(nn_model.train_loader) + i)
+        #         nn_model.tb_writer.add_scalar('MAE/train', avg_meter.metrics['mae'],
+        #                                       epoch * len(nn_model.train_loader) + i)
+        #         nn_model.tb_writer.add_scalar('RMSE/train', avg_meter.metrics['rmse'],
+        #                                       epoch * len(nn_model.train_loader) + i)
 
         # Start counting again for the next iteration
         start = time.time()
 
     # update log
-    nn_model.train_csv.update_log(err_avg, epoch)
+    # nn_model.train_csv.update_log(err_avg, epoch)
 
-    return err_avg
+    # return err_avg
 
 
 # # -------------- EVALUATION FUNCTION ----------------------

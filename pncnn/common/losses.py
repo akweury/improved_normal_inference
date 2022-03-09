@@ -91,13 +91,13 @@ class MaskedProbLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, out, cout, targets):
+    def forward(self, out, targets):
         # means = out[:, :1, :, :]
-        means = out
+        means = out[:, :3, :, :]
 
         # means = torch.permute(means, (0, 2, 3, 1)).unsqueeze(1)
 
-        cout = cout
+        cout = out[:, 3:6, :, :]
         # cout = torch.permute(cout, (0, 2, 3, 1)).unsqueeze(1)
 
         res = cout

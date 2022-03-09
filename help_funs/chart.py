@@ -72,7 +72,11 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 #                  x_label="k_value",
 #                  y_label="RGB_difference")
 
-def draw_output(x0, c0, out, cout, target, exp_path, loss, epoch, i, prefix):
+def draw_output(x0, out, target, exp_path, loss, epoch, i, prefix):
+    c0 = out[:, 6:, :, :]
+    xout = out[:, :3, :, :]
+    cout = out[:, 3:6, :, :]
+
     # ------------------ input ----------------------------------------------
     x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
@@ -88,7 +92,7 @@ def draw_output(x0, c0, out, cout, target, exp_path, loss, epoch, i, prefix):
     conf_cnn_8_bit = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
     mu.addText(conf_cnn_8_bit, "cout")
 
-    normal_cnn_8bit = mu.normalize2_8bit(mu.tenor2numpy(out[:1, :, :, :]))
+    normal_cnn_8bit = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
     mu.addText(normal_cnn_8bit, "output")
 
     normal_gt_8bit = mu.tenor2numpy(target[:1, :, :, :]).astype(np.uint8)

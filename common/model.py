@@ -36,7 +36,7 @@ class NeuralNetworkModel():
         self.tb_freq = args.tb_freq if hasattr(args, 'tb_freq') else 1000
         self.tb_writer = SummaryWriter(os.path.join(self.exp_dir, 'tb_log',
                                                     datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
-        self.loss = losses.get_loss_fn(args)
+        self.loss = self.init_loss()
         self.losses = []
         self.criterion = nn.CrossEntropyLoss()
 
@@ -51,6 +51,12 @@ class NeuralNetworkModel():
 
         # args_parser.save_args(self.exp_dir, args)  # Save args to JSON file
         self.print_info(args)
+
+    def init_loss(self):
+        self.loss = losses.get_loss_fn(self.args)
+        for each in self.loss:
+            each.to(self.device)
+        return self.loss
 
     def init_lr_decayer(self):
         milestones = [int(x) for x in self.args.lr_scheduler.split(",")]

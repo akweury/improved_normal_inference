@@ -1,7 +1,7 @@
 import config
-from workspace.pncnn import train, test
-from workspace.pncnn import network
-
+# from workspace.pncnn import train, test
+# from workspace.pncnn import network
+#
 from workspace.nnn import train, test
 from workspace.nnn import network
 

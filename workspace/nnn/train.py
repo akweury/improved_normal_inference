@@ -70,7 +70,7 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        out, cout, c0 = nn_model.model(input, nn_model.args.cpu)
+        out = nn_model.model(input, nn_model.args.cpu)
 
         # Compute the loss
         if epoch < nn_model.args.loss_milestone:
@@ -78,8 +78,8 @@ def train_epoch(nn_model, epoch):
         else:
             loss_fn = nn_model.loss[1]
 
-        loss_fn.to(nn_model.device)
-        loss = loss_fn(out, cout, target)  # mask prob loss
+        # loss_fn.to(nn_model.device)
+        loss = loss_fn(out, target)  # mask prob loss
 
         # loss = nn_model.criterion(out, target)
 
@@ -96,10 +96,19 @@ def train_epoch(nn_model, epoch):
         loss_total += loss
         if i == 1:
             # print statistics
-            print(f'[epoch: {epoch}] loss: {nn_model.losses}, out_max:{out.max()}, out_min:{out.min()}')
-            input, out, cout, target, c0 = input.to("cpu"), out.to("cpu"), cout.to("cpu"), target.to("cpu"), c0.to(
-                "cpu")
-            chart.draw_output(input, c0, out, cout, target, nn_model.exp_dir, loss, epoch, i, "train")
+            np.set_printoptions(precision=3)
+            print(
+                f'[epoch: {epoch}] loss: {nn_model.losses}, \n'
+                f'out_0_range:({out[:, :1, :, :].min().item():.3f}, {out[:, :1, :, :].max().item():.3f}), \t'
+                f'cout_0_range:({out[:, 3:4, :, :].min().item():.3f}, {out[:, 3:4, :, :].max().item():.3f}), \n'
+                f'out_1_range:({out[:, 1:2, :, :].min().item():.3f}, {out[:, 1:2, :, :].max().item():.3f}), \n'
+                f'cout_1_range:({out[:, 4:5, :, :].min().item():.3f}, {out[:, 4:5, :, :].max().item():.3f}), \n'
+                f'out_2_range:({out[:, 2:3, :, :].min().item():.3f}, {out[:, 2:3, :, :].max().item():.3f}), \n'
+                f'cout_2_range:({out[:, 5:6, :, :].min().item():.3f}, {out[:, 5:6, :, :].max().item():.3f}), \n'
+
+                f'target_range:{target.min().item(), target.max().item()}')
+            input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
+            chart.draw_output(input, out, target, nn_model.exp_dir, loss, epoch, i, "train")
             # save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
         # Start counting again for the next iteration
