@@ -100,7 +100,7 @@ def normalize(numpy_array, data):
     if data is not None:
         min, max = data["minDepth"], data["maxDepth"]
     else:
-        min, max = numpy_array[~mask].min(), numpy_array.max()
+        min, max = numpy_array.min(), numpy_array.max()
         if min == max:
             return numpy_array, 0, 1
 
@@ -233,8 +233,8 @@ def normal2RGB(normals):
                 normals[i, j] = normals[i, j] * 0.5 + 0.5
                 normals[i, j, 2] = 1 - normals[i, j, 2]
                 normals[i, j] = (normals[i, j] * 255)
-
-    return normals.astype(np.uint8)
+    rgb = cv.normalize(normals, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return rgb
 
 
 def depth2vertex(depth, K, R, t):
@@ -257,7 +257,7 @@ def depth2vertex(depth, K, R, t):
 def vertex2normal(vertex, k_idx):
     mask = np.sum(np.abs(vertex), axis=2) != 0
     normals = compute_normal(vertex, mask, k_idx)
-    normals_rgb = normal2RGB(normals).astype(np.uint8)
+    normals_rgb = normal2RGB(normals)
     return normals, normals_rgb
 
 
@@ -274,7 +274,7 @@ def depth2normal(depth, k_idx, K, R, t):
 # -------------------------------------- openCV Utils ------------------------------------------
 def addText(img, text):
     cv.putText(img, text=text, org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255),
+               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1.6, color=(255, 255, 255),
                thickness=1, lineType=cv.LINE_AA)
 
 
@@ -327,6 +327,8 @@ def show_numpy(numpy_array, title):
 def tenor2numpy(tensor):
     if tensor.size() == (1, 3, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
+    elif tensor.size() == (1, 3, 10, 10):
+        return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     else:
         print("Unsupported input tensor size.")
 
@@ -359,3 +361,35 @@ def scale16bitImage(img, minVal, maxVal):
     img = np.array(img)
 
     return img.astype(np.float32)
+
+
+def median_filter(depth):
+    padding = 2  # 2 optimal
+
+    # add padding
+    depth_padded = np.expand_dims(copy_make_border(depth, padding * 2), axis=2)
+    h, w, c = depth_padded.shape
+
+    mask = (depth_padded == 0)
+
+    # predict
+    for i in range(padding, h - padding):
+        for j in range(padding, w - padding):
+            if mask[i, j]:
+                neighbor = depth_padded[i - padding:i + padding + 1, j - padding:j + padding + 1].flatten()
+                neighbor = np.delete(neighbor, np.floor((padding * 2 + 1) ** 2 / 2).astype(np.int32))
+                # depth_padded[i, j] = mu.bi_interpolation(lower_left, lower_right, upper_left, upper_right, 0.5, 0.5)
+                depth_padded[i, j] = np.median(neighbor)
+
+    # remove the padding
+    pred_depth = depth_padded[padding:-padding, padding:-padding]
+
+    return pred_depth.reshape(512, 512)
+
+
+def pred_filter(img, pred_img):
+    h, w = img.shape[:2]
+    mask = ~(img == 0)
+    img[mask] = pred_img[mask]
+
+    return img

@@ -70,7 +70,7 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        out = nn_model.model(input, nn_model.args.cpu)
+        out = nn_model.model(input)
 
         # Compute the loss
         if epoch < nn_model.args.loss_milestone:
@@ -97,7 +97,7 @@ def train_epoch(nn_model, epoch):
         if i == 1:
             # print statistics
             np.set_printoptions(precision=3)
-            print(
+            pprint(
                 f'[epoch: {epoch}] loss: {nn_model.losses}, \n'
                 f'out_0_range:({out[:, :1, :, :].min().item():.3f}, {out[:, :1, :, :].max().item():.3f}), \t'
                 f'cout_0_range:({out[:, 3:4, :, :].min().item():.3f}, {out[:, 3:4, :, :].max().item():.3f}), \n'
@@ -123,7 +123,7 @@ def train_epoch(nn_model, epoch):
     loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
     nn_model.losses.append(loss_avg.item())
 
-    chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir / "output")
+    chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir)
     return loss_total
 
     # return err_avg

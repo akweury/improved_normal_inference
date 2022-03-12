@@ -1,10 +1,13 @@
 import datetime
+import os.path
+
 import numpy as np
 import matplotlib.pyplot as plt
 from help_funs import mu
 import cv2 as cv
 
-time_now = datetime.datetime.today().date()
+date_now = datetime.datetime.today().date()
+time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
 def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False):
@@ -29,7 +32,8 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
     if y_label is not None:
         plt.ylabel(y_label)
 
-    plt.savefig(str(path / f"line_{title}_{x_label}_{y_label}_{time_now}.png"))
+    plt.savefig(
+        str(path / f"output_{date_now}_{time_now}" / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
 
     if show:
         plt.show()
@@ -72,6 +76,33 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 #                  x_label="k_value",
 #                  y_label="RGB_difference")
 
+
+def draw_output_svd(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
+    # c0 = out[:, 6:, :, :]
+    # xout = out[:, :3, :, :]
+    # cout = out[:, 3:6, :, :]
+
+    x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
+    mu.addText(x0_normalized_8bit, "Input(Vertex)")
+
+    normal_gt_8bit = mu.normalize2_8bit(mu.tenor2numpy(target[:1, :]))
+    mu.addText(normal_gt_8bit, "gt")
+
+
+    # normalize output normal
+    normal_cnn_8bit = mu.tenor2numpy(xout[:1, :, :, :]).astype(np.uint8)
+    mu.addText(normal_cnn_8bit, "output")
+
+    # ------------------ combine together ----------------------------------------------
+
+    output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
+    folder_path = exp_path / f"output_{date_now}_{time_now}"
+    if not os.path.exists(str(folder_path)):
+        os.mkdir(str(folder_path))
+
+    cv.imwrite(str(folder_path / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+
+
 def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     # c0 = out[:, 6:, :, :]
     # xout = out[:, :3, :, :]
@@ -80,19 +111,19 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
 
-    normal_gt_8bit = mu.tenor2numpy(target[:1, :, :, :]).astype(np.uint8)
+    normal_gt_8bit = mu.normalize2_8bit(mu.tenor2numpy(target[:1, :, :, :]))
     mu.addText(normal_gt_8bit, "gt")
+
+    normal_cnn_8bit_norm = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
+    mu.addText(normal_cnn_8bit_norm, "output_shifted")
+
+    first_row = [x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit_norm]
 
     # normalize output normal
     normal_cnn_8bit = mu.tenor2numpy(xout[:1, :, :, :]).astype(np.uint8)
     mu.addText(normal_cnn_8bit, "output")
 
-    first_row = [x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit]
-
-    normal_cnn_8bit_norm = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
-    mu.addText(normal_cnn_8bit_norm, "output_norm")
-
-    second_row = [normal_cnn_8bit_norm]
+    second_row = [normal_cnn_8bit]
 
     if c0 is not None:
         c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
@@ -105,14 +136,20 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
         second_row.append(conf_cnn_8_bit)
 
         conf_cnn_8_bit_norm = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
-        mu.addText(conf_cnn_8_bit_norm, "cout_norm")
+        mu.addText(conf_cnn_8_bit_norm, "cout_shifted")
         second_row.append(conf_cnn_8_bit_norm)
 
     # ------------------ combine together ----------------------------------------------
 
     output = mu.concat_tile_resize([first_row, second_row])
-    output = cv.resize(output, (1440,1080))
-    cv.imwrite(str(exp_path / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    output = cv.resize(output, (1440, 1080))
+
+    folder_path = exp_path / f"output_{date_now}_{time_now}"
+
+    if not os.path.exists(str(folder_path)):
+        os.mkdir(str(folder_path))
+
+    cv.imwrite(str(folder_path / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
 
     # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
     # b1, g1, r1 = cv2.split(np_array1)

@@ -127,7 +127,8 @@ def load_single_data(data_path, idx):
 
     depth_gt = load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
     depth_noise = load_scaled16bitImage(depth_noise_file, data['minDepth'], data['maxDepth'])
-    return data, depth_gt, depth_noise
+    normal = load_24bitNormal(normal_file)
+    return data, depth_gt, depth_noise, normal
 
 
 def get_file_name(idx, data_path):

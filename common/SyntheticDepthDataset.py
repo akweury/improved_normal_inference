@@ -14,9 +14,6 @@ import glob
 import os
 import json
 
-import cv2 as cv
-from torchvision import transforms
-import config
 from help_funs import file_io, mu
 
 
@@ -53,8 +50,6 @@ class SyntheticDepthDataset(Dataset):
             self.data = np.array(sorted(glob.glob(str(depth_path / "test" / "*data0.json"), recursive=True)))
         #
 
-
-
         assert (len(self.gt) == len(self.depth))
 
     def __len__(self):
@@ -81,11 +76,7 @@ class SyntheticDepthDataset(Dataset):
                                        torch.tensor(data['K']),
                                        torch.tensor(data['R']).float(),
                                        torch.tensor(data['t']).float())
-
-        # vertex_input, mins, maxs = mu.normalize3channel(vertex_input)
-        # mins, maxs = None, None
-        # mask = np.abs(vertex_input).sum(axis=2) == 0
-        # vertex_input[~mask] = vertex_input[~mask] + 1
+        # vertex_input = mu.normalize3channel(vertex_input)[0]  # shift to non-negative range
 
         vertex_input = torch.from_numpy(vertex_input)  # (depth, dtype=torch.float)
         vertex_input = vertex_input.permute(2, 0, 1)
@@ -104,6 +95,7 @@ class SyntheticDepthDataset(Dataset):
 
         # gt = file_io.load_24bitNormal(self.gt[item])
         gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
+        gt = mu.normalize3channel(gt)[0]
 
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         normal_gt = normal_gt.permute(2, 0, 1)

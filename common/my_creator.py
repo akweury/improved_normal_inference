@@ -3,7 +3,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 
 # Kitti_dept
-from pncnn.dataloaders.SyntheticDepthDataset import SyntheticDepthDataset
+from common.SyntheticDepthDataset import SyntheticDepthDataset
 import config
 
 

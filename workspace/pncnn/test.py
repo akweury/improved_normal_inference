@@ -12,7 +12,7 @@ import time
 import torch
 
 from pncnn.utils import args_parser
-from pncnn.dataloaders.my_creator import create_dataloader
+from common.my_creator import create_dataloader
 from pncnn.utils.error_metrics import AverageMeter, create_error_metric
 from pncnn.utils.save_output_images import create_out_image_saver
 from pncnn.common.losses import get_loss_fn
