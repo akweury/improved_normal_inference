@@ -8,7 +8,7 @@ Created on Mon Feb 25 15:25:52 2019
 import argparse
 import os
 import json
-
+from pprint import pprint
 from pncnn.common.losses import get_loss_list
 import config
 
@@ -38,7 +38,7 @@ def args_parser():
 
     # Mode selection
 
-    parser.add_argument('--mode',type=str, default='train', choices=['train','test'],
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'],
                         help='train a model or test a mode')
     parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
                         help='add noise or not')
@@ -199,7 +199,7 @@ def load_args_from_file(args_file_path, given_args):
 
 # TODO: Print in a nicer way
 def print_args(args):
-    print('==> Experiment Args: \n {} \n'.format(args))
+    pprint(f'==> Experiment Args:  {args} ')
 
 
 # This function compares the args saved in the checkpoint with the json file

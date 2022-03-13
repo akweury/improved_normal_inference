@@ -145,18 +145,21 @@ class SyntheticDataset(Dataset):
             x = np.random.randint(h)
             y = np.random.randint(w)
 
-        gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
+        # gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
+        gt = file_io.load_24bitNormal(self.gt[item]).astype(np.float32)
         gt = gt[x, y, :]
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
-        # normal_gt = normal_gt.permute(2, 0, 1)
+        # normal_gt = normal_gt / np.linalg.norm(normal_gt)
 
-        normal_svd_rgb = candidate_normals.generate_candidates(vertex, x, y).astype(np.float32)
-
-        vertex_input = torch.from_numpy(normal_svd_rgb)  # (depth, dtype=torch.float)
-        vertex_input = vertex_input.permute(2, 0, 1)
+        normal_svd = candidate_normals.generate_candidates(vertex, x, y).astype(np.float32)
+        # normal_svd = normal_svd_rgb / np.linalg.norm(normal_svd_rgb, ord=2, axis=2, keepdims=True)
+        normal_svd = torch.from_numpy(normal_svd)  # (depth, dtype=torch.float)
+        normal_svd = normal_svd.permute(2, 0, 1)
 
         # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
-        return vertex_input, normal_gt
+        return normal_svd, normal_gt
+
+
 
 
 def create_dataloader(args, eval_mode=False):

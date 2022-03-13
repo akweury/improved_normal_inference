@@ -10,7 +10,7 @@ date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
-def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False, log_y = False):
+def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False, log_y=False):
     if data.shape[1] <= 1:
         return
 
@@ -36,7 +36,7 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
         plt.yscale('log')
 
     plt.savefig(
-        str(path / f"output_{date_now}_{time_now}" / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
+        str(path / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
 
     if show:
         plt.show()
@@ -80,31 +80,34 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 #                  y_label="RGB_difference")
 
 
-def draw_output_svd(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
+def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
     target = target[0, :]
-    xout = xout[0,:]
+    xout = xout[0, :]
     # xout = out[:, :3, :, :]
     # cout = out[:, 3:6, :, :]
 
-    x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
-    x0_normalized_8bit = cv.resize(x0_normalized_8bit, (512,512))
-    mu.addText(x0_normalized_8bit, "Input(Vertex)")
+    x0_normalized_8bit = mu.normal2RGB(mu.tenor2numpy(x0[:1, :, :, :]))
+    x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
+    mu.addText(x0_normalized_8bit, "Input(Normals)")
 
-    normal_gt_8bit = mu.pure_color_img(target.numpy(), (512, 512, 3))
+    target_color = mu.normal2RGB_single(target.numpy()).reshape(3)
+    normal_gt_8bit = mu.pure_color_img(target_color, (512, 512, 3))
     mu.addText(normal_gt_8bit, "gt")
 
     # normalize output normal
-    normal_cnn_8bit = mu.pure_color_img(xout.detach().numpy().astype(np.uint8), (512, 512, 3))
+    xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
+    xout_color = mu.normal2RGB_single(xout_normal).reshape(3)
+    normal_cnn_8bit = mu.pure_color_img(xout_color, (512, 512, 3))
     mu.addText(normal_cnn_8bit, "output")
 
+    xout_normal = mu.rgb2normal(xout_color)
+    tartget_normal = mu.rgb2normal(target_color)
+    difference_angle = mu.angle_between(xout_normal, tartget_normal)
+    mu.addText(normal_cnn_8bit, f'e={difference_angle:.2f}', pos='lower_right', font_size=1.0)
     # ------------------ combine together ----------------------------------------------
 
     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
-    folder_path = exp_path / f"output_{date_now}_{time_now}"
-    if not os.path.exists(str(folder_path)):
-        os.mkdir(str(folder_path))
-
-    cv.imwrite(str(folder_path / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
 
 
 def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
@@ -153,7 +156,7 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     if not os.path.exists(str(folder_path)):
         os.mkdir(str(folder_path))
 
-    cv.imwrite(str(folder_path / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    cv.imwrite(str(folder_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
 
     # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
     # b1, g1, r1 = cv2.split(np_array1)

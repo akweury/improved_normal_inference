@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:16:29 2019
 @modified: J. Sha
 
 """
-import sys
+import os, sys
 from os.path import dirname
 
 sys.path.append(dirname(__file__))
@@ -43,9 +43,12 @@ def train_epoch(nn_model, epoch):
         KeyError: Raises an exception.
     """
 
+    folder_path = nn_model.exp_dir / f"output_{chart.date_now}_{chart.time_now}"
+    if not os.path.exists(str(folder_path)):
+        os.mkdir(str(folder_path))
+
     print('\n==> Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
     nn_model.model.train()  # switch to train mode
-
     loss_total = 0.0
     start = time.time()
     for i, (input, target) in enumerate(nn_model.train_loader):
@@ -85,7 +88,7 @@ def train_epoch(nn_model, epoch):
 
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
             pprint(f'[epoch: {epoch}] loss: {nn_model.losses}')
-            chart.draw_output_svd(input, out, cout=None, c0=None, target=target, exp_path=nn_model.exp_dir,
+            chart.draw_output_svd(input, out, target=target, exp_path=folder_path,
                                   loss=loss, epoch=epoch, i=i, prefix="train")
 
         start = time.time()
@@ -93,7 +96,7 @@ def train_epoch(nn_model, epoch):
     loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
     nn_model.losses.append(loss_avg.item())
 
-    chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir, log_y=True)
+    chart.line_chart(np.array([nn_model.losses]), folder_path, log_y=True)
 
 
 def main(args):

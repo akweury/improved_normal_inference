@@ -21,6 +21,12 @@ def normal2RGB(normals):
     return rgb
 
 
+def rgb2normal(color):
+    color_norm = color / np.linalg.norm(color)
+    color_norm[2] = 1 - color_norm[2]
+    return color_norm * 2 - 1
+
+
 def generate_candidates(vertex, x, y, k=1):
     center_vertex = vertex[x, y].reshape(1, 3)
     height, width = vertex.shape[:2]
@@ -70,8 +76,8 @@ def generate_candidates(vertex, x, y, k=1):
 
     # only pick first 100 candidates
     candidate_normals = candidate_normals_all[:100, :].reshape(10, 10, 3)
-    candidate_normals_rgb = normal2RGB(candidate_normals)
-    return candidate_normals_rgb
+
+    return candidate_normals
 
 
 def generate_candidates_all(vertex, k=1):

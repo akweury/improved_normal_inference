@@ -15,20 +15,17 @@ def unit_vector(vector):
 
 
 def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
 
-            >>> angle_between((1, 0, 0), (0, 1, 0))
-            1.5707963267948966
-            >>> angle_between((1, 0, 0), (1, 0, 0))
-            0.0
-            >>> angle_between((1, 0, 0), (-1, 0, 0))
-            3.141592653589793
-    """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    if np.sum(v1_u - v2_u) == 0:
-        return 0
-    return np.degrees(np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)))
+    inner = np.inner(v1, v2)
+    norms = np.linalg.norm(v1) * np.linalg.norm(v2)
+
+    cos = inner / norms
+    rad = np.arccos(np.clip(cos, -1.0, 1.0))
+    deg = np.rad2deg(rad)
+    if deg > 90:
+        deg = 180 - deg
+    return deg
 
 
 def mse(img_1, img_2, valid_pixels=None):
@@ -237,6 +234,20 @@ def normal2RGB(normals):
     return rgb
 
 
+def normal2RGB_single(normal):
+    normal = normal * 0.5 + 0.5
+    normal[2] = 1 - normal[2]
+    normal = normal * 255
+    rgb = cv.normalize(normal, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return rgb
+
+
+def rgb2normal(color):
+    color_norm = color / np.linalg.norm(color)
+    color_norm[2] = 1 - color_norm[2]
+    return color_norm * 2 - 1
+
+
 def depth2vertex(depth, K, R, t):
     c, h, w = depth.shape
 
@@ -272,9 +283,19 @@ def depth2normal(depth, k_idx, K, R, t):
 
 
 # -------------------------------------- openCV Utils ------------------------------------------
-def addText(img, text):
-    cv.putText(img, text=text, org=(10, 50),
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=1.6, color=(255, 255, 255),
+def addText(img, text, pos='upper_left', font_size=1.6):
+    h, w = img.shape[:2]
+    if pos == 'upper_left':
+        position = (10, 50)
+    elif pos == 'lower_right':
+        position = (h - 200, w - 20)
+    elif pos == 'lower_left':
+        position = (10, w - 20)
+    else:
+        raise ValueError('unsupported position to put text in the image.')
+
+    cv.putText(img, text=text, org=position,
+               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=font_size, color=(255, 255, 255),
                thickness=1, lineType=cv.LINE_AA)
 
 
@@ -283,6 +304,38 @@ def pure_color_img(color, size):
     img[:] = color
     return img
 
+
+# https://stackoverflow.com/questions/44650888/resize-an-image-without-distortion-opencv
+def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
+    # initialize the dimensions of the image to be resized and
+    # grab the image size
+    dim = None
+    (h, w) = image.shape[:2]
+
+    # if both the width and height are None, then return the
+    # original image
+    if width is None and height is None:
+        return image
+
+    # check to see if the width is None
+    if width is None:
+        # calculate the ratio of the height and construct the
+        # dimensions
+        r = height / float(h)
+        dim = (int(w * r), height)
+
+    # otherwise, the height is None
+    else:
+        # calculate the ratio of the width and construct the
+        # dimensions
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    # resize the image
+    resized = cv2.resize(image, dim, interpolation=inter)
+
+    # return the resized image
+    return resized
 
 
 # https://www.geeksforgeeks.org/concatenate-images-using-opencv-in-python/
