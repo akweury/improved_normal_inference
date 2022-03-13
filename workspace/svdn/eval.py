@@ -54,9 +54,9 @@ def eval(vertex):
 
     args_parser.print_args(args)
 
-    normal_img, eval_point_counter, avg_time = evaluate_epoch(model, vertex, start_epoch, device)
+    normal_img, eval_point_counter, total_time = evaluate_epoch(model, vertex, start_epoch, device)
 
-    return normal_img, eval_point_counter, avg_time
+    return normal_img, eval_point_counter, total_time
 
 
 ############ EVALUATION FUNCTION ############
@@ -98,7 +98,7 @@ def evaluate_epoch(model, vertex, epoch, device):
 
     avg_time = total_time / eval_point_counter
     normal_img = normal_img.astype(np.uint8)
-    return normal_img, eval_point_counter, avg_time
+    return normal_img, eval_point_counter, total_time
 
 
 if __name__ == '__main__':

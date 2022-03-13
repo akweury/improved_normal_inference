@@ -33,9 +33,9 @@ def main():
     img_list.append(normal_svd_img)
 
     # svd network normal
-    normal_img, eval_point_counter, avg_time = svdn.eval(vertex_gt)
+    normal_img, eval_point_counter, total_time = svdn.eval(vertex_gt)
     mu.addText(normal_img, 'SVD_Net')
-    mu.addText(normal_img, f"{eval_point_counter} points. avg_time:{avg_time}", pos="lower_left", font_size=0.5)
+    mu.addText(normal_img, f"{eval_point_counter} points. processing time: {total_time:.5f}", pos="lower_left", font_size=0.5)
     img_list.append(normal_img)
 
     # show the results
