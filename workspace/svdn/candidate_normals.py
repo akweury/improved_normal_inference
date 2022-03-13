@@ -22,7 +22,7 @@ def normal2RGB(normals):
 
 
 def generate_candidates(vertex, x, y, k=1):
-    center_vertex = vertex[x, y]
+    center_vertex = vertex[x, y].reshape(1, 3)
     height, width = vertex.shape[:2]
 
     candidate_normals = np.zeros(shape=(10, 10, 3))
@@ -31,31 +31,32 @@ def generate_candidates(vertex, x, y, k=1):
 
     # get all the vectors on the plane
     neighbours = vertex[max(x - k, 0):min(x + k + 1, width - 1), max(0, y - k):min(y + k + 1, height - 1)]
-    neighbors = neighbours.reshape(neighbours.shape[0] * neighbours.shape[1], 3)
-    neighbors = np.delete(neighbors, np.where(neighbors == center_vertex), axis=0)  # delete center
-    plane_vectors = neighbors - center_vertex
+    neighbours = neighbours.reshape(neighbours.shape[0] * neighbours.shape[1], 3)
+    neighbours = np.delete(neighbours, [neighbours.shape[0] // 2], axis=0)  # delete center
+    plane_vectors = neighbours - center_vertex
     # shuffle the vectors
     np.random.shuffle(plane_vectors)
 
     vec_num = plane_vectors.shape[0]
 
     # get all combinations of vectors
-    candidate_normals_num = np.sum([math.comb(vec_num, i) for i in range(3, vec_num + 1)])
-    print(f'candidate_normals_num={candidate_normals_num}')
-    print(f'vec_num={vec_num}')
+    candidate_normals_num = int(np.sum([math.comb(vec_num, i) for i in range(3, vec_num + 1)]))
+    # print(f'candidate_normals_num={candidate_normals_num}')
+    # print(f'vec_num={vec_num}')
 
-    candidate_normals_all = np.zeros(shape=(candidate_normals_num, 3))
+    candidate_normals_all = np.zeros(shape=(max(candidate_normals_num, 100), 3))
 
     i = 0
-    for choosen_vector_nums in reversed(range(3, vec_num)):
+    for choosen_vector_nums in reversed(range(3, vec_num + 1)):
         sample_indices = list(itertools.combinations(range(vec_num), choosen_vector_nums))
         for sample_index in sample_indices:
 
             # calculate normals using svd
-            candidate_vectors = plane_vectors[sample_index]
+            # print(f'sample_index={sample_index}')
+            candidate_vectors = np.take(plane_vectors, sample_index, axis=0)
             u, s, vh = np.linalg.svd(candidate_vectors)
             candidate_normal = vh.T[:, -1]
-            normal = normal_point2view_point(candidate_normal, center_vertex, np.array([0, 0, 0]))
+            normal = normal_point2view_point(candidate_normal, center_vertex.reshape(3), np.array([0, 0, 0]))
             if np.linalg.norm(normal) != 1:
                 normal = normal / np.linalg.norm(normal)
 
@@ -65,7 +66,7 @@ def generate_candidates(vertex, x, y, k=1):
     # if candidates less than 100, copy last normal, until 100 normals candidates generated
     if candidate_normals_num < 100:
         for j in range(i, 100):
-            candidate_normals_all[j] = candidate_normals_all[i]
+            candidate_normals_all[j] = candidate_normals_all[i - 1]
 
     # only pick first 100 candidates
     candidate_normals = candidate_normals_all[:100, :].reshape(10, 10, 3)

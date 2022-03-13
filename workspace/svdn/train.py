@@ -46,6 +46,7 @@ def train_epoch(nn_model, epoch):
     print('\n==> Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
     nn_model.model.train()  # switch to train mode
 
+    loss_total = 0.0
     start = time.time()
     for i, (input, target) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -67,7 +68,7 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        loss = nn_model.loss[0](out, target)
+        loss = nn_model.loss(out, target)
 
         # Backward pass
         loss.backward()
@@ -77,19 +78,22 @@ def train_epoch(nn_model, epoch):
 
         # record model time
         gpu_time = time.time() - start
-
+        loss_total += loss
         if i == 1:
             # print statistics
             np.set_printoptions(precision=3)
 
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-
-
-
-            chart.draw_output(input, out, cout=None, c0=None, target=target, exp_path=nn_model.exp_dir,
-                              loss=loss, epoch=epoch, i=i, prefix="train")
+            pprint(f'[epoch: {epoch}] loss: {nn_model.losses}')
+            chart.draw_output_svd(input, out, cout=None, c0=None, target=target, exp_path=nn_model.exp_dir,
+                                  loss=loss, epoch=epoch, i=i, prefix="train")
 
         start = time.time()
+
+    loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
+    nn_model.losses.append(loss_avg.item())
+
+    chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir, log_y=True)
 
 
 def main(args):

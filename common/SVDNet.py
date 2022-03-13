@@ -30,8 +30,8 @@ class SVDNet(nn.Module):
         self.conv3 = nn.Conv2d(256, 256, kernel_3, (1, 1), padding_1)
         self.conv4 = nn.Conv2d(256, 512, kernel_3, (1, 1), padding_1)
 
-        self.fc1 = nn.Linear(1024, 512)
-        self.fc2 = nn.Linear(512, 128)
+        self.fc1 = nn.Linear(512, 256)
+        self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 64)
         self.fc4 = nn.Linear(64, 3)
 
@@ -46,10 +46,9 @@ class SVDNet(nn.Module):
         x = self.conv4(x)
         x = F.max_pool2d(x, 2, 2)
 
-        x = torch.flatten(x)
+        x = torch.flatten(x, start_dim=1)
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.fc3(x)
         x = self.fc4(x)
-
         return x

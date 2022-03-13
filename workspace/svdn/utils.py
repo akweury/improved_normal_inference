@@ -43,9 +43,8 @@ class NeuralNetworkModel():
         self.print_info(args)
 
     def init_loss(self):
-        self.loss = [L2Loss(), L2Loss()]
-        for each in self.loss:
-            each.to(self.device)
+        self.loss = L2Loss()
+        self.loss.to(self.device)
         return self.loss
 
     def init_lr_decayer(self):
@@ -141,11 +140,13 @@ class SyntheticDataset(Dataset):
                                  torch.tensor(data['t']).float())
 
         h, w = vertex.shape[:2]
-        x = np.random.randint(h)
-        y = np.random.randint(w)
+        x, y = 0, 0
+        while vertex[x, y, :].sum() == 0:
+            x = np.random.randint(h)
+            y = np.random.randint(w)
 
         gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
-        gt = mu.normalize3channel(gt)[0][x, y, :]
+        gt = gt[x, y, :]
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         # normal_gt = normal_gt.permute(2, 0, 1)
 

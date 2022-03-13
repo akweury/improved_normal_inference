@@ -278,8 +278,14 @@ def addText(img, text):
                thickness=1, lineType=cv.LINE_AA)
 
 
-# https://www.geeksforgeeks.org/concatenate-images-using-opencv-in-python/
+def pure_color_img(color, size):
+    img = np.zeros(shape=size).astype(np.uint8)
+    img[:] = color
+    return img
 
+
+
+# https://www.geeksforgeeks.org/concatenate-images-using-opencv-in-python/
 def concat_vh(list_2d):
     """
     show image in a 2d array

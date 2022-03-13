@@ -10,7 +10,7 @@ date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
-def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False):
+def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False, log_y = False):
     if data.shape[1] <= 1:
         return
 
@@ -31,6 +31,9 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
         plt.xlabel(x_label)
     if y_label is not None:
         plt.ylabel(y_label)
+
+    if log_y:
+        plt.yscale('log')
 
     plt.savefig(
         str(path / f"output_{date_now}_{time_now}" / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
@@ -78,19 +81,20 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
 
 
 def draw_output_svd(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
-    # c0 = out[:, 6:, :, :]
+    target = target[0, :]
+    xout = xout[0,:]
     # xout = out[:, :3, :, :]
     # cout = out[:, 3:6, :, :]
 
     x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
+    x0_normalized_8bit = cv.resize(x0_normalized_8bit, (512,512))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
 
-    normal_gt_8bit = mu.normalize2_8bit(mu.tenor2numpy(target[:1, :]))
+    normal_gt_8bit = mu.pure_color_img(target.numpy(), (512, 512, 3))
     mu.addText(normal_gt_8bit, "gt")
 
-
     # normalize output normal
-    normal_cnn_8bit = mu.tenor2numpy(xout[:1, :, :, :]).astype(np.uint8)
+    normal_cnn_8bit = mu.pure_color_img(xout.detach().numpy().astype(np.uint8), (512, 512, 3))
     mu.addText(normal_cnn_8bit, "output")
 
     # ------------------ combine together ----------------------------------------------
