@@ -15,7 +15,7 @@ from help_funs import mu
 
 def eval(vertex):
     print('\n==> Evaluation mode!')
-    check_point_id = 299
+    check_point_id = 999
 
     # Define paths
     exp_path = config.ws_path / "svdn"

@@ -1,10 +1,12 @@
 import datetime
 import os.path
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
-from help_funs import mu
 import cv2 as cv
+
+from help_funs import mu
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
@@ -35,8 +37,10 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
     if log_y:
         plt.yscale('log')
 
+    if not os.path.exists(str(path)):
+        os.mkdir(path)
     plt.savefig(
-        str(path / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
+        str(Path(path) / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
 
     if show:
         plt.show()
@@ -86,13 +90,22 @@ def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
     # xout = out[:, :3, :, :]
     # cout = out[:, 3:6, :, :]
 
-    x0_normalized_8bit = mu.normal2RGB(mu.tenor2numpy(x0[:1, :, :, :]))
+    # input normal
+    input = mu.tenor2numpy(x0[:1, :, :, :])
+    x0_normalized_8bit = mu.normal2RGB(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Normals)")
 
-    target_color = mu.normal2RGB_single(target.numpy()).reshape(3)
+    # gt normal
+    target = target.numpy()
+    target_color = mu.normal2RGB_single(target).reshape(3)
     normal_gt_8bit = mu.pure_color_img(target_color, (512, 512, 3))
     mu.addText(normal_gt_8bit, "gt")
+
+    # minimum difference between input normal and gt normal
+    best_angle, diff = mu.choose_best(input, target)
+    diff_min = np.min(diff)
+    mu.addText(normal_gt_8bit, f'e={diff_min:.2f}', pos='lower_right', font_size=1.0)
 
     # normalize output normal
     xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
@@ -100,14 +113,17 @@ def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
     normal_cnn_8bit = mu.pure_color_img(xout_color, (512, 512, 3))
     mu.addText(normal_cnn_8bit, "output")
 
+    # angle difference between output and target
     xout_normal = mu.rgb2normal(xout_color)
     tartget_normal = mu.rgb2normal(target_color)
-    difference_angle = mu.angle_between(xout_normal, tartget_normal)
+    difference_angle = mu.angle_between(xout_normal, tartget_normal).item()
     mu.addText(normal_cnn_8bit, f'e={difference_angle:.2f}', pos='lower_right', font_size=1.0)
+
     # ------------------ combine together ----------------------------------------------
 
     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
     cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    # mu.show_images(output, f"svdn")
 
 
 def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):

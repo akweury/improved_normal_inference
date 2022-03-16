@@ -2,7 +2,7 @@ import config
 # from workspace.pncnn import train, test
 # from workspace.pncnn import network as pncnn_net
 
-from workspace.nnn import train, test
+# from workspace.nnn import train, test
 from workspace.nnn import network as nnn_net
 
 from workspace.svd import eval
@@ -10,6 +10,8 @@ from workspace.svd import eval
 from common.data_preprocess import noisy_a_folder
 from pncnn.utils import args_parser
 from workspace.svdn import train
+# from workspace.deepfit import train
+
 
 def main():
     args = args_parser.args_parser()

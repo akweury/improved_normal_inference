@@ -15,7 +15,7 @@ from torch.optim import SGD, Adam, lr_scheduler
 
 import config
 from help_funs import file_io, mu
-from workspace.svdn import network, candidate_normals
+from workspace.deepfit import network
 
 
 class L2Loss(nn.Module):
@@ -138,35 +138,30 @@ class SyntheticDataset(Dataset):
                                  torch.tensor(data['K']),
                                  torch.tensor(data['R']).float(),
                                  torch.tensor(data['t']).float())
-
         h, w = vertex.shape[:2]
         x, y = 0, 0
         while vertex[x, y, :].sum() == 0:
             x = np.random.randint(h)
             y = np.random.randint(w)
-
+        k = 2
+        vertex = vertex[max(x - k, 0):min(x + k + 1, w - 1), max(0, y - k):min(y + k + 1, h - 1)].reshape(-1, 3)
+        # vertex = vertex[x - 1:x + 2, y - 1:y + 2, :].reshape(-1, 3)
+        vertex = torch.from_numpy(vertex)
         # gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
         gt = file_io.load_24bitNormal(self.gt[item]).astype(np.float32)
         gt = gt[x, y, :]
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         # normal_gt = normal_gt / np.linalg.norm(normal_gt)
 
-        normal_svd = candidate_normals.generate_candidates_random(vertex, x, y).astype(np.float32)
-        # normal_svd = normal_svd_rgb / np.linalg.norm(normal_svd_rgb, ord=2, axis=2, keepdims=True)
-        normal_svd = torch.from_numpy(normal_svd)  # (depth, dtype=torch.float)
-        normal_svd = normal_svd.permute(2, 0, 1)
-
         # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
-        return normal_svd, normal_gt
-
-
+        return vertex, normal_gt
 
 
 def create_dataloader(args, eval_mode=False):
     # Input images are 16-bit, but only 15-bits are utilized, so we normalized the data to [0:1] using a normalization factor
-    ds_dir = args.dataset_path
+    ds_dir = args.trainset
     train_on = args.train_on
-    val_set = args.val_ds
+    val_set = args.testset
 
     train_loader = []
     val_loader = []
@@ -183,26 +178,14 @@ def create_dataloader(args, eval_mode=False):
             train_dataset.depth = train_dataset.depth[training_idxs]
             train_dataset.gt = train_dataset.gt[training_idxs]
 
-        train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size, num_workers=args.workers)
+        train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batchSize, num_workers=args.workers)
 
     # Validation set
     if val_set == 'selval':
         ###### Validation Set ######
         val_dataset = SyntheticDataset(ds_dir, setname='selval')
 
-        val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
-
-    elif val_set == 'selval':
-        ###### Selected Validation set ######
-        val_dataset = SyntheticDataset(ds_dir, setname='selval')
-
-        val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
-
-    elif val_set == 'test':
-        ###### Test set ######
-        val_dataset = SyntheticDataset(ds_dir, setname='test')
-
-        val_loader = DataLoader(val_dataset, shuffle=False, batch_size=1, num_workers=args.workers)
+        val_loader = DataLoader(val_dataset, shuffle=False, batch_size=2, num_workers=args.workers)
 
     return train_loader, val_loader
 

@@ -16,15 +16,15 @@ def unit_vector(vector):
 
 def angle_between(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
-
-    inner = np.inner(v1, v2)
-    norms = np.linalg.norm(v1) * np.linalg.norm(v2)
+    v1 = v1.reshape(-1, 3)
+    v2 = v2.reshape(-1, 3)
+    inner = np.sum(v1.reshape(-1, 3) * v2.reshape(-1, 3), axis=1)
+    norms = np.linalg.norm(v1, axis=1, ord=2) * np.linalg.norm(v2, axis=1, ord=2)
 
     cos = inner / norms
     rad = np.arccos(np.clip(cos, -1.0, 1.0))
     deg = np.rad2deg(rad)
-    if deg > 90:
-        deg = 180 - deg
+    deg[deg > 90] = 180 - deg[deg > 90]
     return deg
 
 
@@ -222,15 +222,16 @@ def array2RGB(numpy_array, mask):
 
 def normal2RGB(normals):
     mask = np.sum(np.abs(normals), axis=2) != 0
+    rgb = np.zeros(shape=normals.shape)
     # convert normal to RGB color
     h, w, c = normals.shape
     for i in range(h):
         for j in range(w):
             if mask[i, j]:
-                normals[i, j] = normals[i, j] * 0.5 + 0.5
-                normals[i, j, 2] = 1 - normals[i, j, 2]
-                normals[i, j] = (normals[i, j] * 255)
-    rgb = cv.normalize(normals, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+                rgb[i, j] = normals[i, j] * 0.5 + 0.5
+                rgb[i, j, 2] = 1 - rgb[i, j, 2]
+                rgb[i, j] = (rgb[i, j] * 255)
+    rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return rgb
 
 
@@ -452,3 +453,14 @@ def pred_filter(img, pred_img):
     img[mask] = pred_img[mask]
 
     return img
+
+
+def choose_best(candidate_array, target):
+    candidate_array = candidate_array.reshape(-1, 3)
+    ele_num = candidate_array.shape[0]
+    target = target.reshape(1, 3)
+    target = np.repeat(target, ele_num, axis=0)
+
+    diff = angle_between(candidate_array, target)
+    min_index = np.argmin(diff)
+    return candidate_array[min_index], diff
