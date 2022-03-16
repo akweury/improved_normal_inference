@@ -111,7 +111,7 @@ def train_epoch(nn_model, epoch):
 
             xout, cout, c0 = out[:, :3, :, :], out[:, 3:6, :, :], out[:, 6:, :, :]
 
-            chart.draw_output(input, xout=xout, cout=cout, c0=c0, target=target, exp_path=nn_model.exp_dir,
+            chart.draw_output(input, xout=xout, cout=cout, c0=c0, target=target, exp_path=nn_model.folder_path,
                               loss=loss, epoch=epoch, i=i, prefix="train")
             # save_output(out, target, output_1, nn_model, epoch, i, "train", f"{loss:.3f}")
 
@@ -123,80 +123,18 @@ def train_epoch(nn_model, epoch):
     loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
     nn_model.losses.append(loss_avg.item())
 
-    chart.line_chart(np.array([nn_model.losses]), nn_model.exp_dir)
+    chart.line_chart(np.array([nn_model.losses]), nn_model.folder_path)
     return loss_total
 
-    # return err_avg
 
-
-# # -------------- EVALUATION FUNCTION ----------------------
-# def evaluate_epoch(nn_model, epoch):
-#     """
-#     Evluation function
-#
-#     Args:
-#         nn_model: all the parameter of the model
-#         epoch: What epoch to start from
-#
-#     Returns:
-#         AverageMeter() object.
-#
-#     Raises:
-#         KeyError: Raises an exception.
-#     """
-#     print('\n==> Evaluating Epoch [{}]'.format(epoch))
-#
-#     # err = create_error_metric(nn_model.args)
-#     # err_avg = AverageMeter(err.get_metrics())  # Accumulator for the error metrics
-#
-#     nn_model.model.eval()  # Swith to evaluate mode
-#
-#     start = time.time()
-#     with torch.no_grad():  # Disable gradients computations
-#         for i, (input, target) in enumerate(nn_model.val_loader):
-#             input, target = input.to(nn_model.device), target.to(nn_model.device)
-#
-#             torch.cuda.synchronize()
-#
-#             data_time = time.time() - start
-#
-#             # Forward Pass
-#             start = time.time()
-#
-#             out, cout, c0 = nn_model.model(input)
-#
-#             # Check if there is cout There is Cout
-#             # loss = nn_model.criterion(out, target)  # Compute the loss
-#             loss = nn_model.loss(out, target)
-#
-#             gpu_time = time.time() - start
-#             print(f'eval: [{epoch + 1}, {i + 1:5d}] loss: {loss:.3f}')
-#             # ------------------ visualize outputs ----------------------------------------------
-#             if i == 4:
-#                 out, target, c0 = out.to("cpu"), target.to("cpu"), c0.to("cpu")
-#                 chart.draw_output(input, c0, out, cout, target, nn_model.exp_dir, loss, epoch, i, "train")
-#             # ------------------------------------------------------------------------------------
-#
-#             start = time.time()
-#
-#     # Evaluate Uncerainty
-#     # ause, ause_fig = nn_model.evaluate_uncertainty(epoch)
-#
-#     # Update Log files
-#     # nn_model.test_csv.update_log(err_avg, epoch, ause)
-#     #
-#     # return err_avg
-#
 
 def main(args, network):
     nn_model = NeuralNetworkModel(args, network)
 
-    # remove old output images
-    output_path = nn_model.exp_dir / "output" / "*"
-    files = glob.glob(str(output_path))
-    pprint(f"{files}\n have been deleted")
-    for f in files:
-        os.remove(f)
+    folder_path = nn_model.exp_dir / f"output_{chart.date_now}_{chart.time_now}"
+    if not os.path.exists(str(folder_path)):
+        os.mkdir(str(folder_path))
+    nn_model.folder_path = folder_path
 
     # init losses
     losses = []

@@ -167,12 +167,9 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     output = mu.concat_tile_resize([first_row, second_row])
     output = cv.resize(output, (1440, 1080))
 
-    folder_path = exp_path / f"output_{date_now}_{time_now}"
 
-    if not os.path.exists(str(folder_path)):
-        os.mkdir(str(folder_path))
 
-    cv.imwrite(str(folder_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
 
     # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
     # b1, g1, r1 = cv2.split(np_array1)

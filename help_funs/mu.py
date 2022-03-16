@@ -194,6 +194,7 @@ def compute_normal(vertex, mask, k):
     for i in range(k, vertex.shape[0]):
         for j in range(k, vertex.shape[1]):
             if mask[i, j]:
+                # TODO: fix here
                 neighbors = vertex[i - k:i + k, j - k:j + k]  # get its k neighbors
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
                 neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)
