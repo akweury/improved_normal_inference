@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
-
+import numpy as np
 import config
 
 from pncnn.common import losses
@@ -37,7 +37,7 @@ class NeuralNetworkModel():
         self.tb_writer = SummaryWriter(os.path.join(self.exp_dir, 'tb_log',
                                                     datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
         self.loss = self.init_loss()
-        self.losses = []
+        self.losses = np.array([])
         self.criterion = nn.CrossEntropyLoss()
 
         # self.lr_decayer = lr_scheduler.StepLR(self.optimizer,

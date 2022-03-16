@@ -39,11 +39,11 @@ class CNN(nn.Module):
 
         # c0 = self.conf_estimator3_3(x0).to(device)  # estimate the input confidence
         c0 = mu.binary(x0).to(device)
-
-        xout_0 = self.conv1_1(x0[:, 0:1, :, :])
-        xout_1 = self.conv1_1(x0[:, 1:2, :, :])
-        xout_2 = self.conv1_1(x0[:, 2:3, :, :])
-        xout = torch.cat((xout_0, xout_1, xout_2), 1)
+        xout = self.conv3_3(x0)
+        # xout_0 = self.conv1_1(x0[:, 0:1, :, :])
+        # xout_1 = self.conv1_1(x0[:, 1:2, :, :])
+        # xout_2 = self.conv1_1(x0[:, 2:3, :, :])
+        # xout = torch.cat((xout_0, xout_1, xout_2), 1)
         # xout = self.conv3_3(x0)
         # xout, cout = self.nconv3_3(x0, c0)
         # cout = self.var_estimator3_3(c0)

@@ -134,48 +134,12 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
 
-    normal_gt_8bit = mu.normalize2_8bit(mu.tenor2numpy(target[:1, :, :, :]))
+    normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target[:1, :, :, :]))
     mu.addText(normal_gt_8bit, "gt")
 
-    normal_cnn_8bit_norm = mu.normalize2_8bit(mu.tenor2numpy(xout[:1, :, :, :]))
+    normal_cnn_8bit_norm = mu.normal2RGB(mu.tenor2numpy(xout[:1, :, :, :]))
     mu.addText(normal_cnn_8bit_norm, "output_shifted")
 
-    first_row = [x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit_norm]
-
-    # normalize output normal
-    normal_cnn_8bit = mu.tenor2numpy(xout[:1, :, :, :]).astype(np.uint8)
-    mu.addText(normal_cnn_8bit, "output")
-
-    second_row = [normal_cnn_8bit]
-
-    if c0 is not None:
-        c0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(c0[:1, :, :, :]))
-        mu.addText(c0_normalized_8bit, "Input Confidence")
-        second_row.append(c0_normalized_8bit)
-
-    if cout is not None:
-        conf_cnn_8_bit = mu.tenor2numpy(cout[:1, :, :, :]).astype(np.uint8)
-        mu.addText(conf_cnn_8_bit, "cout")
-        second_row.append(conf_cnn_8_bit)
-
-        conf_cnn_8_bit_norm = mu.normalize2_8bit(mu.tenor2numpy(cout[:1, :, :, :]))
-        mu.addText(conf_cnn_8_bit_norm, "cout_shifted")
-        second_row.append(conf_cnn_8_bit_norm)
-
-    # ------------------ combine together ----------------------------------------------
-
-    output = mu.concat_tile_resize([first_row, second_row])
-    output = cv.resize(output, (1440, 1080))
-
-
+    output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit_norm])
 
     cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
-
-    # np_array1, np_array2 = mu.tenor2numpy(out[:1, :, :, :]), mu.tenor2numpy(target[:1, :, :, :])
-    # b1, g1, r1 = cv2.split(np_array1)
-    # b2, g2, r2 = cv2.split(np_array2)
-    # output_3 = mu.concat_vh([[b1, g1, r1], [b2, g2, r2]])
-    # cv2.imwrite(str(nn_model.exp_dir / "output" / f"{prefix}_NNN_epoch_{epoch}_{i}_loss_{loss}_tensor.png"), output_3)
-
-    # mu.show_images(output_3, f"tensor_different")
-    # mu.show_images(output, f"{prefix}_NNN_epoch_{epoch}_{i}.png")

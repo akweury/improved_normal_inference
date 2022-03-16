@@ -22,7 +22,6 @@ import numpy as np
 from pprint import pprint
 from help_funs import mu, chart
 from common.model import NeuralNetworkModel
-from pncnn.utils.error_metrics import create_error_metric, AverageMeter
 
 xout_channel = 3
 cin_channel = 6
@@ -121,7 +120,8 @@ def train_epoch(nn_model, epoch):
     # # update log
     # nn_model.train_csv.update_log(err_avg, epoch)
     loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
-    nn_model.losses.append(loss_avg.item())
+
+    nn_model.losses = np.append(nn_model.losses, loss_avg.item())
 
     chart.line_chart(np.array([nn_model.losses]), nn_model.folder_path)
     return loss_total

@@ -94,11 +94,10 @@ class SyntheticDepthDataset(Dataset):
         # vertex_gt = vertex_gt.permute(2,0,1)
 
         # gt = file_io.load_24bitNormal(self.gt[item])
-        gt = file_io.load_24bitImage(self.gt[item]).astype(np.float32)
-        gt = mu.normalize3channel(gt)[0]
 
+
+        gt = file_io.load_24bitNormal(self.gt[item]).astype(np.float32)
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         normal_gt = normal_gt.permute(2, 0, 1)
-
         # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
         return vertex_input, normal_gt
