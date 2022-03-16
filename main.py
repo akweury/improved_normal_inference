@@ -1,19 +1,10 @@
 import config
-# from workspace.pncnn import train, test
-# from workspace.pncnn import network as pncnn_net
-
-from workspace.nnn import train as train_nnn
-from workspace.nnn import test as test_nnn
-from workspace.nnn import network as nnn_net
-
-from workspace.svd import eval
-
 from common.data_preprocess import noisy_a_folder
+from common.SyntheticDepthDataset import SyntheticDepthDataset
+from workspace import train
 from pncnn.utils import args_parser
-from workspace.svdn import train as svdn
 
-
-# from workspace.deepfit import train
+import workspace.nnn.network as nnn
 
 
 def main():
@@ -23,18 +14,13 @@ def main():
             original_folder = config.synthetic_data / folder
             noisy_folder = config.synthetic_data_noise / folder
             noisy_a_folder(original_folder, noisy_folder)
-    train_nnn.main(args, nnn_net)
-    # load all the args
-    # args = args_parser.args_parser()
-    #
+    # config experiments
+    path = config.ws_path / args.exp
+    train_dataset = SyntheticDepthDataset(config.synthetic_data_noise, setname='train')
+    model = nnn.CNN()
 
-    #
-    # if args.mode == "train":
-    #     train.main(args, nnn_net)
-    #
-    #
-    # elif args.mode == 'test':
-    #     test.main(args, nnn_net)
+    # start the training
+    train.main(args, path, model, train_dataset)
 
 
 if __name__ == '__main__':
