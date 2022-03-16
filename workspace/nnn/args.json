@@ -9,7 +9,7 @@
   "dataset": "synthetic",
   "dataset_path": "synthetic_data_noise",
   "modality": "d",
-  "train_on": "20",
+  "train_on": "full",
   "workers": 1,
   "raw_kitti_path": "",
   "selval_ds": "selval",

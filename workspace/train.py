@@ -271,7 +271,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # input normal
     input = mu.tenor2numpy(x0[:1, :, :, :])
-    x0_normalized_8bit = mu.normal2RGB(input)
+    x0_normalized_8bit = mu.normalize2_8bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Normals)")
 
@@ -312,5 +312,4 @@ if __name__ == '__main__':
     Call this method using 
      > main(args, exp_dir)
     """
-
     pass
