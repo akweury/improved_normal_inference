@@ -33,6 +33,7 @@ class L2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
+        outputs = outputs[:, :3, :, :]
         return F.mse_loss(outputs, target)
 
 
@@ -41,6 +42,7 @@ class L1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
+        outputs = outputs[:, :3, :, :]
         return F.l1_loss(outputs, target)
 
 
@@ -49,6 +51,7 @@ class MaskedL1Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
+        outputs = outputs[:, :3, :, :]
         val_pixels = torch.ne(target, 0).float().detach()
         return F.l1_loss(outputs * val_pixels, target * val_pixels)
 
