@@ -25,19 +25,19 @@ class NormalNN(nn.Module):
         padding_2 = (2, 2)
         padding_1 = (1, 1)
         self.le_relu = nn.LeakyReLU(0.1)
-        self.dconv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv1 = nn.Conv2d(in_ch, in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv2 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv3 = nn.Conv2d(in_ch * num_channels, in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv4 = nn.Conv2d(in_ch * num_channels, 2 * in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv4 = nn.Conv2d(in_ch * num_channels, 2 * in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv5 = nn.Conv2d(2 * in_ch * num_channels, 4 * in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv5 = nn.Conv2d(2 * in_ch * num_channels, 4 * in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv6 = nn.Conv2d(4 * in_ch * num_channels, 8 * in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv6 = nn.Conv2d(4 * in_ch * num_channels, 8 * in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
-        self.dconv7 = nn.Conv2d(8 * in_ch * num_channels, 8 * in_ch * num_channels, kernel_3, (1, 1), padding_1)
+        self.dconv7 = nn.Conv2d(8 * in_ch * num_channels, 8 * in_ch * num_channels, kernel_5, (1, 1), padding_2)
 
         self.uconv1 = nn.Conv2d(16 * in_ch * num_channels, 4 * in_ch * num_channels, kernel_3, (1, 1), padding_1)
 
