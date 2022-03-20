@@ -47,7 +47,7 @@ class WeightedL2Loss(nn.Module):
         z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
         weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
         weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
-        return F.mse_loss(outputs * weight * z_weight, target * weight * z_weight)
+        return F.mse_loss(torch.abs(outputs * weight), torch.abs(target * weight))
 
 
 class L1Loss(nn.Module):
