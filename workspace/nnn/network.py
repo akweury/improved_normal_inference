@@ -19,15 +19,8 @@ class CNN(nn.Module):
         self.__name__ = 'nnn'
 
         # input confidence estimation network
-        self.conf_estimator3_3 = UNetSP(3, 3)
         self.conv3_3 = NormalNN(3, 3)
-        self.conv1_1 = NormalNN(1, 1)
-
-        self.nconv3_3 = NConvUNet(3, 3)
-        self.nconv1_1 = NConvUNet(1, 1)
-
-        self.var_estimator3_3 = UNetSP(3, 3)
-        self.var_estimator1_1 = UNetSP(1, 1)
+        # self.conv1_1 = NormalNN(1, 1)
 
     def forward(self, x0):
         # x0: vertex array

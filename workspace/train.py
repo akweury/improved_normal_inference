@@ -37,6 +37,17 @@ class L2Loss(nn.Module):
         return F.mse_loss(outputs, target)
 
 
+class WeightedL2Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, *args):
+        outputs = outputs[:, :3, :, :]
+        weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
+        weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
+        return F.mse_loss(outputs * weight, target * weight)
+
+
 class L1Loss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -70,7 +81,8 @@ loss_dict = {
     'l1': L1Loss(),
     'l2': L2Loss(),
     'masked_l1': MaskedL1Loss(),
-    'masked_l2': MaskedL2Loss()
+    'masked_l2': MaskedL2Loss(),
+    'weighted_l2': WeightedL2Loss()
 }
 
 
@@ -174,6 +186,8 @@ class TrainingModel():
     def save_model(self):
         with open(str(Path(self.output_folder) / "param.txt"), 'w') as f:
             f.write(str(self.args))
+        with open(str(Path(self.output_folder) / "model.txt"), 'w') as f:
+            f.write(str(self.model))
 
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
@@ -181,7 +195,7 @@ def train_epoch(nn_model, epoch):
     print('\n- Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
     # ------------ switch to train mode -------------------
     nn_model.model.train()
-    loss_total = 0.0
+    loss_total = torch.tensor([0.0])
     start = time.time()
     for i, (input, target) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -213,20 +227,22 @@ def train_epoch(nn_model, epoch):
 
         # record model time
         gpu_time = time.time() - start
-        loss_total += loss
-        if i == 1:
+        loss_total += loss.detach().to('cpu')
+        if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
-
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            pprint(f"[epoch: {epoch}] loss: {nn_model.losses}")
+            pprint(f"[epoch: {epoch}] loss: {nn_model.losses:.5f}")
+            print(f'output range: {out.min():.5f} - {out.max():.5f}')
+            print(f'target range: {target.min():.5f} - {target.max():.5f}')
+
             draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                         loss=loss, epoch=epoch, i=i, prefix="train")
 
         start = time.time()
 
-    loss_avg = loss_total / (nn_model.train_loader.__len__() * nn_model.args.batch_size)
-    nn_model.losses = np.append(nn_model.losses, loss_avg.item())
+    loss_avg = loss_total / len(nn_model.train_loader.dataset)
+    nn_model.losses = np.append(nn_model.losses, loss_avg)
     draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder, log_y=True)
 
 
@@ -280,12 +296,17 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # gt normal
     target = target.numpy()
-    normal_gt_8bit = mu.normal2RGB(target)
+    target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    # normal_gt_8bit = mu.normal2RGB(target)
+    normal_gt_8bit = target
     mu.addText(normal_gt_8bit, "gt")
 
     # normalize output normal
-    xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
-    normal_cnn_8bit = mu.normal2RGB(xout_normal)
+    # xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
+
+    xout = xout.detach().numpy()
+    normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     mu.addText(normal_cnn_8bit, "output")
 
     # ------------------ combine together ----------------------------------------------

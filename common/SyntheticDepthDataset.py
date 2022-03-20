@@ -62,16 +62,18 @@ class SyntheticDepthDataset(Dataset):
                                               data['maxDepth'])
         data['R'] = np.identity(3)
         data['t'] = np.zeros(3)
-        vertex_input = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
-                                       torch.tensor(data['K']),
-                                       torch.tensor(data['R']).float(),
-                                       torch.tensor(data['t']).float())
+        vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                                 torch.tensor(data['K']),
+                                 torch.tensor(data['R']).float(),
+                                 torch.tensor(data['t']).float())
 
-        vertex_input = torch.from_numpy(vertex_input)  # (depth, dtype=torch.float)
-        vertex_input = vertex_input.permute(2, 0, 1)
+        input = torch.from_numpy(vertex)  # (depth, dtype=torch.float)
+        input = input.permute(2, 0, 1)
 
         gt = file_io.load_24bitNormal(self.gt[item]).astype(np.float32)
+        gt = mu.normal2RGB(gt)
+        gt = (gt).astype(np.float32)
         normal_gt = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         normal_gt = normal_gt.permute(2, 0, 1)
         # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
-        return vertex_input, normal_gt
+        return input, normal_gt
