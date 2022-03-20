@@ -8,9 +8,7 @@ import os
 import time
 import shutil
 from pathlib import Path
-import importlib
 import datetime
-from pprint import pprint
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -194,7 +192,7 @@ class TrainingModel():
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
-    print('\n- Training Epoch [{}] (lr={})'.format(epoch, nn_model.optimizer.param_groups[0]['lr']))
+    print(f"- Training Epoch [{epoch}] (lr={nn_model.optimizer.param_groups[0]['lr']:.5f})", end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -233,10 +231,10 @@ def train_epoch(nn_model, epoch):
         if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
+            torch.set_printoptions(sci_mode=True)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            pprint(f"[epoch: {epoch}] loss: {nn_model.losses}")
+            print(f" loss: {loss}", end="\t")
             print(f'output range: {out.min():.5f} - {out.max():.5f}')
-            print(f'target range: {target.min():.5f} - {target.max():.5f}')
 
             draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                         loss=loss, epoch=epoch, i=i, prefix="train")
@@ -247,8 +245,9 @@ def train_epoch(nn_model, epoch):
     nn_model.losses = np.append(nn_model.losses, loss_avg)
     draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder, log_y=True)
 
+    # ---------------------------------------------- visualisation -------------------------------------------
 
-# ---------------------------------------------- visualisation -------------------------------------------
+
 def draw_line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None,
                     show=False, log_y=False):
     if data.shape[1] <= 1:

@@ -68,15 +68,15 @@ class SyntheticDepthDataset(Dataset):
                                  torch.tensor(data['t']).float())
         mask = vertex.sum(axis=2) == 0
 
-        vertex = self.vertex_transform(vertex)
-        vertex[mask] = 0
-
         vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
             ~mask].max()
         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
             ~mask].max()
         vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
             ~mask].max()
+
+        vertex = self.vertex_transform(vertex)
+        vertex[mask] = 0
 
         input = torch.from_numpy(vertex)  # (depth, dtype=torch.float)
         input = input.permute(2, 0, 1)
