@@ -42,10 +42,12 @@ class WeightedL2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, *args):
+        alpha = 10
         outputs = outputs[:, :3, :, :]
+        z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
         weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
         weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
-        return F.mse_loss(outputs * weight, target * weight)
+        return F.mse_loss(outputs * weight * z_weight, target * weight * z_weight)
 
 
 class L1Loss(nn.Module):
@@ -289,7 +291,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
         xout = xout[0, :].permute(1, 2, 0)[:, :, :3]
 
     # input normal
-    input = mu.tenor2numpy(x0[:1, :, :, :])
+    input = mu.tenor2numpy(x0[:1, :3, :, :])
     x0_normalized_8bit = mu.normalize2_8bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Normals)")
@@ -312,7 +314,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
     # ------------------ combine together ----------------------------------------------
 
     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
-    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png"), output)
     # mu.show_images(output, f"svdn")
 
 

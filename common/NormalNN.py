@@ -29,10 +29,9 @@ class NormalNN(nn.Module):
         # self.active = nn.Tanh()
         self.active = nn.ReLU()
 
-        channel_size_1 = 8
-        channel_size_2 = 16
-        channel_size_3 = 32
-        channel_size_4 = 64
+        channel_size_1 = 32
+        channel_size_2 = 64
+
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 

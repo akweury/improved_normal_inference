@@ -66,6 +66,17 @@ class SyntheticDepthDataset(Dataset):
                                  torch.tensor(data['K']),
                                  torch.tensor(data['R']).float(),
                                  torch.tensor(data['t']).float())
+        mask = vertex.sum(axis=2) == 0
+
+        vertex = self.vertex_transform(vertex)
+        vertex[mask] = 0
+
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
+            ~mask].max()
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
+            ~mask].max()
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
+            ~mask].max()
 
         input = torch.from_numpy(vertex)  # (depth, dtype=torch.float)
         input = input.permute(2, 0, 1)
@@ -77,3 +88,18 @@ class SyntheticDepthDataset(Dataset):
         normal_gt = normal_gt.permute(2, 0, 1)
         # print(f"data: max, min:{vertex_input.max(), vertex_input.min()}")
         return input, normal_gt
+
+    def vertex_transform(self, vertex):
+        # calculate delta x, y, z of between each point and its neighbors
+        # delta = np.zeros(shape=(512, 512, 24))
+        delta_up_left = np.pad(vertex, ((0, 1), (0, 1), (0, 0)))[1:, 1:, :] - vertex
+        delta_left = np.pad(vertex, ((0, 0), (0, 1), (0, 0)))[:, 1:, :] - vertex
+        delta_down_left = np.pad(vertex, ((1, 0), (0, 1), (0, 0)))[:-1, 1:, :] - vertex
+        delta_down = np.pad(vertex, ((1, 0), (0, 0), (0, 0)))[:-1, :, :] - vertex
+        delta_down_right = np.pad(vertex, ((1, 0), (1, 0), (0, 0)))[:-1, :-1, :] - vertex
+        delta_right = np.pad(vertex, ((0, 0), (1, 0), (0, 0)))[:, :-1, :] - vertex
+        delta_up_right = np.pad(vertex, ((0, 1), (1, 0), (0, 0)))[1:, :-1, :] - vertex
+        delta_up = np.pad(vertex, ((0, 1), (0, 0), (0, 0)))[1:, :, :] - vertex
+        delta_concat = np.concatenate((delta_up_left, delta_left, delta_down_left, delta_down,
+                                       delta_down_right, delta_right, delta_up_right, delta_up), axis=2)
+        return delta_concat
