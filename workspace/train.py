@@ -232,7 +232,7 @@ def train_epoch(nn_model, epoch):
             # print statistics
             np.set_printoptions(precision=5)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            pprint(f"[epoch: {epoch}] loss: {nn_model.losses:.5f}")
+            pprint(f"[epoch: {epoch}] loss: {nn_model.losses}")
             print(f'output range: {out.min():.5f} - {out.max():.5f}')
             print(f'target range: {target.min():.5f} - {target.max():.5f}')
 
