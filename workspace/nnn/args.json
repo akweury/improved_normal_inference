@@ -25,7 +25,7 @@
   "epochs": 1000,
   "optimizer": "adam",
   "lr": 0.1,
-  "lr_scheduler": "3, 800",
+  "lr_scheduler": "2, 800",
   "momentum": 0.9,
   "loss": "weighted_l2",
   "loss_milestone": 15,
