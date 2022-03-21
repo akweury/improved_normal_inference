@@ -196,7 +196,7 @@ class TrainingModel():
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
-    print(f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime(%H-%M-%S)} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
+    print(f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
