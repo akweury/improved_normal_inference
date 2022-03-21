@@ -222,8 +222,7 @@ class TrainingModel():
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
     print(
-        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
-        end="\t")
+        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -259,18 +258,18 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
-        if i == 0 and epoch % 100 == 0:
+        if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
+            if epoch % 100 == 0:
+                draw_output(input, out, target=target, exp_path=nn_model.output_folder,
+                            loss=loss, epoch=epoch, i=i, prefix="train")
 
-            draw_output(input, out, target=target, exp_path=nn_model.output_folder,
-                        loss=loss, epoch=epoch, i=i, prefix="train")
-
+            print(f" loss: {loss:.2e}", end="\t")
+            print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
         start = time.time()
-        print(f" loss: {loss:.2e}", end="\t")
-        print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
     if epoch % 100 == 0:
