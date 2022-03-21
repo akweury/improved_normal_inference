@@ -43,9 +43,13 @@ class WeightedL2Loss(nn.Module):
         alpha = 10
         outputs = outputs[:, :3, :, :]
         z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
+        boarder_right = torch.gt(outputs,255).bool().detach()
+        boarder_left = torch.lt(outputs, 0).bool().detach()
+        outputs[boarder_right] = outputs[boarder_right] * 1.2
+        outputs[boarder_left] = outputs[boarder_left] * 1.2
         weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
         weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
-        return F.mse_loss(torch.abs(outputs * weight), torch.abs(target * weight))
+        return F.mse_loss(outputs, target)
 
 
 class L1Loss(nn.Module):
@@ -192,7 +196,7 @@ class TrainingModel():
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
-    print(f"- Training Epoch [{epoch}] (lr={nn_model.optimizer.param_groups[0]['lr']:.5f})", end="\t")
+    print(f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime(%H-%M-%S)} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -231,10 +235,10 @@ def train_epoch(nn_model, epoch):
         if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
-            torch.set_printoptions(sci_mode=True)
+            torch.set_printoptions(sci_mode=True,precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            print(f" loss: {loss}", end="\t")
-            print(f'output range: {out.min():.5f} - {out.max():.5f}')
+            print(f" loss: {loss:.2e}", end="\t")
+            print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
 
             draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                         loss=loss, epoch=epoch, i=i, prefix="train")
@@ -312,7 +316,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # ------------------ combine together ----------------------------------------------
 
-    output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
+    output = cv.hconcat([normal_gt_8bit, normal_cnn_8bit])
     cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png"), output)
     # mu.show_images(output, f"svdn")
 
