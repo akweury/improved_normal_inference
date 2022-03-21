@@ -9,8 +9,6 @@ import torch
 import torch.nn as nn
 from common.NormalNN import NormalNN
 from help_funs import mu
-from pncnn.common.nconv import NConvUNet
-from pncnn.common.unet import UNetSP
 
 
 class CNN(nn.Module):
@@ -30,11 +28,6 @@ class CNN(nn.Module):
         c0 = mu.binary(x0).to(device)
 
         xout = self.conv24_3(x0)
-
-        # xout_0 = self.conv1_3(x0[:, 0:1, :, :])
-        # xout_1 = self.conv1_3(x0[:, 1:2, :, :])
-        # xout_2 = self.conv1_3(x0[:, 2:3, :, :])
-        # xout = xout_0 + xout_1 + xout_2
 
         # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
         out = torch.cat((xout, c0, c0), 1)

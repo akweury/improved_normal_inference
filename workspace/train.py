@@ -7,16 +7,18 @@ Created on Wed Mar 16 18:49:51 2022
 import os
 import time
 import shutil
+import glob
 from pathlib import Path
 import datetime
-import matplotlib.pyplot as plt
 
 import numpy as np
+import matplotlib.pyplot as plt
 import cv2 as cv
 import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.optim import SGD, Adam, lr_scheduler
+from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
 from help_funs import mu
@@ -43,7 +45,7 @@ class WeightedL2Loss(nn.Module):
         alpha = 10
         outputs = outputs[:, :3, :, :]
         z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
-        boarder_right = torch.gt(outputs,255).bool().detach()
+        boarder_right = torch.gt(outputs, 255).bool().detach()
         boarder_left = torch.lt(outputs, 0).bool().detach()
         outputs[boarder_right] = outputs[boarder_right] * penalty
         outputs[boarder_left] = outputs[boarder_left] * penalty
@@ -90,9 +92,32 @@ loss_dict = {
 }
 
 
+# ----------------------------------------- Dataset Loader -------------------------------------------------------------
+class SyntheticDepthDataset(Dataset):
+
+    def __init__(self, data_path, setname='train'):
+        if setname in ['train', 'selval']:
+            self.input = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / "*_input.pt"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / "*_gt.pt"), recursive=True)))
+
+        assert (len(self.gt) == len(self.input))
+
+    def __len__(self):
+        return len(self.input)
+
+    def __getitem__(self, item):
+        if item < 0 or item >= self.__len__():
+            return None
+
+        input_tensor = torch.load(self.input[item])
+        gt_tensor = torch.load(self.gt[item])
+
+        return input_tensor, gt_tensor
+
+
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
-    def __init__(self, args, exp_dir, network, dataset, start_epoch=0):
+    def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
         self.args = args
         self.start_epoch = start_epoch
         self.device = torch.device("cpu" if self.args.cpu else f"cuda:{self.args.gpu}")
@@ -100,7 +125,7 @@ class TrainingModel():
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
         self.model = self.init_network(network)
-        self.train_loader = self.create_dataloader(dataset)
+        self.train_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
         self.parameters = self.init_parameters()
         self.optimizer = self.init_optimizer()
@@ -111,14 +136,14 @@ class TrainingModel():
         self.print_info(args)
         self.save_model()
 
-    def create_dataloader(self, dataset):
+    def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
-
+        dataset = SyntheticDepthDataset(dataset_path, setname='train')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
             training_idxs = np.array(random.sample(range(0, len(dataset)), int(train_on)))
-            dataset.depth = dataset.depth[training_idxs]
+            dataset.input = dataset.input[training_idxs]
             dataset.gt = dataset.gt[training_idxs]
 
         data_loader = DataLoader(dataset,
@@ -196,7 +221,9 @@ class TrainingModel():
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
-    print(f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
+    print(
+        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
+        end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -232,19 +259,18 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
-        if i==0 and epoch % 100 == 0:
+        if i == 0 and epoch % 100 == 0:
             # print statistics
             np.set_printoptions(precision=5)
-            torch.set_printoptions(sci_mode=True,precision=3)
+            torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            print(f" loss: {loss:.2e}", end="\t")
-            print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
 
             draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                         loss=loss, epoch=epoch, i=i, prefix="train")
 
         start = time.time()
-
+        print(f" loss: {loss:.2e}", end="\t")
+        print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
     if epoch % 100 == 0:

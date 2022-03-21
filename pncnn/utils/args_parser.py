@@ -171,6 +171,7 @@ def initialize_args(args):
         ws_path = config.ws_path
         args_path = ws_path / args.exp / 'args.json'
         load_args_from_file(args_path, args)
+    print_args(args)
     return args
 
 

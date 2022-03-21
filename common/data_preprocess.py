@@ -3,11 +3,13 @@ from os import path
 from pathlib import Path
 import json
 import numpy as np
+import torch
 import cv2 as cv
+import glob
 import shutil
 
 import config
-from help_funs import file_io
+from help_funs import file_io, mu
 
 
 def noisy_1channel(img):
@@ -31,7 +33,7 @@ def noisy_a_folder(folder_path, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     for idx in range(500):
-        image_file, ply_file, json_file, depth_gt_file,_, normal_file = file_io.get_file_name(idx, folder_path)
+        image_file, ply_file, json_file, depth_gt_file, _, normal_file = file_io.get_file_name(idx, folder_path)
         if path.exists(image_file):
             f = open(json_file)
             data = json.load(f)
@@ -53,10 +55,70 @@ def noisy_a_folder(folder_path, output_path):
             print(f'File {idx} added noise.')
 
 
+def convert2training_tensor(path):
+    if not os.path.exists(str(path)):
+        raise FileNotFoundError
+    if not os.path.exists(str(path / "tensor")):
+        os.makedirs(str(path / "tensor"))
+
+    depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+    gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
+    data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
+    for item in range(len(data_files)):
+        f = open(data_files[item])
+        data = json.load(f)
+        f.close()
+
+        depth = file_io.load_scaled16bitImage(depth_files[item],
+                                              data['minDepth'],
+                                              data['maxDepth'])
+        data['R'] = np.identity(3)
+        data['t'] = np.zeros(3)
+        vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                                 torch.tensor(data['K']),
+                                 torch.tensor(data['R']).float(),
+                                 torch.tensor(data['t']).float())
+        mask = vertex.sum(axis=2) == 0
+        # move all the vertex as close to original point as possible,
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
+            ~mask].max()
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
+            ~mask].max()
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
+            ~mask].max()
+
+        # calculate delta x, y, z of between each point and its neighbors
+        delta_up_left = np.pad(vertex, ((0, 1), (0, 1), (0, 0)))[1:, 1:, :] - vertex
+        delta_left = np.pad(vertex, ((0, 0), (0, 1), (0, 0)))[:, 1:, :] - vertex
+        delta_down_left = np.pad(vertex, ((1, 0), (0, 1), (0, 0)))[:-1, 1:, :] - vertex
+        delta_down = np.pad(vertex, ((1, 0), (0, 0), (0, 0)))[:-1, :, :] - vertex
+        delta_down_right = np.pad(vertex, ((1, 0), (1, 0), (0, 0)))[:-1, :-1, :] - vertex
+        delta_right = np.pad(vertex, ((0, 0), (1, 0), (0, 0)))[:, :-1, :] - vertex
+        delta_up_right = np.pad(vertex, ((0, 1), (1, 0), (0, 0)))[1:, :-1, :] - vertex
+        delta_up = np.pad(vertex, ((0, 1), (0, 0), (0, 0)))[1:, :, :] - vertex
+        vectors = np.concatenate((delta_up_left, delta_left, delta_down_left, delta_down,
+                                  delta_down_right, delta_right, delta_up_right, delta_up), axis=2)
+
+        vectors[mask] = 0
+
+        input_torch = torch.from_numpy(vectors)  # (depth, dtype=torch.float)
+        input_torch = input_torch.permute(2, 0, 1)
+
+        gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
+        gt = mu.normal2RGB(gt)
+        gt = (gt).astype(np.float32)
+        gt_torch = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
+        gt_torch = gt_torch.permute(2, 0, 1)
+
+        # save tensors
+        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input.pt"))
+        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt.pt"))
+        print(f'File {item} converted to tensor.')
+
 if __name__ == '__main__':
     # # noisy a folder test code
     # noisy_a_folder(config.synthetic_captured_data, config.synthetic_captured_data_noise)
-    for folder in ["selval","test", "train" ]:
+    for folder in ["selval", "test", "train"]:
         original_folder = config.synthetic_data / folder
         noisy_folder = config.synthetic_data_noise / folder
         noisy_a_folder(original_folder, noisy_folder)
