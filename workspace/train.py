@@ -39,14 +39,14 @@ class WeightedL2Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, outputs, target, *args):
+    def forward(self, outputs, target, penalty):
         alpha = 10
         outputs = outputs[:, :3, :, :]
         z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
         boarder_right = torch.gt(outputs,255).bool().detach()
         boarder_left = torch.lt(outputs, 0).bool().detach()
-        outputs[boarder_right] = outputs[boarder_right] * 1.2
-        outputs[boarder_left] = outputs[boarder_left] * 1.2
+        outputs[boarder_right] = outputs[boarder_right] * penalty
+        outputs[boarder_left] = outputs[boarder_left] * penalty
         weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
         weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         return F.mse_loss(outputs, target)
@@ -221,7 +221,7 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        loss = nn_model.loss(out, target)
+        loss = nn_model.loss(out, target, nn_model.args.penalty)
 
         # Backward pass
         loss.backward()
@@ -232,7 +232,7 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
-        if i == 0:
+        if i==0 and epoch % 100 == 0:
             # print statistics
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True,precision=3)
@@ -247,7 +247,8 @@ def train_epoch(nn_model, epoch):
 
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
-    draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder, log_y=True)
+    if epoch % 100 == 0:
+        draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder, log_y=True)
 
     # ---------------------------------------------- visualisation -------------------------------------------
 

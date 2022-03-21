@@ -136,6 +136,7 @@ def args_parser():
     parser.add_argument('--loss', '-l', default='l1', choices=losses_list,
                         help='Loss function: ' + ' | '.join(losses_list) + ' (default: l1)')
 
+    parser.add_argument('--penalty', '-pena', default=1.2, help='penalty of output value which out of range [0-255]')
     ########### Logging ###########
     parser.add_argument('--print-freq', default=10, type=int,
                         help='Printing evaluation criterion frequency (default: 10)')
