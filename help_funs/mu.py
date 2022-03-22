@@ -294,7 +294,7 @@ def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255)):
     if pos == 'upper_left':
         position = (10, 50)
     elif pos == 'upper_right':
-        position = (w-300, 50)
+        position = (w - 300, 50)
     elif pos == 'lower_right':
         position = (h - 200, w - 20)
     elif pos == 'lower_left':
@@ -316,10 +316,12 @@ def addHist(img):
     for i, col in enumerate(color):
         hist_min, hist_max = img[:, :, i].min().astype(np.float), img[:, :, i].max().astype(np.float)
         color_ranges.append([int(hist_min), int(hist_max)])
-        histr = cv.calcHist([img], [i], None, [(hist_max - hist_min + 1).astype(np.int)], [hist_min, hist_max + 1])
+        bins = (hist_max - hist_min + 1).astype(np.int)
+        if bins < 2:
+            return "..."
+        histr = cv.calcHist([img], [i], None, [bins], [hist_min, hist_max + 1])
         histr = np.delete(histr, np.where(histr == histr.max()), axis=0)
-        if histr.size == 0:
-            return img
+
         thick = 2
         histr = histr / histr.max()
         for i in range(histr.shape[0]):
