@@ -28,7 +28,7 @@
   "lr_scheduler": "800",
   "momentum": 0.9,
   "loss": "weighted_l2",
-  "penalty":1.5,
+  "penalty":1.4,
   "loss_milestone": 15,
   "lr_decay_step": 1,
   "lr_decay_factor": 0.1,

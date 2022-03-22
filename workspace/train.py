@@ -264,7 +264,7 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 1 == 0:
+            if epoch % 100 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
 
