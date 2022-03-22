@@ -336,12 +336,12 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
 
     xout = xout.detach().numpy()
+    xout = mu.filter_noise(xout, threshold=[0, 255])
     xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     mu.addText(normal_cnn_8bit, "output")
     mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-
 
     output = cv.hconcat([normal_gt_8bit, normal_cnn_8bit])
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png")

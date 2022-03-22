@@ -77,6 +77,15 @@ def bi_interpolation(lower_left, lower_right, upper_left, upper_right, x, y):
     return lower_left * (1 - x) * (1 - y) + lower_right * x * (1 - y) + upper_left * (1 - x) * y + upper_right * x * y
 
 
+def filter_noise(numpy_array, threshold):
+    if len(threshold) != 2:
+        raise ValueError
+    threshold_min, threshold_max = threshold[0], threshold[1]
+    numpy_array[numpy_array < threshold_min] = threshold_min
+    numpy_array[numpy_array > threshold_max] = threshold_max
+    return numpy_array
+
+
 def normalize3channel(numpy_array):
     mins, maxs = [], []
     if numpy_array.ndim != 3:
@@ -316,7 +325,7 @@ def addHist(img):
     for i, col in enumerate(color):
         hist_min, hist_max = img[:, :, i].min().astype(np.int), img[:, :, i].max().astype(np.int)
         color_ranges.append([int(hist_min), int(hist_max)])
-        
+
         if hist_max - hist_min < 2:
             return "..."
         histr, histr_x = np.histogram(img, bins=np.arange(hist_min, hist_max + 1))
