@@ -222,7 +222,8 @@ class TrainingModel():
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
     print(
-        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}", end="\t")
+        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
+        end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -263,7 +264,7 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 100 == 0:
+            if epoch % 1 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
                 # todo: draw output value frequencies, from min to max.
@@ -328,24 +329,24 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # gt normal
     target = target.numpy()
+    target_ranges = mu.addHist(target)
     target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     # normal_gt_8bit = mu.normal2RGB(target)
     normal_gt_8bit = target
     mu.addText(normal_gt_8bit, "gt")
-
-    # normalize output normal
-    # xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
+    mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
 
     xout = xout.detach().numpy()
+    xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     mu.addText(normal_cnn_8bit, "output")
+    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
 
-    # ------------------ combine together ----------------------------------------------
 
     output = cv.hconcat([normal_gt_8bit, normal_cnn_8bit])
-    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png"), output)
-    # mu.show_images(output, f"svdn")
+    output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png")
+    cv.imwrite(output_name, output)
 
 
 def main(args, exp_dir, network, train_dataset):

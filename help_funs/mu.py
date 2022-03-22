@@ -1,7 +1,7 @@
-import cv2
 import cv2 as cv
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 
 # --------------------------- evaluate operations ----------------------------------------------------------------------
@@ -195,10 +195,10 @@ def compute_normal(vertex, mask, k):
         for j in range(k, vertex.shape[1]):
             if mask[i, j]:
                 neighbors = vertex[max(i - k, 0): min(i + k + 1, vertex.shape[1] - 1),
-                            max(0, j - k): min(j + k + 1, vertex.shape[0] - 1)] # get its k neighbors
+                            max(0, j - k): min(j + k + 1, vertex.shape[0] - 1)]  # get its k neighbors
                 # neighbors = vertex[i - k:i + k, j - k:j + k]
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
-                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0) # delete center vertex
+                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)  # delete center vertex
                 # delete background vertex
                 neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
 
@@ -289,10 +289,12 @@ def depth2normal(depth, k_idx, K, R, t):
 
 
 # -------------------------------------- openCV Utils ------------------------------------------
-def addText(img, text, pos='upper_left', font_size=1.6):
+def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255)):
     h, w = img.shape[:2]
     if pos == 'upper_left':
         position = (10, 50)
+    elif pos == 'upper_right':
+        position = (w-300, 50)
     elif pos == 'lower_right':
         position = (h - 200, w - 20)
     elif pos == 'lower_left':
@@ -301,8 +303,31 @@ def addText(img, text, pos='upper_left', font_size=1.6):
         raise ValueError('unsupported position to put text in the image.')
 
     cv.putText(img, text=text, org=position,
-               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=font_size, color=(255, 255, 255),
+               fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=font_size, color=color,
                thickness=1, lineType=cv.LINE_AA)
+
+
+# https://docs.opencv.org/4.x/d1/db7/tutorial_py_histogram_begins.html
+def addHist(img):
+    h, w = img.shape[:2]
+    fig = plt.figure()
+    color = ([255, 0, 0], [0, 255, 0], [0, 0, 255])
+    color_ranges = []
+    for i, col in enumerate(color):
+        hist_min, hist_max = img[:, :, i].min().astype(np.float), img[:, :, i].max().astype(np.float)
+        color_ranges.append([int(hist_min), int(hist_max)])
+        histr = cv.calcHist([img], [i], None, [(hist_max - hist_min + 1).astype(np.int)], [hist_min, hist_max + 1])
+        histr = np.delete(histr, np.where(histr == histr.max()), axis=0)
+        if histr.size == 0:
+            return img
+        thick = 2
+        histr = histr / histr.max()
+        for i in range(histr.shape[0]):
+            height = int(histr[i] * 50)
+            width = int(w / histr.shape[0])
+            img[max(h - 1 - height - thick, 0):min(h - 1, h - height + thick),
+            max(0, i * width - thick):min(w - 1, i * width + thick)] = col
+    return color_ranges
 
 
 def pure_color_img(color, size):
@@ -312,7 +337,7 @@ def pure_color_img(color, size):
 
 
 # https://stackoverflow.com/questions/44650888/resize-an-image-without-distortion-opencv
-def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
+def image_resize(image, width=None, height=None, inter=cv.INTER_AREA):
     # initialize the dimensions of the image to be resized and
     # grab the image size
     dim = None
@@ -338,7 +363,7 @@ def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
         dim = (width, int(h * r))
 
     # resize the image
-    resized = cv2.resize(image, dim, interpolation=inter)
+    resized = cv.resize(image, dim, interpolation=inter)
 
     # return the resized image
     return resized
@@ -358,33 +383,33 @@ def concat_vh(list_2d):
 
 def vconcat_resize(img_list, interpolation):
     w_min = min(img.shape[1] for img in img_list)
-    im_list_resize = [cv2.resize(img,
-                                 (w_min, int(img.shape[0] * w_min / img.shape[1])), interpolation=interpolation)
+    im_list_resize = [cv.resize(img,
+                                (w_min, int(img.shape[0] * w_min / img.shape[1])), interpolation=interpolation)
                       for img in img_list]
-    return cv2.vconcat(im_list_resize)
+    return cv.vconcat(im_list_resize)
 
 
 def hconcat_resize(img_list, interpolation):
     h_min = min(img.shape[0] for img in img_list)
-    im_list_resize = [cv2.resize(img,
-                                 (int(img.shape[1] * h_min / img.shape[0]),
-                                  h_min), interpolation)
+    im_list_resize = [cv.resize(img,
+                                (int(img.shape[1] * h_min / img.shape[0]),
+                                 h_min), interpolation)
                       for img in img_list]
 
-    return cv2.hconcat(im_list_resize)
+    return cv.hconcat(im_list_resize)
 
 
 def concat_tile_resize(list_2d):
-    img_list_v = [hconcat_resize(list_h, cv2.INTER_CUBIC) for list_h in list_2d]
-    return vconcat_resize(img_list_v, cv2.INTER_CUBIC)
+    img_list_v = [hconcat_resize(list_h, cv.INTER_CUBIC) for list_h in list_2d]
+    return vconcat_resize(img_list_v, cv.INTER_CUBIC)
 
 
 def show_numpy(numpy_array, title):
     if numpy_array.shape[2] == 3:
         # rgb image
-        cv2.imshow(f"numpy_{title}", numpy_array)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        cv.imshow(f"numpy_{title}", numpy_array)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
     else:
         print(f"Unsupported input array shape.")
 
@@ -400,21 +425,21 @@ def tenor2numpy(tensor):
 
 def show_tensor(tensor, title):
     numpy_array = tenor2numpy(tensor)
-    cv2.imshow(f"tensor_{title}", numpy_array)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv.imshow(f"tensor_{title}", numpy_array)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 def show_images(array, title):
-    cv2.imshow(title, array)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv.imshow(title, array)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 def show_grid(grid, title):
-    cv2.imshow(f"grid_{title}", concat_vh(grid))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv.imshow(f"grid_{title}", concat_vh(grid))
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 def scale16bitImage(img, minVal, maxVal):
