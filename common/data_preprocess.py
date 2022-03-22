@@ -55,6 +55,45 @@ def noisy_a_folder(folder_path, output_path):
             print(f'File {idx} added noise.')
 
 
+def neighbor_vector(vertex, xu, xd, yl, yr, zf, zb):
+    vertex_padded = np.pad(vertex, ((xd, xu), (yr, yl), (zf, zb)))
+    h, w, c = vertex_padded.shape
+    return vertex_padded[xu:h - xd, yl:w - yr, zf:c - zb] - vertex
+
+
+def neighbor_vectors_k(vertex, k=2):
+    vectors = np.zeros(shape=vertex.shape)
+    for i in range(k):
+        for j in range(k):
+            if i == j and i == 0:
+                continue
+            vectors = np.concatenate((vectors, neighbor_vector(vertex, 0, i, 0, j, 0, 0)), axis=2)
+            if j != 0:
+                vectors = np.concatenate((vectors, neighbor_vector(vertex, 0, i, j, 0, 0, 0)), axis=2)
+            if i != 0:
+                vectors = np.concatenate((vectors, neighbor_vector(vertex, i, 0, j, 0, 0, 0)), axis=2)
+                if j != 0:
+                    vectors = np.concatenate((vectors, neighbor_vector(vertex, i, 0, 0, j, 0, 0)), axis=2)
+
+    return vectors[:, :, 3:]
+
+
+def neighbor_vectors(vertex, i=1):
+    delta_right = np.pad(vertex, ((0, 0), (i, 0), (0, 0)))[:, :-i, :] - vertex
+    delta_left = np.pad(vertex, ((0, 0), (0, i), (0, 0)))[:, i:, :] - vertex
+    delta_down = np.pad(vertex, ((i, 0), (0, 0), (0, 0)))[:-i, :, :] - vertex
+    delta_up = np.pad(vertex, ((0, i), (0, 0), (0, 0)))[i:, :, :] - vertex
+    delta_down_right = np.pad(vertex, ((i, 0), (i, 0), (0, 0)))[:-i, :-i, :] - vertex
+    delta_up_left = np.pad(vertex, ((0, i), (0, i), (0, 0)))[i:, i:, :] - vertex
+    delta_up_right = np.pad(vertex, ((0, i), (i, 0), (0, 0)))[i:, :-i, :] - vertex
+    delta_down_left = np.pad(vertex, ((i, 0), (0, i), (0, 0)))[:-i, i:, :] - vertex
+
+    vectors = np.concatenate((delta_up_left, delta_left, delta_down_left, delta_down,
+                              delta_down_right, delta_right, delta_up_right, delta_up), axis=2)
+
+    return vectors
+
+
 def convert2training_tensor(path):
     if not os.path.exists(str(path)):
         raise FileNotFoundError
@@ -88,17 +127,8 @@ def convert2training_tensor(path):
             ~mask].max()
 
         # calculate delta x, y, z of between each point and its neighbors
-        delta_up_left = np.pad(vertex, ((0, 1), (0, 1), (0, 0)))[1:, 1:, :] - vertex
-        delta_left = np.pad(vertex, ((0, 0), (0, 1), (0, 0)))[:, 1:, :] - vertex
-        delta_down_left = np.pad(vertex, ((1, 0), (0, 1), (0, 0)))[:-1, 1:, :] - vertex
-        delta_down = np.pad(vertex, ((1, 0), (0, 0), (0, 0)))[:-1, :, :] - vertex
-        delta_down_right = np.pad(vertex, ((1, 0), (1, 0), (0, 0)))[:-1, :-1, :] - vertex
-        delta_right = np.pad(vertex, ((0, 0), (1, 0), (0, 0)))[:, :-1, :] - vertex
-        delta_up_right = np.pad(vertex, ((0, 1), (1, 0), (0, 0)))[1:, :-1, :] - vertex
-        delta_up = np.pad(vertex, ((0, 1), (0, 0), (0, 0)))[1:, :, :] - vertex
-        vectors = np.concatenate((delta_up_left, delta_left, delta_down_left, delta_down,
-                                  delta_down_right, delta_right, delta_up_right, delta_up), axis=2)
-
+        k = 3
+        vectors = neighbor_vectors_k(vertex, k)
         vectors[mask] = 0
 
         input_torch = torch.from_numpy(vectors)  # (depth, dtype=torch.float)
@@ -111,9 +141,10 @@ def convert2training_tensor(path):
         gt_torch = gt_torch.permute(2, 0, 1)
 
         # save tensors
-        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input.pt"))
-        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt.pt"))
+        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}.pt"))
+        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}.pt"))
         print(f'File {item} converted to tensor.')
+
 
 if __name__ == '__main__':
     # # noisy a folder test code
