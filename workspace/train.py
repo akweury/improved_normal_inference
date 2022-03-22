@@ -267,7 +267,6 @@ def train_epoch(nn_model, epoch):
             if epoch % 1 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
-                # todo: draw output value frequencies, from min to max.
 
             print(f" loss: {loss:.2e}", end="\t")
             print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
