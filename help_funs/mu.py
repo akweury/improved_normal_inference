@@ -328,11 +328,11 @@ def addHist(img):
 
         if hist_max - hist_min < 2:
             return "..."
-        histr, histr_x = np.histogram(img, bins=np.arange(hist_min, hist_max + 1))
+        histr, histr_x = np.histogram(img[:, :, i], bins=np.arange(hist_min, hist_max + 1))
         histr = np.delete(histr, np.where(histr == histr.max()), axis=0)
 
         thick = 2
-        histr = histr / histr.max()
+        histr = histr / max(histr.max(), 100)
         for i in range(histr.shape[0]):
             height = int(histr[i] * 50)
             width = int(w / histr.shape[0])
