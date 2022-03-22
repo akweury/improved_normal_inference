@@ -314,12 +314,12 @@ def addHist(img):
     color = ([255, 0, 0], [0, 255, 0], [0, 0, 255])
     color_ranges = []
     for i, col in enumerate(color):
-        hist_min, hist_max = img[:, :, i].min().astype(np.float), img[:, :, i].max().astype(np.float)
+        hist_min, hist_max = img[:, :, i].min().astype(np.int), img[:, :, i].max().astype(np.int)
         color_ranges.append([int(hist_min), int(hist_max)])
-        bins = (hist_max - hist_min + 1).astype(np.int)
-        if bins < 2:
+        
+        if hist_max - hist_min < 2:
             return "..."
-        histr = cv.calcHist([img], [i], None, [bins], [hist_min, hist_max + 1])
+        histr, histr_x = np.histogram(img, bins=np.arange(hist_min, hist_max + 1))
         histr = np.delete(histr, np.where(histr == histr.max()), axis=0)
 
         thick = 2
