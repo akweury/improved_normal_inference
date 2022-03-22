@@ -194,10 +194,14 @@ def compute_normal(vertex, mask, k):
     for i in range(k, vertex.shape[0]):
         for j in range(k, vertex.shape[1]):
             if mask[i, j]:
-                # TODO: fix here
-                neighbors = vertex[i - k:i + k, j - k:j + k]  # get its k neighbors
+                neighbors = vertex[max(i - k, 0): min(i + k + 1, vertex.shape[1] - 1),
+                            max(0, j - k): min(j + k + 1, vertex.shape[0] - 1)] # get its k neighbors
+                # neighbors = vertex[i - k:i + k, j - k:j + k]
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
-                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)
+                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0) # delete center vertex
+                # delete background vertex
+                neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
+
                 plane_vectors = neighbors - vertex[i, j]
 
                 u, s, vh = np.linalg.svd(plane_vectors)

@@ -37,19 +37,6 @@ def main():
     mu.addText(normal_svd_img, 'SVD')
     img_list.append(normal_svd_img)
 
-    # svd network normal
-    normal_img, eval_point_counter, total_time = svdn.eval(vertex_gt)
-    mu.addText(normal_img, 'SVD_Net')
-    mu.addText(normal_img, f"{eval_point_counter} points. processing time: {total_time:.3f} s", pos="lower_left",
-               font_size=0.5)
-    img_list.append(normal_img)
-
-    # deepfit network normal
-    deepfit_normal, eval_point_counter, total_time = deepfit.eval(vertex_gt)
-    mu.addText(deepfit_normal, 'DeepFit')
-    mu.addText(deepfit_normal, f"{eval_point_counter} points. processing time: {total_time:.3f} s", pos="lower_left",
-               font_size=0.5)
-    img_list.append(deepfit_normal)
 
     # show the results
     output = cv.hconcat(img_list)
