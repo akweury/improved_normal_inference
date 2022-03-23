@@ -62,6 +62,9 @@ def neighbor_vector(vertex, xu, xd, yl, yr, zf, zb):
 
 
 def neighbor_vectors_k(vertex, k=2):
+    if k == 1:
+        # use vertex itself as the input of network
+        return vertex
     vectors = np.zeros(shape=vertex.shape)
     for i in range(k):
         for j in range(k):

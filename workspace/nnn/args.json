@@ -1,6 +1,6 @@
 {
-  "noise": false,
-  "neighbor": 2,
+  "noise": true,
+  "neighbor": 0,
   "args": "json",
   "exp": "nnn",
   "workspace": "",
