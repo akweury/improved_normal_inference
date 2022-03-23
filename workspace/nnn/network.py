@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from common.NormalNN24 import NormalNN24
 from common.NormalNN72 import NormalNN72
+from common.NormalNN3 import NormalNN3
 from help_funs import mu
 
 
@@ -19,7 +20,7 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         # self.conv1_3 = NormalNN(1, 3)  # input 1 channel, output 3 channels
-        # self.conv3_3 = NormalNN(3, 3)
+        self.conv3_3 = NormalNN3(3, 3)
         self.conv24_3 = NormalNN24(24, 3)
         self.conv72_3 = NormalNN72(72, 3)
 
@@ -28,7 +29,9 @@ class CNN(nn.Module):
         # c0: confidence of each element in x0
         device = x0.get_device()
         c0 = mu.binary(x0).to(device)
-        if x0.size(1) == 24:
+        if x0.size(1) == 3:
+            xout = self.conv3_3(x0)
+        elif x0.size(1) == 24:
             xout = self.conv24_3(x0)
         elif x0.size(1) == 72:
             xout = self.conv72_3(x0)
