@@ -23,8 +23,8 @@ class NormalNN3(nn.Module):
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
         channel_size_0 = 24
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_1 = 72
+        channel_size_2 = 144
         channel_size_3 = 128
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_0, kernel_down, (1, 1), padding_down)
@@ -96,6 +96,6 @@ class NormalNN3(nn.Module):
         xout = self.active(self.uconv3(torch.cat((x23, x1), 1)))  # 512, 512
 
         # xout = self.active(self.conv1(xout))
-        xout = self.conv1(xout)  # 512, 512
+        xout = self.active(self.conv1(xout))  # 512, 512
         xout = self.conv2(xout)
         return xout

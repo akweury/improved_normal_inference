@@ -21,8 +21,8 @@ class CNN(nn.Module):
         # input confidence estimation network
         # self.conv1_3 = NormalNN(1, 3)  # input 1 channel, output 3 channels
         self.conv3_3 = NormalNN3(3, 3)
-        self.conv24_3 = NormalNN24(24, 3)
-        self.conv72_3 = NormalNN72(72, 3)
+        # self.conv24_3 = NormalNN24(24, 3)
+        # self.conv72_3 = NormalNN72(72, 3)
 
     def forward(self, x0):
         # x0: vertex array
