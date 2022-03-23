@@ -42,6 +42,7 @@ def args_parser():
                         help='train a model or test a mode')
     parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
                         help='add noise or not')
+    parser.add_argument('--neighbor', type=int, default=2, help='the neighbors will be considered')
 
     parser.add_argument('--cpu', '-c', action="store_true",
                         help='Use CPU for training?')
@@ -199,7 +200,6 @@ def load_args_from_file(args_file_path, given_args):
         print('\n==> Args file "{}" was not found!'.format(args_file_path))
 
 
-# TODO: Print in a nicer way
 def print_args(args):
     pprint(f'==> Experiment Args:  {args} ')
 

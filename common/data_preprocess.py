@@ -94,7 +94,7 @@ def neighbor_vectors(vertex, i=1):
     return vectors
 
 
-def convert2training_tensor(path):
+def convert2training_tensor(path, k):
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -127,7 +127,6 @@ def convert2training_tensor(path):
             ~mask].max()
 
         # calculate delta x, y, z of between each point and its neighbors
-        k = 3
         vectors = neighbor_vectors_k(vertex, k)
         vectors[mask] = 0
 

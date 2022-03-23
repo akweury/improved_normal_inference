@@ -16,10 +16,10 @@ output: normal  (3,512,512)
 """
 
 
-class NormalNN(nn.Module):
+class NormalNN24(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
-        self.__name__ = 'NormalNN'
+        self.__name__ = 'NormalNN24'
         kernel_down = (3, 3)
         kernel_up = (3, 3)
         padding_down = (1, 1)

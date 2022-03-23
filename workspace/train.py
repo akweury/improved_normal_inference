@@ -95,10 +95,11 @@ loss_dict = {
 # ----------------------------------------- Dataset Loader -------------------------------------------------------------
 class SyntheticDepthDataset(Dataset):
 
-    def __init__(self, data_path, setname='train'):
+    def __init__(self, data_path, k, setname='train'):
         if setname in ['train', 'selval']:
-            self.input = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / "*_input.pt"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / "*_gt.pt"), recursive=True)))
+            self.input = np.array(
+                sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_input_{k}.pt"), recursive=True)))
+            self.gt = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_gt_{k}.pt"), recursive=True)))
 
         assert (len(self.gt) == len(self.input))
 
@@ -138,7 +139,7 @@ class TrainingModel():
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
-        dataset = SyntheticDepthDataset(dataset_path, setname='train')
+        dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, setname='train')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random

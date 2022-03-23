@@ -13,7 +13,7 @@ def main():
             original_folder = config.synthetic_data / folder
             noisy_folder = config.synthetic_data_noise / folder
             noisy_a_folder(original_folder, noisy_folder)
-            convert2training_tensor(noisy_folder)
+            convert2training_tensor(noisy_folder, args.neighbor)
 
     # config experiments
     exp_path = config.ws_path / args.exp
