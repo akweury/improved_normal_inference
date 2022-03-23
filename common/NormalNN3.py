@@ -103,6 +103,6 @@ class NormalNN3(nn.Module):
 
         # xout = self.active(self.conv1(xout))
         xout = self.active(self.conv1(xout))  # 512, 512
-        xout = self.active(self.conv2(xout))  # 512, 512
+        xout = self.conv2(xout)  # 512, 512
         xout = self.conv3(xout)
         return xout
