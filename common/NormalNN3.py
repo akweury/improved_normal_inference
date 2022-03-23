@@ -22,13 +22,13 @@ class NormalNN3(nn.Module):
         self.active = nn.LeakyReLU(0.1)
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
-
+        channel_size_0 = 24
         channel_size_1 = 32
         channel_size_2 = 64
 
-        self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv1 = nn.Conv2d(in_ch, channel_size_0, kernel_down, (1, 1), padding_down)
 
-        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv2 = nn.Conv2d(channel_size_0, channel_size_1, kernel_down, (1, 1), padding_down)
 
         self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
 
