@@ -1,8 +1,8 @@
 {
   "noise": false,
-  "neighbor": 2,
+  "neighbor": 1,
   "args": "json",
-  "exp": "nnn",
+  "exp": "nnn24",
   "workspace": "",
   "resume": null,
   "evaluate": null,

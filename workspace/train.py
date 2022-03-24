@@ -8,6 +8,7 @@ import os
 import time
 import shutil
 import glob
+import json
 from pathlib import Path
 import datetime
 
@@ -214,8 +215,8 @@ class TrainingModel():
                 os.remove(prev_checkpoint_filename)
 
     def save_model(self):
-        with open(str(Path(self.output_folder) / "param.txt"), 'w') as f:
-            f.write(str(self.args))
+        with open(str(Path(self.output_folder) / "param.json"), 'w') as f:
+            json.dump(vars(self.args), f)
         with open(str(Path(self.output_folder) / "model.txt"), 'w') as f:
             f.write(str(self.model))
 

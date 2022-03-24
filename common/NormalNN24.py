@@ -1,12 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.parameter import Parameter
-from torch.nn.modules.conv import _ConvNd
-import numpy as np
-from scipy.stats import poisson
-from scipy import signal
-import math
 
 """
 Normal Neuron Network
@@ -25,13 +19,12 @@ class NormalNN24(nn.Module):
         padding_down = (1, 1)
         padding_up = (1, 1)
 
-        self.active = nn.LeakyReLU(0.1)
+        self.active = nn.LeakyReLU(0.01)
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
 
         channel_size_1 = 32
         channel_size_2 = 64
-
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 
