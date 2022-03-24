@@ -9,8 +9,7 @@ import datetime
 from help_funs import file_io, mu
 import config
 from workspace.svd import eval as svd
-from workspace.svdn import eval as svdn
-from workspace.deepfit import eval as deepfit
+from workspace import eval
 
 
 def main():
@@ -37,6 +36,17 @@ def main():
     mu.addText(normal_svd_img, 'SVD')
     img_list.append(normal_svd_img)
 
+    # neighbor normal
+    # neighbor_model_path = config.ws_path / "nnn" / "trained_model" / "neighbor_model.pth.tar"
+    # normal_neighbor, normal_neighbor_img = eval.eval(vertex_gt, neighbor_model_path)
+    # mu.addText(normal_svd_img, 'Neighbor')
+    # img_list.append(normal_neighbor_img)
+
+    # vertex normal
+    vertex_model_path = config.ws_path / "nnn" / "trained_model" / "vertex_model.pth.tar"
+    normal_vertex, normal_vertex_img = eval.eval(vertex_gt, vertex_model_path, k=1)
+    mu.addText(normal_vertex_img, 'Vertex')
+    img_list.append(normal_vertex_img)
 
     # show the results
     output = cv.hconcat(img_list)
