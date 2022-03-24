@@ -60,7 +60,9 @@ def eval(vertex, model_path, k):
 
     normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device)
 
-    return normal_img, eval_point_counter, total_time
+    normal = mu.rgb2normal(normal_img)
+
+    return normal, normal_img, eval_point_counter, total_time
 
 
 ############ EVALUATION FUNCTION ############

@@ -505,3 +505,16 @@ def choose_best(candidate_array, target):
     diff = angle_between(candidate_array, target)
     min_index = np.argmin(diff)
     return candidate_array[min_index], diff
+
+
+def eval_img_angle(output, target):
+    mask = target.sum(axis=2) == 0
+    angle_matrix = np.zeros(target.shape)
+    angle_matrix[mask] = angle_between(target[mask], output[mask])
+
+    return angle_matrix
+
+
+def angle2rgb(angle_matrix):
+    angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_JET)

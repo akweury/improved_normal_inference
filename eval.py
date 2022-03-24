@@ -25,22 +25,36 @@ def main():
                                 torch.tensor(data['t']).float())
 
     img_list = []
-
+    diff_list = []
     # ground truth normal
     normal_gt_img = mu.normal2RGB(normal_gt)
     mu.addText(normal_gt_img, 'Ground Truth')
     img_list.append(normal_gt_img)
+
+    normal_gt_ = mu.rgb2normal(normal_gt_img)
+    diff_gt_img = mu.eval_img_angle(normal_gt_, normal_gt)
+    mu.addText(diff_gt_img, 'Diff GT')
+    diff_list.append(diff_gt_img)
 
     # svd normal
     normal_svd, normal_svd_img = svd.eval(vertex_gt, farthest_neighbour=2)
     mu.addText(normal_svd_img, 'SVD')
     img_list.append(normal_svd_img)
 
+    diff_svd_img = mu.eval_img_angle(normal_svd, normal_gt)
+    mu.addText(diff_svd_img, "Diff SVD")
+    diff_list.append(diff_svd_img)
+
     # neighbor normal
-    # neighbor_model_path = config.ws_path / "nnn" / "trained_model" / "neighbor_model.pth.tar"
-    # normal_neighbor, normal_neighbor_img = eval.eval(vertex_gt, neighbor_model_path)
-    # mu.addText(normal_svd_img, 'Neighbor')
-    # img_list.append(normal_neighbor_img)
+    neighbor_model_path = config.ws_path / "nnn" / "trained_model" / "neighbor_model.pth.tar"
+    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
+                                                                                               neighbor_model_path, k=2)
+    mu.addText(normal_neighbor_img, 'Neighbor')
+    img_list.append(normal_neighbor_img)
+
+    diff_neighbor_img = mu.eval_img_angle(normal_neighbor, normal_gt)
+    mu.addText(diff_neighbor_img, "Diff Neighbor")
+    diff_list.append(diff_neighbor_img)
 
     # vertex normal
     vertex_model_path = config.ws_path / "nnn" / "trained_model" / "vertex_model.pth.tar"
@@ -48,8 +62,13 @@ def main():
     mu.addText(normal_vertex_img, 'Vertex')
     img_list.append(normal_vertex_img)
 
+    diff_vertex_img = mu.eval_img_angle(normal_vertex, normal_gt)
+    mu.addText(diff_vertex_img, "Diff Vertex")
+    diff_list.append(diff_vertex_img)
+
     # show the results
     output = cv.hconcat(img_list)
+    output_diff = cv.hconcat(diff_list)
     mu.show_images(output, "evaluation")
     time_now = datetime.datetime.now().strftime("%H_%M_%S")
     date_now = datetime.datetime.today().date()
