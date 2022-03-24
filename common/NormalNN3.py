@@ -22,52 +22,54 @@ class NormalNN3(nn.Module):
         self.active = nn.LeakyReLU(0.1)
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
-        channel_size_0 = 32
-        channel_size_1 = 64
-        channel_size_2 = 128
-        channel_size_3 = 256
+        channel_size_0 = 8
+        channel_size_1 = 24
+        channel_size_2 = 72
+        channel_size_3 = 128
+        channel_size_4 = 256
+        channel_size_5 = 512
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_0, kernel_down, (1, 1), padding_down)
 
-        self.dconv2 = nn.Conv2d(channel_size_0, channel_size_0, kernel_down, (1, 1), padding_down)
+        self.dconv2 = nn.Conv2d(channel_size_0, channel_size_1, kernel_down, (1, 1), padding_down)
 
-        self.dconv3 = nn.Conv2d(channel_size_0, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_2, kernel_down, (1, 1), padding_down)
 
-        # self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv4 = nn.Conv2d(channel_size_2, channel_size_3, kernel_down, (1, 1), padding_down)
 
-        self.dconv5 = nn.Conv2d(channel_size_1, channel_size_2, kernel_down, (1, 1), padding_down)
+        self.dconv5 = nn.Conv2d(channel_size_3, channel_size_4, kernel_down, (1, 1), padding_down)
 
-        # self.dconv6 = nn.Conv2d(channel_size_2, channel_size_2, kernel_down, (1, 1), padding_down)
+        self.dconv6 = nn.Conv2d(channel_size_4, channel_size_4, kernel_down, (1, 1), padding_down)
 
-        self.dconv7 = nn.Conv2d(channel_size_2, channel_size_2, kernel_down, (1, 1), padding_down)
+        # self.dconv7 = nn.Conv2d(channel_size_2, channel_size_2, kernel_down, (1, 1), padding_down)
 
         # self.dconv8 = nn.Conv2d(channel_size_3, channel_size_2, kernel_down, (1, 1), padding_down)
 
-        self.uconv1 = nn.Conv2d(channel_size_3, channel_size_2, kernel_up, (1, 1), padding_up)
+        self.uconv1 = nn.Conv2d(channel_size_5, channel_size_4, kernel_up, (1, 1), padding_up)
 
-        self.uconv2 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
+        self.uconv2 = nn.Conv2d(channel_size_4, channel_size_3, kernel_up, (1, 1), padding_up)
 
-        self.uconv3 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
+        self.uconv3 = nn.Conv2d(channel_size_4, channel_size_3, kernel_up, (1, 1), padding_up)
 
-        self.uconv4 = nn.Conv2d(channel_size_1, channel_size_0, kernel_up, (1, 1), padding_up)
+        self.uconv4 = nn.Conv2d(channel_size_3, channel_size_2, kernel_up, (1, 1), padding_up)
 
-        self.uconv5 = nn.Conv2d(channel_size_1, channel_size_0, kernel_up, (1, 1), padding_up)
+        self.uconv5 = nn.Conv2d(144, channel_size_2, kernel_up, (1, 1), padding_up)
 
-        self.conv1 = nn.Conv2d(channel_size_0, channel_size_0, (1, 1), (1, 1), (0, 0))
+        self.conv1 = nn.Conv2d(channel_size_2, channel_size_0, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(channel_size_0, channel_size_0, (1, 1), (1, 1), (0, 0))
         self.conv3 = nn.Conv2d(channel_size_0, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0):
         x1 = self.active(self.dconv1(x0))  # 512,512
         x1 = self.active(self.dconv2(x1))  # 512,512
-        # x1 = self.active(self.dconv3(x1))  # 512,512
+        x1 = self.active(self.dconv3(x1))  # 512,512
 
         # Downsample 1
         ds = 2
         x1_ds, idx = F.max_pool2d(x1, ds, ds, return_indices=True)  # 256,256
         x1_ds /= 4
 
-        x2_ds = self.active(self.dconv3(x1_ds))  # 256,256
+        x2_ds = self.active(self.dconv4(x1_ds))  # 256,256
         # x2_ds = self.active(self.dconv4(x2_ds))  # 256,256
 
         # Downsample 2
@@ -83,7 +85,7 @@ class NormalNN3(nn.Module):
         x3_dss, idx = F.max_pool2d(x3_ds, ds, ds, return_indices=True)  # 64,64
         x3_dss /= 4
 
-        x4_ds = self.active(self.dconv7(x3_dss))  # 64,64
+        x4_ds = self.active(self.dconv6(x3_dss))  # 64,64
         # x4_ds = self.active(self.dconv8(x4_ds))  # 64,64
 
         # Upsample 1
