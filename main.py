@@ -4,6 +4,7 @@ from workspace import train
 from pncnn.utils import args_parser
 
 import workspace.nnn.network as nnn
+import workspace.nnn24.network as nnn24
 
 
 def main():
@@ -17,7 +18,12 @@ def main():
 
     # config experiments
     exp_path = config.ws_path / args.exp
-    model = nnn.CNN()
+    if args.exp == "nnn":
+        model = nnn.CNN()
+    elif args.exp == "nnn24":
+        model = nnn24.CNN()
+    else:
+        raise ValueError("Unknown exp path")
     dataset_path = config.synthetic_data_noise
 
     # start the training
