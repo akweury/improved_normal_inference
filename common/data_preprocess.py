@@ -133,7 +133,7 @@ def convert2training_tensor(path, k):
         vectors = neighbor_vectors_k(vertex, k)
         vectors[mask] = 0
 
-        input_torch = torch.from_numpy(vectors)  # (depth, dtype=torch.float)
+        input_torch = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
         input_torch = input_torch.permute(2, 0, 1)
 
         gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
