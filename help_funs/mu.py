@@ -18,11 +18,12 @@ def angle_between(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
     v1 = v1.reshape(-1, 3)
     v2 = v2.reshape(-1, 3)
-    inner = np.sum(v1.reshape(-1, 3) * v2.reshape(-1, 3), axis=1)
-    norms = np.linalg.norm(v1, axis=1, ord=2) * np.linalg.norm(v2, axis=1, ord=2)
+    # inner = np.sum(v1.reshape(-1, 3) * v2.reshape(-1, 3), axis=1)
+    # norms = np.linalg.norm(v1, axis=1, ord=2) * np.linalg.norm(v2, axis=1, ord=2)
+    v1_u = v1 / (np.linalg.norm(v1, axis=1, ord=2, keepdims=True) + 1e-9)
+    v2_u = v2 / (np.linalg.norm(v2, axis=1, ord=2, keepdims=True) + 1e-9)
 
-    cos = inner / norms
-    rad = np.arccos(np.clip(cos, -1.0, 1.0))
+    rad = np.arccos(np.clip(np.sum(v1_u * v2_u, axis=1), -1.0, 1.0))
     deg = np.rad2deg(rad)
     deg[deg > 90] = 180 - deg[deg > 90]
     return deg
@@ -245,8 +246,9 @@ def normal2RGB(normals):
                 rgb[i, j] = normals[i, j] * 0.5 + 0.5
                 rgb[i, j, 2] = 1 - rgb[i, j, 2]
                 rgb[i, j] = (rgb[i, j] * 255)
-    rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    return rgb
+
+    # rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return rgb.astype(np.uint8)
 
 
 def normal2RGB_single(normal):
@@ -258,9 +260,12 @@ def normal2RGB_single(normal):
 
 
 def rgb2normal(color):
-    color_norm = color / np.linalg.norm(color)
-    color_norm[2] = 1 - color_norm[2]
-    return color_norm * 2 - 1
+    mask = color.sum(axis=2) == 0
+    color_norm = color / 255.0
+    color_norm[:, :, 2][~mask] = 1 - color_norm[:, :, 2][~mask]
+    color_norm[~mask] = (color_norm[~mask] - 0.5) / 0.5
+    # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
+    return color_norm
 
 
 def depth2vertex(depth, K, R, t):
@@ -509,12 +514,14 @@ def choose_best(candidate_array, target):
 
 def eval_img_angle(output, target):
     mask = target.sum(axis=2) == 0
-    angle_matrix = np.zeros(target.shape)
-    angle_matrix[mask] = angle_between(target[mask], output[mask])
+    angle_matrix = np.zeros(target.shape[:2])
+    angle_matrix[~mask] = angle_between(target[~mask], output[~mask])
 
-    return angle_matrix
+    img = angle2rgb(angle_matrix)
+    img[mask] = 0
+    return img, angle_matrix.max(), angle_matrix.min()
 
 
 def angle2rgb(angle_matrix):
     angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_JET)
+    return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_DEEPGREEN)

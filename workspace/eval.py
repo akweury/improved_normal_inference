@@ -55,7 +55,7 @@ def eval(vertex, model_path, k):
     vectors = data_preprocess.neighbor_vectors_k(vertex, k)
     vectors[mask] = 0
 
-    input_tensor = torch.from_numpy(vectors)  # (depth, dtype=torch.float)
+    input_tensor = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
     input_tensor = input_tensor.permute(2, 0, 1)
 
     normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device)
@@ -83,14 +83,14 @@ def evaluate_epoch(model, input_tensor, epoch, device):
         gpu_time = time.time() - start
 
         # store the predicted normal
+        normal_img = normal_img[0, :].permute(1, 2, 0)[:, :, :3]
         normal_img = normal_img.to('cpu').numpy().astype(np.uint8)
 
-    normal_img = normal_img.detach().numpy()
     normal_img = mu.filter_noise(normal_img, threshold=[0, 255])
     out_ranges = mu.addHist(normal_img)
     normal_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     # normal_cnn_8bit = mu.normal2RGB(xout_normal)
-    mu.addText(normal_8bit, "output")
+    # mu.addText(normal_8bit, "output")
     mu.addText(normal_8bit, str(out_ranges), pos="upper_right", font_size=0.5)
 
     return normal_8bit, eval_point_counter, gpu_time
