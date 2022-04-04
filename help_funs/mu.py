@@ -248,6 +248,7 @@ def normal2RGB(normals):
                 rgb[i, j] = (rgb[i, j] * 255)
 
     # rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    rgb = np.rint(rgb)
     return rgb.astype(np.uint8)
 
 
@@ -261,9 +262,14 @@ def normal2RGB_single(normal):
 
 def rgb2normal(color):
     mask = color.sum(axis=2) == 0
-    color_norm = color / 255.0
-    color_norm[:, :, 2][~mask] = 1 - color_norm[:, :, 2][~mask]
-    color_norm[~mask] = (color_norm[~mask] - 0.5) / 0.5
+    color_norm = np.zeros(shape=color.shape)
+    h, w, c = color.shape
+    for i in range(h):
+        for j in range(w):
+            if not mask[i, j]:
+                color_norm[i, j] = color[i, j] / 255.0
+                color_norm[i, j, 2] = 1 - color_norm[i, j, 2]
+                color_norm[i, j] = (color_norm[i, j] - 0.5) / 0.5
     # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
     return color_norm
 
@@ -519,7 +525,7 @@ def eval_img_angle(output, target):
 
     img = angle2rgb(angle_matrix)
     img[mask] = 0
-    return img, angle_matrix.max(), angle_matrix.min()
+    return img, angle_matrix
 
 
 def angle2rgb(angle_matrix):
