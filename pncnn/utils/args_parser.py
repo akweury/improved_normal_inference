@@ -44,6 +44,7 @@ def args_parser():
                         help='add noise or not')
     parser.add_argument('--neighbor', type=int, default=2, help='the neighbors will be considered')
 
+    parser.add_argument('--machine', type=str, default="local", help='choose the training machin, local or remote')
     parser.add_argument('--cpu', '-c', action="store_true",
                         help='Use CPU for training?')
 

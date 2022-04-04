@@ -6,7 +6,6 @@ cout_in_channel = 3
 cout_out_channel = 6
 cin_channel = 6
 
-
 root = Path(__file__).parents[0]
 dataset = root / "dataset"
 ws_path = root / "workspace"
@@ -19,6 +18,7 @@ geo_data = dataset / "data_geometrical_body"
 # synthetic dataset path
 synthetic_data = dataset / "data_synthetic"
 synthetic_data_noise = dataset / "data_synthetic_noise"
+synthetic_data_noise_dfki = Path("/datasets/sha/data_synthetic_noise")
 
 # real dataset path
 real_data = dataset / "data_real"
@@ -37,4 +37,3 @@ test_depth_path = dataset / "data_depth_selection" / "depth_selection" / "test_d
 
 # pncnn workspace path
 exper_kitti = pncnn_path / "workspace" / "kitti"
-

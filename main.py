@@ -12,7 +12,12 @@ def main():
     if args.noise:
         for folder in ["selval", "test", "train"]:
             original_folder = config.synthetic_data / folder
-            noisy_folder = config.synthetic_data_noise / folder
+            if args.machine == "remote":
+                noisy_folder = config.synthetic_data_noise_dfki / folder
+            elif args.machine == 'local':
+                noisy_folder = config.synthetic_data_noise / folder
+            else:
+                raise ValueError
             noisy_a_folder(original_folder, noisy_folder)
             convert2training_tensor(noisy_folder, args.neighbor)
 
@@ -24,7 +29,12 @@ def main():
         model = nnn24.CNN()
     else:
         raise ValueError("Unknown exp path")
-    dataset_path = config.synthetic_data_noise
+    if args.machine == 'local':
+        dataset_path = config.synthetic_data_noise
+    elif args.machine == 'remote':
+        dataset_path = config.synthetic_data_noise_dfki
+    else:
+        raise ValueError
 
     # start the training
     train.main(args, exp_path, model, dataset_path)
