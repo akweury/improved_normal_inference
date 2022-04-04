@@ -19,7 +19,7 @@ class NormalNN3(nn.Module):
         padding_down = (1, 1)
         padding_up = (1, 1)
 
-        self.active = nn.LeakyReLU(0.01)
+        self.active = nn.LeakyReLU(0.1)
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
         channel_size_0 = 8
@@ -105,6 +105,6 @@ class NormalNN3(nn.Module):
 
         # xout = self.active(self.conv1(xout))
         xout = self.active(self.conv1(xout))  # 512, 512
-        xout = self.conv2(xout)  # 512, 512
+        xout = self.active(self.conv2(xout))  # 512, 512
         xout = self.conv3(xout)
         return xout
