@@ -270,7 +270,7 @@ def train_epoch(nn_model, epoch):
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
 
-            print(f" loss: {loss:.2e}", end="\t")
+            print(f" loss: {loss:.2e}", end="    ")
             print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
