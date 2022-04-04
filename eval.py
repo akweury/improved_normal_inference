@@ -46,7 +46,7 @@ def main():
     diff_list.append(gt_diff)
 
     # svd normal
-    normal_svd, svd_img = svd.eval(vertex_gt, farthest_neighbour=2)
+    normal_svd, svd_img = svd.eval(vertex_gt, farthest_neighbour=1)
     svd_img, svd_diff = eval_post_processing(normal_svd, svd_img, normal_gt, "SVD")
     img_list.append(svd_img)
     diff_list.append(svd_diff)
