@@ -60,12 +60,12 @@ def main():
     diff_list.append(neighbor_diff)
 
     # vertex normal
-    # vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
-    # normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
-    #                                                                                       k=1)
-    # vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
-    # img_list.append(vertex_img)
-    # diff_list.append(vertex_diff)
+    vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
+    normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
+                                                                                          k=1)
+    vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
+    img_list.append(vertex_img)
+    diff_list.append(vertex_diff)
 
     # show the results
     output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)

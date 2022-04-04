@@ -29,7 +29,6 @@ class NormalNN72(nn.Module):
         channel_size_1 = 128
         channel_size_2 = 256
 
-
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 
         self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
