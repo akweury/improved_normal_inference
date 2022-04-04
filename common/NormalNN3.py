@@ -45,19 +45,18 @@ class NormalNN3(nn.Module):
 
         # self.dconv8 = nn.Conv2d(channel_size_3, channel_size_2, kernel_down, (1, 1), padding_down)
 
-        self.uconv1 = nn.Conv2d(channel_size_5, channel_size_4, kernel_up, (1, 1), padding_up)
+        self.uconv1 = nn.Conv2d(channel_size_5, channel_size_3, kernel_up, (1, 1), padding_up)
 
         self.uconv2 = nn.Conv2d(channel_size_4, channel_size_3, kernel_up, (1, 1), padding_up)
 
-        self.uconv3 = nn.Conv2d(channel_size_4, channel_size_3, kernel_up, (1, 1), padding_up)
+        self.uconv3 = nn.Conv2d(channel_size_4, channel_size_2, kernel_up, (1, 1), padding_up)
 
         self.uconv4 = nn.Conv2d(channel_size_3, channel_size_2, kernel_up, (1, 1), padding_up)
 
         self.uconv5 = nn.Conv2d(channel_size_3, channel_size_2, kernel_up, (1, 1), padding_up)
 
         self.conv1 = nn.Conv2d(channel_size_2, channel_size_0, (1, 1), (1, 1), (0, 0))
-        self.conv2 = nn.Conv2d(channel_size_0, channel_size_0, (1, 1), (1, 1), (0, 0))
-        self.conv3 = nn.Conv2d(channel_size_0, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv2 = nn.Conv2d(channel_size_0, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0):
         x1 = self.active(self.dconv1(x0))  # 512,512
@@ -92,12 +91,12 @@ class NormalNN3(nn.Module):
         x4 = F.interpolate(x4_ds, x3_ds.size()[2:], mode='nearest')  # 128,128
 
         x34_ds = self.active(self.uconv1(torch.cat((x3_ds, x4), 1)))  # 128, 128
-        x34_ds = self.active(self.uconv2(x34_ds))  # 128, 128
+        # x34_ds = self.active(self.uconv2(x34_ds))  # 128, 128
 
         # Upsample 2
         x34 = F.interpolate(x34_ds, x2_ds.size()[2:], mode='nearest')
         x23_ds = self.active(self.uconv3(torch.cat((x2_ds, x34), 1)))  # 256, 256
-        x23_ds = self.active(self.uconv4(x23_ds))  # 256, 256
+        # x23_ds = self.active(self.uconv4(x23_ds))  # 256, 256
 
         # # Upsample 3
         x23 = F.interpolate(x23_ds, x0.size()[2:], mode='nearest')  # 512, 512
@@ -105,6 +104,6 @@ class NormalNN3(nn.Module):
 
         # xout = self.active(self.conv1(xout))
         xout = self.active(self.conv1(xout))  # 512, 512
-        xout = self.active(self.conv2(xout))  # 512, 512
-        xout = self.conv3(xout)
+        xout = self.conv2(xout)  # 512, 512
+        # xout = self.conv3(xout)
         return xout

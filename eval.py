@@ -18,7 +18,7 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
     diff_img, diff_angle = mu.eval_img_angle(normal, normal_gt)
     diff = np.sum(np.abs(diff_angle))
 
-    mu.addText(diff_img, f"Diff {name}")
+    mu.addText(diff_img, f"{name}")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
 
     return normal_img, diff_img
