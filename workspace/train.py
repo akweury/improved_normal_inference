@@ -57,9 +57,13 @@ class AngleLoss(nn.Module):
 
     def forward(self, outputs, target, penalty_weight):
         outputs = outputs[:, :3, :, :]
-        diff_angle = mu.angle_between_2d_tensor(outputs, target)
-        # norm_penalty = torch.abs((torch.norm(outputs, dim=1) - 1))*penalty_weight
-        return (torch.sum(diff_angle)) / (outputs.shape[0] * outputs.shape[2] * outputs.shape[3])
+        boarder_right = torch.gt(outputs, 1).bool().detach()
+        boarder_left = torch.lt(outputs, -1).bool().detach()
+        outputs[boarder_right] = outputs[boarder_right] * penalty_weight
+        outputs[boarder_left] = outputs[boarder_left] * penalty_weight
+        outputs = outputs + 1
+        target = target + 1
+        return F.mse_loss(outputs, target)
 
 
 class L1Loss(nn.Module):
@@ -274,7 +278,7 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 100 == 0:
+            if epoch % 1 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
 
