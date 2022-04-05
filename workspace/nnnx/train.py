@@ -17,7 +17,7 @@ import time
 import torch
 import numpy as np
 from pprint import pprint
-from workspace.svdn import utils
+from workspace.nnnx import utils
 from help_funs import mu, chart
 
 xout_channel = 3

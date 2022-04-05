@@ -16,19 +16,19 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.SVDNet import SVDNet
-from common.SVDNet import MLPNet
-from help_funs import mu
+from common.NormalNN24 import NormalNN24
 
 
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
-        self.__name__ = 'svdn'
+        self.__name__ = 'nnnx'
 
         self.svdNN = SVDNet()
-        self.mlpNN = MLPNet()
+        self.nnn24 = NormalNN24(24, 3)
 
     def forward(self, x0):
         # out = self.svdNN(x0)
-        out = self.mlpNN(x0)
+        best_8neighbor_vectors = self.svdNN(x0)
+        out = self.nnn24(best_8neighbor_vectors)
         return out

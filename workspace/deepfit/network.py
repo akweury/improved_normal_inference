@@ -23,7 +23,7 @@ from help_funs import mu
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
-        self.__name__ = 'svdn'
+        self.__name__ = 'nnnx'
 
         self.svdNN = SVDNet()
         self.mlpNN = MLPNet()

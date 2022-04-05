@@ -1,3 +1,5 @@
+import math
+import itertools
 import cv2 as cv
 import numpy as np
 import torch
@@ -24,6 +26,17 @@ def angle_between(v1, v2):
     v2_u = v2 / (np.linalg.norm(v2, axis=1, ord=2, keepdims=True) + 1e-9)
 
     rad = np.arccos(np.clip(np.sum(v1_u * v2_u, axis=1), -1.0, 1.0))
+    deg = np.rad2deg(rad)
+    deg[deg > 90] = 180 - deg[deg > 90]
+    return deg
+
+
+def angle_between_2d(m1, m2):
+    """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
+    m1_u = m1 / (np.linalg.norm(m1, axis=2, ord=2, keepdims=True) + 1e-9)
+    m2_u = m2 / (np.linalg.norm(m2, axis=2, ord=2, keepdims=True) + 1e-9)
+
+    rad = np.arccos(np.clip(np.sum(m1_u * m2_u, axis=2), -1.0, 1.0))
     deg = np.rad2deg(rad)
     deg[deg > 90] = 180 - deg[deg > 90]
     return deg
@@ -193,9 +206,9 @@ def normalize2_8bit(img_scaled, data=None):
 
 
 def normal_point2view_point(normal, point, view_point):
-    if np.dot(normal, (point - view_point)) > 0:
-        normal = -normal
-
+    # if normal * (point - view_point) > 0:
+    #     normal = -normal
+    normal[normal * (point - view_point) > 0] = -normal[normal * (point - view_point) > 0]
     return normal
 
 
@@ -222,6 +235,34 @@ def compute_normal(vertex, mask, k):
                 normals[i, j] = normal
 
     return normals
+
+
+def generate_normals_all(vectors, vertex, normal_gt, svd_rank=3, MAX_ATTEMPT=1000):
+    point_num, neighbors_num = vectors.shape[:2]
+    random_idx = np.random.choice(neighbors_num, size=(point_num, MAX_ATTEMPT, svd_rank))
+    candidate_neighbors = np.zeros(shape=(point_num, MAX_ATTEMPT, svd_rank, 3))
+    # candidate_neighbors = vectors[random_idx]
+    for i in range(point_num):
+        for j in range(MAX_ATTEMPT):
+            candidate_neighbors[i, j] = vectors[i][random_idx[i, j]]
+
+    u, s, vh = np.linalg.svd(candidate_neighbors)
+    candidate_normal = np.swapaxes(vh, -2, -1)[:, :, :, -1]
+    vertex = np.repeat(np.expand_dims(vertex, axis=1), MAX_ATTEMPT, axis=1)
+    normal = normal_point2view_point(candidate_normal, vertex, np.zeros(shape=vertex.shape))
+    # if np.linalg.norm(normal, axis=1, ord=2) != 1:
+    #     normal = normal / np.linalg.norm(normal)
+    normal_gt_expended = np.repeat(np.expand_dims(normal_gt, axis=1), repeats=MAX_ATTEMPT, axis=1)
+    error = angle_between_2d(normal, normal_gt_expended)
+    best_error = np.min(error, axis=1)
+    best_error_idx = np.argmin(error, axis=1)
+    best_normals_idx = np.zeros(shape=(point_num, svd_rank))
+    best_normals = np.zeros(shape=(point_num, 3))
+    for i in range(point_num):
+        best_normals_idx[i] = random_idx[i, best_error_idx[i]]
+        best_normals[i] = normal[i, best_error_idx[i]]
+
+    return best_normals, best_normals_idx, best_error
 
 
 # --------------------------- convert functions -----------------------------------------------------------------------

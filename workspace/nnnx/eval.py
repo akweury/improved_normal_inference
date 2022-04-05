@@ -9,7 +9,7 @@ import numpy as np
 
 import config
 from pncnn.utils import args_parser
-from workspace.svdn import candidate_normals
+from workspace.nnnx import candidate_normals
 from help_funs import mu
 
 
@@ -18,7 +18,7 @@ def eval(vertex):
     check_point_id = 999
 
     # Define paths
-    exp_path = config.ws_path / "svdn"
+    exp_path = config.ws_path / "nnnx"
 
     # load args
     json_file = str(exp_path / "args.json")

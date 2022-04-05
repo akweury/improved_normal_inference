@@ -15,7 +15,7 @@ from torch.optim import SGD, Adam, lr_scheduler
 
 import config
 from help_funs import file_io, mu
-from workspace.svdn import network, candidate_normals
+from workspace.nnnx import network, candidate_normals
 
 
 class L2Loss(nn.Module):

@@ -123,7 +123,7 @@ def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
     cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
-    # mu.show_images(output, f"svdn")
+    # mu.show_images(output, f"nnnx")
 
 
 def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):

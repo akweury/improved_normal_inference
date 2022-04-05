@@ -25,9 +25,9 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
 
 
 def main():
-    # path = config.synthetic_data_noise / "train"
-    #
-    path = config.geo_data / "train"
+    path = config.synthetic_data_noise / "train"
+
+    # path = config.geo_data / "train"
     data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=0)
 
     # vertex

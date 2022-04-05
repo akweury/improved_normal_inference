@@ -1,11 +1,12 @@
 import config
-from common.data_preprocess import noisy_a_folder, convert2training_tensor
+from common.data_preprocess import noisy_a_folder, convert2training_tensor, convert2training_tensor2
 from workspace import train
 from pncnn.utils import args_parser
 
 import workspace.nnn.network as nnn
 import workspace.nnn24.network as nnn24
 import workspace.nnn72.network as nnn72
+import workspace.nnnx.network as nnnx
 
 
 def main():
@@ -20,7 +21,10 @@ def main():
             else:
                 raise ValueError
             noisy_a_folder(original_folder, noisy_folder)
-            convert2training_tensor(noisy_folder, args.neighbor)
+            if args.exp == "nnnx":
+                convert2training_tensor2(noisy_folder, 3)
+            else:
+                convert2training_tensor(noisy_folder, args.neighbor)
 
     # config experiments
     exp_path = config.ws_path / args.exp
@@ -30,6 +34,8 @@ def main():
         model = nnn24.CNN()
     elif args.exp == "nnn72":
         model = nnn72.CNN()
+    elif args.exp == "nnnx":
+        model = nnnx.CNN()
     else:
         raise ValueError("Unknown exp path")
     if args.machine == 'local':
