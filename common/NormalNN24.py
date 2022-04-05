@@ -24,7 +24,7 @@ class NormalNN24(nn.Module):
         # self.active = nn.ReLU()
 
         channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_2 = 128
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 
