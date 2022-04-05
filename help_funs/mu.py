@@ -42,6 +42,19 @@ def angle_between_2d(m1, m2):
     return deg
 
 
+def angle_between_2d_tensor(t1, t2):
+    """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
+    t1_permuted = t1.permute(0, 2, 3, 1)
+    t2_permuted = t2.permute(0, 2, 3, 1)
+    t1_u = t1_permuted / (torch.norm(t1_permuted, dim=-1, keepdim=True) + 1e-9)
+    t2_u = t2_permuted / (torch.norm(t2_permuted, dim=-1, keepdim=True) + 1e-9)
+
+    rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
+    deg = torch.rad2deg(rad)
+    deg[deg > 90] = 180 - deg[deg > 90]
+    return deg
+
+
 def mse(img_1, img_2, valid_pixels=None):
     """
 
@@ -311,6 +324,21 @@ def rgb2normal(color):
                 color_norm[i, j] = color[i, j] / 255.0
                 color_norm[i, j, 2] = 1 - color_norm[i, j, 2]
                 color_norm[i, j] = (color_norm[i, j] - 0.5) / 0.5
+    # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
+    return color_norm
+
+
+def rgb2normal_tensor(color):
+    mask = color.sum(dim=-3) == 0
+    color_norm = torch.zeros(color.shape)
+    batch_size, c, h, w = color.shape
+    for b in range(batch_size):
+        for i in range(h):
+            for j in range(w):
+                if not mask[b, i, j]:
+                    color_norm[b, :, i, j] = color[b, :, i, j] / 255.0
+                    color_norm[b, 2, i, j] = 1 - color_norm[b, 2, i, j]
+                    color_norm[b, :, i, j] = (color_norm[b, :, i, j] - 0.5) / 0.5
     # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
     return color_norm
 

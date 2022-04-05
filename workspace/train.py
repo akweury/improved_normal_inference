@@ -43,16 +43,23 @@ class WeightedL2Loss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, penalty):
-        alpha = 10
         outputs = outputs[:, :3, :, :]
-        z_weight = torch.tensor([1, 1, alpha]).repeat(outputs.size(0), 1).unsqueeze(2).unsqueeze(3).to(outputs.device)
         boarder_right = torch.gt(outputs, 255).bool().detach()
         boarder_left = torch.lt(outputs, 0).bool().detach()
         outputs[boarder_right] = outputs[boarder_right] * penalty
         outputs[boarder_left] = outputs[boarder_left] * penalty
-        weight = 1 / torch.ne(target, 0).float().detach().sum(dim=1).sum(dim=1).sum(dim=1)
-        weight = weight.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         return F.mse_loss(outputs, target)
+
+
+class AngleLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, penalty_weight):
+        outputs = outputs[:, :3, :, :]
+        diff_angle = mu.angle_between_2d_tensor(outputs, target)
+        # norm_penalty = torch.abs((torch.norm(outputs, dim=1) - 1))*penalty_weight
+        return (torch.sum(diff_angle)) / (outputs.shape[0] * outputs.shape[2] * outputs.shape[3])
 
 
 class L1Loss(nn.Module):
@@ -89,7 +96,8 @@ loss_dict = {
     'l2': L2Loss(),
     'masked_l1': MaskedL1Loss(),
     'masked_l2': MaskedL2Loss(),
-    'weighted_l2': WeightedL2Loss()
+    'weighted_l2': WeightedL2Loss(),
+    'angle': AngleLoss()
 }
 
 
@@ -271,7 +279,8 @@ def train_epoch(nn_model, epoch):
                             loss=loss, epoch=epoch, i=i, prefix="train")
 
             print(f" loss: {loss:.2e}", end="    ")
-            print(f'output range:[{out.min():.1f} - {out.max():.1f}]')
+            print(
+                f'output range:[{out.min():.1f} - {out.max():.1f}], target range:[{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
@@ -330,18 +339,18 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # gt normal
     target = target.numpy()
+    target = mu.normal2RGB(target)
     target_ranges = mu.addHist(target)
     target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    # normal_gt_8bit = mu.normal2RGB(target)
     normal_gt_8bit = target
     mu.addText(normal_gt_8bit, "gt")
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
 
     xout = xout.detach().numpy()
-    xout = mu.filter_noise(xout, threshold=[0, 255])
+    xout = mu.filter_noise(xout, threshold=[-1, 1])
+    xout = mu.normal2RGB(xout)
     xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     mu.addText(normal_cnn_8bit, "output")
     mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
 

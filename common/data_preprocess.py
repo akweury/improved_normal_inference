@@ -137,8 +137,8 @@ def convert2training_tensor(path, k):
         input_torch = input_torch.permute(2, 0, 1)
 
         gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        gt = mu.normal2RGB(gt)
-        gt = (gt).astype(np.float32)
+        # gt = mu.normal2RGB(gt)
+        gt = gt.astype(np.float32)
         gt_torch = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         gt_torch = gt_torch.permute(2, 0, 1)
 
