@@ -15,22 +15,26 @@ class NormalNN24(nn.Module):
         super().__init__()
         self.__name__ = 'NormalNN24'
         kernel_down = (3, 3)
+        kernel_down_2 = (5, 5)
         kernel_up = (3, 3)
+        kernel_up_2 = (5, 5)
         padding_down = (1, 1)
+        padding_down_2 = (2, 2)
         padding_up = (1, 1)
+        padding_up_2 = (2, 2)
 
         self.active = nn.LeakyReLU(0.01)
         # self.active = nn.Tanh()
         # self.active = nn.ReLU()
 
-        channel_size_1 = 32
+        channel_size_1 = 64
         channel_size_2 = 128
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 
-        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down_2, (1, 1), padding_down_2)
 
-        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
+        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down_2, (1, 1), padding_down_2)
 
         self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
 
@@ -46,13 +50,9 @@ class NormalNN24(nn.Module):
 
         self.uconv3 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
 
-        self.uconv4 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
-
-        self.uconv5 = nn.Conv2d(channel_size_1, channel_size_1, kernel_up, (1, 1), padding_up)
 
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
-        self.conv3 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0):
         x1 = self.active(self.dconv1(x0))  # 512,512
