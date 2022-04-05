@@ -36,7 +36,7 @@ class MLPNet(nn.Module):
 
 
 class SVDNet(nn.Module):
-    def __init__(self):
+    def __init__(self, input_ch, output_ch):
         super().__init__()
         self.__name__ = 'NormalNN'
         kernel_5 = (5, 5)
@@ -44,15 +44,15 @@ class SVDNet(nn.Module):
         padding_2 = (2, 2)
         padding_1 = (1, 1)
 
-        self.conv1 = nn.Conv2d(3, 128, kernel_3, (1, 1), padding_1)
-        self.conv2 = nn.Conv2d(128, 256, kernel_3, (1, 1), padding_1)
-        self.conv3 = nn.Conv2d(256, 256, kernel_3, (1, 1), padding_1)
-        self.conv4 = nn.Conv2d(256, 512, kernel_3, (1, 1), padding_1)
+        self.conv1 = nn.Conv1d(3, 8, kernel_3, (1, 1), padding_1)
+        self.conv2 = nn.Conv2d(8, 16, kernel_3, (1, 1), padding_1)
+        self.conv3 = nn.Conv2d(16, 32, kernel_3, (1, 1), padding_1)
+        self.conv4 = nn.Conv2d(32, 64, kernel_3, (1, 1), padding_1)
 
         self.fc1 = nn.Linear(512, 256)
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 64)
-        self.fc4 = nn.Linear(64, 3)
+        self.fc4 = nn.Linear(64, 4)
 
     def forward(self, x0):
         x = self.conv1(x0)
