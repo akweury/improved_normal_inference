@@ -94,8 +94,8 @@ def evaluate_epoch(model, input_tensor, epoch, device, output_type='normal'):
         output = output.astype(np.uint8)
         output = mu.filter_noise(output, threshold=[0, 255])
         output[mask] = 0
-
-        normal_8bit = cv.normalize(output, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_8bit = np.ascontiguousarray(output, dtype=np.uint8)
+        # normal_8bit = cv.normalize(output, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         normal = mu.rgb2normal(normal_8bit)
     # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     # mu.addText(normal_8bit, "output")

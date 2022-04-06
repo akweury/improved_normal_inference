@@ -61,10 +61,10 @@ class AngleLoss(nn.Module):
         boarder_left = torch.lt(outputs, -1).bool().detach()
         outputs[boarder_right] = outputs[boarder_right] * penalty_weight
         outputs[boarder_left] = outputs[boarder_left] * penalty_weight
-        angle_loss = torch.sum(2*(1-torch.cos(mu.angle_between_2d_tensor(outputs, target)))) / (512 * 512) *0.01
+        angle_loss = torch.sum(2 * (1 - torch.cos(mu.angle_between_2d_tensor(outputs, target)))) / (512 * 512) * 0.01
         outputs = outputs + 1
         target = target + 1
-        return F.mse_loss(outputs, target) 
+        return F.mse_loss(outputs, target)
 
 
 class L1Loss(nn.Module):
@@ -345,6 +345,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
     # gt normal
     target = target.numpy()
     target = mu.normal2RGB(target)
+    mask = target.sum(axis=2) == 0
     target_ranges = mu.addHist(target)
     target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     normal_gt_8bit = target
@@ -354,6 +355,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
     xout = xout.detach().numpy()
     xout = mu.filter_noise(xout, threshold=[-1, 1])
     xout = mu.normal2RGB(xout)
+    xout[mask] = 0
     xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")

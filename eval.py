@@ -30,7 +30,7 @@ def main():
     path = config.synthetic_data_noise / "train"
 
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=0)
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=169)
 
     # vertex
     vertex_gt = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
@@ -53,21 +53,31 @@ def main():
     img_list.append(svd_img)
     diff_list.append(svd_diff)
 
-    # neighbor normal
+    # neighbor rgb
     neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
     normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
                                                                                                neighbor_model_path, k=2)
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "Neighbor")
+    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "FULL_RGB")
     img_list.append(neighbor_img)
     diff_list.append(neighbor_diff)
 
-    # # vertex normal
-    vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
-    normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
-                                                                                          k=1, output_type='rgb')
-    vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
-    img_list.append(vertex_img)
-    diff_list.append(vertex_diff)
+    # neighbor normal
+    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "2022_04_06_10_07_33" / "checkpoint-572.pth.tar"
+    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
+                                                                                               neighbor_model_path,
+                                                                                               k=2,
+                                                                                               output_type='normal')
+    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "32_Normal")
+    img_list.append(neighbor_img)
+    diff_list.append(neighbor_diff)
+
+    # # # vertex normal
+    # vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
+    # normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
+    #                                                                                       k=1, output_type='rgb')
+    # vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
+    # img_list.append(vertex_img)
+    # diff_list.append(vertex_diff)
 
     # show the results
     output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
