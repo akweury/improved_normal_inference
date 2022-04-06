@@ -4,13 +4,13 @@ ssh sha@pc-2103
 
 # remote command
 
-CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn --args json --mode train --batch_size 8 --machine remote
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 16 --machine remote
 
 scp C:\Users\shaji\TestProject\CapturedData\data_geometrical_body.zip sha@pc-2103:
 /home/sha/improved_normal_inference/dataset
 
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnn/output.zip D:
-\TUK\improved_normal_inference\workspace\nnn
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnn24/output.zip D:
+\TUK\improved_normal_inference\workspace\nnn24
 
 # local command
 

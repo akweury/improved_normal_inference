@@ -13,6 +13,8 @@ from workspace import eval
 
 
 def eval_post_processing(normal, normal_img, normal_gt, name):
+    out_ranges = mu.addHist(normal_img)
+    mu.addText(normal_img, str(out_ranges), pos="upper_right", font_size=0.5)
     mu.addText(normal_img, name)
 
     diff_img, diff_angle = mu.eval_img_angle(normal, normal_gt)
@@ -46,26 +48,26 @@ def main():
     diff_list.append(gt_diff)
 
     # svd normal
-    normal_svd, svd_img = svd.eval(vertex_gt, farthest_neighbour=1)
+    normal_svd, svd_img = svd.eval(vertex_gt, farthest_neighbour=2)
     svd_img, svd_diff = eval_post_processing(normal_svd, svd_img, normal_gt, "SVD")
     img_list.append(svd_img)
     diff_list.append(svd_diff)
 
     # neighbor normal
-    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "checkpoint.pth.tar"
+    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
     normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
                                                                                                neighbor_model_path, k=2)
     neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "Neighbor")
     img_list.append(neighbor_img)
     diff_list.append(neighbor_diff)
 
-    # vertex normal
-    vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
-    normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
-                                                                                          k=1)
-    vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
-    img_list.append(vertex_img)
-    diff_list.append(vertex_diff)
+    # # vertex normal
+    # vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
+    # normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
+    #                                                                                       k=1)
+    # vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
+    # img_list.append(vertex_img)
+    # diff_list.append(vertex_diff)
 
     # show the results
     output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)

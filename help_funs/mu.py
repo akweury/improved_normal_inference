@@ -52,7 +52,8 @@ def angle_between_2d_tensor(t1, t2):
     rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     deg = torch.rad2deg(rad)
     deg[deg > 90] = 180 - deg[deg > 90]
-    return deg
+
+    return deg.type('torch.cuda.ShortTensor')
 
 
 def mse(img_1, img_2, valid_pixels=None):
@@ -219,9 +220,8 @@ def normalize2_8bit(img_scaled, data=None):
 
 
 def normal_point2view_point(normal, point, view_point):
-    # if normal * (point - view_point) > 0:
-    #     normal = -normal
-    normal[normal * (point - view_point) > 0] = -normal[normal * (point - view_point) > 0]
+    if np.dot(normal, (point - view_point)) > 0:
+        normal = -normal
     return normal
 
 

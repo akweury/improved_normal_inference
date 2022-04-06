@@ -19,7 +19,7 @@ from pncnn.utils import args_parser
 from common import data_preprocess
 
 
-def eval(vertex, model_path, k):
+def eval(vertex, model_path, k, output_type='rgb'):
     # load model
     checkpoint = torch.load(model_path)
 
@@ -58,19 +58,15 @@ def eval(vertex, model_path, k):
     input_tensor = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
     input_tensor = input_tensor.permute(2, 0, 1)
 
-    normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device)
-
-    normal = mu.rgb2normal(normal_img)
+    normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device,
+                                                                        output_type)
 
     return normal, normal_img, eval_point_counter, total_time
 
 
 ############ EVALUATION FUNCTION ############
-def evaluate_epoch(model, input_tensor, epoch, device):
-    mask = input_tensor.sum(axis=2) == 0
-
+def evaluate_epoch(model, input_tensor, epoch, device, output_type='normal'):
     model.eval()  # Swith to evaluate mode
-    eval_point_counter = torch.sum(mask)
 
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
@@ -79,21 +75,32 @@ def evaluate_epoch(model, input_tensor, epoch, device):
 
         # Forward Pass
         start = time.time()
-        normal_img = model(input_tensor)
+        output = model(input_tensor)
         gpu_time = time.time() - start
 
         # store the predicted normal
-        normal_img = normal_img[0, :].permute(1, 2, 0)[:, :, :3]
-        normal_img = normal_img.to('cpu').numpy().astype(np.uint8)
+        output = output[0, :].permute(1, 2, 0)[:, :, :3]
+        output = output.to('cpu').numpy()
+    mask = input_tensor.sum(axis=1) == 0
+    mask = mask.to('cpu').numpy().reshape(512, 512)
+    eval_point_counter = np.sum(mask)
+    if output_type == 'normal':
+        normal = mu.filter_noise(output, threshold=[-1, 1])
+        output_img = mu.normal2RGB(normal)
+        normal_8bit = cv.normalize(output_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_8bit[mask] = 0
 
-    normal_img = mu.filter_noise(normal_img, threshold=[0, 255])
-    out_ranges = mu.addHist(normal_img)
-    normal_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    else:
+        output = output.astype(np.uint8)
+        output = mu.filter_noise(output, threshold=[0, 255])
+        output[mask] = 0
+
+        normal_8bit = cv.normalize(output, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal = mu.rgb2normal(normal_8bit)
     # normal_cnn_8bit = mu.normal2RGB(xout_normal)
     # mu.addText(normal_8bit, "output")
-    mu.addText(normal_8bit, str(out_ranges), pos="upper_right", font_size=0.5)
 
-    return normal_8bit, eval_point_counter, gpu_time
+    return normal, normal_8bit, eval_point_counter, gpu_time
 
 
 if __name__ == '__main__':
