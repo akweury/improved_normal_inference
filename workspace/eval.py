@@ -85,9 +85,11 @@ def evaluate_epoch(model, input_tensor, epoch, device, output_type='normal'):
     mask = mask.to('cpu').numpy().reshape(512, 512)
     eval_point_counter = np.sum(mask)
     if output_type == 'normal':
+        # normal = output / np.linalg.norm(output, axis=2, ord=2, keepdims=True)
         normal = mu.filter_noise(output, threshold=[-1, 1])
         output_img = mu.normal2RGB(normal)
-        normal_8bit = cv.normalize(output_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_8bit = np.ascontiguousarray(output_img, dtype=np.uint8)
+        # normal_8bit = cv.normalize(output_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         normal_8bit[mask] = 0
 
     else:

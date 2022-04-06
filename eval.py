@@ -30,7 +30,7 @@ def main():
     path = config.synthetic_data_noise / "train"
 
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=169)
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=133)
 
     # vertex
     vertex_gt = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
@@ -62,12 +62,12 @@ def main():
     diff_list.append(neighbor_diff)
 
     # neighbor normal
-    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "2022_04_06_10_07_33" / "checkpoint-572.pth.tar"
+    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2022_04_06" / "checkpoint-433.pth.tar"
     normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
                                                                                                neighbor_model_path,
                                                                                                k=2,
                                                                                                output_type='normal')
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "32_Normal")
+    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "FULL_Normal")
     img_list.append(neighbor_img)
     diff_list.append(neighbor_diff)
 

@@ -109,11 +109,13 @@ loss_dict = {
 # ----------------------------------------- Dataset Loader -------------------------------------------------------------
 class SyntheticDepthDataset(Dataset):
 
-    def __init__(self, data_path, k, setname='train'):
+    def __init__(self, data_path, k, output_type, setname='train'):
         if setname in ['train', 'selval']:
             self.input = np.array(
-                sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_input_{k}.pt"), recursive=True)))
-            self.gt = np.array(sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_gt_{k}.pt"), recursive=True)))
+                sorted(
+                    glob.glob(str(data_path / "train" / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
+            self.gt = np.array(
+                sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
 
         assert (len(self.gt) == len(self.input))
 
@@ -153,7 +155,7 @@ class TrainingModel():
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
-        dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, setname='train')
+        dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -281,7 +283,7 @@ def train_epoch(nn_model, epoch):
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
             if epoch % 100 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
-                            loss=loss, epoch=epoch, i=i, prefix="train")
+                            loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f" loss: {loss:.2e}", end="    ")
             print(
@@ -330,7 +332,7 @@ def draw_line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=
         plt.show()
 
 
-def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
+def draw_output(x0, xout, target, exp_path, loss, epoch, i, output_type, prefix):
     if target.size() != (512, 512, 3):
         target = target[0, :].permute(1, 2, 0)[:, :, :3]
     if xout.size() != (512, 512, 3):
@@ -344,7 +346,8 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
 
     # gt normal
     target = target.numpy()
-    target = mu.normal2RGB(target)
+    if output_type == 'normal':
+        target = mu.normal2RGB(target)
     mask = target.sum(axis=2) == 0
     target_ranges = mu.addHist(target)
     target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
@@ -353,8 +356,11 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, prefix):
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
 
     xout = xout.detach().numpy()
-    xout = mu.filter_noise(xout, threshold=[-1, 1])
-    xout = mu.normal2RGB(xout)
+    if output_type == 'normal':
+        xout = mu.filter_noise(xout, threshold=[-1, 1])
+        xout = mu.normal2RGB(xout)
+    else:
+        xout = mu.filter_noise(xout, threshold=[0, 255])
     xout[mask] = 0
     xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)

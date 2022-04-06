@@ -24,7 +24,7 @@ def main():
             if args.exp == "nnnx":
                 convert2training_tensor2(noisy_folder, 3)
             else:
-                convert2training_tensor(noisy_folder, args.neighbor)
+                convert2training_tensor(noisy_folder, args.neighbor, output_type=args.output_type)
 
     # config experiments
     exp_path = config.ws_path / args.exp

@@ -97,7 +97,7 @@ def neighbor_vectors(vertex, i=1):
     return vectors
 
 
-def convert2training_tensor(path, k):
+def convert2training_tensor(path, k, output_type='normal'):
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -137,14 +137,15 @@ def convert2training_tensor(path, k):
         input_torch = input_torch.permute(2, 0, 1)
 
         gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        # gt = mu.normal2RGB(gt)
+        if output_type == 'rgb':
+            gt = mu.normal2RGB(gt)
         gt = gt.astype(np.float32)
         gt_torch = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
         gt_torch = gt_torch.permute(2, 0, 1)
 
         # save tensors
-        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}.pt"))
-        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}.pt"))
+        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt"))
+        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}_{output_type}.pt"))
         print(f'File {item} converted to tensor.')
 
 
