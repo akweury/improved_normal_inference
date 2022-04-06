@@ -63,7 +63,7 @@ class AngleLoss(nn.Module):
         outputs[boarder_left] = outputs[boarder_left] * penalty_weight
         outputs = outputs + 1
         target = target + 1
-        return F.mse_loss(outputs, target)
+        return F.mse_loss(outputs, target) + norm_loss
 
 
 class L1Loss(nn.Module):
