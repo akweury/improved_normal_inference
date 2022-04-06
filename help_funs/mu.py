@@ -345,6 +345,7 @@ def rgb2normal(color):
 def rgb2normal_tensor(color):
     color = color.permute(0, 2, 3, 1)
     mask = color.sum(dim=-1) == 0
+    assert torch.sum(color != color) == 0
     color_norm = torch.zeros(color.shape).to(color.device)
     color_norm[~mask] = color[~mask] / 255.0
     assert torch.sum(color_norm != color_norm) == 0
