@@ -67,8 +67,7 @@ class AngleLoss(nn.Module):
         # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
 
-        # TODO: add a mask
-        loss = F.mse_loss(outputs * val_pixels, target*val_pixels)
+
         return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(args.angle_loss_weight)
 
 
@@ -298,7 +297,7 @@ def train_epoch(nn_model, epoch):
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f" loss: {loss:.2e}", end="  ")
-            print(f" angle loss: {angle_loss:.2e}", end="  ")
+            print(f" angle loss: {angle_loss:.5e}", end="  ")
 
             print(
                 f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')
