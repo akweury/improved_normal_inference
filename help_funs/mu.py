@@ -44,20 +44,20 @@ def angle_between_2d(m1, m2):
 
 def angle_between_2d_tensor(t1, t2, mask=None):
     """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
-    t1 = t1.permute(0, 2, 3, 1).to("cpu").detach().numpy()
-    t2 = t2.permute(0, 2, 3, 1).to("cpu").detach().numpy()
-    mask = mask.to("cpu").permute(0, 2, 3, 1).squeeze(-1)
-
-    for i in range(t1.shape[0]):
-        t1[i, :] = rgb2normal(t1[i, :])
-        t2[i, :] = rgb2normal(t2[i, :])
-    t1_masked = t1[mask]
-    t2_masked = t2[mask]
-    t1_u = t1_masked / (np.linalg.norm(t1_masked, axis=-1, keepdims=True) + 1e-9)
-    t2_u = t2_masked / (np.linalg.norm(t2_masked, axis=-1, keepdims=True) + 1e-9)
+    # t1 = t1.permute(0, 2, 3, 1).to("cpu").detach().numpy()
+    # t2 = t2.permute(0, 2, 3, 1).to("cpu").detach().numpy()
+    # mask = mask.to("cpu").permute(0, 2, 3, 1).squeeze(-1)
+    t1 = rgb2normal_tensor(t1)
+    t2 = rgb2normal_tensor(t2)
+    mask = mask.permute(0, 2, 3, 1).squeeze(-1)
+    if mask is not None:
+        t1 = t1[mask]
+        t2 = t2[mask]
+    t1_u = t1 / (torch.norm(t1, dim=-1, keepdim=True) + 1e-9)
+    t2_u = t2 / (torch.norm(t2, dim=-1, keepdim=True) + 1e-9)
 
     # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
-    rad = np.arccos(np.sum(t1_u * t2_u, axis=-1))
+    rad = torch.arccos(torch.sum(t1_u * t2_u, dim=-1))
 
     # deg = torch.rad2deg(rad)
     # deg[deg > 90] = 180 - deg[deg > 90]
@@ -338,16 +338,21 @@ def rgb2normal(color):
 
 
 def rgb2normal_tensor(color):
-    mask = color.sum(dim=-3) == 0
-    color_norm = torch.zeros(color.shape)
-    batch_size, c, h, w = color.shape
-    for b in range(batch_size):
-        for i in range(h):
-            for j in range(w):
-                if not mask[b, i, j]:
-                    color_norm[b, :, i, j] = color[b, :, i, j] / 255.0
-                    color_norm[b, 2, i, j] = 1 - color_norm[b, 2, i, j]
-                    color_norm[b, :, i, j] = (color_norm[b, :, i, j] - 0.5) / 0.5
+    color = color.permute(0, 2, 3, 1)
+    mask = color.sum(dim=-1) == 0
+    color_norm = torch.zeros(color.shape).to(color.device)
+
+    color_norm[~mask] = color[~mask] / 255.0
+    color_norm[~mask][:, 2] = 1 - color_norm[~mask][:, 2]
+    color_norm[~mask] = (color_norm[~mask] - 0.5) / 0.5
+    # batch_size, c, h, w = color.shape
+    # for b in range(batch_size):
+    #     for i in range(h):
+    #         for j in range(w):
+    #             if not mask[b, i, j]:
+    #                 color_norm[b, :, i, j] = color[b, :, i, j] / 255.0
+    #                 color_norm[b, 2, i, j] = 1 - color_norm[b, 2, i, j]
+    #                 color_norm[b, :, i, j] = (color_norm[b, :, i, j] - 0.5) / 0.5
     # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
     return color_norm
 
