@@ -153,6 +153,7 @@ class TrainingModel():
         self.optimizer = self.init_optimizer()
         self.loss = loss_dict[args.loss].to(self.device)
         self.losses = np.array([])
+        self.angle_losses = np.array([])
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -249,6 +250,7 @@ def train_epoch(nn_model, epoch):
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
+    angle_loss_total = torch.tensor([0.0])
     start = time.time()
     for i, (input, target) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -281,6 +283,10 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
+
+        angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target).sum()
+        angle_loss_total += angle_loss.detach().to('cpu')
+
         if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
@@ -290,21 +296,28 @@ def train_epoch(nn_model, epoch):
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
-            print(f" loss: {loss:.2e}", end="    ")
+            print(f" loss: {loss:.2e}", end="  ")
+            print(f" angle loss: {angle_loss:.2e}", end="  ")
+
             print(
-                f' range(out):[{out.min():.1f} - {out.max():.1f}], range(gt):[{target.min():.1f} - {target.max():.1f}]')
+                f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
+    angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
+    nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
     if epoch % 100 == 0:
-        draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder, log_y=True)
+        draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder,
+                        log_y=True)
+        draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
+                        log_y=True)
 
     # ---------------------------------------------- visualisation -------------------------------------------
 
 
-def draw_line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None,
+def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None,
                     show=False, log_y=False):
-    if data.shape[1] <= 1:
+    if data_1.shape[1] <= 1:
         return
 
     if y_scale is None:
@@ -312,7 +325,7 @@ def draw_line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=
     if x_scale is None:
         x_scale = [1, 1]
 
-    for row in data:
+    for row in data_1:
         x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
         y = row
         plt.plot(x, y)

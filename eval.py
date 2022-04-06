@@ -28,11 +28,11 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
 
 def main():
     path = config.synthetic_data_noise / "train"
-    path = config.real_data
+    # path = config.real_data
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=9)
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=133)
 
-    depth = mu.median_filter(depth)
+    # depth = mu.median_filter(depth)
 
     # vertex
     vertex_gt = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
@@ -54,6 +54,16 @@ def main():
     svd_img, svd_diff = eval_post_processing(normal_svd, svd_img, normal_gt, "SVD")
     img_list.append(svd_img)
     diff_list.append(svd_diff)
+
+    # neighbor normal
+    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2022_04_06" / "checkpoint-433.pth.tar"
+    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
+                                                                                               neighbor_model_path,
+                                                                                               k=2,
+                                                                                               output_type='normal')
+    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "Normal")
+    img_list.append(neighbor_img)
+    diff_list.append(neighbor_diff)
 
     # neighbor rgb
     neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
