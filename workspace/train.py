@@ -55,12 +55,12 @@ class AngleLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, outputs, target, penalty_weight, angle_loss_weight=0.01):
+    def forward(self, outputs, target, args):
         outputs = outputs[:, :3, :, :]
         boarder_right = torch.gt(outputs, 1).bool().detach()
         boarder_left = torch.lt(outputs, -1).bool().detach()
-        outputs[boarder_right] = outputs[boarder_right] * penalty_weight
-        outputs[boarder_left] = outputs[boarder_left] * penalty_weight
+        outputs[boarder_right] = outputs[boarder_right] * args.penalty
+        outputs[boarder_left] = outputs[boarder_left] * args.penalty
 
         val_pixels = (~torch.prod(target == 0, 1).bool())
 
@@ -69,7 +69,7 @@ class AngleLoss(nn.Module):
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
 
         # TODO: add a mask
-        return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(10)
+        return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(args.angle_loss_weight)
 
 
 class L1Loss(nn.Module):
@@ -273,7 +273,7 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        loss = nn_model.loss(out, target, nn_model.args.penalty)
+        loss = nn_model.loss(out, target, nn_model.args)
 
         # Backward pass
         loss.backward()
