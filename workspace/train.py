@@ -271,8 +271,8 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        assert torch.sum(input != input) == 0
         print(f"{input.max(), input.min()}")
+        assert torch.sum(input != input) == 0
         out = nn_model.model(input)
         assert torch.sum(out != out) == 0
 
