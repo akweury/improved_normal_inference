@@ -63,10 +63,12 @@ class AngleLoss(nn.Module):
         outputs[boarder_left] = outputs[boarder_left] * args.penalty
 
         val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+        assert torch.sum(outputs != outputs) == 0
+        assert torch.sum(target != target) == 0
+
         angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
-
 
         return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(args.angle_loss_weight)
 
