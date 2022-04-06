@@ -46,6 +46,7 @@ def angle_between_2d_tensor(t1, t2, mask=None):
     """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
     t1_permuted = t1.permute(0, 2, 3, 1)
     t2_permuted = t2.permute(0, 2, 3, 1)
+    mask = mask.permute(0,2,3,1).squeeze(-1)
     t1_masked = t1_permuted[mask]
     t2_masked = t2_permuted[mask]
 

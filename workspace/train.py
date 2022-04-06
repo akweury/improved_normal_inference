@@ -62,13 +62,13 @@ class AngleLoss(nn.Module):
         outputs[boarder_right] = outputs[boarder_right] * args.penalty
         outputs[boarder_left] = outputs[boarder_left] * args.penalty
 
-        val_pixels = (~torch.prod(target == 0, 1).bool())
-
+        val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
 
         # TODO: add a mask
+        loss = F.mse_loss(outputs * val_pixels, target*val_pixels)
         return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(args.angle_loss_weight)
 
 
@@ -284,8 +284,8 @@ def train_epoch(nn_model, epoch):
         # record model time
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
-
-        angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target).sum()
+        mask =(~torch.prod(target == 0, 1).bool()).unsqueeze(1) 
+        angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum()
         angle_loss_total += angle_loss.detach().to('cpu')
 
         if i == 0:
