@@ -285,7 +285,7 @@ def train_epoch(nn_model, epoch):
         loss_total += loss.detach().to('cpu')
         mask =(~torch.prod(target == 0, 1).bool()).unsqueeze(1) 
         angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum()
-        angle_loss_total += angle_loss.detach().to('cpu')
+        angle_loss_total += angle_loss
 
         if i == 0:
             # print statistics
@@ -297,7 +297,7 @@ def train_epoch(nn_model, epoch):
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f" loss: {loss:.2e}", end="  ")
-            print(f" angle loss: {angle_loss:.5e}", end="  ")
+            print(f" angle loss: {angle_loss:.2e}", end="  ")
 
             print(
                 f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')

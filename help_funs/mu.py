@@ -44,22 +44,25 @@ def angle_between_2d(m1, m2):
 
 def angle_between_2d_tensor(t1, t2, mask=None):
     """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
-    t1_permuted = t1.permute(0, 2, 3, 1)
-    t2_permuted = t2.permute(0, 2, 3, 1)
-    mask = mask.permute(0,2,3,1).squeeze(-1)
-    t1_masked = t1_permuted[mask]
-    t2_masked = t2_permuted[mask]
+    t1 = t1.permute(0, 2, 3, 1).to("cpu").detach().numpy()
+    t2 = t2.permute(0, 2, 3, 1).to("cpu").detach().numpy()
+    mask = mask.to("cpu").permute(0, 2, 3, 1).squeeze(-1)
 
-    t1_u = t1_masked / (torch.norm(t1_masked, dim=-1, keepdim=True) + 1e-9)
-    t2_u = t2_masked / (torch.norm(t2_masked, dim=-1, keepdim=True) + 1e-9)
+    for i in range(t1.shape[0]):
+        t1[i, :] = rgb2normal(t1[i, :])
+        t2[i, :] = rgb2normal(t2[i, :])
+    t1_masked = t1[mask]
+    t2_masked = t2[mask]
+    t1_u = t1_masked / (np.linalg.norm(t1_masked, axis=-1, keepdims=True) + 1e-9)
+    t2_u = t2_masked / (np.linalg.norm(t2_masked, axis=-1, keepdims=True) + 1e-9)
 
     # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
-    rad = torch.arccos(torch.sum(t1_u * t2_u, dim=-1))
+    rad = np.arccos(np.sum(t1_u * t2_u, axis=-1))
 
     # deg = torch.rad2deg(rad)
     # deg[deg > 90] = 180 - deg[deg > 90]
 
-    return rad.type('torch.cuda.ShortTensor')
+    return rad
 
 
 def mse(img_1, img_2, valid_pixels=None):
