@@ -546,7 +546,7 @@ def scale16bitImage(img, minVal, maxVal):
 
 
 def median_filter(depth):
-    padding = 2  # 2 optimal
+    padding = 3  # 2 optimal
 
     # add padding
     depth_padded = np.expand_dims(copy_make_border(depth, padding * 2), axis=2)
@@ -566,7 +566,7 @@ def median_filter(depth):
     # remove the padding
     pred_depth = depth_padded[padding:-padding, padding:-padding]
 
-    return pred_depth.reshape(512, 512)
+    return pred_depth.reshape(512, 512, 1)
 
 
 def pred_filter(img, pred_img):
