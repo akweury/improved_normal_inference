@@ -49,11 +49,13 @@ def angle_between_2d_tensor(t1, t2):
     t1_u = t1_permuted / (torch.norm(t1_permuted, dim=-1, keepdim=True) + 1e-9)
     t2_u = t2_permuted / (torch.norm(t2_permuted, dim=-1, keepdim=True) + 1e-9)
 
-    rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
-    deg = torch.rad2deg(rad)
-    deg[deg > 90] = 180 - deg[deg > 90]
+    # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
+    rad = torch.arccos(torch.sum(t1_u * t2_u, dim=-1))
 
-    return deg.type('torch.cuda.ShortTensor')
+    # deg = torch.rad2deg(rad)
+    # deg[deg > 90] = 180 - deg[deg > 90]
+
+    return rad.type('torch.cuda.ShortTensor')
 
 
 def mse(img_1, img_2, valid_pixels=None):

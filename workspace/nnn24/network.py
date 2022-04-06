@@ -7,9 +7,7 @@ sys.path.append(dirname(__file__))
 
 import torch
 import torch.nn as nn
-# from common.NormalNN24 import NormalNN24
-# from common.NormalNN24_2 import NormalNN24
-from common.NormalNN24_4 import NormalNN24
+from common.NormalNN24 import NormalNN24
 from help_funs import mu
 
 

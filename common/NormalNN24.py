@@ -24,7 +24,7 @@ class NormalNN24(nn.Module):
         padding_up_2 = (2, 2)
 
         self.active = nn.LeakyReLU(0.01)
-        # self.active = nn.Tanh()
+        self.active_last = nn.Tanh()
         # self.active = nn.ReLU()
 
         channel_size_1 = 32
@@ -97,5 +97,6 @@ class NormalNN24(nn.Module):
 
         # xout = self.active(self.conv1(xout))
         xout = self.conv1(xout)  # 512, 512
+        # xout = self.active_last(self.conv2(xout))  # TODO: update
         xout = self.conv2(xout)
         return xout

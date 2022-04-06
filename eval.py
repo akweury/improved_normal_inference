@@ -59,18 +59,7 @@ def main():
     neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
     normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
                                                                                                neighbor_model_path, k=2)
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "FULL_RGB")
-    img_list.append(neighbor_img)
-    diff_list.append(neighbor_diff)
-
-
-    # neighbor normal
-    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2022_04_06" / "checkpoint-433.pth.tar"
-    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
-                                                                                               neighbor_model_path,
-                                                                                               k=2,
-                                                                                               output_type='normal')
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "FULL_Normal")
+    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "RGB")
     img_list.append(neighbor_img)
     diff_list.append(neighbor_diff)
 

@@ -11,7 +11,7 @@ import glob
 import json
 from pathlib import Path
 import datetime
-
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
@@ -55,16 +55,20 @@ class AngleLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, outputs, target, penalty_weight):
+    def forward(self, outputs, target, penalty_weight, angle_loss_weight=0.01):
         outputs = outputs[:, :3, :, :]
         boarder_right = torch.gt(outputs, 1).bool().detach()
         boarder_left = torch.lt(outputs, -1).bool().detach()
         outputs[boarder_right] = outputs[boarder_right] * penalty_weight
         outputs[boarder_left] = outputs[boarder_left] * penalty_weight
-        angle_loss = torch.sum(2 * (1 - torch.cos(mu.angle_between_2d_tensor(outputs, target)))) / (512 * 512) * 0.01
-        outputs = outputs + 1
-        target = target + 1
-        return F.mse_loss(outputs, target)
+
+        angle_loss = mu.angle_between_2d_tensor(outputs, target).sum() / (512 * 512)
+
+        # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
+        # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
+
+        # TODO: add a mask
+        return F.mse_loss(outputs, target) + angle_loss.mul(100)
 
 
 class L1Loss(nn.Module):
@@ -92,7 +96,8 @@ class MaskedL2Loss(nn.Module):
 
     def forward(self, outputs, target, *args):
         outputs = outputs[:, :3, :, :]
-        val_pixels = torch.ne(target, 0).float().detach()
+        # val_pixels = torch.ne(target, 0).float().detach()
+        val_pixels = (~torch.prod(target == 0, 1).bool()).float().unsqueeze(1)
         return F.mse_loss(outputs * val_pixels, target * val_pixels)
 
 
