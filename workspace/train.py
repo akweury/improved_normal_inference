@@ -61,7 +61,7 @@ class AngleLoss(nn.Module):
         boarder_left = torch.lt(outputs, -1).bool().detach()
         outputs[boarder_right] = outputs[boarder_right] * penalty_weight
         outputs[boarder_left] = outputs[boarder_left] * penalty_weight
-        angle_loss = torch.sum(mu.angle_between_2d_tensor(outputs, target)) / (512 * 512 * 90)
+        angle_loss = torch.sum(2*(1-torch.cos(mu.angle_between_2d_tensor(outputs, target)))) / (512 * 512) *0.1
         outputs = outputs + 1
         target = target + 1
         return F.mse_loss(outputs, target) + angle_loss
