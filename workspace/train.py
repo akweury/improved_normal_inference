@@ -273,6 +273,7 @@ def train_epoch(nn_model, epoch):
         # Forward pass
         assert torch.sum(input != input) == 0
         out = nn_model.model(input)
+        assert torch.sum(out != out) == 0
 
         # Compute the loss
         loss = nn_model.loss(out, target, nn_model.args)
