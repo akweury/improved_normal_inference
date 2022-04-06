@@ -32,9 +32,9 @@ class NormalNN24(nn.Module):
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, (1, 1), padding_down)
 
-        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down_2, (1, 1), padding_down_2)
+        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
 
-        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down_2, (1, 1), padding_down_2)
+        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
 
         # self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
         #

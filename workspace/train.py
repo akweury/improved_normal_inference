@@ -278,13 +278,13 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 1 == 0:
+            if epoch % 100 == 0:
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, prefix="train")
 
             print(f" loss: {loss:.2e}", end="    ")
             print(
-                f'output range:[{out.min():.1f} - {out.max():.1f}], target range:[{target.min():.1f} - {target.max():.1f}]')
+                f' range(out):[{out.min():.1f} - {out.max():.1f}], range(gt):[{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)

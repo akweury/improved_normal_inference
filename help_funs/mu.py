@@ -418,6 +418,7 @@ def addHist(img):
             width = int(w / histr.shape[0])
             img[max(h - 1 - height - thick, 0):min(h - 1, h - height + thick),
             max(0, i * width - thick):min(w - 1, i * width + thick)] = col
+    plt.close('all')
     return color_ranges
 
 
