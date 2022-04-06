@@ -70,7 +70,7 @@ class AngleLoss(nn.Module):
         # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
 
-        return F.mse_loss(outputs * val_pixels, target * val_pixels) + angle_loss.mul(args.angle_loss_weight)
+        return F.mse_loss(outputs, target) + angle_loss.mul(args.angle_loss_weight)
 
 
 class L1Loss(nn.Module):
