@@ -42,12 +42,12 @@ class WeightedL2Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, outputs, target, penalty):
+    def forward(self, outputs, target, args):
         outputs = outputs[:, :3, :, :]
         boarder_right = torch.gt(outputs, 255).bool().detach()
         boarder_left = torch.lt(outputs, 0).bool().detach()
-        outputs[boarder_right] = outputs[boarder_right] * penalty
-        outputs[boarder_left] = outputs[boarder_left] * penalty
+        outputs[boarder_right] = outputs[boarder_right] * args.penalty
+        outputs[boarder_left] = outputs[boarder_left] * args.penalty
         return F.mse_loss(outputs, target)
 
 
@@ -63,9 +63,6 @@ class AngleLoss(nn.Module):
         outputs[boarder_left] = outputs[boarder_left] * args.penalty
 
         val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        assert torch.sum(outputs != outputs) == 0
-        assert torch.sum(target != target) == 0
-
         angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
         # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
@@ -272,9 +269,7 @@ def train_epoch(nn_model, epoch):
 
         # Forward pass
         print(f"{input.max(), input.min()}")
-        assert torch.sum(input != input) == 0
         out = nn_model.model(input)
-        assert torch.sum(out != out) == 0
 
         # Compute the loss
         loss = nn_model.loss(out, target, nn_model.args)

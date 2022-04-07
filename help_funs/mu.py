@@ -47,11 +47,8 @@ def angle_between_2d_tensor(t1, t2, mask=None):
     # t1 = t1.permute(0, 2, 3, 1).to("cpu").detach().numpy()
     # t2 = t2.permute(0, 2, 3, 1).to("cpu").detach().numpy()
     # mask = mask.to("cpu").permute(0, 2, 3, 1).squeeze(-1)
-    t1 = rgb2normal_tensor(t1)
-    t2 = rgb2normal_tensor(t2)
-    assert torch.sum(mask != mask) == 0
-    assert torch.sum(t1 != t1) == 0 and torch.sum(t2 != t2) == 0
-
+    t1 = t1.permute(0, 2, 3, 1)
+    t2 = t2.permute(0, 2, 3, 1)
     mask = mask.permute(0, 2, 3, 1).squeeze(-1)
     if mask is not None:
         t1 = t1[mask]
@@ -59,7 +56,6 @@ def angle_between_2d_tensor(t1, t2, mask=None):
 
     t1_u = t1 / (torch.norm(t1, dim=-1, keepdim=True) + 1e-9)
     t2_u = t2 / (torch.norm(t2, dim=-1, keepdim=True) + 1e-9)
-    assert torch.sum(t1_u != t1_u) == 0 and torch.sum(t2_u != t2_u) == 0
     # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     assert torch.sum(rad != rad) == 0
