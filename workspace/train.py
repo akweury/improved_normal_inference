@@ -244,7 +244,7 @@ class TrainingModel():
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
     print(
-        f"-{datetime.datetime.today().date()} {datetime.datetime.now().strftime('%H-%M-%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
+        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
         end="\t")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
@@ -268,7 +268,6 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
 
         # Forward pass
-        print(f"{input.max(), input.min()}")
         out = nn_model.model(input)
 
         # Compute the loss
@@ -298,9 +297,7 @@ def train_epoch(nn_model, epoch):
 
             print(f" loss: {loss:.2e}", end="  ")
             print(f" angle loss: {angle_loss:.2e}", end="  ")
-
-            print(
-                f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')
+            print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
@@ -392,7 +389,7 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, output_type, prefix)
 
 def main(args, exp_dir, network, train_dataset):
     nn_model = TrainingModel(args, exp_dir, network, train_dataset)
-
+    print(f"Training Date: {datetime.datetime.today().date()}")
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
