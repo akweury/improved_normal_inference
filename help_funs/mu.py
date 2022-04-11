@@ -60,10 +60,10 @@ def angle_between_2d_tensor(t1, t2, mask=None):
     # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     assert torch.sum(rad != rad) == 0
-    print(f"\t output normal: ({t1[0, 0].item():.2f},{t1[0, 1].item():.2f}, {t1[0, 2].item():.2f})")
-    print(f"\t target normal: ({t2[0, 0].item():.2f},{t2[0, 1].item():.2f},{t2[0, 2].item():.2f}\n"
-          f"\t rad:{rad[0].item():.2f}\n"
-          f"\t mse:{F.mse_loss(t1[0, :], t2[0, :]):.2f}\n")
+    # print(f"\t output normal: ({t1[0, 0].item():.2f},{t1[0, 1].item():.2f}, {t1[0, 2].item():.2f})")
+    # print(f"\t target normal: ({t2[0, 0].item():.2f},{t2[0, 1].item():.2f},{t2[0, 2].item():.2f}\n"
+    #       f"\t rad:{rad[0].item():.2f}\n"
+    #       f"\t mse:{F.mse_loss(t1[0, :], t2[0, :]):.2f}\n")
 
     # deg = torch.rad2deg(rad)
     # deg[deg > 90] = 180 - deg[deg > 90]

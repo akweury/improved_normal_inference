@@ -8,7 +8,7 @@ ssh sha@pc-2103
 
 # remote command
 
-CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8 --remote
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8
 
 scp D:\TUK\MasterThesisJingyuan\MasterThesisJingyuan\TestProject\CapturedData\data_synthetic\train.zip sha@pc-2103:
 /home/sha/improved_normal_inference/dataset/data_synthetic

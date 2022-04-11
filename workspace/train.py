@@ -67,6 +67,7 @@ class AngleLoss(nn.Module):
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
+        print(f"\t axis: {axis}\t axis_loss: {loss:.2f}")
 
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
@@ -152,7 +153,7 @@ class TrainingModel():
         self.parameters = self.init_parameters()
         self.optimizer = self.init_optimizer()
         self.loss = loss_dict[args.loss].to(self.device)
-        self.losses = np.array([])
+        self.losses = np.zeros((3, args.epochs))
         self.angle_losses = np.array([])
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
@@ -246,8 +247,7 @@ class TrainingModel():
 def train_epoch(nn_model, epoch):
     nn_model.args.epoch = epoch
     print(
-        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
-        end="\t")
+        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
@@ -304,10 +304,14 @@ def train_epoch(nn_model, epoch):
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     # angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
-    nn_model.losses = np.append(nn_model.losses, loss_avg)
+    nn_model.losses[epoch % 3, epoch] = loss_avg
     # nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
     if epoch % 100 == 0:
-        draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder,
+        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+                        log_y=True)
+        draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
+                        log_y=True)
+        draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
                         log_y=True)
         # draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
         #                 log_y=True)
