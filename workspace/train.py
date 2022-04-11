@@ -67,7 +67,7 @@ class AngleLoss(nn.Module):
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
-        print(f"\t axis: {axis}\t axis_loss: {loss:.2f}")
+        print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
 
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
