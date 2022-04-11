@@ -64,10 +64,11 @@ class AngleLoss(nn.Module):
 
         val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
-        # error = torch.div(torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True)), math.pi)
-        # torch.acos(torch.sum(torch.mul(outputs, target), dim=1, keepdim=True))
+        axis = args.epoch % 3
+        axis_diff = (outputs - target)[:, axis, :, :]
+        loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
 
-        return F.mse_loss(outputs, target) + angle_loss.mul(args.angle_loss_weight)
+        return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
 class L1Loss(nn.Module):
@@ -243,6 +244,7 @@ class TrainingModel():
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
+    nn_model.args.epoch = epoch
     print(
         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}",
         end="\t")
@@ -283,8 +285,8 @@ def train_epoch(nn_model, epoch):
         gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
         mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum()
-        angle_loss_total += angle_loss.to('cpu').detach().numpy()
+        # angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum()
+        # angle_loss_total += angle_loss.to('cpu').detach().numpy()
 
         if i == 0:
             # print statistics
@@ -295,19 +297,20 @@ def train_epoch(nn_model, epoch):
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
-            print(f" loss: {loss:.2e}", end="  ")
-            print(f" angle loss: {angle_loss:.2e}", end="  ")
-            print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  ')
+            print(f" loss: {loss:.2e}")
+            # print(f" angle loss: {angle_loss:.2e}")
+            print(
+                f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
-    angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
+    # angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses = np.append(nn_model.losses, loss_avg)
-    nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
+    # nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
     if epoch % 100 == 0:
         draw_line_chart(np.array([nn_model.losses]), nn_model.output_folder,
                         log_y=True)
-        draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
-                        log_y=True)
+        # draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
+        #                 log_y=True)
 
     # ---------------------------------------------- visualisation -------------------------------------------
 

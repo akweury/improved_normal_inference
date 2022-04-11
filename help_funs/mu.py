@@ -3,6 +3,7 @@ import itertools
 import cv2 as cv
 import numpy as np
 import torch
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 
@@ -49,16 +50,20 @@ def angle_between_2d_tensor(t1, t2, mask=None):
     # mask = mask.to("cpu").permute(0, 2, 3, 1).squeeze(-1)
     t1 = t1.permute(0, 2, 3, 1)
     t2 = t2.permute(0, 2, 3, 1)
+
     mask = mask.permute(0, 2, 3, 1).squeeze(-1)
     if mask is not None:
         t1 = t1[mask]
         t2 = t2[mask]
-
     t1_u = t1 / (torch.norm(t1, dim=-1, keepdim=True) + 1e-9)
     t2_u = t2 / (torch.norm(t2, dim=-1, keepdim=True) + 1e-9)
     # rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     rad = torch.arccos(torch.clip(torch.sum(t1_u * t2_u, dim=-1), -1.0, 1.0))
     assert torch.sum(rad != rad) == 0
+    print(f"\t output normal: ({t1[0, 0].item():.2f},{t1[0, 1].item():.2f}, {t1[0, 2].item():.2f})")
+    print(f"\t target normal: ({t2[0, 0].item():.2f},{t2[0, 1].item():.2f},{t2[0, 2].item():.2f}\n"
+          f"\t rad:{rad[0].item():.2f}\n"
+          f"\t mse:{F.mse_loss(t1[0, :], t2[0, :]):.2f}\n")
 
     # deg = torch.rad2deg(rad)
     # deg[deg > 90] = 180 - deg[deg > 90]
