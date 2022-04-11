@@ -67,7 +67,7 @@ class AngleLoss(nn.Module):
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
-        print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
+        # print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
 
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
@@ -297,7 +297,7 @@ def train_epoch(nn_model, epoch):
                 draw_output(input, out, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
-            # print(f" loss: {loss:.2e}")
+            print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
             # print(f" angle loss: {angle_loss:.2e}")
             # print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
