@@ -307,11 +307,11 @@ def train_epoch(nn_model, epoch):
     # nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
     if epoch % 100 == 0:
         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-                        log_y=True)
+                        log_y=True, label=0)
         draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
-                        log_y=True)
+                        log_y=True, label=1)
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
-                        log_y=True)
+                        log_y=True, label=2)
         # draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
         #                 log_y=True)
 
@@ -319,7 +319,7 @@ def train_epoch(nn_model, epoch):
 
 
 def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None,
-                    show=False, log_y=False):
+                    show=False, log_y=False, label=None):
     if data_1.shape[1] <= 1:
         return
 
@@ -331,7 +331,7 @@ def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_labe
     for row in data_1:
         x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
         y = row
-        plt.plot(x, y)
+        plt.plot(x, y, label=label)
 
     if title is not None:
         plt.title(title)
@@ -343,7 +343,8 @@ def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_labe
 
     if log_y:
         plt.yscale('log')
-
+        
+    plt.legend()
     if not os.path.exists(str(path)):
         os.mkdir(path)
     plt.savefig(
