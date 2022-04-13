@@ -8,6 +8,13 @@ ssh sha@pc-2103
 
 # remote command
 
+## resume
+
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8 --resume
+/home/sha/improved_normal_inference/workspace/nnn24/trained_model/full_normal/checkpoint-1740.pth.tar
+
+## new training work
+
 CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8
 
 scp D:\TUK\MasterThesisJingyuan\MasterThesisJingyuan\TestProject\CapturedData\data_synthetic\train.zip sha@pc-2103:

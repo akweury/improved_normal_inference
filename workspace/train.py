@@ -62,8 +62,8 @@ class AngleLoss(nn.Module):
         outputs[boarder_right] = outputs[boarder_right] * args.penalty
         outputs[boarder_left] = outputs[boarder_left] * args.penalty
 
-        val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
+        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
@@ -154,7 +154,7 @@ class TrainingModel():
         self.optimizer = self.init_optimizer()
         self.loss = loss_dict[args.loss].to(self.device)
         self.losses = np.zeros((3, args.epochs))
-        self.angle_losses = np.array([])
+        self.angle_losses = np.zeros((1, args.epochs))
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -296,11 +296,11 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.step()
 
         # record model time
-        gpu_time = time.time() - start
+        # gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
         mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        # angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum()
-        # angle_loss_total += angle_loss.to('cpu').detach().numpy()
+        angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum() / mask.sum()
+        angle_loss_total += angle_loss.to('cpu').detach().numpy()
 
         if i == 0:
             # print statistics
@@ -316,29 +316,30 @@ def train_epoch(nn_model, epoch):
             # print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
-    # angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
+    angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
+
     nn_model.losses[epoch % 3, epoch] = loss_avg
-    # nn_model.angle_losses = np.append(nn_model.angle_losses, angle_loss_avg)
+    nn_model.angle_losses[0, epoch] = angle_loss_avg
     if epoch % 10 == 9:
         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-                        log_y=True, label=0, epoch=epoch)
+                        log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
         draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
-                        log_y=True, label=1, epoch=epoch)
+                        log_y=True, label=1, epoch=epoch, start_epoch=nn_model.start_epoch)
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
-                        log_y=True, label=2, epoch=epoch, cla_leg=True)
-        # draw_line_chart(np.array([nn_model.angle_losses]), nn_model.output_folder,
-        #                 log_y=True)
+                        log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True)
+        draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True,
+                        epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
 
     # ---------------------------------------------- visualisation -------------------------------------------
 
 
-def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None,
-                    show=False, log_y=False, label=None, epoch=None, cla_leg=False):
+def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
+                    label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
     if data_1.shape[1] <= 1:
         return
 
-    x = np.arange(epoch)
-    y = data_1[0, :epoch]
+    x = np.arange(epoch - start_epoch)
+    y = data_1[0, start_epoch:epoch]
     x = x[y.nonzero()]
     y = y[y.nonzero()]
     plt.plot(x, y, label=label)
@@ -357,8 +358,13 @@ def draw_line_chart(data_1, path, title=None, x_scale=None, y_scale=None, x_labe
     plt.legend()
     if not os.path.exists(str(path)):
         os.mkdir(path)
-    plt.savefig(
-        str(Path(path) / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
+
+    if loss_type == "mse":
+        plt.savefig(str(Path(path) / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
+    elif loss_type == "angle":
+        plt.savefig(str(Path(path) / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}_angle.png"))
+    else:
+        raise ValueError("loss type is not supported.")
 
     if show:
         plt.show()
