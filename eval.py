@@ -55,31 +55,19 @@ def main():
     img_list.append(svd_img)
     diff_list.append(svd_diff)
 
-    # neighbor normal
-    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2022_04_06" / "checkpoint-433.pth.tar"
-    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
-                                                                                               neighbor_model_path,
-                                                                                               k=2,
-                                                                                               output_type='normal')
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "Normal")
-    img_list.append(neighbor_img)
-    diff_list.append(neighbor_diff)
-
     # neighbor rgb
-    neighbor_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
-    normal_neighbor, normal_neighbor_img, normal_neighbor_pn, normal_neighbor_time = eval.eval(vertex_gt,
-                                                                                               neighbor_model_path, k=2)
-    neighbor_img, neighbor_diff = eval_post_processing(normal_neighbor, normal_neighbor_img, normal_gt, "RGB")
-    img_list.append(neighbor_img)
-    diff_list.append(neighbor_diff)
+    rgb_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
+    rgb_normal, rgb_img, _, _ = eval.eval(vertex_gt, rgb_model_path, k=2)
+    rgb_img_final, rgb_diff_img = eval_post_processing(rgb_normal, rgb_img, normal_gt, "RGB")
+    img_list.append(rgb_img_final)
+    diff_list.append(rgb_diff_img)
 
-    # # # vertex normal
-    # vertex_model_path = config.ws_path / "nnn" / "trained_model" / "checkpoint.pth.tar"
-    # normal_vertex, normal_vertex_img, normal_vertex_p_num, normal_vertex_time = eval.eval(vertex_gt, vertex_model_path,
-    #                                                                                       k=1, output_type='rgb')
-    # vertex_img, vertex_diff = eval_post_processing(normal_vertex, normal_vertex_img, normal_gt, "Vertex")
-    # img_list.append(vertex_img)
-    # diff_list.append(vertex_diff)
+    # neighbor normal
+    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal" / "checkpoint-1740.pth.tar"
+    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
+    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal")
+    img_list.append(normal_img_final)
+    diff_list.append(birnak_diff_img)
 
     # show the results
     output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)

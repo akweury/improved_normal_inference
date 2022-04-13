@@ -19,7 +19,8 @@ from pncnn.utils import args_parser
 from common import data_preprocess
 
 
-def eval(vertex, model_path, k, output_type='rgb'):
+def eval(v, model_path, k, output_type='rgb'):
+    vertex = v.copy()
     # load model
     checkpoint = torch.load(model_path)
 
@@ -43,6 +44,7 @@ def eval(vertex, model_path, k, output_type='rgb'):
     args_parser.print_args(args)
 
     mask = vertex.sum(axis=2) == 0
+
     # move all the vertex as close to original point as possible,
     vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
         ~mask].max()
