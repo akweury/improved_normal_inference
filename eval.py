@@ -30,7 +30,7 @@ def main():
     path = config.synthetic_data_noise / "train"
     # path = config.real_data
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=133)
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=134)
 
     # depth = mu.median_filter(depth)
 
