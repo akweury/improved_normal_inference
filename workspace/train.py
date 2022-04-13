@@ -187,8 +187,22 @@ class TrainingModel():
         return folder_path
 
     def init_network(self, network):
-        model = network.to(self.device)
-        return model
+        if self.args.resume:
+            print(f'------------------ Resume a training work ----------------------- ')
+            chkpt_path = self.args.resume
+            assert os.path.isfile(chkpt_path), f"No checkpoint found at:{chkpt_path}"
+
+            checkpoint = torch.load(chkpt_path)
+            # self.args = checkpoint['args']
+            self.start_epoch = checkpoint['epoch'] + 1
+            print(f"- checkout {checkpoint['epoch']} was loaded successfully!")
+
+            model = checkpoint['model'].to(self.device)
+            return model
+        else:
+            print(f"------------ start a new training work -----------------")
+            model = network.to(self.device)
+            return model
 
     def init_parameters(self, ):
         return filter(lambda p: p.requires_grad, self.model.parameters())
