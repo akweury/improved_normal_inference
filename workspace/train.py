@@ -389,7 +389,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
     # gt normal
     target = target.numpy()
-    if output_type == 'normal':
+    if output_type == 'normal' or 'normal_noise':
         target = mu.normal2RGB(target)
     mask = target.sum(axis=2) == 0
     target_ranges = mu.addHist(target)
@@ -401,7 +401,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
     # pred normal
     xout = xout.detach().numpy()
-    if output_type == 'normal':
+    if output_type == 'normal' or 'normal_noise':
         xout = mu.filter_noise(xout, threshold=[-1, 1])
         xout = mu.normal2RGB(xout)
     else:
@@ -416,7 +416,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     # cout
     if cout is not None:
         cout = cout.detach().numpy()
-        if output_type == 'normal':
+        if output_type == 'normal' or 'normal_noise':
             cout = mu.filter_noise(cout, threshold=[0, 1])
             cout = mu.normal2RGB(cout)
         else:
