@@ -407,7 +407,7 @@ def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255)):
     if pos == 'upper_left':
         position = (10, 50)
     elif pos == 'upper_right':
-        position = (w - 250, 50)
+        position = (w - 250, 80)
     elif pos == 'lower_right':
         position = (h - 200, w - 20)
     elif pos == 'lower_left':

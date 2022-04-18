@@ -15,7 +15,7 @@ from workspace import eval
 def eval_post_processing(normal, normal_img, normal_gt, name):
     out_ranges = mu.addHist(normal_img)
     mu.addText(normal_img, str(out_ranges), pos="upper_right", font_size=0.5)
-    mu.addText(normal_img, name)
+    mu.addText(normal_img, name, font_size=0.8)
 
     diff_img, diff_angle = mu.eval_img_angle(normal, normal_gt)
     diff = np.sum(np.abs(diff_angle))
@@ -27,10 +27,12 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
 
 
 def main():
-    path = config.synthetic_data_noise / "train"
+    # path = config.synthetic_data_noise / "test"
+    path = config.synthetic_data / "test"  # test 1108, 1164
+
     # path = config.real_data
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=134)
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=1108)
 
     # depth = mu.median_filter(depth)
 
@@ -47,7 +49,7 @@ def main():
     normal_gt_ = mu.rgb2normal(normal_gt_img)
     gt_img, gt_diff = eval_post_processing(normal_gt_, normal_gt_img, normal_gt, "GT")
     img_list.append(gt_img)
-    diff_list.append(gt_diff)
+    # diff_list.append(gt_diff)
 
     # svd normal
     normal_svd, svd_img = svd.eval(vertex_gt, farthest_neighbour=2)
@@ -55,17 +57,38 @@ def main():
     img_list.append(svd_img)
     diff_list.append(svd_diff)
 
-    # neighbor rgb
-    rgb_model_path = config.ws_path / "nnn24" / "trained_model" / "full_nnn24_05_04_2022" / "checkpoint-814.pth.tar"
-    rgb_normal, rgb_img, _, _ = eval.eval(vertex_gt, rgb_model_path, k=2)
-    rgb_img_final, rgb_diff_img = eval_post_processing(rgb_normal, rgb_img, normal_gt, "RGB")
-    img_list.append(rgb_img_final)
-    diff_list.append(rgb_diff_img)
-
     # neighbor normal
     normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal" / "checkpoint-1740.pth.tar"
     normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
-    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal")
+    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_1740")
+    img_list.append(normal_img_final)
+    diff_list.append(birnak_diff_img)
+
+    # # neighbor normal 2999
+    # normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-2999.pth.tar"
+    # normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
+    # normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_2999")
+    # img_list.append(normal_img_final)
+    # diff_list.append(birnak_diff_img)
+
+    # neighbor normal 4634
+    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-4634.pth.tar"
+    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
+    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_4634")
+    img_list.append(normal_img_final)
+    diff_list.append(birnak_diff_img)
+
+    # neighbor normal 7851
+    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-7851.pth.tar"
+    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
+    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_7851")
+    img_list.append(normal_img_final)
+    diff_list.append(birnak_diff_img)
+
+    # neighbor normal 9999
+    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar"
+    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
+    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_9999")
     img_list.append(normal_img_final)
     diff_list.append(birnak_diff_img)
 
