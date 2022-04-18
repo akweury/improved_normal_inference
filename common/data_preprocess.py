@@ -102,8 +102,12 @@ def convert2training_tensor(path, k, output_type='normal'):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
         os.makedirs(str(path / "tensor"))
-
-    depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+    if output_type == "normal":
+        depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+    elif output_type == "normal_noise":
+        depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+    else:
+        raise ValueError("output_file is not supported. change it in args.json")
     gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
     for item in range(len(data_files)):

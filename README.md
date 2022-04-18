@@ -15,13 +15,13 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --ba
 
 ## new training work
 
-CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnnn --args json --mode train --batch_size 8
 
 scp D:\TUK\MasterThesisJingyuan\MasterThesisJingyuan\TestProject\CapturedData\data_synthetic\train.zip sha@pc-2103:
 /home/sha/improved_normal_inference/dataset/data_synthetic
 
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnn24/output.zip D:
-\TUK\improved_normal_inference\workspace\nnn24
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnnn/output.zip D:
+\TUK\improved_normal_inference\workspace\nnnn
 
 # local command
 
