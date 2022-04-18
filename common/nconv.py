@@ -137,33 +137,18 @@ class NConv2d(_ConvNd):
 
     def forward(self, data, conf):
         # Normalized Convolution
-        denom = F.conv2d(conf, self.weight, None, self.stride,
-                         self.padding, self.dilation, self.groups)
-        nomin = F.conv2d(data * conf, self.weight, None, self.stride,
-                         self.padding, self.dilation, self.groups)
+        denom = F.conv2d(conf, self.weight, None, self.stride, self.padding, self.dilation, self.groups)
+        nomin = F.conv2d(data * conf, self.weight, None, self.stride, self.padding, self.dilation, self.groups)
         nconv = nomin / (denom + self.eps)
 
         # Add bias
-        b = self.bias
-        sz = b.size(0)
-        b = b.view(1, sz, 1, 1)
-        b = b.expand_as(nconv)
-        nconv += b
+        nconv += self.bias.view(1, self.bias.size(0), 1, 1).expand_as(nconv)
 
         # Propagate confidence
-        cout = denom
-        # cout = denom.sum(dim=1, keepdim=True)
-        sz = cout.size()
-        cout = cout.view(sz[0], sz[1], -1)
+        sz = denom.size()
 
-        k = self.weight
-        k_sz = k.size()
-        k = k.view(k_sz[0], -1)
-
-        s = torch.sum(k, dim=-1, keepdim=True)
-        # s = torch.sum(k)
-
-        cout = cout / s
+        cout = denom.view(sz[0], sz[1], -1) / torch.sum(self.weight.view(self.weight.size()[0], -1), dim=-1,
+                                                        keepdim=True)
         cout = cout.view(sz)
 
         return nconv, cout

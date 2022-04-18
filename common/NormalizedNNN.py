@@ -91,5 +91,5 @@ class NormalizedNNN(nn.Module):
         xout, cout = self.unconv3(torch.cat((x1, x23), 1), torch.cat((c23, c1), 1))  # 512, 512
 
         xout = self.conv1(xout)  # 512, 512
-        xout = self.conv2(xout)
+        # xout = self.conv2(xout)  # optional layer
         return xout, cout
