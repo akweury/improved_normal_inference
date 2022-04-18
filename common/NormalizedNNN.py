@@ -16,8 +16,8 @@ class NormalizedNNN(nn.Module):
         self.active_last = nn.Tanh()
         # self.active = nn.ReLU()
         pos_fn = "SoftPlus"
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_1 = 8
+        channel_size_2 = 16
 
         self.dnconv1 = NConv2d(in_ch, channel_size_1, kernel_down, pos_fn, 'k', padding=padding_down)
         self.dnconv2 = NConv2d(channel_size_1, channel_size_1, kernel_down, pos_fn, 'k', padding=padding_down)

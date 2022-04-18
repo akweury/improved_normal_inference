@@ -306,7 +306,7 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 20 == 19:
+            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
                 draw_output(input, out, True, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
@@ -386,6 +386,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     x0_normalized_8bit = mu.normalize2_8bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Normals)")
+    output_list.append(x0_normalized_8bit)
 
     # gt normal
     target = target.numpy()
