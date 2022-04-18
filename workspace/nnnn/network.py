@@ -16,14 +16,14 @@ class CNN(nn.Module):
         self.__name__ = 'nnnn'
 
         # input confidence estimation network
-        self.nconv24_3 = NormalizedNNN(24, 3)
+        self.nconv3_3 = NormalizedNNN(3, 3)
 
     def forward(self, x0):
         # x0: vertex array
         # c0: confidence of each element in x0
         device = x0.get_device()
         c0 = mu.binary(x0).to(device)
-        xout, cout = self.nconv24_3(x0, c0)
+        xout, cout = self.nconv3_3(x0, c0)
 
         # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
         out = torch.cat((xout, cout, c0), 1)
