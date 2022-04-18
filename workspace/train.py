@@ -11,7 +11,6 @@ import glob
 import json
 from pathlib import Path
 import datetime
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
@@ -307,8 +306,8 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            if epoch % 100 == 0:
-                draw_output(input, out, target=target, exp_path=nn_model.output_folder,
+            if epoch % 5 == 4:
+                draw_output(input, out, True, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
@@ -372,11 +371,15 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(x0, xout, target, exp_path, loss, epoch, i, output_type, prefix):
+def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, prefix):
     if target.size() != (512, 512, 3):
         target = target[0, :].permute(1, 2, 0)[:, :, :3]
-    if xout.size() != (512, 512, 3):
-        xout = xout[0, :].permute(1, 2, 0)[:, :, :3]
+    # if xout.size() != (512, 512, 3):
+    if cout is not None:
+        cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
+    xout = xout[0, :].permute(1, 2, 0)[:, :, :3]
+
+    output_list = []
 
     # input normal
     input = mu.tenor2numpy(x0[:1, :3, :, :])
@@ -394,7 +397,9 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, output_type, prefix)
     normal_gt_8bit = target
     mu.addText(normal_gt_8bit, "gt")
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
+    output_list.append(normal_gt_8bit)
 
+    # pred normal
     xout = xout.detach().numpy()
     if output_type == 'normal':
         xout = mu.filter_noise(xout, threshold=[-1, 1])
@@ -406,9 +411,26 @@ def draw_output(x0, xout, target, exp_path, loss, epoch, i, output_type, prefix)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")
     mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    output_list.append(normal_cnn_8bit)
 
-    output = cv.hconcat([normal_gt_8bit, normal_cnn_8bit])
-    output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.18f}.png")
+    # cout
+    if cout is not None:
+        cout = cout.detach().numpy()
+        if output_type == 'normal':
+            cout = mu.filter_noise(cout, threshold=[0, 1])
+            cout = mu.normal2RGB(cout)
+        else:
+            cout = mu.filter_noise(cout, threshold=[0, 255])
+
+        normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_OCEAN)
+        cout_ranges = mu.addHist(cout)
+        mu.addText(normal_cout_8bit, "cout")
+        mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cout_8bit)
+
+    output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+    output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.8f}.png")
     cv.imwrite(output_name, output)
 
 

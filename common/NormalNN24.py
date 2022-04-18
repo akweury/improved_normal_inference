@@ -2,13 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-"""
-Normal Neuron Network
-input: vertex (3,512,512)
-output: normal  (3,512,512)
-
-"""
-
 
 class NormalNN24(nn.Module):
     def __init__(self, in_ch, out_ch):
@@ -36,14 +29,6 @@ class NormalNN24(nn.Module):
 
         self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
 
-        # self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
-        #
-        # self.dconv5 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
-        #
-        # self.dconv6 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
-        #
-        # self.dconv7 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, (1, 1), padding_down)
-
         self.uconv1 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
 
         self.uconv2 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, (1, 1), padding_up)
@@ -54,16 +39,9 @@ class NormalNN24(nn.Module):
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0):
-        assert torch.sum(x0 != x0) == 0
-
         x1 = self.active(self.dconv1(x0))  # 512,512
-        assert torch.sum(x1 != x1) == 0
-
         x1 = self.active(self.dconv2(x1))  # 512,512
-        assert torch.sum(x1 != x1) == 0
-
         x1 = self.active(self.dconv3(x1))  # 512,512
-        assert torch.sum(x1 != x1) == 0
 
         # Downsample 1
         ds = 2
@@ -72,17 +50,14 @@ class NormalNN24(nn.Module):
 
         x2_ds = self.active(self.dconv2(x1_ds))  # 256,256
         x2_ds = self.active(self.dconv3(x2_ds))  # 256,256
-        assert torch.sum(x2_ds != x2_ds) == 0
 
         # Downsample 2
         ds = 2
         x2_ds, idx = F.max_pool2d(x2_ds, ds, ds, return_indices=True)  # 128,128
         x2_ds /= 4
-        assert torch.sum(x2_ds != x2_ds) == 0
 
         x3_ds = self.active(self.dconv2(x2_ds))  # 128,128
         x3_ds = self.active(self.dconv3(x3_ds))  # 128,128
-        assert torch.sum(x3_ds != x3_ds) == 0
 
         # Downsample 3
         ds = 2
@@ -91,24 +66,19 @@ class NormalNN24(nn.Module):
 
         x4_ds = self.active(self.dconv2(x3_ds))  # 64,64
         x4_ds = self.active(self.dconv3(x4_ds))  # 64,64
-        assert torch.sum(x4_ds != x4_ds) == 0
 
         # Upsample 1
         x4 = F.interpolate(x4_ds, x3_ds.size()[2:], mode='nearest')  # 128,128
-
         x34_ds = self.active(self.uconv1(torch.cat((x3_ds, x4), 1)))  # 128, 128
 
         # Upsample 2
         x34 = F.interpolate(x34_ds, x2_ds.size()[2:], mode='nearest')
         x23_ds = self.active(self.uconv2(torch.cat((x2_ds, x34), 1)))  # 256, 256
-        assert torch.sum(x23_ds != x23_ds) == 0
 
         # # Upsample 3
         x23 = F.interpolate(x23_ds, x0.size()[2:], mode='nearest')  # 512, 512
         xout = self.active(self.uconv3(torch.cat((x23, x1), 1)))  # 512, 512
-        assert torch.sum(xout != xout) == 0
-        # xout = self.active(self.conv1(xout))
+
         xout = self.conv1(xout)  # 512, 512
-        # xout = self.active_last(self.conv2(xout))  # TODO: update
         xout = self.conv2(xout)
         return xout

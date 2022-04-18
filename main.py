@@ -5,7 +5,7 @@ from pncnn.utils import args_parser
 
 import workspace.nnn.network as nnn
 import workspace.nnn24.network as nnn24
-import workspace.nnn72.network as nnn72
+import workspace.nnnn.network as nnnn
 import workspace.nnnx.network as nnnx
 
 
@@ -32,8 +32,8 @@ def main():
         model = nnn.CNN()
     elif args.exp == "nnn24":
         model = nnn24.CNN()
-    elif args.exp == "nnn72":
-        model = nnn72.CNN()
+    elif args.exp == "nnnn":
+        model = nnnn.CNN()
     elif args.exp == "nnnx":
         model = nnnx.CNN()
     else:

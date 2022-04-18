@@ -28,13 +28,15 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
 
 def main():
     # path = config.synthetic_data_noise / "test"
-    path = config.synthetic_data / "test"  # test 1108, 1164
-
-    # path = config.real_data
+    # path = config.synthetic_data / "test"  # test 1108, 1164
     # path = config.geo_data / "train"
-    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=1108)
 
-    # depth = mu.median_filter(depth)
+    path = config.real_data  # test 9
+
+    data, depth, depth_noise, normal_gt = file_io.load_single_data(path, idx=4)
+
+    if path == config.real_data:
+        depth = mu.median_filter(depth)
 
     # vertex
     vertex_gt = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
@@ -57,31 +59,10 @@ def main():
     img_list.append(svd_img)
     diff_list.append(svd_diff)
 
-    # neighbor normal
-    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal" / "checkpoint-1740.pth.tar"
-    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
-    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_1740")
-    img_list.append(normal_img_final)
-    diff_list.append(birnak_diff_img)
-
-    # # neighbor normal 2999
-    # normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-2999.pth.tar"
-    # normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
-    # normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_2999")
-    # img_list.append(normal_img_final)
-    # diff_list.append(birnak_diff_img)
-
     # neighbor normal 4634
     normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-4634.pth.tar"
     normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
     normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_4634")
-    img_list.append(normal_img_final)
-    diff_list.append(birnak_diff_img)
-
-    # neighbor normal 7851
-    normal_model_path = config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-7851.pth.tar"
-    normal_noraml, normal_img, _, _ = eval.eval(vertex_gt, normal_model_path, k=2, output_type='normal')
-    normal_img_final, birnak_diff_img = eval_post_processing(normal_noraml, normal_img, normal_gt, "Normal_7851")
     img_list.append(normal_img_final)
     diff_list.append(birnak_diff_img)
 
