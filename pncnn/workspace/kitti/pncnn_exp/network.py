@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 
 from common.unet import UNetSP
-from common.nconv import NConvUNet
+from common.PncnnNconv import NConvUNet
 
 
 class CNN(nn.Module):

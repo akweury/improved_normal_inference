@@ -114,7 +114,7 @@ class NConvUNet(nn.Module):
         # x_o, c_o = self.nconv0(xout, cout)
         return xout, cout
 
-
+# https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 # Normalized Convolution Layer
 class NConv2d(_ConvNd):
     def __init__(self, in_channels, out_channels, kernel_size, pos_fn='softplus', init_method='n', stride=(1, 1),
