@@ -424,7 +424,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
             cout = mu.filter_noise(cout, threshold=[0, 255])
 
         normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_DEEPGREEN)
+        normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_BONE)
         cout_ranges = mu.addHist(cout)
         mu.addText(normal_cout_8bit, "cout")
         mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
