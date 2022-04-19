@@ -130,7 +130,7 @@ class NConv2d(_ConvNd):
         self.init_method = init_method
 
         # Initialize weights and bias
-        # self.init_parameters()
+        self.init_parameters()
 
         # if self.pos_fn is not None:
         #     EnforcePos.apply(self, 'weight', pos_fn)
