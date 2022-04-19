@@ -310,9 +310,9 @@ def train_epoch(nn_model, epoch):
                 draw_output(input, out, True, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
-            print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
-            # print(f" angle loss: {angle_loss:.2e}")
-            # print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
+        print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
+        # print(f" angle loss: {angle_loss:.2e}")
+        # print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
         start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
