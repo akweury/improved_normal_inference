@@ -43,13 +43,11 @@ class NormalizedNNN(nn.Module):
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0, c0):
-        x1 = x0
-        c1 = c0
-        x1 = self.cconv(x0)
+        x0 = self.cconv(x0)
         c1 = self.cconv(c0)
-        x1 = x1 / (c1 + 1e-20)
+        x0 = x0 / (c1 + 1e-20)
 
-        x1 = self.active(self.dconv1(x1))  # 512,512
+        x1 = self.active(self.dconv1(x0))  # 512,512
         x1 = self.active(self.dconv2(x1))  # 512,512
         x1 = self.active(self.dconv3(x1))  # 512,512
 
@@ -91,4 +89,4 @@ class NormalizedNNN(nn.Module):
 
         xout = self.conv1(xout)  # 512, 512
         xout = self.conv2(xout)
-        return xout, c1
+        return xout, c1, x0

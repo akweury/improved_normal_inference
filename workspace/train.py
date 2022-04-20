@@ -377,6 +377,9 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     # if xout.size() != (512, 512, 3):
     if cout is not None:
         cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
+        x1 = xout[0, :].permute(1, 2, 0)[:, :, 6:9]
+    else:
+        x1 = None
     xout = xout[0, :].permute(1, 2, 0)[:, :, :3]
 
     output_list = []
@@ -429,6 +432,12 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         mu.addText(normal_cout_8bit, "cout")
         mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cout_8bit)
+        if x1 is not None:
+            x1 = x1.detach().numpy()
+            x1_normalized_8bit = mu.normalize2_8bit(x1)
+            x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
+            mu.addText(x1_normalized_8bit, "x1")
+            output_list.append(x1_normalized_8bit)
 
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.8f}.png")
