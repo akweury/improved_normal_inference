@@ -125,7 +125,7 @@ def convert2training_tensor(path, k, output_type='normal'):
                                  torch.tensor(data['R']).float(),
                                  torch.tensor(data['t']).float())
         mask = vertex.sum(axis=2) == 0
-        # move all the vertex as close to original point as possible,
+        # move all the vertex as close to original point as possible, and noramlized all the vertex
         vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
             ~mask].max()
         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
