@@ -168,6 +168,6 @@ class NormalizedNNN(nn.Module):
         x7 = x7 / (c7 + self.epsilon)
         c7 = self.c_avg(c7, self.uconv3.weight)
 
-        # xout = self.conv1(x7)  # 512, 512
+        xout = self.conv1(x7)  # 512, 512
         # xout = self.conv2(xout)
-        return x7, c7, x7
+        return xout, c7, x7
