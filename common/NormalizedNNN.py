@@ -45,9 +45,9 @@ class NormalizedNNN(nn.Module):
     def forward(self, x0, c0):
         x1 = x0
         c1 = c0
-        # x1 = self.cconv(x0)
-        # c1 = self.cconv(c0)
-        # x1 = x1 / (c1 + 1e-20)
+        x1 = self.cconv(x0)
+        c1 = self.cconv(c0)
+        x1 = x1 / (c1 + 1e-20)
 
         x1 = self.active(self.dconv1(x1))  # 512,512
         x1 = self.active(self.dconv2(x1))  # 512,512
