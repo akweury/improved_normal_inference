@@ -16,6 +16,7 @@ class CNN(nn.Module):
         self.__name__ = 'nnnn'
 
         # input confidence estimation network
+        # self.nconv3_3 = NormalizedNNN(24, 3)
         self.nconv3_3 = NormalizedNNN(24, 3)
         # self.nconv3_3 = NConvUNet(3, 3)
 
