@@ -26,9 +26,9 @@ class CNN(nn.Module):
         device = x0.get_device()
         c0 = mu.binary(x0).to(device)
 
-        xout, cout, x1 = self.nconv3_3(x0, c0)
+        xout, cout = self.nconv3_3(x0, c0)
         # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
-        out = torch.cat((xout, cout, x1), 1)
+        out = torch.cat((xout, cout, x0), 1)
         return out
 
     def minor_filter(self, tensor):
