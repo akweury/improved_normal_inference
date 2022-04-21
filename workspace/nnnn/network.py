@@ -6,7 +6,7 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.NormalizedNNN import NormalizedNNN
-# from common.PncnnNconv import NConvUNet
+from common.Nconv import NConvUNet
 from help_funs import mu
 
 
@@ -17,8 +17,8 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         # self.nconv3_3 = NormalizedNNN(24, 3)
-        self.nconv3_3 = NormalizedNNN(3, 3)
-        # self.nconv3_3 = NConvUNet(3, 3)
+        # self.nconv3_3 = NormalizedNNN(3, 3)
+        self.nconv3_3 = NConvUNet(3, 3)
 
     def forward(self, x0):
         # x0: vertex array
