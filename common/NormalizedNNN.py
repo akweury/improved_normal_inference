@@ -91,7 +91,7 @@ class NormalizedNNN(nn.Module):
         for i in range(x1_ds.size(0)):
             for j in range(x1_ds.size(1)):
                 x1_ds[i, j, :, :] = x1[i, j, :, :].view(-1)[idx[i, j, :, :].view(-1)].view(idx.size()[2:])
-        c1_ds /= 4
+        # c1_ds /= 4
 
         x2 = self.dconv2(x1_ds)  # 256,256
         c2 = self.dconv2(c1_ds)
@@ -110,7 +110,7 @@ class NormalizedNNN(nn.Module):
         for i in range(x2_ds.size(0)):
             for j in range(x2_ds.size(1)):
                 x2_ds[i, j, :, :] = x2[i, j, :, :].view(-1)[idx[i, j, :, :].view(-1)].view(idx.size()[2:])
-        c2_ds /= 4
+        # c2_ds /= 4
 
         x3 = self.dconv2(x2_ds)  # 128,128
         c3 = self.dconv2(c2_ds)
@@ -129,7 +129,7 @@ class NormalizedNNN(nn.Module):
         for i in range(x3_ds.size(0)):
             for j in range(x3_ds.size(1)):
                 x3_ds[i, j, :, :] = x3[i, j, :, :].view(-1)[idx[i, j, :, :].view(-1)].view(idx.size()[2:])
-        c3_ds /= 4
+        # c3_ds /= 4
 
         x4 = self.dconv2(x3_ds)  # 64,64
         c4 = self.dconv2(c3_ds)
@@ -173,4 +173,4 @@ class NormalizedNNN(nn.Module):
         xout = xout / (cout + self.epsilon)
         cout = self.c_avg(cout, self.conv1.weight)
         # xout = self.conv2(xout)
-        return xout, cout, x7
+        return x7, cout, x7
