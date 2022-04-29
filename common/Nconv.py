@@ -24,7 +24,7 @@ import math
 
 
 class NConvUNet(nn.Module):
-    def __init__(self, in_ch, out_ch, num_channels=2, pos_fn='SoftPlus'):
+    def __init__(self, in_ch, out_ch, num_channels=8, pos_fn='Sigmoid'):
         super().__init__()
         self.__name__ = 'NConvUNet'
 
@@ -159,7 +159,10 @@ class NConv2d(_ConvNd):
         elif self.pos_fn.lower() == 'softplus':
             self.weight.data = F.softplus(p, beta=10).data
         elif self.pos_fn.lower() == 'sigmoid':
-            self.weight.data = F.sigmoid(p).data
+            # self.weight.data = F.sigmoid(p).data
+            self.weight.data= F.leaky_relu(p,0.01).data
+        elif self.pos_fn.lower() == 'LeakyReLU':
+            self.weight.data = F.leaky_relu(p, 0.01).data
         else:
             print('Undefined positive function!')
             return
