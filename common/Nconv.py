@@ -160,7 +160,7 @@ class NConv2d(_ConvNd):
             self.weight.data = F.softplus(p, beta=10).data
         elif self.pos_fn.lower() == 'sigmoid':
             # self.weight.data = F.sigmoid(p).data
-            self.weight.data= F.leaky_relu(p,0.01).data
+            self.weight.data = F.leaky_relu(p, 0.01).data
         elif self.pos_fn.lower() == 'LeakyReLU':
             self.weight.data = F.leaky_relu(p, 0.01).data
         else:
