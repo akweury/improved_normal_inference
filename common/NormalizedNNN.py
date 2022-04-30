@@ -172,5 +172,5 @@ class NormalizedNNN(nn.Module):
         # cout = self.conv1(c7)
         # xout = xout / (cout + self.epsilon)
         # cout = self.c_avg(cout, self.conv1.weight)
-        # xout = self.conv2(xout)
+        xout = self.conv2(xout)
         return x7, c0
