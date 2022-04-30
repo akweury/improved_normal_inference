@@ -63,10 +63,10 @@ class NormalizedNNN(nn.Module):
         return cout
 
     def forward(self, x0, c0):
-        # x0 = self.cconv1(x0)
-        # c0 = self.cconv1(c0)
-        # x0 = x0 / (c0 + self.epsilon)
-        # c0 = self.c_avg(c0, self.cconv1.weight)
+        x0 = self.cconv1(x0)
+        c0 = self.cconv1(c0)
+        x0 = x0 / (c0 + self.epsilon)
+        c0 = self.c_avg(c0, self.cconv1.weight)
 
         x1 = self.dconv1(x0 * c0)  # 512,512
         # c1 = self.dconv1(c0)
