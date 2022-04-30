@@ -429,15 +429,9 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_BONE)
         cout_ranges = mu.addHist(cout)
-        mu.addText(normal_cout_8bit, "c7")
+        mu.addText(normal_cout_8bit, "c_out")
         mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cout_8bit)
-        if x1 is not None:
-            x1 = x1.detach().numpy()
-            x1_normalized_8bit = mu.normalize2_8bit(x1)
-            x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
-            mu.addText(x1_normalized_8bit, "x7")
-            output_list.append(x1_normalized_8bit)
 
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.8f}.png")

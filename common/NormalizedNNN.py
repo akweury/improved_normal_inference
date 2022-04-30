@@ -68,17 +68,17 @@ class NormalizedNNN(nn.Module):
         x0 = x0 / (c0 + self.epsilon)
         c0 = self.c_avg(c0, self.cconv1.weight)
 
-        x1 = self.dconv1(x0 * c0)  # 512,512
+        x1 = self.active(self.dconv1(x0 * c0))  # 512,512
         # c1 = self.dconv1(c0)
         # x1 = x1 / (c1 + self.epsilon)
         # c1 = self.c_avg(c1, self.dconv1.weight)
 
-        x1 = self.dconv2(x1)  # 512,512
+        x1 = self.active(self.dconv2(x1))  # 512,512
         # c1 = self.dconv2(c1)
         # x1 = x1 / (c1 + self.epsilon)
         # c1 = self.c_avg(c1, self.dconv2.weight)
 
-        x1 = self.dconv3(x1)  # 512,512
+        x1 = self.active(self.dconv3(x1))  # 512,512
         # c1 = self.dconv3(c1)
         # x1 = x1 / (c1 + self.epsilon)
         # c1 = self.c_avg(c1, self.dconv3.weight)
