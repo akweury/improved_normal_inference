@@ -52,8 +52,8 @@ class NormalizedNNN(nn.Module):
         # self.active = nn.ReLU()
 
         self.epsilon = 1e-20
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_1 = 12
+        channel_size_2 = 24
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
@@ -73,6 +73,34 @@ class NormalizedNNN(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
+        # conv branch
+        self.d2conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
+        self.d2conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.d2conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.d2conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+
+        self.dilated21 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
+        self.dilated22 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
+        self.dilated23 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
+        self.dilated24 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
+
+        # attention branch
+        self.d3conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
+        self.d3conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.d3conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.d3conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+
+        # merge
+        self.mconv1 = GConv(channel_size_2, channel_size_1, kernel_down, stride, padding_down)
+        self.mconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+
+        self.umconv1 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+        self.umconv2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+        self.umconv3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+
+        self.m2conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.m2conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
+
     def c_avg(self, cout, weight):
         # Propagate confidence
         # cout = denom.sum(dim=1, keepdim=True)
@@ -90,30 +118,24 @@ class NormalizedNNN(nn.Module):
         cout = cout.view(sz)
         return cout
 
-    def forward(self, x0, c0):
-        x1 = self.dconv1(x0)
+    def forward(self, xin, cin):
+        x1 = self.dconv1(xin)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
         # Downsample 1
-        # ds = 2
-        # x1_ds, idx = F.max_pool2d(x1, ds, ds, return_indices=True)  # 256,256
-        x1_ds = self.dconv4(x1)
-        x2 = self.dconv2(x1_ds)
+        x2 = self.dconv4(x1)
+        x2 = self.dconv2(x2)
         x2 = self.dconv3(x2)
 
         # Downsample 2
-        # ds = 2
-        # x2_ds, idx = F.max_pool2d(x2, ds, ds, return_indices=True)  # 128,128
-        x2_ds = self.dconv4(x2)
-        x3 = self.dconv2(x2_ds)
+        x3 = self.dconv4(x2)
+        x3 = self.dconv2(x3)
         x3 = self.dconv3(x3)
 
         # Downsample 3
-        # ds = 2
-        # x3_ds, idx = F.max_pool2d(x3, ds, ds, return_indices=True)  # 64,64
-        x3_ds = self.dconv4(x3)
-        x4 = self.dconv2(x3_ds)
+        x4 = self.dconv4(x3)
+        x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
         # dilated conv
@@ -125,17 +147,80 @@ class NormalizedNNN(nn.Module):
         x4 = self.dconv3(x4)
 
         # Upsample 1
-        x4_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
-        x5 = self.uconv1(torch.cat((x3, x4_us), 1))
+        x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
+        x3 = self.uconv1(torch.cat((x3, x3_us), 1))
 
         # Upsample 2
-        x5_us = F.interpolate(x5, x2.size()[2:], mode='nearest')
-        x6 = self.uconv2(torch.cat((x2, x5_us), 1))
+        x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
+        x2 = self.uconv2(torch.cat((x2, x2_us), 1))
 
         # # Upsample 3
-        x6_us = F.interpolate(x6, x1.size()[2:], mode='nearest')  # 512, 512
-        x7 = self.uconv3(torch.cat((x1, x6_us), 1))
+        x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
+        x1 = self.uconv3(torch.cat((x1, x1_us), 1))
 
-        xout = self.conv1(x7)  # 512, 512
+        xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
-        return xout, c0
+
+        xin2 = xout * (1 - cin) + xin * cin
+
+        # Downsample 1
+        x1 = self.d2conv1(xin2)
+        x2 = self.d2conv4(x1)
+        x2 = self.d2conv2(x2)
+        x2 = self.d2conv3(x2)
+
+        # Downsample 2
+        x3 = self.d2conv4(x2)
+        x3 = self.d2conv2(x3)
+        x3 = self.d2conv3(x3)
+
+        # Downsample 3
+        x4 = self.d2conv4(x3)
+        x4 = self.d2conv2(x4)
+        x4 = self.d2conv3(x4)
+
+        # dilated conv
+        x4 = self.dilated21(x4)
+        x4 = self.dilated22(x4)
+        x4 = self.dilated23(x4)
+        x4 = self.dilated24(x4)
+
+        x_hallu = x4
+
+        # Downsample 1
+        x1 = self.d3conv1(xin2)
+        x2 = self.d3conv4(x1)
+        x2 = self.d3conv2(x2)
+        x2 = self.d3conv3(x2)
+
+        # Downsample 2
+        x3 = self.d3conv4(x2)
+        x3 = self.d3conv2(x3)
+        x3 = self.d3conv3(x3)
+
+        # Downsample 3
+        x4 = self.d3conv4(x3)
+        x4 = self.d3conv2(x4)
+        x4 = self.d3conv3(x4)
+
+        x5 = torch.cat((x_hallu, x4), 1)
+
+        x5 = self.mconv1(x5)
+        x5 = self.mconv2(x5)
+
+        # Upsample 1
+        x3_us = F.interpolate(x5, x3.size()[2:], mode='nearest')  # 128,128
+        x3 = self.umconv1(x3_us)
+
+        # Upsample 2
+        x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
+        x2 = self.umconv2(x2_us)
+
+        # # Upsample 3
+        x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
+        x1 = self.umconv3(x1_us)
+
+        xout = self.m2conv1(x1)  # 512, 512
+        xout = self.m2conv2(xout)
+
+        return xout, cin
