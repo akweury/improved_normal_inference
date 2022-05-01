@@ -41,19 +41,30 @@ class NormalizedNNN(nn.Module):
         padding_up_2 = (2, 2)
         stride = (1, 1)
         stride_2 = (2, 2)
+
+        dilate1 = (2, 2)
+        dilate2 = (4, 4)
+        dilate3 = (8, 8)
+        dilate4 = (16, 16)
+
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
         # self.active = nn.ReLU()
 
         self.epsilon = 1e-20
-        channel_size_1 = 12
-        channel_size_2 = 24
+        channel_size_1 = 32
+        channel_size_2 = 64
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
         self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+
+        self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
+        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
+        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
+        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
 
         self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
@@ -103,6 +114,14 @@ class NormalizedNNN(nn.Module):
         # x3_ds, idx = F.max_pool2d(x3, ds, ds, return_indices=True)  # 64,64
         x3_ds = self.dconv4(x3)
         x4 = self.dconv2(x3_ds)
+        x4 = self.dconv3(x4)
+
+        # dilated conv
+        x4 = self.dilated1(x4)
+        x4 = self.dilated2(x4)
+        x4 = self.dilated3(x4)
+        x4 = self.dilated4(x4)
+        x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
         # Upsample 1
