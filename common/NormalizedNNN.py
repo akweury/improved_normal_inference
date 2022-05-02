@@ -161,66 +161,66 @@ class NormalizedNNN(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
 
-        xin2 = xout * (1 - cin) + xin * cin
-
-        # Downsample 1
-        x1 = self.d2conv1(xin2)
-        x2 = self.d2conv4(x1)
-        x2 = self.d2conv2(x2)
-        x2 = self.d2conv3(x2)
-
-        # Downsample 2
-        x3 = self.d2conv4(x2)
-        x3 = self.d2conv2(x3)
-        x3 = self.d2conv3(x3)
-
-        # Downsample 3
-        x4 = self.d2conv4(x3)
-        x4 = self.d2conv2(x4)
-        x4 = self.d2conv3(x4)
-
-        # dilated conv
-        x4 = self.dilated21(x4)
-        x4 = self.dilated22(x4)
-        x4 = self.dilated23(x4)
-        x4 = self.dilated24(x4)
-
-        x_hallu = x4
-
-        # Downsample 1
-        x1 = self.d3conv1(xin2)
-        x2 = self.d3conv4(x1)
-        x2 = self.d3conv2(x2)
-        x2 = self.d3conv3(x2)
-
-        # Downsample 2
-        x3 = self.d3conv4(x2)
-        x3 = self.d3conv2(x3)
-        x3 = self.d3conv3(x3)
-
-        # Downsample 3
-        x4 = self.d3conv4(x3)
-        x4 = self.d3conv2(x4)
-        x4 = self.d3conv3(x4)
-
-        x5 = torch.cat((x_hallu, x4), 1)
-
-        x5 = self.mconv1(x5)
-        x5 = self.mconv2(x5)
-
-        # Upsample 1
-        x3_us = F.interpolate(x5, x3.size()[2:], mode='nearest')  # 128,128
-        x3 = self.umconv1(x3_us)
-
-        # Upsample 2
-        x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
-        x2 = self.umconv2(x2_us)
-
-        # # Upsample 3
-        x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
-        x1 = self.umconv3(x1_us)
-
-        xout = self.m2conv1(x1)  # 512, 512
-        xout = self.m2conv2(xout)
+        # xin2 = xout * (1 - cin) + xin * cin
+        #
+        # # Downsample 1
+        # x1 = self.d2conv1(xin2)
+        # x2 = self.d2conv4(x1)
+        # x2 = self.d2conv2(x2)
+        # x2 = self.d2conv3(x2)
+        #
+        # # Downsample 2
+        # x3 = self.d2conv4(x2)
+        # x3 = self.d2conv2(x3)
+        # x3 = self.d2conv3(x3)
+        #
+        # # Downsample 3
+        # x4 = self.d2conv4(x3)
+        # x4 = self.d2conv2(x4)
+        # x4 = self.d2conv3(x4)
+        #
+        # # dilated conv
+        # x4 = self.dilated21(x4)
+        # x4 = self.dilated22(x4)
+        # x4 = self.dilated23(x4)
+        # x4 = self.dilated24(x4)
+        #
+        # x_hallu = x4
+        #
+        # # Downsample 1
+        # x1 = self.d3conv1(xin2)
+        # x2 = self.d3conv4(x1)
+        # x2 = self.d3conv2(x2)
+        # x2 = self.d3conv3(x2)
+        #
+        # # Downsample 2
+        # x3 = self.d3conv4(x2)
+        # x3 = self.d3conv2(x3)
+        # x3 = self.d3conv3(x3)
+        #
+        # # Downsample 3
+        # x4 = self.d3conv4(x3)
+        # x4 = self.d3conv2(x4)
+        # x4 = self.d3conv3(x4)
+        #
+        # x5 = torch.cat((x_hallu, x4), 1)
+        #
+        # x5 = self.mconv1(x5)
+        # x5 = self.mconv2(x5)
+        #
+        # # Upsample 1
+        # x3_us = F.interpolate(x5, x3.size()[2:], mode='nearest')  # 128,128
+        # x3 = self.umconv1(x3_us)
+        #
+        # # Upsample 2
+        # x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
+        # x2 = self.umconv2(x2_us)
+        #
+        # # # Upsample 3
+        # x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
+        # x1 = self.umconv3(x1_us)
+        #
+        # xout = self.m2conv1(x1)  # 512, 512
+        # xout = self.m2conv2(xout)
 
         return xout, cin
