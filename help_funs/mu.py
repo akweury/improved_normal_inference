@@ -153,7 +153,7 @@ def normalize(numpy_array, data):
         if min == max:
             return numpy_array, 0, 1
 
-    numpy_array[~mask] = (numpy_array[~mask] - min) / (max - min)
+    numpy_array[~mask] = (numpy_array[~mask] - min).astype(np.float32) / (max - min)
     return numpy_array, min, max
 
 
@@ -625,3 +625,21 @@ def eval_img_angle(output, target):
 def angle2rgb(angle_matrix):
     angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_DEEPGREEN)
+
+
+def filter_bg(normal_img):
+    normal_img = normal_img.astype(np.int64)
+    freq = np.bincount((normal_img[:, :, 0] * 1000000 + normal_img[:, :, 1] * 1000 + normal_img[:, :, 2]).reshape(-1))
+    freq_idx = np.nonzero(freq)[0]
+    freq_list = np.vstack((freq_idx, freq[freq_idx])).T
+    most_freq_color_sum = freq_list[freq_list[:, 1].argsort()[::-1][:15]][:, 0]
+    most_freq_color_b = most_freq_color_sum % 1000
+    most_freq_color_g = (most_freq_color_sum - most_freq_color_b) / 1000 % 1000
+    most_freq_color_r = (((most_freq_color_sum - most_freq_color_b) / 1000 - most_freq_color_g) / 1000)
+    most_freq_color = np.vstack((most_freq_color_r, most_freq_color_g, most_freq_color_b)).T
+
+    for color in most_freq_color:
+        bg_mask = (np.sum(normal_img == color, axis=2) == 3)
+        normal_img[bg_mask] = 0
+
+    return normal_img

@@ -46,12 +46,21 @@ def eval(v, model_path, k, output_type='rgb'):
     mask = vertex.sum(axis=2) == 0
 
     # move all the vertex as close to original point as possible,
-    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
-        ~mask].max()
-    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
-        ~mask].max()
-    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
-        ~mask].max()
+    if k == 2:
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
+            ~mask].max()
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
+            ~mask].max()
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
+            ~mask].max()
+    elif k == 1:
+        range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
+        range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
+        range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
+
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
 
     # calculate delta x, y, z of between each point and its neighbors
     vectors = data_preprocess.neighbor_vectors_k(vertex, k)
@@ -62,6 +71,10 @@ def eval(v, model_path, k, output_type='rgb'):
 
     normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device,
                                                                         output_type)
+
+    normal_img = mu.filter_bg(normal_img)
+    normal_img = normal_img.astype(np.float32)
+    normal_img = mu.normalize2_8bit(normal_img)
 
     return normal, normal_img, eval_point_counter, total_time
 
@@ -92,7 +105,7 @@ def evaluate_epoch(model, input_tensor, epoch, device, output_type='normal'):
         output_img = mu.normal2RGB(normal)
         normal_8bit = np.ascontiguousarray(output_img, dtype=np.uint8)
         # normal_8bit = cv.normalize(output_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        normal_8bit[mask] = 0
+        # normal_8bit[mask] = 0
 
     else:
         output = output.astype(np.uint8)
