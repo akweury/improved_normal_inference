@@ -110,6 +110,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         raise ValueError("output_file is not supported. change it in args.json")
     gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
+    img_files = np.array(sorted(glob.glob(str(path / "*image0.png"), recursive=True)))
     for item in range(len(data_files)):
         f = open(data_files[item])
         data = json.load(f)
@@ -118,6 +119,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
+        img = file_io.load_16bitImage(img_files[item])
         data['R'] = np.identity(3)
         data['t'] = np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
@@ -135,7 +137,16 @@ def convert2training_tensor(path, k, output_type='normal'):
         vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
 
         # calculate delta x, y, z of between each point and its neighbors
-        vectors = neighbor_vectors_k(vertex, k)
+        if k >= 2:
+            vectors = neighbor_vectors_k(vertex, k)
+        # case of ng
+        elif k == 0:
+            vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
+        elif k == 1:
+            vectors = vertex
+        else:
+            raise ValueError
+
         vectors[mask] = 0
 
         input_torch = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)

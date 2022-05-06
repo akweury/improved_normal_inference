@@ -12,11 +12,9 @@ sys.path.append(dirname(__file__))
 
 import time
 import torch
-import cv2 as cv
 import numpy as np
-from help_funs import mu
+from help_funs import mu, data_preprocess
 from pncnn.utils import args_parser
-from common import data_preprocess
 
 
 def eval(v, model_path, k, output_type='rgb'):

@@ -1,5 +1,5 @@
 import config
-from common.data_preprocess import noisy_a_folder, convert2training_tensor, convert2training_tensor2
+from help_funs.data_preprocess import noisy_a_folder, convert2training_tensor, convert2training_tensor2
 from workspace import train
 from pncnn.utils import args_parser
 
@@ -7,6 +7,7 @@ import workspace.nnn.network as nnn
 import workspace.nnn24.network as nnn24
 import workspace.nnnn.network as nnnn
 import workspace.nnnx.network as nnnx
+import workspace.ng.network as ng
 
 
 def main():
@@ -36,6 +37,8 @@ def main():
         model = nnnn.CNN()
     elif args.exp == "nnnx":
         model = nnnx.CNN()
+    elif args.exp == "ng":
+        model = ng.CNN()
     else:
         raise ValueError("Unknown exp path")
     if args.machine == 'local':
