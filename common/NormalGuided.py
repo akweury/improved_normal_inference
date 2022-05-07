@@ -49,6 +49,7 @@ class NormalGuided(nn.Module):
 
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
+        self.active_img = nn.ReLU()
 
         self.epsilon = 1e-20
         channel_size_1 = 32
@@ -73,75 +74,47 @@ class NormalGuided(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-        # conv branch
-        # self.d2conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        # self.d2conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        # self.d2conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        # self.d2conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
-        #
-        # self.dilated21 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
-        # self.dilated22 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
-        # self.dilated23 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
-        # self.dilated24 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
-
-        # # attention branch
-        # self.d3conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        # self.d3conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        # self.d3conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        # self.d3conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
-
         # branch 2
         self.img_conv1 = nn.Conv2d(1, channel_size_1, kernel_down, stride, padding_down)
         self.img_conv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.img_conv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.img_conv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        # merge
-        # self.mconv1 = GConv(channel_size_2, channel_size_1, kernel_down, stride, padding_down)
-        # self.mconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        #
-        # self.umconv1 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        # self.umconv2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        # self.umconv3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        #
-        # self.m2conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
-        # self.m2conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
-
     def forward(self, d_in, img_in, cin):
         x1 = self.dconv1(d_in)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
-        x_img_1 = self.img_conv1(img_in)
-        x_img_1 = self.img_conv2(x_img_1)
-        x_img_1 = self.img_conv3(x_img_1)
+        x_img_1 = self.active_img(self.img_conv1(img_in))
+        x_img_1 = self.active_img(self.img_conv2(x_img_1))
+        x_img_1 = self.active_img(self.img_conv3(x_img_1))
 
         # Downsample 1
         x2 = self.dconv4(x1)
         x2 = self.dconv2(x2)
         x2 = self.dconv3(x2)
 
-        x_img_2 = self.img_conv4(x_img_1)
-        x_img_2 = self.img_conv2(x_img_2)
-        x_img_2 = self.img_conv3(x_img_2)
+        x_img_2 = self.active_img(self.img_conv4(x_img_1))
+        x_img_2 = self.active_img(self.img_conv2(x_img_2))
+        x_img_2 = self.active_img(self.img_conv3(x_img_2))
 
         # Downsample 2
         x3 = self.dconv4(x2)
         x3 = self.dconv2(x3)
         x3 = self.dconv3(x3)
 
-        x_img_3 = self.img_conv4(x_img_2)
-        x_img_3 = self.img_conv2(x_img_3)
-        x_img_3 = self.img_conv3(x_img_3)
+        x_img_3 = self.active_img(self.img_conv4(x_img_2))
+        x_img_3 = self.active_img(self.img_conv2(x_img_3))
+        x_img_3 = self.active_img(self.img_conv3(x_img_3))
 
         # Downsample 3
         x4 = self.dconv4(x3)
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
-        x_img_4 = self.img_conv4(x_img_3)
-        x_img_4 = self.img_conv2(x_img_4)
-        x_img_4 = self.img_conv3(x_img_4)
+        x_img_4 = self.active_img(self.img_conv4(x_img_3))
+        x_img_4 = self.active_img(self.img_conv2(x_img_4))
+        x_img_4 = self.active_img(self.img_conv3(x_img_4))
 
         # dilated conv
         x4 = self.dilated1(x4)
