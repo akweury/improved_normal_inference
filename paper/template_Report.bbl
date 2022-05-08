@@ -14,6 +14,10 @@ S.~Holzer, R.~B. Rusu, M.~Dixon, S.~Gedikli, and N.~Navab.
 \newblock In {\em 2012 IEEE/RSJ International Conference on Intelligent Robots
   and Systems}, pages 2684--2689, 2012.
 
+\bibitem{gconv}
+Jiahui Yu, Zhe Lin, Jimei Yang, Xiaohui Shen, Xin Lu, and Thomas Huang.
+\newblock Free-form image inpainting with gated convolution, 2018.
+
 \bibitem{zhou2021fast}
 Jun Zhou, Wei Jin, Mingjie Wang, Xiuping Liu, Zhiyang Li, and Zhaobin Liu.
 \newblock Fast and accurate normal estimation for point cloud via patch

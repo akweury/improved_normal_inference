@@ -1,9 +1,7 @@
-import math
-import itertools
 import cv2 as cv
 import numpy as np
 import torch
-import torch.nn.functional as F
+import json
 import matplotlib.pyplot as plt
 
 
@@ -643,3 +641,35 @@ def filter_bg(normal_img):
         normal_img[bg_mask] = 0
 
     return normal_img
+
+
+def visual_input(depth, data, output_name):
+    data['R'] = np.identity(3)
+    data['t'] = np.zeros(3)
+    vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                          torch.tensor(data['K']),
+                          torch.tensor(data['R']).float(),
+                          torch.tensor(data['t']).float())
+    mask = vertex.sum(axis=2) == 0
+    # move all the vertex as close to original point as possible, and noramlized all the vertex
+    range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
+    range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
+    range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
+
+    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
+    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
+    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
+
+    vectors = vertex
+    vectors[mask] = 0
+
+    input_torch = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
+    input_torch = input_torch.permute(2, 0, 1)
+    input_torch = input_torch.unsqueeze(0)
+    input = tenor2numpy(input_torch[:1, :3, :, :])
+    x0_normalized_8bit = normalize2_8bit(input)
+    x0_normalized_8bit = image_resize(x0_normalized_8bit, width=512, height=512)
+
+    output = cv.cvtColor(x0_normalized_8bit, cv.COLOR_RGB2BGR)
+    output_name = str(f"{output_name}.png")
+    cv.imwrite(output_name, output)

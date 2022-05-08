@@ -49,7 +49,7 @@ class NormalGuided(nn.Module):
 
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
-        self.active_img = nn.ReLU()
+        self.active_img = nn.LeakyReLU(0.01)
 
         self.epsilon = 1e-20
         channel_size_1 = 32
@@ -70,6 +70,7 @@ class NormalGuided(nn.Module):
         self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv4 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
 
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
@@ -80,12 +81,12 @@ class NormalGuided(nn.Module):
         self.img_conv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.img_conv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-    def forward(self, d_in, img_in, cin):
-        x1 = self.dconv1(d_in)
+    def forward(self, x1, x_img_1, cin):
+        x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
-        x_img_1 = self.active_img(self.img_conv1(img_in))
+        x_img_1 = self.active_img(self.img_conv1(x_img_1))
         x_img_1 = self.active_img(self.img_conv2(x_img_1))
         x_img_1 = self.active_img(self.img_conv3(x_img_1))
 
@@ -129,15 +130,16 @@ class NormalGuided(nn.Module):
 
         # Upsample 1
         x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
-        x3 = self.uconv1(x3_us)
+        x3_mus = self.uconv1(x3_us)
+        x3 = self.uconv2(torch.cat((x3, x3_mus), 1))
 
         # Upsample 2
         x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
-        x2 = self.uconv2(torch.cat((x2, x2_us), 1))
+        x2 = self.uconv3(torch.cat((x2, x2_us), 1))
 
         # # Upsample 3
         x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
-        x1 = self.uconv3(torch.cat((x1, x1_us), 1))
+        x1 = self.uconv4(torch.cat((x1, x1_us), 1))
 
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
