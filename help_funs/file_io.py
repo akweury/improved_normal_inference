@@ -126,11 +126,15 @@ def load_single_data(data_path, idx):
     data['t'] = np.zeros(3)
 
     depth_gt = load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
-    # depth_noise = load_scaled16bitImage(depth_noise_file, data['minDepth'], data['maxDepth'])
-    depth_noise = depth_gt
+    if data_path == config.real_data:
+        depth_noise = depth_gt
+    else:
+        depth_noise = load_scaled16bitImage(depth_noise_file, data['minDepth'], data['maxDepth'])
+    #
 
     normal = load_24bitNormal(normal_file)
-    return data, depth_gt, depth_noise, normal
+    image = load_16bitImage(image_file)
+    return data, depth_gt, depth_noise, normal, image
 
 
 def get_file_name(idx, data_path):

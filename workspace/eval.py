@@ -17,7 +17,7 @@ from help_funs import mu, data_preprocess
 from pncnn.utils import args_parser
 
 
-def eval(v, model_path, k, output_type='rgb'):
+def eval(v, model_path, k, output_type='rgb', img=None):
     vertex = v.copy()
     # load model
     checkpoint = torch.load(model_path)
@@ -38,30 +38,28 @@ def eval(v, model_path, k, output_type='rgb'):
         device = torch.device("cuda:" + str(args.gpu))
 
     model = checkpoint['model'].to(device)
-
     args_parser.print_args(args)
-
     mask = vertex.sum(axis=2) == 0
+    # move all the vertex as close to original point as possible, and noramlized all the vertex
+    range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
+    range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
+    range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
 
-    # move all the vertex as close to original point as possible,
-    if k == 2:
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
-            ~mask].max()
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
-            ~mask].max()
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
-            ~mask].max()
-    elif k == 1:
-        range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
-        range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
-        range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
-
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
+    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
+    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
+    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
 
     # calculate delta x, y, z of between each point and its neighbors
-    vectors = data_preprocess.neighbor_vectors_k(vertex, k)
+    if k >= 2:
+        vectors = data_preprocess.neighbor_vectors_k(vertex, k)
+    # case of ng
+    elif k == 0:
+        vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
+    elif k == 1:
+        vectors = vertex
+    else:
+        raise ValueError
+
     vectors[mask] = 0
 
     input_tensor = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
