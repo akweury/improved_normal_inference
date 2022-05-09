@@ -219,7 +219,7 @@ def normalize2_8bit(img_scaled, data=None):
         raise ValueError
 
     if img_scaled.shape[2] == 1:
-        normalized_img = normalize(img_scaled, data)
+        normalized_img, mins, maxs = normalize(img_scaled.sum(axis=-1), data)
     elif img_scaled.shape[2] == 3:
         normalized_img, mins, maxs = normalize3channel(img_scaled)
     else:
@@ -532,6 +532,8 @@ def tenor2numpy(tensor):
     if tensor.size() == (1, 3, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     elif tensor.size() == (1, 3, 10, 10):
+        return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
+    elif tensor.size() == (1, 1, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     else:
         print("Unsupported input tensor size.")

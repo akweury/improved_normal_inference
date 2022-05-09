@@ -137,6 +137,31 @@ class SyntheticDepthDataset(Dataset):
         return input_tensor, gt_tensor
 
 
+class NoiseDataset(Dataset):
+
+    def __init__(self, data_path, k, output_type, setname='train'):
+        if setname in ['train', 'selval']:
+            self.input = np.array(
+                sorted(
+                    glob.glob(str(data_path / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
+            self.gt = np.array(
+                sorted(glob.glob(str(data_path / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
+
+        assert (len(self.gt) == len(self.input))
+
+    def __len__(self):
+        return len(self.input)
+
+    def __getitem__(self, item):
+        if item < 0 or item >= self.__len__():
+            return None
+
+        input_tensor = torch.load(self.input[item])
+        gt_tensor = torch.load(self.gt[item])
+
+        return input_tensor, gt_tensor
+
+
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
     def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
@@ -161,7 +186,10 @@ class TrainingModel():
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
-        dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
+        if self.args.exp == "noise_net":
+            dataset = NoiseDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
+        else:
+            dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -307,7 +335,7 @@ def train_epoch(nn_model, epoch):
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                draw_output(input, out, True, target=target, exp_path=nn_model.output_folder,
+                draw_output(input, out, nn_model.args.cout, target=target, exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
@@ -385,7 +413,10 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     output_list = []
 
     # input normal
-    input = mu.tenor2numpy(x0[:1, :3, :, :])
+    if output_type == "noise":
+        input = mu.tenor2numpy(x0[:1, :1, :, :])
+    else:
+        input = mu.tenor2numpy(x0[:1, :3, :, :])
     x0_normalized_8bit = mu.normalize2_8bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Normals)")
@@ -393,7 +424,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
     # gt normal
     target = target.numpy()
-    if output_type == 'normal' or 'normal_noise':
+    if output_type == 'normal' or output_type == 'normal_noise':
         target = mu.normal2RGB(target)
     mask = target.sum(axis=2) == 0
     target_ranges = mu.addHist(target)
@@ -405,7 +436,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
     # pred normal
     xout = xout.detach().numpy()
-    if output_type == 'normal' or 'normal_noise':
+    if output_type == 'normal' or output_type == 'normal_noise':
         xout = mu.filter_noise(xout, threshold=[-1, 1])
         xout = mu.normal2RGB(xout)
     else:

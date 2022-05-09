@@ -88,17 +88,10 @@ def main():
         img_list.append(nnnn_img_final)
         diff_list.append(birnak_diff_img)
 
-        # ng50 5064
-        normal_model_path = config.ws_path / "ng" / "trained_model" / "output_2022-05-07_08_45_18" / "checkpoint-5064.pth.tar"
+        # ng500 2994
+        normal_model_path = config.ws_path / "ng" / "trained_model" / "output_2022-05-08_08_17_02" / "checkpoint-2994.pth.tar"
         nnnn_noraml, nnnn_img, _, _ = eval.eval(vertex, normal_model_path, img=img, k=0, output_type='normal')
-        nnnn_img_final, birnak_diff_img = eval_post_processing(nnnn_noraml, nnnn_img, normal_gt, "NG_5064(50)")
-        img_list.append(nnnn_img_final)
-        diff_list.append(birnak_diff_img)
-
-        # ng500 862
-        normal_model_path = config.ws_path / "ng" / "trained_model" / "output_2022-05-07_14_10_19" / "checkpoint-863.pth.tar"
-        nnnn_noraml, nnnn_img, _, _ = eval.eval(vertex, normal_model_path, img=img, k=0, output_type='normal')
-        nnnn_img_final, birnak_diff_img = eval_post_processing(nnnn_noraml, nnnn_img, normal_gt, "NG_863(500)")
+        nnnn_img_final, birnak_diff_img = eval_post_processing(nnnn_noraml, nnnn_img, normal_gt, "NG_2994")
         img_list.append(nnnn_img_final)
         diff_list.append(birnak_diff_img)
 

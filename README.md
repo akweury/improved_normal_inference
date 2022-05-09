@@ -13,12 +13,12 @@ ssh sha@pc-2103
 CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8 --resume
 /home/sha/improved_normal_inference/workspace/nnn24/trained_model/full_normal/checkpoint-1740.pth.tar
 
+D:\TUK\improved_normal_inference\workspace\noise_net\output_2022-05-09_15_37_05\checkpoint-98.pth.tar
 ## new training work
 
 CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnnn --args json --mode train --batch_size 8
 
-scp D:\TUK\MasterThesisJingyuan\MasterThesisJingyuan\TestProject\CapturedData\data_synthetic\train.zip sha@pc-2103:
-/home/sha/improved_normal_inference/dataset/data_synthetic
+scp D:\TUK\improved_normal_inference\dataset\data_real.zip sha@pc-2103:/datasets/sha
 
 scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnnn/output.zip D:
 \TUK\improved_normal_inference\workspace\nnnn
