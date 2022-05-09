@@ -20,8 +20,8 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --exp noise_net --args json --mode train 
 
 scp D:\TUK\improved_normal_inference\dataset\data_real.zip sha@pc-2103:/datasets/sha
 
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnnn/output.zip D:
-\TUK\improved_normal_inference\workspace\nnnn
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/noise_net/output.zip D:
+\TUK\improved_normal_inference\workspace\noise_net
 
 # local command
 

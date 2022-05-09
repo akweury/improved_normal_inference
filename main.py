@@ -12,9 +12,9 @@ import workspace.ng.network as ng
 def main():
     args = args_parser.args_parser()
     if args.noise:
-        for folder in ["selval", "test", "train"]:
+        for folder in ["train"]:
             # add noise
-            original_folder = config.synthetic_data / folder
+            original_folder = config.synthetic_data_nobg / folder
             if args.machine == "remote":
                 dataset_folder = config.synthetic_data_noise_dfki / folder
             elif args.machine == 'local':

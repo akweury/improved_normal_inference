@@ -1,5 +1,5 @@
 {
-  "noise": false,
+  "noise": true,
   "machine": "local",
   "output_type": "normal_noise",
   "neighbor": 0,

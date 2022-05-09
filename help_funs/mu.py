@@ -568,6 +568,11 @@ def scale16bitImage(img, minVal, maxVal):
 
     return img.astype(np.float32)
 
+def normalise216bitImage(img):
+    img = np.array(img, dtype=np.float32)
+    min, max = img.min(), img.max()
+    img_16bit = ((img - min) / (max - min) * 65535).astype(np.uint16)
+    return img_16bit
 
 def median_filter(depth):
     padding = 3  # 2 optimal

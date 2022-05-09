@@ -89,6 +89,15 @@ def load_16bitImage(root):
     img = cv2.imread(root, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
     return img
 
+def save_16bitImage(img, img_name):
+    img = img.reshape(512, 512)
+    img[np.isnan(img) != 0] = 0
+    mask = (img == 0)
+
+    img = np.array(img, dtype=np.uint16)
+    cv2.imwrite(img_name, img)
+
+    return img
 
 def load_24bitNormal(root):
     R = torch.tensor(np.identity(3)).float()

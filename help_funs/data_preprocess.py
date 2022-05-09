@@ -10,6 +10,7 @@ import shutil
 
 import config
 from help_funs import file_io, mu
+from pncnn.utils import args_parser
 
 
 def noisy_1channel(img, noise_templete):
@@ -29,9 +30,48 @@ def noisy(img):
     return noise_img
 
 
+############ EVALUATION FUNCTION ############
+def evaluate_epoch(model, input_tensor, device):
+    model.eval()  # Swith to evaluate mode
+
+    with torch.no_grad():
+        input_tensor = input_tensor.to(device)
+        input_tensor = input_tensor.unsqueeze(0)
+        torch.cuda.synchronize()
+
+        # Forward Pass
+        output = model(input_tensor)
+
+        # store the predicted normal
+        output = output[0, :].permute(1, 2, 0)[:, :, :3]
+        output = output.to('cpu').numpy()
+
+    return output
+
+
 def noisy_a_folder(folder_path, output_path):
-    # get all the normal files from 'Real' dataset
-    normal_files = np.array(sorted(glob.glob(str(config.real_data / "*normal?.png"), recursive=True)))
+    # get noise model
+    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_16_41_36" / "checkpoint-98.pth.tar"
+
+    # load model
+    checkpoint = torch.load(noise_model_path)
+
+    # Assign some local variables
+    args = checkpoint['args']
+    start_epoch = checkpoint['epoch']
+    print('- Checkpoint was loaded successfully.')
+
+    # Compare the checkpoint args with the json file in case I wanted to change some args
+    # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
+    args.evaluate = noise_model_path
+
+    if args.cpu:
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda:" + str(args.gpu))
+
+    model = checkpoint['model'].to(device)
+    args_parser.print_args(args)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -40,17 +80,25 @@ def noisy_a_folder(folder_path, output_path):
         if path.exists(image_file):
             f = open(json_file)
             data = json.load(f)
-            # normal_gt = cv.imread(normal_file)
             depth = file_io.load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
-            random_real_normal = file_io.load_24bitNormal(np.random.choice(normal_files)).astype(np.float32)
-            noise_templete = random_real_normal.sum(axis=2) != 0
+
+            # get noise mask
+            img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
+
+            input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
+            input_tensor = input_tensor.permute(2, 0, 1)
+
+            img_noise = evaluate_epoch(model, input_tensor, device)
+            noise_mask = img_noise.sum(axis=2) == 0
             # add noise
-            noise_depth = noisy_1channel(depth, noise_templete)
+            depth[noise_mask] = 0
 
             # save files to the new folders
-            file_io.save_scaled16bitImage(noise_depth,
+            file_io.save_scaled16bitImage(depth,
                                           str(output_path / (str(idx).zfill(5) + ".depth0_noise.png")),
                                           data['minDepth'], data['maxDepth'])
+            img_noise = mu.normalise216bitImage(img_noise)
+            file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
             shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
             shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
             shutil.copyfile(json_file, str(output_path / (str(idx).zfill(5) + ".data0.json")))
@@ -169,6 +217,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         print(f'File {item} converted to tensor.')
 
 
+def high_pass_filter(img, threshold=20):
+    img[img < threshold] = 0
+    return img
+
+
 def convert2training_tensor_noise(path):
     k = 0
     output_type = 'noise'
@@ -180,7 +233,11 @@ def convert2training_tensor_noise(path):
     img_files = np.array(sorted(glob.glob(str(path / "*image?.png"), recursive=True)))
     gt_files = np.array(sorted(glob.glob(str(path / "*normal?.png"), recursive=True)))
     for item in range(len(img_files)):
-        img = np.expand_dims(file_io.load_16bitImage(img_files[item]), axis=2)
+        img = file_io.load_16bitImage(img_files[item])
+        idx = img_files[item].split(".")[-2][-1]
+        prefix_idx = img_files[item].replace("\\", ".").split(".")[-3]
+        img = high_pass_filter(img)
+        img = np.expand_dims(img, axis=2)
         gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
         gt = gt.sum(axis=2, keepdims=True) != 0
         gt = gt.astype(np.float32)
@@ -193,6 +250,9 @@ def convert2training_tensor_noise(path):
         torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt"))
         torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}_{output_type}.pt"))
         print(f'File {item} converted to tensor.')
+
+        img_16bit = mu.normalise216bitImage(img)
+        file_io.save_16bitImage(img_16bit, str(path / (prefix_idx + f".image{idx}_lowpass.png")))
 
 
 # def convert2training_tensor2(path, k, input_size=1000):
