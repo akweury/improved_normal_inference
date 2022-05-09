@@ -14,7 +14,7 @@ def main():
     if args.noise:
         for folder in ["train"]:
             # add noise
-            original_folder = config.synthetic_data_nobg / folder
+            original_folder = config.synthetic_data / folder
             if args.machine == "remote":
                 dataset_folder = config.synthetic_data_noise_dfki / folder
             elif args.machine == 'local':

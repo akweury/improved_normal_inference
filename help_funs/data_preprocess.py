@@ -13,11 +13,11 @@ from help_funs import file_io, mu
 from pncnn.utils import args_parser
 
 
-def noisy_1channel(img, noise_templete):
+def noisy_1channel(img):
     img = img.reshape(512, 512)
     h, w = img.shape
     noise = np.random.randint(2, size=(h, w))
-    noise_img = img * noise * noise_templete
+    noise_img = img * noise
     return noise_img
 
 
@@ -51,7 +51,7 @@ def evaluate_epoch(model, input_tensor, device):
 
 def noisy_a_folder(folder_path, output_path):
     # get noise model
-    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_19_55_13" / "checkpoint-99.pth.tar"
+    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_20_38_46" / "checkpoint-9.pth.tar"
 
     # load model
     checkpoint = torch.load(noise_model_path)
@@ -84,12 +84,14 @@ def noisy_a_folder(folder_path, output_path):
 
             # get noise mask
             img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
-
-            input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
-            input_tensor = input_tensor.permute(2, 0, 1)
-
-            img_noise = evaluate_epoch(model, input_tensor, device)
-            noise_mask = img_noise.sum(axis=2) == 0
+            img[img < 20] = 0
+            noise_mask = noisy_1channel(img)
+            noise_mask = noise_mask == 0
+            # input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
+            # input_tensor = input_tensor.permute(2, 0, 1)
+            #
+            # img_noise = evaluate_epoch(model, input_tensor, device)
+            # noise_mask = img_noise.sum(axis=2) == 0
             # add noise
             depth[noise_mask] = 0
 
@@ -97,7 +99,7 @@ def noisy_a_folder(folder_path, output_path):
             file_io.save_scaled16bitImage(depth,
                                           str(output_path / (str(idx).zfill(5) + ".depth0_noise.png")),
                                           data['minDepth'], data['maxDepth'])
-            img_noise = mu.normalise216bitImage(img_noise)
+            img_noise = mu.normalise216bitImage(img)
             file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
             shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
             shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
