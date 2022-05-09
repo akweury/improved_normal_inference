@@ -463,8 +463,10 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         mu.addText(normal_cout_8bit, "c_out")
         mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cout_8bit)
-
-    output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+    if output_type != "noise":
+        output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+    else:
+        output = cv.hconcat(output_list)
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.8f}.png")
     cv.imwrite(output_name, output)
 
