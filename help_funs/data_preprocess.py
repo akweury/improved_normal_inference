@@ -50,28 +50,28 @@ def evaluate_epoch(model, input_tensor, device):
 
 
 def noisy_a_folder(folder_path, output_path):
-    # get noise model
-    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_20_38_46" / "checkpoint-9.pth.tar"
-
-    # load model
-    checkpoint = torch.load(noise_model_path)
-
-    # Assign some local variables
-    args = checkpoint['args']
-    start_epoch = checkpoint['epoch']
-    print('- Checkpoint was loaded successfully.')
-
-    # Compare the checkpoint args with the json file in case I wanted to change some args
-    # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
-    args.evaluate = noise_model_path
-
-    if args.cpu:
-        device = torch.device("cpu")
-    else:
-        device = torch.device("cuda:" + str(args.gpu))
-
-    model = checkpoint['model'].to(device)
-    args_parser.print_args(args)
+    # # get noise model
+    # noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_20_38_46" / "checkpoint-9.pth.tar"
+    #
+    # # load model
+    # checkpoint = torch.load(noise_model_path)
+    #
+    # # Assign some local variables
+    # args = checkpoint['args']
+    # start_epoch = checkpoint['epoch']
+    # print('- Checkpoint was loaded successfully.')
+    #
+    # # Compare the checkpoint args with the json file in case I wanted to change some args
+    # # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
+    # args.evaluate = noise_model_path
+    #
+    # if args.cpu:
+    #     device = torch.device("cpu")
+    # else:
+    #     device = torch.device("cuda:" + str(args.gpu))
+    #
+    # model = checkpoint['model'].to(device)
+    # args_parser.print_args(args)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
