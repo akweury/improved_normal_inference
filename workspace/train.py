@@ -441,11 +441,13 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         xout = mu.normal2RGB(xout)
     else:
         xout = mu.filter_noise(xout, threshold=[0, 255])
+
     xout[mask] = 0
-    xout_ranges = mu.addHist(xout)
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")
-    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    if output_type != "noise":
+        xout_ranges = mu.addHist(xout)
+        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_cnn_8bit)
 
     # cout
