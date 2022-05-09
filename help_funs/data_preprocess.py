@@ -51,7 +51,7 @@ def evaluate_epoch(model, input_tensor, device):
 
 def noisy_a_folder(folder_path, output_path):
     # get noise model
-    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_16_41_36" / "checkpoint-98.pth.tar"
+    noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_19_55_13" / "checkpoint-99.pth.tar"
 
     # load model
     checkpoint = torch.load(noise_model_path)

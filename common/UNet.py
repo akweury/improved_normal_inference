@@ -22,8 +22,8 @@ class UNet(nn.Module):
         self.active_f = nn.Sigmoid()
 
         self.epsilon = 1e-20
-        channel_size_1 = 12
-        channel_size_2 = 24
+        channel_size_1 = 2
+        channel_size_2 = 4
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, stride, padding_down)
