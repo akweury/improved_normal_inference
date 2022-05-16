@@ -1,54 +1,51 @@
-This is BibTeX, Version 0.99d
+This is BibTeX, Version 0.99d (TeX Live 2020)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: template_Report.aux
-Reallocating 'name_of_file' (item size: 1) to 17 items.
+A level-1 auxiliary file: introduction.aux
 A level-1 auxiliary file: related_work.aux
-Reallocating 'name_of_file' (item size: 1) to 13 items.
 A level-1 auxiliary file: approach.aux
-Reallocating 'name_of_file' (item size: 1) to 13 items.
+A level-1 auxiliary file: experiments.aux
 A level-1 auxiliary file: formular.aux
-Reallocating 'name_of_file' (item size: 1) to 6 items.
 The style file: plain.bst
-Reallocating 'name_of_file' (item size: 1) to 10 items.
 Database file #1: reference.bib
-You've used 4 entries,
+You've used 12 entries,
             2118 wiz_defined-function locations,
-            522 strings with 4959 characters,
-and the built_in function-call counts, 1611 in all, are:
-= -- 136
-> -- 112
-< -- 1
-+ -- 44
-- -- 40
-* -- 114
-:= -- 265
-add.period$ -- 10
-call.type$ -- 4
-change.case$ -- 32
+            571 strings with 6528 characters,
+and the built_in function-call counts, 4584 in all, are:
+= -- 411
+> -- 281
+< -- 3
++ -- 110
+- -- 98
+* -- 325
+:= -- 744
+add.period$ -- 32
+call.type$ -- 12
+change.case$ -- 85
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 53
-empty$ -- 117
-format.name$ -- 40
-if$ -- 336
+cite$ -- 12
+duplicate$ -- 153
+empty$ -- 345
+format.name$ -- 98
+if$ -- 968
 int.to.chr$ -- 0
-int.to.str$ -- 4
-missing$ -- 2
-newline$ -- 21
-num.names$ -- 8
-pop$ -- 49
+int.to.str$ -- 12
+missing$ -- 7
+newline$ -- 59
+num.names$ -- 24
+pop$ -- 116
 preamble$ -- 1
-purify$ -- 28
+purify$ -- 73
 quote$ -- 0
-skip$ -- 46
+skip$ -- 132
 stack$ -- 0
-substring$ -- 56
-swap$ -- 17
-text.length$ -- 1
+substring$ -- 219
+swap$ -- 45
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 16
+type$ -- 48
 warning$ -- 0
-while$ -- 10
-width$ -- 5
-write$ -- 39
+while$ -- 34
+width$ -- 14
+write$ -- 120

@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{Ben-Shabat_2019_CVPR}
 Yizhak Ben-Shabat, Michael Lindenbaum, and Anath Fischer.
@@ -7,12 +7,58 @@ Yizhak Ben-Shabat, Michael Lindenbaum, and Anath Fischer.
 \newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
   Pattern Recognition (CVPR)}, June 2019.
 
+\bibitem{gru}
+Kyunghyun Cho, Bart van Merrienboer, Dzmitry Bahdanau, and Yoshua Bengio.
+\newblock On the properties of neural machine translation: Encoder-decoder
+  approaches, 2014.
+
+\bibitem{pncnn}
+Abdelrahman Eldesokey, Michael Felsberg, Karl Holmquist, and Mikael Persson.
+\newblock Uncertainty-aware cnns for depth completion: Uncertainty from
+  beginning to end, 2020.
+
+\bibitem{ncnn}
+Abdelrahman Eldesokey, Michael Felsberg, and Fahad~Shahbaz Khan.
+\newblock Confidence propagation through {CNNs} for guided sparse depth
+  regression.
+\newblock {\em {IEEE} Transactions on Pattern Analysis and Machine
+  Intelligence}, 42(10):2423--2436, oct 2020.
+
+\bibitem{lstm}
+Sepp Hochreiter and Jürgen Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural computation}, 9:1735--80, 12 1997.
+
 \bibitem{Holzer.S}
 S.~Holzer, R.~B. Rusu, M.~Dixon, S.~Gedikli, and N.~Navab.
 \newblock Adaptive neighborhood selection for real-time surface normal
   estimation from organized point cloud data using integral images.
 \newblock In {\em 2012 IEEE/RSJ International Conference on Intelligent Robots
   and Systems}, pages 2684--2689, 2012.
+
+\bibitem{nconv}
+H.~Knutsson and C.-F. Westin.
+\newblock Normalized and differential convolution.
+\newblock In {\em Proceedings of IEEE Conference on Computer Vision and Pattern
+  Recognition}, pages 515--523, 1993.
+
+\bibitem{gated_activation}
+Aaron van~den Oord, Nal Kalchbrenner, Oriol Vinyals, Lasse Espeholt, Alex
+  Graves, and Koray Kavukcuoglu.
+\newblock Conditional image generation with pixelcnn decoders, 2016.
+
+\bibitem{inpainting2}
+Fei Qi, Junyu Han, Pengjin Wang, Guangming Shi, and Fu~Li.
+\newblock Structure guided fusion for depth map inpainting.
+\newblock {\em Pattern Recognition Letters}, 34(1):70--76, 2013.
+\newblock Extracting Semantics from Multi-Spectrum Video.
+
+\bibitem{inpainting1}
+Na-Eun Yang, Yong-Gon Kim, and Rae-Hong Park.
+\newblock Depth hole filling using the depth distribution of neighboring
+  regions of depth holes in the kinect sensor.
+\newblock In {\em 2012 IEEE International Conference on Signal Processing,
+  Communication and Computing (ICSPCC 2012)}, pages 658--661, 2012.
 
 \bibitem{gconv}
 Jiahui Yu, Zhe Lin, Jimei Yang, Xiaohui Shen, Xin Lu, and Thomas Huang.

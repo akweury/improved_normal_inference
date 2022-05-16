@@ -12,4 +12,17 @@ In 2019, Ben-Shabat et al. \cite{Ben-Shabat_2019_CVPR} presented a CNN based met
 In 2021, Zhou et al.  \cite{zhou2021fast}
 
 
+\section{Sparse Input processing}
+%% gconv, nconv, median filter...
+The depth-map captured by active sensors are usually full with missing pixels and holes. Thus a preprocessing for the depth map is necessary before it is fed into a neural network.
 
+Generally, it can be solved as image inpainting problems.\cite{inpainting1},\cite{inpainting2}. Recently, some deep learning based method for image inpainting achieved quite good performance for the hole mending task. 
+Notably, in 2016, Oord et al. \cite{gated_activation} proposed a gated activation unit for a CNN model,
+\[\textbf{y} = \tanh (W_{k,f} * \textbf{x}) \odot \sigma (W_{k,g} * \textbf{x})\]
+to substitute the standard activation layer, where $ \sigma $ is the sigmoid function, which constricts the output value of second part between $ [0,1] $.  The function is inspired by Long Short-Term Memory (LSTM) \cite{lstm} and Rated Recurrent Unit (GRU).\cite{gru} It is originally used for learning complex interactions as LSTM gates does. In 2018, Yu et al. \cite{gconv} employed same function for free-form image inpainting, which can be used to learn mask automatically from image it self.
+
+Different to aforementioned approaches, Knutsson et al. in 2005 introduced normalized convolution \cite{nconv} dealing with missing sample case for convolution operation. 
+In 2018, Eldesokey et al. \cite{ncnn} applied normalized convolution in CNN as normalized convolution layer that takes both sparse depth map and a binary confidence map as input to perform scene depth completion.  
+In 2020, Eldesokey et al. \cite{pncnn} focus on modeling the uncertainty of depth data instead of assuming binary input confidence.
+
+\section{Normal Inference}
