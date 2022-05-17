@@ -42,7 +42,7 @@ class NormalGuided(nn.Module):
         padding_down_2 = (2, 2)
         padding_down_3 = (4, 4)
         padding_down_4 = (8, 8)
-
+        padding_down_5 = (16, 16)
         padding_up = (1, 1)
         padding_up_2 = (2, 2)
         stride = (1, 1)
@@ -71,9 +71,9 @@ class NormalGuided(nn.Module):
         self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
         self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_2, dilate1)
-        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_2, dilate2)
-        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilate3)
-        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilate4)
+        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilate2)
+        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_4, dilate3)
+        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_5, dilate4)
 
         self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
