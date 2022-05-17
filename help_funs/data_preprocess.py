@@ -85,15 +85,15 @@ def noisy_a_folder(folder_path, output_path):
             # get noise mask
             img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
             # img[img < 20] = 0
-            noise_mask = noisy_1channel(img)
-            noise_mask = noise_mask == 0
+            depth = noisy_1channel(depth)
+            # noise_mask = noise_mask == 0
             # input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
             # input_tensor = input_tensor.permute(2, 0, 1)
             #
             # img_noise = evaluate_epoch(model, input_tensor, device)
             # noise_mask = img_noise.sum(axis=2) == 0
             # add noise
-            depth[noise_mask] = 0
+            # depth[noise_mask] = 0
 
             # save files to the new folders
             file_io.save_scaled16bitImage(depth,
@@ -183,21 +183,21 @@ def convert2training_tensor(path, k, output_type='normal'):
         mask = vertex.sum(axis=2) == 0
         # move all the vertex as close to original point as possible, and noramlized all the vertex
 
-        range_0 = vertex[~mask].max() - vertex[~mask].min()
-        range_1 = vertex[~mask].max() - vertex[~mask].min()
-        range_2 = vertex[~mask].max() - vertex[~mask].min()
+        # range_0 = vertex[~mask].max() - vertex[~mask].min()
+        # range_1 = vertex[~mask].max() - vertex[~mask].min()
+        # range_2 = vertex[~mask].max() - vertex[~mask].min()
+        #
+        # vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[~mask].min()) / range_0
+        # vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[~mask].min()) / range_1
+        # vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[~mask].min()) / range_2
 
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[~mask].min()) / range_0
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[~mask].min()) / range_1
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[~mask].min()) / range_2
+        range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
+        range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
+        range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
 
-        # range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
-        # range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
-        # range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
-
-        # vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
-        # vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
-        # vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
 
         # calculate delta x, y, z of between each point and its neighbors
         if k >= 2:
