@@ -8,6 +8,30 @@ from common.ResNet import Bottleneck
 from common.nconv2d import NConv2d
 
 
+# Normalized Convolution Layer
+class NConv(_ConvNd):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=(1, 1),
+                 padding=(0, 0), dilation=(1, 1), groups=1, bias=True):
+        # Call _ConvNd constructor
+        super(NConv, self).__init__(in_channels, out_channels, kernel_size,
+                                    stride, padding, dilation, False, (0, 0),
+                                    groups, bias, padding_mode='zeros')
+
+        self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+        self.nconv = NConv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding)
+        self.active = nn.LeakyReLU(0.01)
+
+    def forward(self, x, cin=None, n=False):
+        if n:
+            # Normalized Convolution
+            x, cout = self.nconv(x, cin)
+        else:
+            x = self.conv(x)
+            x = self.active(x)
+        return x
+
+
 class NormalizedNet(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
@@ -42,28 +66,27 @@ class NormalizedNet(nn.Module):
         self.resnet50 = ResNet(Bottleneck, layers=[1, 3, 4, 5])
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
         # self.dconv1 = NConv2d(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
-        self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
+        self.dconv1 = NConv(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
+        self.dconv2 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv3 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv4 = NConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+        self.dilated1 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate1)
+        self.dilated2 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate2)
+        self.dilated3 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate3)
+        self.dilated4 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate4)
 
-        self.dilated1 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down_2, dilation=dilate1)
-        self.dilated2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilation=dilate2)
-        self.dilated3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down_4, dilation=dilate3)
-        self.dilated4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down_5, dilation=dilate4)
+        self.uconv1 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv2 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv3 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv4 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
 
-        self.uconv1 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv2 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv3 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv4 = nn.Conv2d(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-
-        self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
-        self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv1 = NConv(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv2 = NConv(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x1, x_img_1, cin):
         # x1, c1 = self.dconv1(x1, cin)
-        x1 = self.dconv1(x1)
+        x1 = self.dconv1(x1, cin, n=True)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
