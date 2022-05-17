@@ -16,8 +16,8 @@ class GConv(_ConvNd):
                                     stride, padding, dilation, False, (0, 0),
                                     groups, bias, padding_mode='zeros')
 
-        self.conv_g = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation=dilation)
-        self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation=dilation)
+        self.conv_g = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+        self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
 
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
