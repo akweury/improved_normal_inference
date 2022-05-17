@@ -62,7 +62,8 @@ class NormalizedNet(nn.Module):
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x1, x_img_1, cin):
-        x1, c1 = self.dconv1(x1, cin)
+        # x1, c1 = self.dconv1(x1, cin)
+        x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
