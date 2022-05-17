@@ -84,7 +84,7 @@ def noisy_a_folder(folder_path, output_path):
 
             # get noise mask
             img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
-            img[img < 20] = 0
+            # img[img < 20] = 0
             noise_mask = noisy_1channel(img)
             noise_mask = noise_mask == 0
             # input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
@@ -182,6 +182,7 @@ def convert2training_tensor(path, k, output_type='normal'):
                                  torch.tensor(data['t']).float())
         mask = vertex.sum(axis=2) == 0
         # move all the vertex as close to original point as possible, and noramlized all the vertex
+        # TODO: use one scaling factor
         range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
         range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
         range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()

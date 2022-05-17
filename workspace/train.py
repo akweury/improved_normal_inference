@@ -63,9 +63,12 @@ class AngleLoss(nn.Module):
 
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
+        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
+
         axis = args.epoch % 3
-        axis_diff = (outputs - target)[:, axis, :, :]
-        loss = torch.sum(axis_diff ** 2) / (axis_diff.shape[0] * axis_diff.shape[1] * axis_diff.shape[2])
+        axis_diff = (outputs - target)[:, axis, :, :][~mask]
+        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
         # print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
 
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
