@@ -41,7 +41,9 @@ class NormalizedNet(nn.Module):
 
         self.resnet50 = ResNet(Bottleneck, layers=[1, 3, 4, 5])
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
-        self.dconv1 = NConv2d(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
+        # self.dconv1 = NConv2d(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
+        self.dconv1 = nn.Conv2d(in_ch, channel_size_1, kernel_down, stride=stride, padding=padding_down)
+
         self.dconv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
