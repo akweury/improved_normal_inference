@@ -16,7 +16,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --ba
 D:\TUK\improved_normal_inference\workspace\noise_net\output_2022-05-09_15_37_05\checkpoint-98.pth.tar
 ## new training work
 
-CUDA_VISIBLE_DEVICES=0 python3 main.py --exp ng --args json --mode train --batch_size 8
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp resng --args json --mode train --batch_size 8
 
 scp D:\TUK\improved_normal_inference\dataset\data_real.zip sha@pc-2103:/datasets/sha
 

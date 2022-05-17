@@ -29,6 +29,14 @@ Although the depth image is incomplete, the depth sensor usually able to capture
 Both depth and grayscale image are initially relevant to the machine learning algorithms. Based grayscale image and corresponding semi-dense depth map, a CNN model can be designed to inference the normal map, which gives more density and robust comparing to standard algorithm. However, the missing pixels in depth map can be distributed around the whole image, some of the region leaves complete empty pixels. This situation imposes further processing for the missing regions and some other challenges on the machine learning methods. 
 In this thesis, we found a solution for the problems mentioned above.
 
+%% CNN based methods
+The deep convolutional neural network is typically used for image classification, which achieved great success in last several years. \cite{yolov3}, \cite{efficientDet}. 
+%% talk about the reason we need new type of network architecture
+These kinds of network architecture takes a single image as input which usually employed for classification problems. The image is usually convoluted with convolutional layer and downsampling with pooling layers. The outputs of the network consists of a single value to represent the ID of corresponding class \cite{efficientDet}, or with set of values to represent the position of bounding boxes.\cite{yolov3}.
+
+
+However, in many other vision tasks, the output is demanded as an image, instead of predicting one or several classes of the input, but the classes of each pixel are predicted. In this case, the traditional network architecture is not suitable anymore.
+
 %% improved normal inference figure
 \begin{figure}[!h]
 	\centering

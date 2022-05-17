@@ -1,3 +1,9 @@
+# args
+workspace/ng/args.json
+workspace/resng/args.json
+workspace/nnn24/args.json
+workspace/nnnn/args.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

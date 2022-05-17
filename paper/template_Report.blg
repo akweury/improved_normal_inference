@@ -21,45 +21,45 @@ Repeated entry---line 513 of file reference.bib
 I'm skipping whatever remains of this entry
 Warning--empty journal in nconv
 Warning--empty journal in efficientDet
-You've used 17 entries,
+You've used 21 entries,
             2118 wiz_defined-function locations,
-            589 strings with 7078 characters,
-and the built_in function-call counts, 6067 in all, are:
-= -- 557
-> -- 361
-< -- 3
-+ -- 142
-- -- 124
-* -- 411
-:= -- 986
-add.period$ -- 46
-call.type$ -- 17
-change.case$ -- 113
+            608 strings with 7947 characters,
+and the built_in function-call counts, 7445 in all, are:
+= -- 670
+> -- 458
+< -- 4
++ -- 180
+- -- 158
+* -- 491
+:= -- 1205
+add.period$ -- 55
+call.type$ -- 21
+change.case$ -- 142
 chr.to.int$ -- 0
-cite$ -- 19
-duplicate$ -- 212
-empty$ -- 451
-format.name$ -- 124
-if$ -- 1280
+cite$ -- 23
+duplicate$ -- 261
+empty$ -- 560
+format.name$ -- 158
+if$ -- 1578
 int.to.chr$ -- 0
-int.to.str$ -- 17
-missing$ -- 10
-newline$ -- 82
-num.names$ -- 34
-pop$ -- 154
+int.to.str$ -- 21
+missing$ -- 11
+newline$ -- 99
+num.names$ -- 42
+pop$ -- 207
 preamble$ -- 1
-purify$ -- 96
+purify$ -- 121
 quote$ -- 0
-skip$ -- 191
+skip$ -- 238
 stack$ -- 0
-substring$ -- 270
-swap$ -- 62
-text.length$ -- 3
+substring$ -- 295
+swap$ -- 79
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 68
+type$ -- 84
 warning$ -- 2
-while$ -- 45
-width$ -- 19
-write$ -- 167
+while$ -- 53
+width$ -- 23
+write$ -- 201
 (There was 1 error message)
