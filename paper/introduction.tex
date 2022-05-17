@@ -1,8 +1,74 @@
+
+%%%%%%%%%%%%%%%%%%% talk about the reason of this thesis %%%%%%%%%%%%%%%%%%
+
+%% standard method for normal inference is insufficient, input is sparse, not robust enough
+Standard methods compute normals from point cloud using neighboring information in image space or use Shape from Shading. However, the point clouds captured by sensors like Kinect or similar RGB-D, LiDAR sensors are only semi-dense. As shown in Figure \ref{fig:standard_normal_inference}. If map these normals to mesh, that is not good at all. Standard methods dependents on chosen neighbor size, if too small, it has larger noise sensitive, if too large, the output will too smooth and not crispy. Errors may occur in regions with inter-reflections, where we have errors in the 3D measurement. 
+
 %% add noise image
-%\begin{figure}[!h]
-%	\centering
-%	\begin{tikzpicture}
-%		\node[inner sep=0pt] (depthmap) at (0,0)
-%	{\includegraphics[width=.5\textwidth]{./pic/00028.normal0.png}};
-%	\end{tikzpicture}
-%\end{figure}
+\begin{figure}[!h]
+	\centering
+	\begin{tikzpicture}
+
+		
+		\node[inner sep=0pt] (depthmap) at (0,0)
+		{\includegraphics[width=.3\textwidth]{./pic/00028.depth0.png}};
+		
+		\path [line] (3,0) -- node [text width=1.5cm,midway,above ] {SVD/PCA} (5,0);
+		
+		\node[inner sep=0pt] (normal) at (8,0)
+		{\includegraphics[width=.3\textwidth]{./pic/00028.normal0.png}};
+	\end{tikzpicture}
+\caption{Left: Depth Map, Right: Semi-dense Normal Map}
+\label{fig:standard_normal_inference}
+\end{figure}
+
+%% there exists space for improvment 
+Although the depth image is incomplete, the depth sensor usually able to capture grayscale texture image, which are typically fully dense due to their passive nature. Furthermore, if the texture image is already illuminated by strong directional light of a video projector, whose position is known, then there should exist theoretical relations between light direction, normal direction, etc. Thus the normal can be inferenced better using the given image information and depth map. 
+
+%%%%%%%%%%%%%%%%%%% talk about the chanllege of this task %%%%%%%%%%%%%%%%%%
+Both depth and grayscale image are initially relevant to the machine learning algorithms. Based grayscale image and corresponding semi-dense depth map, a CNN model can be designed to inference the normal map, which gives more density and robust comparing to standard algorithm. However, the missing pixels in depth map can be distributed around the whole image, some of the region leaves complete empty pixels. This situation imposes further processing for the missing regions and some other challenges on the machine learning methods. 
+In this thesis, we found a solution for the problems mentioned above.
+
+%% improved normal inference figure
+\begin{figure}[!h]
+	\centering
+	\begin{tikzpicture}
+		
+		\node[inner sep=0pt] (image) at (0,0)
+		{\includegraphics[width=.2\textwidth]{./pic/00028.image0.png}};
+		
+		\node[text width=1cm] at (2,0) {$ + $};
+		
+		\node[inner sep=0pt] (depthmap) at (3.3,0)
+		{\includegraphics[width=.2\textwidth]{./pic/00028.depth0.png}};
+		\node[text width=1cm] at (8,0) {$ ? $};
+		
+		\path [line] (5,0) -- node [text width=1cm,midway,above ] {CNN} (6,0);
+		
+	\end{tikzpicture}
+	\caption{Left: Grayscale Image, Middle: Depth Map}
+	\label{fig:improved_normal_inference}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

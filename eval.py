@@ -33,7 +33,7 @@ def main():
     # path = config.geo_data / "train"
 
     path = config.real_data  # test 103, 166, 189,9
-    eval_list = [9, 66, 110, 103, 166, 189]
+    eval_list = [170, 9, 66, 110, 103, 166, 189]
     time_now = datetime.datetime.now().strftime("%H_%M_%S")
     date_now = datetime.datetime.today().date()
     folder_path = config.ws_path / "eval_output" / f"{date_now}_{time_now}"
@@ -92,6 +92,13 @@ def main():
         normal_model_path = config.ws_path / "ng" / "trained_model" / "output_2022-05-08_08_17_02" / "checkpoint-2994.pth.tar"
         nnnn_noraml, nnnn_img, _, _ = eval.eval(vertex, normal_model_path, img=img, k=0, output_type='normal')
         nnnn_img_final, birnak_diff_img = eval_post_processing(nnnn_noraml, nnnn_img, normal_gt, "NG_2994")
+        img_list.append(nnnn_img_final)
+        diff_list.append(birnak_diff_img)
+
+        # ng500+ 5516
+        normal_model_path = config.ws_path / "ng" / "trained_model" / "output_2022-05-09_21_40_33" / "checkpoint-5516.pth.tar"
+        nnnn_noraml, nnnn_img, _, _ = eval.eval(vertex, normal_model_path, img=img, k=0, output_type='normal')
+        nnnn_img_final, birnak_diff_img = eval_post_processing(nnnn_noraml, nnnn_img, normal_gt, "NG+_5516")
         img_list.append(nnnn_img_final)
         diff_list.append(birnak_diff_img)
 

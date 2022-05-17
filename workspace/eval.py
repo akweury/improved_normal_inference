@@ -68,7 +68,7 @@ def eval(v, model_path, k, output_type='rgb', img=None):
     normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device,
                                                                         output_type)
 
-    normal_img = mu.filter_bg(normal_img)
+    normal_img = mu.filter_gray_color(normal_img)
     normal_img = normal_img.astype(np.float32)
     normal_img = mu.normalize2_8bit(normal_img)
 

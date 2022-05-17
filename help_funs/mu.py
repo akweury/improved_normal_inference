@@ -568,11 +568,13 @@ def scale16bitImage(img, minVal, maxVal):
 
     return img.astype(np.float32)
 
+
 def normalise216bitImage(img):
     img = np.array(img, dtype=np.float32)
     min, max = img.min(), img.max()
     img_16bit = ((img - min) / (max - min) * 65535).astype(np.uint16)
     return img_16bit
+
 
 def median_filter(depth):
     padding = 3  # 2 optimal
@@ -648,6 +650,16 @@ def filter_bg(normal_img):
         normal_img[bg_mask] = 0
 
     return normal_img
+
+
+def filter_gray_color(img):
+    normal_img = img.astype(np.int64)
+    low_mask = normal_img[:, :, 1] > 170
+    diff = (np.abs(normal_img[:, :, 1] - normal_img[:, :, 0]) + np.abs(normal_img[:, :, 2] - normal_img[:, :, 0]))
+    gray_idx = diff < 20
+    mask = ~low_mask * gray_idx
+    img[mask] = 0
+    return img
 
 
 def visual_input(depth, data, output_name):

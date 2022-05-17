@@ -99,8 +99,8 @@ def noisy_a_folder(folder_path, output_path):
             file_io.save_scaled16bitImage(depth,
                                           str(output_path / (str(idx).zfill(5) + ".depth0_noise.png")),
                                           data['minDepth'], data['maxDepth'])
-            img_noise = mu.normalise216bitImage(img)
-            file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
+            # img_noise = mu.normalise216bitImage(img)
+            # file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
             shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
             shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
             shutil.copyfile(json_file, str(output_path / (str(idx).zfill(5) + ".data0.json")))

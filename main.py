@@ -7,6 +7,7 @@ import workspace.nnn.network as nnn
 import workspace.nnn24.network as nnn24
 import workspace.nnnn.network as nnnn
 import workspace.ng.network as ng
+import workspace.resng.network as resng
 
 
 def main():
@@ -35,6 +36,8 @@ def main():
         model = nnnn.CNN()
     elif args.exp == "ng":
         model = ng.CNN()
+    elif args.exp == "resng":
+        model = resng.CNN()
     else:
         raise ValueError("Unknown exp path")
     if args.machine == 'local':
