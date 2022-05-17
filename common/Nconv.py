@@ -19,7 +19,7 @@ class NConv(_ConvNd):
 
         self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
         self.nconv = NConv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding)
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, dilation=dilation)
         self.active = nn.LeakyReLU(0.01)
 
     def forward(self, x, cin=None, n=False):
@@ -71,10 +71,10 @@ class NormalizedNet(nn.Module):
         self.dconv3 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv4 = NConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        self.dilated1 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate1)
-        self.dilated2 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate2)
-        self.dilated3 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate3)
-        self.dilated4 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilation=dilate4)
+        self.dilated1 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_2, dilation=dilate1)
+        self.dilated2 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilation=dilate2)
+        self.dilated3 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_4, dilation=dilate3)
+        self.dilated4 = NConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_5, dilation=dilate4)
 
         self.uconv1 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = NConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
@@ -86,7 +86,7 @@ class NormalizedNet(nn.Module):
 
     def forward(self, x1, x_img_1, cin):
         # x1, c1 = self.dconv1(x1, cin)
-        x1 = self.dconv1(x1, cin, n=False)
+        x1 = self.dconv1(x1, cin, n=True)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
