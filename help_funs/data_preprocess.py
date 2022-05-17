@@ -182,10 +182,14 @@ def convert2training_tensor(path, k, output_type='normal'):
                                  torch.tensor(data['t']).float())
         mask = vertex.sum(axis=2) == 0
         # move all the vertex as close to original point as possible, and noramlized all the vertex
-        # TODO: use one scaling factor
-        range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
-        range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
-        range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
+
+        range_0 = vertex[~mask].max - vertex[~mask].min()
+        range_1 = vertex[~mask].max - vertex[~mask].min()
+        range_2 = vertex[~mask].max - vertex[~mask].min()
+
+        # range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
+        # range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
+        # range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
 
         vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
