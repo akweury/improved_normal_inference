@@ -28,7 +28,8 @@ class NConv(_ConvNd):
             x, cout = self.nconv(x, cin)
         else:
             x = self.conv(x)
-            x = self.active(x)
+            
+        x = self.active(x)
         return x
 
 
