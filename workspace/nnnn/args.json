@@ -1,6 +1,6 @@
 {
   "noise": false,
-  "machine": "local",
+  "machine": "remote",
   "output_type": "normal_noise",
   "neighbor": 1,
   "args": "json",
@@ -12,7 +12,7 @@
   "dataset": "synthetic",
   "dataset_path": "synthetic_data_noise",
   "modality": "d",
-  "train_on": "10",
+  "train_on": "50",
   "workers": 1,
   "raw_kitti_path": "",
   "selval_ds": "selval",

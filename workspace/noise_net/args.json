@@ -1,6 +1,6 @@
 {
   "convert": false,
-  "machine": "local",
+  "machine": "remote",
   "output_type": "noise",
   "neighbor": 0,
   "cout": null,
@@ -17,7 +17,7 @@
   "selval_ds": "selval",
   "norm_factor": 256,
   "num_samples": 200,
-  "epochs": 10001,
+  "epochs": 100,
   "optimizer": "adam",
   "lr": 0.001,
   "lr_scheduler": "9999",
