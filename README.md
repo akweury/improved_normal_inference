@@ -29,6 +29,5 @@ CUDA_VISIBLE_DEVICES=1 python3 eval.py --machine remote --data synthetic --noise
 #### Copy the trained model from remote
 
 ```
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/noise_net/output.zip D:
-\TUK\improved_normal_inference\workspace\noise_net
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/resng/output.zip D:\TUK\improved_normal_inference\workspace\resng
 ```

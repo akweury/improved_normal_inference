@@ -449,7 +449,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")
     if output_type != "noise":
-        xout_ranges = mu.addHist(xout)
+        xout_ranges = mu.addHist(normal_cnn_8bit)
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_cnn_8bit)
 
@@ -479,7 +479,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 def main(args, exp_dir, network, train_dataset):
     nn_model = TrainingModel(args, exp_dir, network, train_dataset)
 
-    print(f'- Training GPU: {nn_model.device} -- ')
+    print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
