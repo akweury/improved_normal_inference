@@ -44,9 +44,9 @@ def preprocessing():
     # Mode selection
     parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
-                        action=argparse.BooleanOptionalAction,
-                        help='add noise or not')
+    parser.add_argument('--noise', action='store_true')
+    parser.add_argument('--no-noise', dest='feature', action='store_false')
+    parser.set_defaults(noise=False)
 
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
