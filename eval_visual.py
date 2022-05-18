@@ -14,8 +14,6 @@ from help_funs import file_io, mu
 import config
 from workspace.svd import eval as svd
 from help_funs import data_preprocess
-from help_funs import chart
-from help_funs.data_preprocess import noisy_a_folder
 
 
 def preprocessing():

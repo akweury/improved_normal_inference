@@ -11,7 +11,7 @@ parser.add_argument('--machine', type=str, default="local", choices=['local', 'r
                     help="loading dataset from local or dfki machine")
 args = parser.parse_args()
 
-for folder in ["test"]:
+for folder in ["train", "test"]:
     original_folder = config.synthetic_data / folder
     if args.machine == "remote":
         dataset_folder = config.synthetic_data_noise_dfki / folder
