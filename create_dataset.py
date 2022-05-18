@@ -22,4 +22,5 @@ for folder in ["train", "test"]:
         raise ValueError
     noisy_a_folder(original_folder, dataset_folder)
     for k in range(2):
+        print(f"K = {k}")
         convert2training_tensor(dataset_folder, k=k, output_type="normal_noise")

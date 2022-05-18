@@ -222,7 +222,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         # save tensors
         torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt"))
         torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}_{output_type}.pt"))
-        print(f'File {item} converted to tensor.')
+        print(f'File {item}/{len(data_files)} converted to tensor. K = {k}')
 
 
 def high_pass_filter(img, threshold=20):
