@@ -631,7 +631,7 @@ def eval_img_angle(output, target):
 
 def angle2rgb(angle_matrix):
     angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_DEEPGREEN)
+    return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_HOT)
 
 
 def filter_bg(normal_img):
