@@ -15,10 +15,15 @@ import torch
 import numpy as np
 from help_funs import mu, data_preprocess
 from pncnn.utils import args_parser
+from workspace.svd import eval as svd
 
 
-def eval(v, model_path, k, output_type='rgb', img=None):
+def eval(v, model_path, output_type='rgb', img=None, gpu=0):
     vertex = v.copy()
+
+    if model_path is None:
+        return svd.eval(vertex, farthest_neighbour=2)
+
     # load model
     checkpoint = torch.load(model_path)
 
@@ -26,7 +31,7 @@ def eval(v, model_path, k, output_type='rgb', img=None):
     args = checkpoint['args']
     start_epoch = checkpoint['epoch']
     print('- Checkpoint was loaded successfully.')
-
+    k = args.neighbor
     # Compare the checkpoint args with the json file in case I wanted to change some args
     # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
     args.evaluate = model_path
@@ -35,7 +40,7 @@ def eval(v, model_path, k, output_type='rgb', img=None):
     if args.cpu:
         device = torch.device("cpu")
     else:
-        device = torch.device("cuda:" + str(args.gpu))
+        device = torch.device("cuda:" + str(gpu))
 
     model = checkpoint['model'].to(device)
     args_parser.print_args(args)
@@ -67,8 +72,10 @@ def eval(v, model_path, k, output_type='rgb', img=None):
 
     normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device,
                                                                         output_type)
+    normal[mask] = 0
+    normal_img[mask] = 0
 
-    normal_img = mu.filter_gray_color(normal_img)
+    # normal_img = mu.filter_gray_color(normal_img)
     normal_img = normal_img.astype(np.float32)
     normal_img = mu.normalize2_8bit(normal_img)
 

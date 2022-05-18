@@ -4,9 +4,9 @@ output: a complete depth map
 """
 import os
 import argparse
-from pathlib import Path
 
 import glob
+import cv2 as cv
 import torch
 import datetime
 import numpy as np
@@ -32,8 +32,8 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
     return normal_img, diff_img, diff
 
 
-def model_eval(model_path, input, gt, name, img=None, gpu=0):
-    noraml, img, _, _ = eval.eval(input, model_path, output_type='normal', img=img, gpu=gpu)
+def model_eval(model_path, input, gt, name):
+    noraml, img, _, _ = eval.eval(input, model_path, output_type='normal')
     normal_img, angle_err_img, err = eval_post_processing(noraml, img, gt, name)
     return normal_img, angle_err_img, err
 
@@ -43,7 +43,6 @@ def preprocessing():
 
     # Mode selection
     parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
-    parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
     parser.add_argument('--noise', type=bool, default=False, help='add noise to the test folder')
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
@@ -70,6 +69,7 @@ def preprocessing():
     all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
     all_names = np.array(all_names)
     eval_indices = [int(name.split(".")[0]) for name in all_names]
+    eval_indices = eval_indices[:5]
 
     # load test model names
     models = {
@@ -92,40 +92,54 @@ def preprocessing():
           f"Eval Time: {eval_time}\n"
           f"Eval Objects: {len(eval_indices)}\n"
           f"Eval Models: {models.keys()}\n")
-    return models, eval_indices, path, folder_path, eval_res, eval_date, eval_time, args.gpu
+    return models, eval_indices, path, folder_path, eval_res, eval_date, eval_time
 
 
 def main():
-    models, eval_idx, dataset_path, folder_path, eval_res, eval_date, eval_time, gpu = preprocessing()
-    eval_avg = {}
-    # evaluate CNN models
-    for model_idx, (name, model) in enumerate(models.items()):
-        for i, data_idx in enumerate(eval_idx):
-            # read data
-            data, depth, depth_noise, normal_gt, image = file_io.load_single_data(dataset_path, idx=data_idx)
+    models, eval_idx, dataset_path, folder_path, eval_res, eval_date, eval_time = preprocessing()
 
+    for i, data_idx in enumerate(eval_idx):
+        # read data
+        data, depth, depth_noise, normal_gt, _ = file_io.load_single_data(dataset_path, idx=data_idx)
+
+        vertex_filted_gt = None
+        if dataset_path == config.real_data:
             depth_filtered = mu.median_filter(depth)
-            vertex_filted = mu.depth2vertex(torch.tensor(depth_filtered).permute(2, 0, 1),
-                                            torch.tensor(data['K']),
-                                            torch.tensor(data['R']).float(),
-                                            torch.tensor(data['t']).float())
-            vertex = mu.depth2vertex(torch.tensor(depth_noise).permute(2, 0, 1),
-                                     torch.tensor(data['K']),
-                                     torch.tensor(data['R']).float(),
-                                     torch.tensor(data['t']).float())
+            vertex_filted_gt = mu.depth2vertex(torch.tensor(depth_filtered).permute(2, 0, 1),
+                                               torch.tensor(data['K']),
+                                               torch.tensor(data['R']).float(),
+                                               torch.tensor(data['t']).float())
+        vertex = mu.depth2vertex(torch.tensor(depth_noise).permute(2, 0, 1),
+                                 torch.tensor(data['K']),
+                                 torch.tensor(data['R']).float(),
+                                 torch.tensor(data['t']).float())
 
-            if name == "Neigh_9999":
-                normal_img, angle_err_img, err = model_eval(model, vertex_filted, normal_gt, name, image, gpu)
+        img_list = []
+        diff_list = []
+        # ground truth normal
+        normal_gt_img = mu.normal2RGB(normal_gt)
+        # normal_gt_ = mu.rgb2normal(normal_gt_img)
+        # gt_img, gt_diff = eval_post_processing(normal_gt_, normal_gt_img, normal_gt, "GT")
+        img_list.append(normal_gt_img)
+        # diff_list.append(gt_diff)
+
+        # evaluate CNN models
+        for model_idx, (name, model) in enumerate(models.items()):
+            if dataset_path == config.real_data and name == "Neigh_9999":
+                normal_img, angle_err_img, err = model_eval(model, vertex_filted_gt, normal_gt, name)
             else:
-                normal_img, angle_err_img, err = model_eval(model, vertex, normal_gt, name, image, gpu)
+                normal_img, angle_err_img, err = model_eval(model, vertex, normal_gt, name)
+            img_list.append(normal_img)
+            diff_list.append(angle_err_img)
             eval_res[model_idx, i] = err
-            print(f"{data_idx} has been evaluated.")
-
-        eval_avg[name] = eval_res.sum(axis=-1) / len(eval_idx)
-    chart.line_chart(eval_res, str(folder_path), "Evaluation", y_label="Degree", labels=list(models.keys()), log_y=True)
-
-    with open(str(folder_path / "evaluation.txt"), 'w') as f:
-        f.write(str(eval_avg))
+        # show the results
+        output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
+        output_diff = cv.hconcat(diff_list)
+        time_now = datetime.datetime.now().strftime("%H_%M_%S")
+        date_now = datetime.datetime.today().date()
+        cv.imwrite(str(folder_path / f"evaluation_{date_now}_{time_now}.png"), output)
+        cv.imwrite(str(folder_path / f"diff{date_now}_{time_now}.png"), output_diff)
+        print(f"{data_idx} has been evaluated.")
 
 
 if __name__ == '__main__':

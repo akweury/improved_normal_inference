@@ -12,7 +12,7 @@ date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
-def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None, y_label=None, show=False, log_y=False):
+def line_chart(data, path, title=None, x_scale=None, y_scale=None, labels=None, y_label=None, show=False, log_y=False):
     if data.shape[1] <= 1:
         return
 
@@ -21,26 +21,26 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, x_label=None,
     if x_scale is None:
         x_scale = [1, 1]
 
-    for row in data:
+    for i, row in enumerate(data):
         x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
         y = row
-        plt.plot(x, y)
+        plt.plot(x, y, label=labels[i])
 
     if title is not None:
         plt.title(title)
 
-    if x_label is not None:
-        plt.xlabel(x_label)
     if y_label is not None:
         plt.ylabel(y_label)
 
     if log_y:
         plt.yscale('log')
 
+    plt.legend()
+
     if not os.path.exists(str(path)):
         os.mkdir(path)
     plt.savefig(
-        str(Path(path) / f"line_{title}_{x_label}_{y_label}_{date_now}_{time_now}.png"))
+        str(Path(path) / f"{title}_{y_label}_{date_now}_{time_now}.png"))
 
     if show:
         plt.show()

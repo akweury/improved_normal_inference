@@ -14,7 +14,7 @@ import workspace.nconv.network as nconv
 def main():
     args = args_parser.args_parser()
     if args.noise:
-        for folder in ["train"]:
+        for folder in ["train", "test"]:
             # add noise
             original_folder = config.synthetic_data / folder
             if args.machine == "remote":

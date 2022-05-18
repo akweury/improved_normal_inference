@@ -10,7 +10,7 @@ ssh sha@pc-2103
 
 ## resume
 
-CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nnn24 --args json --mode train --batch_size 8 --resume
+CUDA_VISIBLE_DEVICES=0 python3 main.py --exp nconv --args json --mode train --batch_size 8 --resume
 /home/sha/improved_normal_inference/workspace/nnn24/trained_model/full_normal/checkpoint-1740.pth.tar
 
 D:\TUK\improved_normal_inference\workspace\noise_net\output_2022-05-09_15_37_05\checkpoint-98.pth.tar
