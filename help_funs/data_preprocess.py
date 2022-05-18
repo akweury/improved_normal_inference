@@ -189,12 +189,17 @@ def convert2training_tensor(path, k, output_type='normal'):
         mask = vertex.sum(axis=2) == 0
         # move all the vertex as close to original point as possible, and noramlized all the vertex
 
-        v_range = vertex[~mask].max() - vertex[~mask].min()
+        x_range = vertex[:, :, 0][~mask].max() - vertex[:, :, 0][~mask].min()
+        y_range = vertex[:, :, 1][~mask].max() - vertex[:, :, 1][~mask].min()
+        z_range = vertex[:, :, 2][~mask].max() - vertex[:, :, 2][~mask].min()
+
+        scale_factor = max(x_range, y_range, z_range)
+
         v_min, v_max = vertex[~mask].min(), vertex[~mask].max()
 
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - v_min) / v_range
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - v_min) / v_range
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - v_min) / v_range
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factor
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factor
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factor
 
         # calculate delta x, y, z of between each point and its neighbors
         if k >= 2:

@@ -1,4 +1,3 @@
-
 import argparse
 
 import config
@@ -9,6 +8,9 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
+parser.add_argument('--max_k', type=int, default=2,
+                    help="loading dataset from local or dfki machine")
+
 args = parser.parse_args()
 
 for folder in ["train", "test"]:
@@ -21,6 +23,6 @@ for folder in ["train", "test"]:
     else:
         raise ValueError
     noisy_a_folder(original_folder, dataset_folder)
-    for k in range(3):
+    for k in range(args.max_k):
         print(f"K = {k}, {folder}")
         convert2training_tensor(dataset_folder, k=k, output_type="normal_noise")
