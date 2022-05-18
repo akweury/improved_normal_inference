@@ -3,6 +3,7 @@
   "machine": "local",
   "output_type": "normal_noise",
   "neighbor": 0,
+  "cout": true,
   "args": "json",
   "exp": "resng",
   "workspace": "",
