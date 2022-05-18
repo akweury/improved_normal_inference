@@ -422,7 +422,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         input = mu.tenor2numpy(x0[:1, :3, :, :])
     x0_normalized_8bit = mu.normalize2_8bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
-    mu.addText(x0_normalized_8bit, "Input(Normals)")
+    mu.addText(x0_normalized_8bit, "Input(Vertex)")
     output_list.append(x0_normalized_8bit)
 
     # gt normal

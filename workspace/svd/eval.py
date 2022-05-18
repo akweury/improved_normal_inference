@@ -49,5 +49,10 @@ def eval(dataloader, farthest_neighbour):
     return loss_list, time_list
 
 
+def eval_single(v, farthest_neighbour):
+    normal, normal_img = mu.vertex2normal(v, farthest_neighbour)
+    return normal, normal_img, None, None
+
+
 if __name__ == '__main__':
     pass
