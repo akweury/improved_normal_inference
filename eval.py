@@ -76,7 +76,7 @@ def preprocessing():
 
     # load test model names
     models = {
-        "SVD": None,
+        # "SVD": None,
         "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
         "NNNN_10082": config.ws_path / "nnnn" / "trained_model" / "output_2022-05-02_08_09_16" / "checkpoint-10082.pth.tar",
         "NG_2994": config.ws_path / "ng" / "trained_model" / "output_2022-05-08_08_17_02" / "checkpoint-2994.pth.tar",
