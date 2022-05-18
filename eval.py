@@ -45,6 +45,7 @@ def preprocessing():
     parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
     parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
+                        action=argparse.BooleanOptionalAction,
                         help='add noise or not')
 
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
