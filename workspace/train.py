@@ -478,7 +478,9 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
 def main(args, exp_dir, network, train_dataset):
     nn_model = TrainingModel(args, exp_dir, network, train_dataset)
-    print(f"\nTraining Date: {datetime.datetime.today().date()}\n")
+
+    print(f'- Training GPU: {nn_model.device} -- ')
+    print(f"- Training Date: {datetime.datetime.today().date()}\n")
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
