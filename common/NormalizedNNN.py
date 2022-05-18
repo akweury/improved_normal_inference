@@ -47,11 +47,11 @@ class NormalizedNNN(nn.Module):
         dilate3 = (8, 8)
         dilate4 = (16, 16)
 
-        self.active_f = nn.LeakyReLU(0.01)
-        self.active_g = nn.Sigmoid()
+        # self.active_f = nn.LeakyReLU(0.01)
+        # self.active_g = nn.Sigmoid()
         # self.active = nn.ReLU()
 
-        self.epsilon = 1e-20
+        # self.epsilon = 1e-20
         channel_size_1 = 32
         channel_size_2 = 64
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
@@ -61,10 +61,10 @@ class NormalizedNNN(nn.Module):
         self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
-        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
-        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
-        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
+        # self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
+        # self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
+        # self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
+        # self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
 
         self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
@@ -73,50 +73,6 @@ class NormalizedNNN(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-        # conv branch
-        self.d2conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        self.d2conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.d2conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.d2conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
-
-        self.dilated21 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
-        self.dilated22 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
-        self.dilated23 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
-        self.dilated24 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
-
-        # attention branch
-        self.d3conv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        self.d3conv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.d3conv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.d3conv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
-
-        # merge
-        self.mconv1 = GConv(channel_size_2, channel_size_1, kernel_down, stride, padding_down)
-        self.mconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-
-        self.umconv1 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        self.umconv2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        self.umconv3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-
-        self.m2conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
-        self.m2conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
-
-    def c_avg(self, cout, weight):
-        # Propagate confidence
-        # cout = denom.sum(dim=1, keepdim=True)
-        sz = cout.size()
-        cout = cout.view(sz[0], sz[1], -1)
-
-        k = weight
-        k_sz = k.size()
-        k = k.view(k_sz[0], -1)
-
-        s = torch.sum(k, dim=-1, keepdim=True)
-        # s = torch.sum(k)
-
-        cout = cout / s
-        cout = cout.view(sz)
-        return cout
 
     def forward(self, xin, cin):
         x1 = self.dconv1(xin)
@@ -138,13 +94,13 @@ class NormalizedNNN(nn.Module):
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
-        # dilated conv
-        x4 = self.dilated1(x4)
-        x4 = self.dilated2(x4)
-        x4 = self.dilated3(x4)
-        x4 = self.dilated4(x4)
-        x4 = self.dconv2(x4)
-        x4 = self.dconv3(x4)
+        # # dilated conv
+        # x4 = self.dilated1(x4)
+        # x4 = self.dilated2(x4)
+        # x4 = self.dilated3(x4)
+        # x4 = self.dilated4(x4)
+        # x4 = self.dconv2(x4)
+        # x4 = self.dconv3(x4)
 
         # Upsample 1
         x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
@@ -160,67 +116,5 @@ class NormalizedNNN(nn.Module):
 
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
-
-        # xin2 = xout * (1 - cin) + xin * cin
-        #
-        # # Downsample 1
-        # x1 = self.d2conv1(xin2)
-        # x2 = self.d2conv4(x1)
-        # x2 = self.d2conv2(x2)
-        # x2 = self.d2conv3(x2)
-        #
-        # # Downsample 2
-        # x3 = self.d2conv4(x2)
-        # x3 = self.d2conv2(x3)
-        # x3 = self.d2conv3(x3)
-        #
-        # # Downsample 3
-        # x4 = self.d2conv4(x3)
-        # x4 = self.d2conv2(x4)
-        # x4 = self.d2conv3(x4)
-        #
-        # # dilated conv
-        # x4 = self.dilated21(x4)
-        # x4 = self.dilated22(x4)
-        # x4 = self.dilated23(x4)
-        # x4 = self.dilated24(x4)
-        #
-        # x_hallu = x4
-        #
-        # # Downsample 1
-        # x1 = self.d3conv1(xin2)
-        # x2 = self.d3conv4(x1)
-        # x2 = self.d3conv2(x2)
-        # x2 = self.d3conv3(x2)
-        #
-        # # Downsample 2
-        # x3 = self.d3conv4(x2)
-        # x3 = self.d3conv2(x3)
-        # x3 = self.d3conv3(x3)
-        #
-        # # Downsample 3
-        # x4 = self.d3conv4(x3)
-        # x4 = self.d3conv2(x4)
-        # x4 = self.d3conv3(x4)
-        #
-        # x5 = torch.cat((x_hallu, x4), 1)
-        #
-        # x5 = self.mconv1(x5)
-        # x5 = self.mconv2(x5)
-        #
-        # # Upsample 1
-        # x3_us = F.interpolate(x5, x3.size()[2:], mode='nearest')  # 128,128
-        # x3 = self.umconv1(x3_us)
-        #
-        # # Upsample 2
-        # x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
-        # x2 = self.umconv2(x2_us)
-        #
-        # # # Upsample 3
-        # x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
-        # x1 = self.umconv3(x1_us)
-        #
-        # xout = self.m2conv1(x1)  # 512, 512
-        # xout = self.m2conv2(xout)
 
         return xout, cin
