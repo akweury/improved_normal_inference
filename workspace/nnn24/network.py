@@ -23,11 +23,11 @@ class CNN(nn.Module):
         # x0: vertex array
         # c0: confidence of each element in x0
         device = x0.get_device()
-        c0 = mu.binary(x0).to(device)
+        # c0 = mu.binary(x0).to(device)
         xout = self.conv24_3(x0)
 
         # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
-        out = torch.cat((xout, c0, c0), 1)
+        out = torch.cat((xout, xout, xout), 1)
         return out
 
     def minor_filter(self, tensor):

@@ -16,111 +16,113 @@ import numpy as np
 from help_funs import mu, data_preprocess
 from pncnn.utils import args_parser
 from workspace.svd import eval as svd
+from torch.utils.data import Dataset, DataLoader
+import glob
 
 
-def eval(v, model_path, output_type='rgb', img=None, gpu=0):
-    vertex = v.copy()
+class SyntheticDepthDataset(Dataset):
 
+    def __init__(self, data_path, k, output_type):
+        self.input = np.array(
+            sorted(
+                glob.glob(str(data_path / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
+        self.gt = np.array(
+            sorted(glob.glob(str(data_path / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
+
+        assert (len(self.gt) == len(self.input))
+
+    def __len__(self):
+        return len(self.input)
+
+    def __getitem__(self, item):
+        if item < 0 or item >= self.__len__():
+            return None
+
+        input_tensor = torch.load(self.input[item])
+        gt_tensor = torch.load(self.gt[item])
+
+        return input_tensor, gt_tensor
+
+
+def eval(dataset_path, name, model_path, gpu=0):
+    print(f"---------- Start {name} Evaluation --------")
+    print(f"load checkpoint... ", end="")
+    # SVD model
     if model_path is None:
-        return svd.eval(vertex, farthest_neighbour=2)
+        # load dataset
+        dataset = SyntheticDepthDataset(dataset_path, 1, "normal_noise")
+        data_loader = DataLoader(dataset, shuffle=True, batch_size=1, num_workers=1)
+        loss_list, time_list = svd.eval(data_loader, 2)
+        return loss_list, time_list
 
     # load model
     checkpoint = torch.load(model_path)
-
-    # Assign some local variables
     args = checkpoint['args']
     start_epoch = checkpoint['epoch']
-    print('- Checkpoint was loaded successfully.')
-    k = args.neighbor
-    # Compare the checkpoint args with the json file in case I wanted to change some args
-    # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
-    args.evaluate = model_path
+    model = checkpoint['model']
 
-    # load model
     if args.cpu:
         device = torch.device("cpu")
     else:
         device = torch.device("cuda:" + str(gpu))
-
-    model = checkpoint['model'].to(device)
-    args_parser.print_args(args)
-    mask = vertex.sum(axis=2) == 0
-    # move all the vertex as close to original point as possible, and noramlized all the vertex
-    range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
-    range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
-    range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
-
-    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
-    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
-    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
-
-    # calculate delta x, y, z of between each point and its neighbors
-    if k >= 2:
-        vectors = data_preprocess.neighbor_vectors_k(vertex, k)
-    # case of ng
-    elif k == 0:
-        vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
-    elif k == 1:
-        vectors = vertex
-    else:
-        raise ValueError
-
-    vectors[mask] = 0
-
-    input_tensor = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
-    input_tensor = input_tensor.permute(2, 0, 1)
-
-    normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device,
-                                                                        output_type)
-    normal[mask] = 0
-    normal_img[mask] = 0
-
-    # normal_img = mu.filter_gray_color(normal_img)
-    normal_img = normal_img.astype(np.float32)
-    normal_img = mu.normalize2_8bit(normal_img)
-
-    return normal, normal_img, eval_point_counter, total_time
-
-
-############ EVALUATION FUNCTION ############
-def evaluate_epoch(model, input_tensor, epoch, device, output_type='normal'):
+    model = model.to(device)
     model.eval()  # Swith to evaluate mode
+    print("ok.")
+    print("load dataset...", end="")
+    # load dataset
+    dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise")
+    data_loader = DataLoader(dataset,
+                             shuffle=True,
+                             batch_size=1,
+                             num_workers=1)
 
-    with torch.no_grad():
-        input_tensor = input_tensor.to(device)
-        input_tensor = input_tensor.unsqueeze(0)
-        torch.cuda.synchronize()
+    print(f'ok, {data_loader.dataset.__len__()} items.')
 
-        # Forward Pass
-        start = time.time()
-        output = model(input_tensor)
-        gpu_time = time.time() - start
+    loss_list = np.zeros(data_loader.dataset.__len__())
+    time_list = np.zeros(data_loader.dataset.__len__())
 
-        # store the predicted normal
-        output = output[0, :].permute(1, 2, 0)[:, :, :3]
-        output = output.to('cpu').numpy()
-    mask = input_tensor.sum(axis=1) == 0
-    mask = mask.to('cpu').numpy().reshape(512, 512)
-    eval_point_counter = np.sum(mask)
-    if output_type == 'normal':
-        # normal = output / np.linalg.norm(output, axis=2, ord=2, keepdims=True)
-        normal = mu.filter_noise(output, threshold=[-1, 1])
-        output_img = mu.normal2RGB(normal)
-        normal_8bit = np.ascontiguousarray(output_img, dtype=np.uint8)
-        # normal_8bit = cv.normalize(output_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        # normal_8bit[mask] = 0
+    for i, (input, target) in enumerate(data_loader):
+        with torch.no_grad():
+            # put input and target to device
+            input, target = input.to(device), target.to(device)
 
-    else:
-        output = output.astype(np.uint8)
-        output = mu.filter_noise(output, threshold=[0, 255])
-        output[mask] = 0
-        normal_8bit = np.ascontiguousarray(output, dtype=np.uint8)
-        # normal_8bit = cv.normalize(output, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        normal = mu.rgb2normal(normal_8bit)
-    # normal_cnn_8bit = mu.normal2RGB(xout_normal)
-    # mu.addText(normal_8bit, "output")
+            # Wait for all kernels to finish
+            torch.cuda.synchronize()
 
-    return normal, normal_8bit, eval_point_counter, gpu_time
+            # start count the model time
+            start = time.time()
+
+            # Forward pass
+            out = model(input)
+
+            # record data load time
+            gpu_time = time.time() - start
+
+            # calculate loss
+            out = mu.filter_noise(out, threshold=[-1, 1])
+            mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+            rad_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum() / mask.sum()
+            rad_loss = rad_loss.to('cpu').detach().numpy()
+            loss_list[i] = rad_loss
+            time_list[i] = gpu_time
+            print(
+                f"[{name}] Test Case: {i}/{loss_list.shape[0]}, Rad Loss: {rad_loss:.2e}, Time: {(gpu_time * 1000):.2e} ms")
+
+    return loss_list, time_list
+
+
+def eval_post_processing(normal, normal_img, normal_gt, name):
+    out_ranges = mu.addHist(normal_img)
+    mu.addText(normal_img, str(out_ranges), pos="upper_right", font_size=0.5)
+    mu.addText(normal_img, name, font_size=0.8)
+
+    diff_img, diff_angle = mu.eval_img_angle(normal, normal_gt)
+    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+    mu.addText(diff_img, f"{name}")
+    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+
+    return normal_img, diff_img, diff
 
 
 if __name__ == '__main__':

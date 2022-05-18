@@ -1,5 +1,4 @@
 import os
-from os import path
 from pathlib import Path
 import json
 import numpy as np
@@ -76,8 +75,10 @@ def noisy_a_folder(folder_path, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     for idx in range(1000):
+        if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0_noise.png"))):
+            continue
         image_file, ply_file, json_file, depth_gt_file, _, normal_file = file_io.get_file_name(idx, folder_path)
-        if path.exists(image_file):
+        if os.path.exists(image_file):
             f = open(json_file)
             data = json.load(f)
             depth = file_io.load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
@@ -166,6 +167,9 @@ def convert2training_tensor(path, k, output_type='normal'):
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
     img_files = np.array(sorted(glob.glob(str(path / "*image0.png"), recursive=True)))
     for item in range(len(data_files)):
+        if os.path.exists(str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt")):
+            continue
+
         f = open(data_files[item])
         data = json.load(f)
         f.close()
@@ -173,6 +177,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
+        if k == 2:
+            depth = mu.median_filter(depth)
         img = file_io.load_16bitImage(img_files[item])
         data['R'] = np.identity(3)
         data['t'] = np.zeros(3)

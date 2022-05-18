@@ -12,67 +12,28 @@ import datetime
 import numpy as np
 from help_funs import file_io, mu
 import config
+from torch.utils.data import Dataset
 
 from workspace import eval
 from help_funs import chart
-from help_funs.data_preprocess import noisy_a_folder
+from help_funs.data_preprocess import noisy_a_folder, convert2training_tensor
 
 
-def eval_post_processing(normal, normal_img, normal_gt, name):
-    out_ranges = mu.addHist(normal_img)
-    mu.addText(normal_img, str(out_ranges), pos="upper_right", font_size=0.5)
-    mu.addText(normal_img, name, font_size=0.8)
-
-    diff_img, diff_angle = mu.eval_img_angle(normal, normal_gt)
-    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-
-    mu.addText(diff_img, f"{name}")
-    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
-
-    return normal_img, diff_img, diff
-
-
-def model_eval(model_path, input, gt, name, img=None, gpu=0):
-    noraml, img, _, _ = eval.eval(input, model_path, output_type='normal', img=img, gpu=gpu)
-    normal_img, angle_err_img, err = eval_post_processing(noraml, img, gt, name)
-    return normal_img, angle_err_img, err
-
-
-def preprocessing():
+def get_args():
     parser = argparse.ArgumentParser(description='Eval')
 
     # Mode selection
     parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--noise', action='store_true')
-    parser.add_argument('--no-noise', dest='feature', action='store_false')
-    parser.set_defaults(noise=False)
-
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
-    if args.noise:
-        original_folder = config.synthetic_data / "test"
-        if args.machine == "remote":
-            dataset_folder = config.synthetic_data_noise_dfki / "test"
-        elif args.machine == 'local':
-            dataset_folder = config.synthetic_data_noise / "test"
-        else:
-            raise ValueError
-        noisy_a_folder(original_folder, dataset_folder)
+    return args
 
-    # load data file names
-    if args.data == "synthetic":
-        path = config.synthetic_data_noise / "test"
-    elif args.data == "real":
-        path = config.real_data  # key tests 103, 166, 189,9
-    else:
-        raise ValueError
-    # test dataset indices
-    all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
-    all_names = np.array(all_names)
-    eval_indices = [int(name.split(".")[0]) for name in all_names]
+
+def main():
+    args = get_args()
 
     # load test model names
     models = {
@@ -82,7 +43,8 @@ def preprocessing():
         "NG_2994": config.ws_path / "ng" / "trained_model" / "output_2022-05-08_08_17_02" / "checkpoint-2994.pth.tar",
         "NG+_5516": config.ws_path / "ng" / "trained_model" / "output_2022-05-09_21_40_33" / "checkpoint-5516.pth.tar",
     }
-    eval_res = np.zeros((len(models), len(eval_indices)))
+
+    dataset_path = config.synthetic_data_noise / "test"
 
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
@@ -93,42 +55,31 @@ def preprocessing():
     print(f"\n\n==================== Evaluation Start =============================\n"
           f"Eval Date: {eval_date}\n"
           f"Eval Time: {eval_time}\n"
-          f"Eval Objects: {len(eval_indices)}\n"
           f"Eval Models: {models.keys()}\n")
-    return models, eval_indices, path, folder_path, eval_res, eval_date, eval_time, args.gpu
 
-
-def main():
-    models, eval_idx, dataset_path, folder_path, eval_res, eval_date, eval_time, gpu = preprocessing()
-    eval_avg = {}
-    # evaluate CNN models
+    loss_avg = {}
+    time_avg = {}
+    losses = []
+    times = []
+    # evaluate CNN models one by one
     for model_idx, (name, model) in enumerate(models.items()):
-        for i, data_idx in enumerate(eval_idx):
-            # read data
-            data, depth, depth_noise, normal_gt, image = file_io.load_single_data(dataset_path, idx=data_idx)
+        # start the evaluation
+        loss_list, time_list = eval.eval(dataset_path, name, model, gpu=args.gpu)
 
-            depth_filtered = mu.median_filter(depth)
-            vertex_filted = mu.depth2vertex(torch.tensor(depth_filtered).permute(2, 0, 1),
-                                            torch.tensor(data['K']),
-                                            torch.tensor(data['R']).float(),
-                                            torch.tensor(data['t']).float())
-            vertex = mu.depth2vertex(torch.tensor(depth_noise).permute(2, 0, 1),
-                                     torch.tensor(data['K']),
-                                     torch.tensor(data['R']).float(),
-                                     torch.tensor(data['t']).float())
+        loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
+        time_avg[name] = np.array(time_list).sum() / np.array(time_list).shape[0]
+        losses.append(loss_list)
+        times.append(time_list)
 
-            if name == "Neigh_9999":
-                normal_img, angle_err_img, err = model_eval(model, vertex_filted, normal_gt, name, image, gpu)
-            else:
-                normal_img, angle_err_img, err = model_eval(model, vertex, normal_gt, name, image, gpu)
-            eval_res[model_idx, i] = err
-            print(f"{data_idx} has been evaluated.")
+    chart.line_chart(np.array(losses), folder_path, "Loss Evaluation", y_label="Radius", log_y=True,
+                     labels=list(models.keys()), cla_leg=True)
+    chart.line_chart(np.array(times), folder_path, "Time Evaluation", y_label="Milliseconds", log_y=True,
+                     labels=list(models.keys()))
 
-        eval_avg[name] = eval_res.sum(axis=-1) / len(eval_idx)
-    chart.line_chart(eval_res, str(folder_path), "Evaluation", y_label="Degree", labels=list(models.keys()), log_y=True)
-
+    # save the evaluation
     with open(str(folder_path / "evaluation.txt"), 'w') as f:
-        f.write(str(eval_avg))
+        f.write(str(loss_avg))
+        f.write(str(time_avg))
 
 
 if __name__ == '__main__':
