@@ -531,7 +531,7 @@ def show_numpy(numpy_array, title):
 def tenor2numpy(tensor):
     if tensor.size() == (1, 3, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
-    elif tensor.size() == (1, 3, 10, 10):
+    elif tensor.size() == (1, 4, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     elif tensor.size() == (1, 1, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
@@ -692,3 +692,19 @@ def visual_input(depth, data, output_name):
     output = cv.cvtColor(x0_normalized_8bit, cv.COLOR_RGB2BGR)
     output_name = str(f"{output_name}.png")
     cv.imwrite(output_name, output)
+
+
+def normaliseVertex(vertex):
+    mask = vertex.sum(axis=2) == 0
+
+    x_range = vertex[:, :, 0][~mask].max() - vertex[:, :, 0][~mask].min()
+    y_range = vertex[:, :, 1][~mask].max() - vertex[:, :, 1][~mask].min()
+    z_range = vertex[:, :, 2][~mask].max() - vertex[:, :, 2][~mask].min()
+
+    scale_factor = max(x_range, y_range, z_range)
+
+    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factor
+    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factor
+    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factor
+
+    return vertex

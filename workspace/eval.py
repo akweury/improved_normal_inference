@@ -101,12 +101,21 @@ def eval(dataset_path, name, model_path, gpu=0):
             # calculate loss
             out = mu.filter_noise(out, threshold=[-1, 1])
             mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-            rad_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum() / mask.sum()
-            rad_loss = rad_loss.to('cpu').detach().numpy()
-            loss_list[i] = rad_loss
+
+            output = out[0, :].permute(1, 2, 0)[:, :, :3]
+            target = target[0, :].permute(1, 2, 0)[:, :, :3]
+
+            output = output.to('cpu').numpy()
+            target = target.to('cpu').numpy()
+
+            diff_img, diff_angle = mu.eval_img_angle(output, target)
+
+            diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+            loss_list[i] = diff
             time_list[i] = gpu_time
             print(
-                f"[{name}] Test Case: {i}/{loss_list.shape[0]}, Rad Loss: {rad_loss:.2e}, Time: {(gpu_time * 1000):.2e} ms")
+                f"[{name}] Test Case: {i}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
 
     return loss_list, time_list
 

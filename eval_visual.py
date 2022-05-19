@@ -36,15 +36,15 @@ def preprocessing():
     all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
     all_names = np.array(all_names)
     eval_indices = [int(name.split(".")[0]) for name in all_names]
-    eval_indices = eval_indices[:5]
+    eval_indices = eval_indices
 
     # load test model names
     models = {
-        "SVD": None,
-        "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
-        "NNNN_10082": config.ws_path / "nnnn" / "trained_model" / "output_2022-05-02_08_09_16" / "checkpoint-10082.pth.tar",
-        "NG_2994": config.ws_path / "ng" / "trained_model" / "output_2022-05-08_08_17_02" / "checkpoint-2994.pth.tar",
-        "NG+_5516": config.ws_path / "ng" / "trained_model" / "output_2022-05-09_21_40_33" / "checkpoint-5516.pth.tar",
+        # "SVD": None,
+        # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
     eval_res = np.zeros((len(models), len(eval_indices)))
 
@@ -77,8 +77,7 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
     return normal_img, diff_img, diff
 
 
-def evaluate(v, model_path, img):
-    vertex = v.copy()
+def evaluate(test_0_tensor, test_1_tensor, model_path):
     # load model
     if model_path is None:
         normal, normal_img, eval_point_counter, total_time = svd.eval_single(v, farthest_neighbour=2)
@@ -98,42 +97,17 @@ def evaluate(v, model_path, img):
     model = checkpoint['model'].to(device)
     k = args.neighbor
 
-    mask = vertex.sum(axis=2) == 0
-    # move all the vertex as close to original point as possible, and noramlized all the vertex
-    v_min, v_max = vertex[~mask].min(), vertex[~mask].max()
-    v_range = v_max - v_min
-
-    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - v_min) / v_range
-    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - v_min) / v_range
-    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - v_min) / v_range
-
-    # range_0 = vertex[:, :, :1][~mask].max() - vertex[:, :, :1][~mask].min()
-    # range_1 = vertex[:, :, 1:2][~mask].max() - vertex[:, :, 1:2][~mask].min()
-    # range_2 = vertex[:, :, 2:3][~mask].max() - vertex[:, :, 2:3][~mask].min()
-    # vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / range_0
-    # vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / range_1
-    # vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / range_2
-    # calculate delta x, y, z of between each point and its neighbors
-    if k >= 2:
-        vectors = data_preprocess.neighbor_vectors_k(vertex, k)
-    # case of ng
-    elif k == 0:
-        vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
+    if k == 0:
+        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, test_0_tensor, start_epoch, device)
     elif k == 1:
-        vectors = vertex
+        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, test_1_tensor, start_epoch, device)
     else:
         raise ValueError
 
-    vectors[mask] = 0
-
-    input_tensor = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
-    input_tensor = input_tensor.permute(2, 0, 1)
-    normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, input_tensor, start_epoch, device)
-
     normal_img = normal_img.astype(np.float32)
-    normal_img = mu.normalize2_8bit(normal_img)
+    normal_cnn_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
 
-    return normal, normal_img, eval_point_counter, total_time
+    return normal, normal_cnn_8bit, eval_point_counter, total_time
 
 
 ############ EVALUATION FUNCTION ############
@@ -141,7 +115,6 @@ def evaluate_epoch(model, input_tensor, epoch, device):
     model.eval()  # Swith to evaluate mode
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
-        input_tensor = input_tensor.unsqueeze(0)
         torch.cuda.synchronize()
         # Forward Pass
         start = time.time()
@@ -162,9 +135,9 @@ def evaluate_epoch(model, input_tensor, epoch, device):
     return normal, normal_8bit, eval_point_counter, gpu_time
 
 
-def model_eval(model_path, input, gt, name, image):
+def model_eval(model_path, test_0_tensor, test_1_tensor, gt, name):
     mask = gt.sum(axis=2) == 0
-    normal, img, _, _ = evaluate(input, model_path, image)
+    normal, img, _, _ = evaluate(test_0_tensor, test_1_tensor, model_path)
     normal[mask] = 0
     img[mask] = 0
 
@@ -175,40 +148,46 @@ def model_eval(model_path, input, gt, name, image):
 def main():
     models, eval_idx, dataset_path, folder_path, eval_res, eval_date, eval_time = preprocessing()
 
+    test_0_input = np.array(
+        sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_0_normal_noise.pt"), recursive=True)))
+    test_1_input = np.array(
+        sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_1_normal_noise.pt"), recursive=True)))
+    # test_0_input = np.array(sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_0_normal_noise.pt"), recursive=True)))
+    test_gt = np.array(sorted(glob.glob(str(dataset_path / "tensor" / f"*_gt_0_normal_noise.pt"), recursive=True)))
+
     for i, data_idx in enumerate(eval_idx):
         # read data
-        data, depth, depth_noise, normal_gt, image = file_io.load_single_data(dataset_path, idx=data_idx)
-
-        depth_filtered = mu.median_filter(depth)
-        vertex_filted_gt = mu.depth2vertex(torch.tensor(depth_filtered).permute(2, 0, 1),
-                                           torch.tensor(data['K']),
-                                           torch.tensor(data['R']).float(),
-                                           torch.tensor(data['t']).float())
-        vertex = mu.depth2vertex(torch.tensor(depth_noise).permute(2, 0, 1),
-                                 torch.tensor(data['K']),
-                                 torch.tensor(data['R']).float(),
-                                 torch.tensor(data['t']).float())
+        test_0_tensor = torch.load(test_0_input[i]).unsqueeze(0)
+        test_1_tensor = torch.load(test_1_input[i]).unsqueeze(0)
+        gt_tensor = torch.load(test_gt[i]).unsqueeze(0)
 
         img_list = []
         diff_list = []
 
+        gt = mu.tenor2numpy(gt_tensor)
+        vertex_0 = mu.tenor2numpy(test_0_tensor)
+        vertex_1 = mu.tenor2numpy(test_1_tensor)
+
         # add ground truth
-        normal_gt_img = mu.normal2RGB(normal_gt)
+        normal_gt_img = mu.normal2RGB(gt)
+        out_ranges = mu.addHist(normal_gt_img)
         mu.addText(normal_gt_img, "GT", font_size=0.8)
         img_list.append(normal_gt_img)
 
         # add input
-        x0_normalized_8bit = mu.normalize2_8bit(vertex)
+        # x0_normalized_8bit = mu.normalize2_8bit(vertex_0)
+        # x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
+        # mu.addText(x0_normalized_8bit, "Input(Vertex0)")
+        # img_list.append(x0_normalized_8bit)
+
+        x0_normalized_8bit = mu.normalize2_8bit(vertex_1[:, :, :3])
         x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
-        mu.addText(x0_normalized_8bit, "Input(Vertex)")
+        mu.addText(x0_normalized_8bit, "Input(Vertex1)")
         img_list.append(x0_normalized_8bit)
 
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
-            if name == "Neigh_9999" or "SVD":
-                normal_img, angle_err_img, err = model_eval(model, vertex_filted_gt, normal_gt, name, image)
-            else:
-                normal_img, angle_err_img, err = model_eval(model, vertex, normal_gt, name, image)
+            normal_img, angle_err_img, err = model_eval(model, test_0_tensor, test_1_tensor, gt, name)
             img_list.append(normal_img)
             diff_list.append(angle_err_img)
             eval_res[model_idx, i] = err
