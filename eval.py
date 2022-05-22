@@ -40,7 +40,7 @@ def main():
         # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
 
     dataset_path = config.synthetic_data_noise / "test"
@@ -68,11 +68,11 @@ def main():
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list).sum() / np.array(time_list).shape[0]
         losses.append(loss_list)
-        times.append(time_list)
+        times.append(time_list[5:])
 
-    chart.line_chart(np.array(losses), folder_path, "Loss Evaluation", y_label="Radius", log_y=True,
-                     labels=list(models.keys()), cla_leg=True)
-    chart.line_chart(np.array(times), folder_path, "Time Evaluation", y_label="Milliseconds", log_y=True,
+    chart.line_chart(np.array(losses), folder_path, "Loss Evaluation", y_label="Radius", labels=list(models.keys()),
+                     cla_leg=True)
+    chart.line_chart(np.array(times), folder_path, "Time Evaluation", y_label="Milliseconds",
                      labels=list(models.keys()))
 
     # save the evaluation

@@ -27,7 +27,7 @@ def preprocessing():
 
     # load data file names
     if args.data == "synthetic":
-        path = config.synthetic_data_noise / "test"
+        path = config.synthetic_data_noise / "test_visual"
     elif args.data == "real":
         path = config.real_data  # key tests 103, 166, 189,9
     else:
@@ -80,7 +80,7 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
 def evaluate(test_0_tensor, test_1_tensor, model_path):
     # load model
     if model_path is None:
-        normal, normal_img, eval_point_counter, total_time = svd.eval_single(v, farthest_neighbour=2)
+        normal, normal_img, eval_point_counter, total_time = svd.eval_single(test_1_tensor, farthest_neighbour=2)
         return normal, normal_img, eval_point_counter, total_time
 
     checkpoint = torch.load(model_path)

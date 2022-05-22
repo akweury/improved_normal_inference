@@ -56,13 +56,14 @@ class AngleLoss(nn.Module):
 
     def forward(self, outputs, target, args):
         outputs = outputs[:, :3, :, :]
-        boarder_right = torch.gt(outputs, 1).bool().detach()
-        boarder_left = torch.lt(outputs, -1).bool().detach()
-        outputs[boarder_right] = outputs[boarder_right] * args.penalty
-        outputs[boarder_left] = outputs[boarder_left] * args.penalty
+        mask_too_high = torch.gt(outputs, 1).bool().detach()
+        mask_too_low = torch.lt(outputs, -1).bool().detach()
+        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
+        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
 
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
+        # mask of non-zero positions
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
         # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
 

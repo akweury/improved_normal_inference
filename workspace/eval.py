@@ -113,9 +113,9 @@ def eval(dataset_path, name, model_path, gpu=0):
             diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
             loss_list[i] = diff
-            time_list[i] = gpu_time
+            time_list[i] = gpu_time * 1000
             print(
-                f"[{name}] Test Case: {i}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
+                f"[{name}] Test Case: {i + 1}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
 
     return loss_list, time_list
 
