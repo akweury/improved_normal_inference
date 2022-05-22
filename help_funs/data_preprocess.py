@@ -167,9 +167,10 @@ def convert2training_tensor(path, k, output_type='normal'):
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
     img_files = np.array(sorted(glob.glob(str(path / "*image0.png"), recursive=True)))
     for item in range(len(data_files)):
-        if os.path.exists(str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt")):
+        if os.path.exists(str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar")):
             continue
 
+        # input vertex
         f = open(data_files[item])
         data = json.load(f)
         f.close()
@@ -187,46 +188,42 @@ def convert2training_tensor(path, k, output_type='normal'):
                                  torch.tensor(data['R']).float(),
                                  torch.tensor(data['t']).float())
         mask = vertex.sum(axis=2) == 0
-        # move all the vertex as close to original point as possible, and noramlized all the vertex
 
+        # move all the vertex as close to original point as possible, and noramlized all the vertex
         x_range = vertex[:, :, 0][~mask].max() - vertex[:, :, 0][~mask].min()
         y_range = vertex[:, :, 1][~mask].max() - vertex[:, :, 1][~mask].min()
         z_range = vertex[:, :, 2][~mask].max() - vertex[:, :, 2][~mask].min()
+        zzz = np.argmax(np.array([x_range, y_range, z_range]))
+        scale_factors = [x_range, y_range, z_range]
 
-        scale_factor = max(x_range, y_range, z_range)
+        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factors[0]
+        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
+        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
 
-        v_min, v_max = vertex[~mask].min(), vertex[~mask].max()
-
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factor
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factor
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factor
-
-        # calculate delta x, y, z of between each point and its neighbors
         if k >= 2:
+            # calculate delta x, y, z of between each point and its neighbors
             vectors = neighbor_vectors_k(vertex, k)
-        # case of ng
+        # case of resng, ng
         elif k == 0:
             vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
         elif k == 1:
             vectors = vertex
         else:
             raise ValueError
-
         vectors[mask] = 0
 
-        input_torch = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
-        input_torch = input_torch.permute(2, 0, 1)
+        # gt normal
+        gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
 
-        gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        if output_type == 'rgb':
-            gt = mu.normal2RGB(gt)
-        gt = gt.astype(np.float32)
-        gt_torch = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
-        gt_torch = gt_torch.permute(2, 0, 1)
+        # convert to tensor
+        input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)
+        gt_tensor = torch.from_numpy(gt_normal).permute(2, 0, 1)
 
         # save tensors
-        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt"))
-        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}_{output_type}.pt"))
+        training_case = {'input_tensor': input_tensor,
+                         'gt_tensor': gt_tensor,
+                         'scale_factors': scale_factors}
+        torch.save(training_case, str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar"))
         print(f'File {item}/{len(data_files)} converted to tensor. K = {k}')
 
 

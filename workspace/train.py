@@ -119,32 +119,30 @@ loss_dict = {
 class SyntheticDepthDataset(Dataset):
 
     def __init__(self, data_path, k, output_type, setname='train'):
-        if setname in ['train', 'selval']:
-            self.input = np.array(
+        if setname in ['train']:
+            self.training_case = np.array(
                 sorted(
-                    glob.glob(str(data_path / "train" / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
-            self.gt = np.array(
-                sorted(glob.glob(str(data_path / "train" / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
-
-        assert (len(self.gt) == len(self.input))
+                    glob.glob(str(data_path / "train" / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
 
     def __len__(self):
-        return len(self.input)
+        return len(self.training_case)
 
     def __getitem__(self, item):
         if item < 0 or item >= self.__len__():
             return None
 
-        input_tensor = torch.load(self.input[item])
-        gt_tensor = torch.load(self.gt[item])
+        training_case = torch.load(self.training_case[item])
+        input_tensor = training_case['input_tensor']
+        gt_tensor = training_case['gt_tensor']
+        scale_factors = training_case['scale_factors']
 
-        return input_tensor, gt_tensor
+        return input_tensor, gt_tensor, scale_factors
 
 
 class NoiseDataset(Dataset):
 
     def __init__(self, data_path, k, output_type, setname='train'):
-        if setname in ['train', 'selval']:
+        if setname in ['train']:
             self.input = np.array(
                 sorted(
                     glob.glob(str(data_path / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
@@ -198,8 +196,7 @@ class TrainingModel():
         if train_on != 'full':
             import random
             training_idxs = np.array(random.sample(range(0, len(dataset)), int(train_on)))
-            dataset.input = dataset.input[training_idxs]
-            dataset.gt = dataset.gt[training_idxs]
+            dataset.training_case = dataset.training_case[training_idxs]
 
         data_loader = DataLoader(dataset,
                                  shuffle=True,
@@ -298,7 +295,7 @@ def train_epoch(nn_model, epoch):
     loss_total = torch.tensor([0.0])
     angle_loss_total = torch.tensor([0.0])
     start = time.time()
-    for i, (input, target) in enumerate(nn_model.train_loader):
+    for i, (input, target, scale_factor) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target = input.to(nn_model.device), target.to(nn_model.device)
 
@@ -326,7 +323,6 @@ def train_epoch(nn_model, epoch):
         # Update the parameters
         nn_model.optimizer.step()
 
-        # record model time
         # gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
         mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
@@ -454,21 +450,29 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_cnn_8bit)
 
-    # cout
-    if cout is not None:
-        cout = cout.detach().numpy()
-        if output_type == 'normal' or 'normal_noise':
-            cout = mu.filter_noise(cout, threshold=[0, 1])
-            cout = mu.normal2RGB(cout)
-        else:
-            cout = mu.filter_noise(cout, threshold=[0, 255])
+    # err visualisation
+    diff_img, diff_angle = mu.eval_img_angle(xout, target)
+    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+    mu.addText(diff_img, "Error")
+    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+    output_list.append(normal_cnn_8bit)
 
-        normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_BONE)
-        cout_ranges = mu.addHist(cout)
-        mu.addText(normal_cout_8bit, "c_out")
-        mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cout_8bit)
+    # cout
+    # if cout is not None:
+    #     cout = cout.detach().numpy()
+    #     if output_type == 'normal' or 'normal_noise':
+    #         cout = mu.filter_noise(cout, threshold=[0, 1])
+    #         cout = mu.normal2RGB(cout)
+    #     else:
+    #         cout = mu.filter_noise(cout, threshold=[0, 255])
+    #
+    #     normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    #     normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_BONE)
+    #     cout_ranges = mu.addHist(cout)
+    #     mu.addText(normal_cout_8bit, "c_out")
+    #     mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
+    #     output_list.append(normal_cout_8bit)
+
     if output_type != "noise":
         output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
     else:

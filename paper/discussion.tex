@@ -1,13 +1,7 @@
 \section{Dataset Normalization}
 %% How to represent input tensor, to make it fast converse
 
-The vertices have been normalized before feed them into the model. 
-
-The depth range of each scene is shown in Figure \ref{fig:data_range}.
-
-Z axis in range [4,6]
-Y axis in range [-1,1]
-Y axis in range [-1,1]
+The vertices have been normalized before feed them into the model. The depth range of each scene is shown in Figure \ref{fig:data_range}.
 
 \begin{figure}
 	\centering
@@ -17,18 +11,18 @@ Y axis in range [-1,1]
 	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
 \end{figure}
 
-Normalize the point cloud to a unit size.
+Normalize the point cloud to a unit size. The average range and extreme value is shown in Table \ref{tab:data_range}. Choose the range of one axes as scale factor to normalize the point cloud. Use Min value to move the point clouds close to original point as much as possible. 
 
-The average range and extreme value is shown in Table \ref{tab:data_range}. Choose the biggest range as a scale factor to normalize the point cloud. Use Min value to move the point clouds close to original point as much as possible.
+In this paper, the range factor is the range of axes X.
 
-\begin{table}[t]
+\begin{table}[!h]
 	\centering
 	\begin{tabular}{|c|c|c|c|}
 		\hline
 		Axis & Range & Min & Max\\
 		\hline
 		X & 1.48 & -0.75 & 0.73\\
-		Y & \textbf{1.56} & -0.76 & 0.80\\
+		Y & 1.56 & -0.76 & 0.80\\
 		Z & 1.47 & 6.53 & 8.00\\
 		\hline
 	\end{tabular}
