@@ -7,6 +7,7 @@ from common.ResNet import ResNet
 from common.ResNet import Bottleneck
 from common.GConv import GConv
 from common.UNet import UNet
+from help_funs import mu
 
 
 class DeGaResNet(nn.Module):
@@ -35,6 +36,7 @@ class DeGaResNet(nn.Module):
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
         self.active_img = nn.LeakyReLU(0.01)
+        self.detailNet = UNet(3, 3)
 
         self.epsilon = 1e-20
         channel_size_1 = 32
@@ -61,7 +63,10 @@ class DeGaResNet(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-    def forward(self, x1, x_img_1):
+    def forward(self, x):
+        x1 = x[:, :3, :, :]
+        x_img_1 = x[:, 3:, :, :]
+
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
@@ -111,4 +116,12 @@ class DeGaResNet(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
 
-        return xout
+        mask_sharp_part = torch.zeros(size=(xout.size(0), 512, 512), dtype=torch.bool).to(xout.device)
+        # detail edge training
+        for i in range(xout.size(0)):
+            mask_sharp_part[i, :, :] = ~mu.hpf_torch(xout[i, :, :, :])
+
+        mask_sharp_part = mask_sharp_part.unsqueeze(1).repeat(1, 3, 1, 1)
+        x_out_sharp = self.detailNet(xout[mask_sharp_part], mask_sharp_part)
+
+        return torch.cat((xout, x_out_sharp, mask_sharp_part), 1)
