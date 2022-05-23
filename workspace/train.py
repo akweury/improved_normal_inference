@@ -91,7 +91,8 @@ class AngleDetailLoss(nn.Module):
         mask = mask.unsqueeze(1).repeat(1, 3, 1, 1)
         outputs_smooth = outputs[:, :3, :, :]
         outputs_sharp = outputs[:, 3:6, :, :]
-        mask_sharp = outputs[:, 6:, :, :].bool()
+        mask_sharp = torch.sum(torch.abs(outputs_sharp), dim=1) > 0
+        mask_sharp = mask_sharp.unsqueeze(1).repeat(1, 3, 1, 1)
         mask_smooth = (~mask_sharp) * mask
 
         axis = args.epoch % 3

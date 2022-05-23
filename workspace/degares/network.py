@@ -30,5 +30,5 @@ class CNN(nn.Module):
 
         mask_sharp_part = mask_sharp_part.unsqueeze(1).repeat(1, 3, 1, 1)
         x_out_sharp = self.detailNet(x[:, :3, :, :][mask_sharp_part], mask_sharp_part)
-
-        return torch.cat((xout, x_out_sharp, mask_sharp_part), 1)
+        x_out_sharp[~mask_sharp_part] = 0
+        return torch.cat((xout, x_out_sharp), 1)
