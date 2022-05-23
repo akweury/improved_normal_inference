@@ -43,7 +43,7 @@ def main():
         "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
 
-    dataset_path = config.synthetic_data_noise / "test"
+    dataset_path = config.synthetic_data_noise
 
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
@@ -66,7 +66,7 @@ def main():
         loss_list, time_list = eval.eval(dataset_path, name, model, gpu=args.gpu)
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
-        time_avg[name] = np.array(time_list).sum() / np.array(time_list).shape[0]
+        time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
         losses.append(loss_list)
         times.append(time_list[5:])
 

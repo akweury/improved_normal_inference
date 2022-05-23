@@ -50,27 +50,6 @@ def evaluate_epoch(model, input_tensor, device):
 
 def noisy_a_folder(folder_path, output_path):
     # # get noise model
-    # noise_model_path = config.ws_path / "noise_net" / "trained_model" / "output_2022-05-09_20_38_46" / "checkpoint-9.pth.tar"
-    #
-    # # load model
-    # checkpoint = torch.load(noise_model_path)
-    #
-    # # Assign some local variables
-    # args = checkpoint['args']
-    # start_epoch = checkpoint['epoch']
-    # print('- Checkpoint was loaded successfully.')
-    #
-    # # Compare the checkpoint args with the json file in case I wanted to change some args
-    # # args_parser.compare_args_w_json(args, exp_dir, start_epoch + 1)
-    # args.evaluate = noise_model_path
-    #
-    # if args.cpu:
-    #     device = torch.device("cpu")
-    # else:
-    #     device = torch.device("cuda:" + str(args.gpu))
-    #
-    # model = checkpoint['model'].to(device)
-    # args_parser.print_args(args)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -200,14 +179,21 @@ def convert2training_tensor(path, k, output_type='normal'):
         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
         vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
 
-        if k >= 2:
-            # calculate delta x, y, z of between each point and its neighbors
-            vectors = neighbor_vectors_k(vertex, k)
         # case of resng, ng
-        elif k == 0:
+        if k == 0:
             vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
         elif k == 1:
             vectors = vertex
+        elif k == 2:
+            # calculate delta x, y, z of between each point and its neighbors
+            vectors = neighbor_vectors_k(vertex, k)
+        # detail enhanced
+        elif k == 5:
+            hp_mask = mu.hpf(depth_files[item], visual=True) == 0
+            hp_vertex = vertex.copy()
+            hp_vertex[hp_mask] = 0
+
+            vectors = np.c_[vertex, np.expand_dims(img, axis=2), hp_vertex]
         else:
             raise ValueError
         vectors[mask] = 0
@@ -230,39 +216,6 @@ def convert2training_tensor(path, k, output_type='normal'):
 def high_pass_filter(img, threshold=20):
     img[img < threshold] = 0
     return img
-
-
-def convert2training_tensor_noise(path):
-    k = 0
-    output_type = 'noise'
-    if not os.path.exists(str(path)):
-        raise FileNotFoundError
-    if not os.path.exists(str(path / "tensor")):
-        os.makedirs(str(path / "tensor"))
-
-    img_files = np.array(sorted(glob.glob(str(path / "*image?.png"), recursive=True)))
-    gt_files = np.array(sorted(glob.glob(str(path / "*normal?.png"), recursive=True)))
-    for item in range(len(img_files)):
-        img = file_io.load_16bitImage(img_files[item])
-        idx = img_files[item].split(".")[-2][-1]
-        prefix_idx = img_files[item].replace("\\", ".").split(".")[-3]
-        img = high_pass_filter(img)
-        img = np.expand_dims(img, axis=2)
-        gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        gt = gt.sum(axis=2, keepdims=True) != 0
-        gt = gt.astype(np.float32)
-        gt_torch = torch.from_numpy(gt)  # tensor(gt, dtype=torch.float)
-        gt_torch = gt_torch.permute(2, 0, 1)
-
-        input_torch = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
-        input_torch = input_torch.permute(2, 0, 1)
-        # save tensors
-        torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_{k}_{output_type}.pt"))
-        torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_{k}_{output_type}.pt"))
-        print(f'File {item} converted to tensor.')
-
-        img_16bit = mu.normalise216bitImage(img)
-        file_io.save_16bitImage(img_16bit, str(path / (prefix_idx + f".image{idx}_lowpass.png")))
 
 
 # def convert2training_tensor2(path, k, input_size=1000):

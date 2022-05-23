@@ -27,7 +27,7 @@ def preprocessing():
 
     # load data file names
     if args.data == "synthetic":
-        path = config.synthetic_data_noise / "test_visual"
+        path = config.synthetic_data_noise / "test"
     elif args.data == "real":
         path = config.real_data  # key tests 103, 166, 189,9
     else:
@@ -36,7 +36,7 @@ def preprocessing():
     all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
     all_names = np.array(all_names)
     eval_indices = [int(name.split(".")[0]) for name in all_names]
-    eval_indices = eval_indices
+    eval_indices = eval_indices[:5]
 
     # load test model names
     models = {
@@ -148,18 +148,19 @@ def model_eval(model_path, test_0_tensor, test_1_tensor, gt, name):
 def main():
     models, eval_idx, dataset_path, folder_path, eval_res, eval_date, eval_time = preprocessing()
 
-    test_0_input = np.array(
-        sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_0_normal_noise.pt"), recursive=True)))
-    test_1_input = np.array(
-        sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_1_normal_noise.pt"), recursive=True)))
-    # test_0_input = np.array(sorted(glob.glob(str(dataset_path / "tensor" / f"*_input_0_normal_noise.pt"), recursive=True)))
-    test_gt = np.array(sorted(glob.glob(str(dataset_path / "tensor" / f"*_gt_0_normal_noise.pt"), recursive=True)))
+    test_0_data = np.array(
+        sorted(glob.glob(str(dataset_path / "tensor" / f"*_0_normal_noise.pth.tar"), recursive=True)))
+    test_1_data = np.array(
+        sorted(glob.glob(str(dataset_path / "tensor" / f"*_1_normal_noise.pth.tar"), recursive=True)))
 
     for i, data_idx in enumerate(eval_idx):
         # read data
-        test_0_tensor = torch.load(test_0_input[i]).unsqueeze(0)
-        test_1_tensor = torch.load(test_1_input[i]).unsqueeze(0)
-        gt_tensor = torch.load(test_gt[i]).unsqueeze(0)
+        test_0 = torch.load(test_0_data[i])
+        test_1 = torch.load(test_1_data[i])
+
+        test_0_tensor = test_0['input_tensor'].unsqueeze(0)
+        test_1_tensor = test_1['input_tensor'].unsqueeze(0)
+        gt_tensor = test_0['gt_tensor'].unsqueeze(0)
 
         img_list = []
         diff_list = []

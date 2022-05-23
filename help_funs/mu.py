@@ -101,6 +101,83 @@ def get_valid_pixels_idx(img):
 
 
 # --------------------------- filter operations -----------------------------------------------------------------------
+
+# https: // github.com / bnsreenu / python_for_image_processing_APEER / blob / master / tutorial41_image_filters_using_fourier_transform_DFT.py
+def fft_filter(input_array):
+    if input_array.shape != (512, 512):
+        raise ValueError
+
+    # file_io.save_16bitImage(input_array, str(Path(config.ws_path) / f"depth.png"))
+
+    rows, cols = input_array.shape
+    crow, ccol = int(rows / 2), int(cols / 2)
+    mask = np.ones((rows, cols, 2), np.uint8)
+    r = 50
+    center = [crow, ccol]
+    x, y = np.ogrid[:rows, :cols]
+    mask_area = (x - center[0]) ** 2 + (y - center[1]) ** 2 <= r * r
+    mask[mask_area] = 0
+
+    input_array = np.float32(input_array)
+    dft = cv.dft(input_array, flags=cv.DFT_COMPLEX_OUTPUT)
+    dft_shift = np.fft.fftshift(dft)
+    magnitude_spectrum = 20 * np.log(cv.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
+
+    fshift = dft_shift * mask
+    fshift_mask_mag = 20 * np.log(cv.magnitude(fshift[:, :, 0], fshift[:, :, 1]))
+    f_ishift = np.fft.ifftshift(fshift)
+    img_back = cv.idft(f_ishift)
+    img_back = cv.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+
+    fig = plt.figure(figsize=(12, 12))
+    ax1 = fig.add_subplot(2, 2, 1)
+    ax1.imshow(input_array, cmap='gray')
+    ax1.title.set_text('Input Image')
+    ax2 = fig.add_subplot(2, 2, 2)
+    ax2.imshow(magnitude_spectrum, cmap='gray')
+    ax2.title.set_text('FFT of image')
+    ax3 = fig.add_subplot(2, 2, 3)
+    ax3.imshow(fshift_mask_mag, cmap='gray')
+    ax3.title.set_text('FFT + Mask')
+    ax4 = fig.add_subplot(2, 2, 4)
+    ax4.imshow(img_back, cmap='gray')
+    ax4.title.set_text('After inverse FFT')
+
+    mask_valid_area = input_array != 0
+    img_back[~mask_valid_area] = 0
+
+    # noramlize hpf image to 16 bit
+    img_back = normalise216bitImage(img_back)
+
+    # get the mask of detail pixels
+    threshold = 0
+    mask_hp = img_back > threshold
+    input_array[~mask_hp] = 0
+
+    # save filtered img
+    # file_io.save_16bitImage(img_back, str(Path(config.ws_path) / f"fft.png"))
+    # plt.savefig(str(Path(config.ws_path) / f"fft_info.png"), dpi=1000)
+
+    # check if save and load function has loss
+
+
+def canny_edge_filter(img_path):
+    img = cv.imread(img_path, 0)
+
+    plt.subplot(131), plt.imshow(img, cmap='gray')
+    plt.title('Original'), plt.xticks([]), plt.yticks([])
+
+    edges = cv.Canny(img, 1000, 0, apertureSize=7, L2gradient=True)
+    plt.subplot(132), plt.imshow(edges, cmap='gray')
+    plt.title('Edge '), plt.xticks([]), plt.yticks([])
+
+    edges = cv.Canny(img, 1000, 0, apertureSize=7, L2gradient=False)
+    plt.subplot(133), plt.imshow(edges, cmap='gray')
+    plt.title('Edge'), plt.xticks([]), plt.yticks([])
+
+    # plt.savefig(str(Path(config.ws_path) / f"canny_comparison.png"), dpi=1000)
+
+
 def binary(img):
     # h, w = img.shape[:2]
     img_permuted = img.permute(0, 2, 3, 1)
@@ -317,6 +394,25 @@ def normal2RGB(normals):
     # rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     rgb = np.rint(rgb)
     return rgb.astype(np.uint8)
+
+
+def normal2RGB_torch(normals):
+    if normals.size() != (3, 512, 512):
+        raise ValueError
+
+    normals = normals.permute(1, 2, 0)
+    mask = torch.sum(torch.abs(normals), dim=2) != 0
+    rgb = torch.zeros(size=normals.shape).to(normals.device)
+
+    # convert normal to RGB color
+    rgb[mask] = normals[mask] * 0.5 + 0.5
+    rgb[:, :, 2][mask] = 1 - rgb[:, :, 2][mask]
+    rgb[mask] = rgb[mask] * 255
+
+    # rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    rgb = torch.round(rgb)
+    rgb = rgb.permute(2, 0, 1)
+    return rgb.byte()
 
 
 def normal2RGB_single(normal):
@@ -570,10 +666,61 @@ def scale16bitImage(img, minVal, maxVal):
 
 
 def normalise216bitImage(img):
-    img = np.array(img, dtype=np.float32)
-    min, max = img.min(), img.max()
-    img_16bit = ((img - min) / (max - min) * 65535).astype(np.uint16)
+    img_16bit = np.uint16(img / img.max() * 65535)
     return img_16bit
+
+
+def hpf_torch(normal):
+    normal_img = normal2RGB_torch(normal).permute(1, 2, 0).to("cpu").numpy()
+    edges = cv.Canny(normal_img, 100, 200, apertureSize=5, L2gradient=True)
+    # left shift
+    ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
+    # right shift
+    rs = np.pad(edges, ((0, 0), (1, 0)), mode='constant')[:, :-1]
+    # up shift
+    us = np.pad(edges, ((0, 1), (0, 0)), mode='constant')[1:, :]
+    # down shift
+    ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
+
+    detail = np.zeros(normal_img.shape)
+    detail[(ls + rs + us + ds) > 0] = 255
+    detail[normal_img == 0] = 0
+    normal_img[~(detail == 255)] = 0
+
+    return torch.from_numpy(normal_img.sum(axis=2) == 0)
+
+
+def hpf(img_path, visual=False):
+    img = cv.imread(img_path, 0)
+
+    edges = cv.Canny(img, 100, 200, apertureSize=5, L2gradient=True)
+    # left shift
+    ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
+    # right shift
+    rs = np.pad(edges, ((0, 0), (1, 0)), mode='constant')[:, :-1]
+    # up shift
+    us = np.pad(edges, ((0, 1), (0, 0)), mode='constant')[1:, :]
+    # down shift
+    ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
+
+    detail = np.zeros(img.shape)
+    detail[(ls + rs + us + ds) > 0] = 255
+    detail[img == 0] = 0
+    img[~(detail == 255)] = 0
+
+    if visual:
+        # plot
+        plt.subplot(131), plt.imshow(img, cmap='gray')
+        plt.title('Original'), plt.xticks([]), plt.yticks([])
+
+        plt.subplot(132), plt.imshow(edges, cmap='gray')
+        plt.title('Edge '), plt.xticks([]), plt.yticks([])
+
+        plt.subplot(133), plt.imshow(img, cmap='gray')
+        plt.title('Detail'), plt.xticks([]), plt.yticks([])
+        plt.show()
+
+    return img
 
 
 def median_filter(depth):

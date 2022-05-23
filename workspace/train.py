@@ -75,6 +75,37 @@ class AngleLoss(nn.Module):
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
+class AngleDetailLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, args):
+        # add penalty to the extreme values, i.e. out of range [-1,1]
+        mask_too_high = torch.gt(outputs, 1).bool().detach()
+        mask_too_low = torch.lt(outputs, -1).bool().detach()
+        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
+        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
+
+        # mask of normals
+        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+        mask = mask.unsqueeze(1).repeat(1, 3, 1, 1)
+        outputs_smooth = outputs[:, :3, :, :]
+        outputs_sharp = outputs[:, 3:6, :, :]
+        mask_sharp = outputs[:, 6:, :, :].bool()
+        mask_smooth = (~mask_sharp) * mask
+
+        axis = args.epoch % 3
+        outputs_smooth[mask_sharp] = 0
+        outputs_sharp[mask_smooth] = 0
+
+        outputs_merged = outputs_sharp + outputs_smooth
+        # smooth loss and sharp loss
+        axis_diff = (outputs_merged - target)[:, axis, :, :][mask[:, 0, :, :]]
+        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
+
+        return loss
+
+
 class L1Loss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -111,7 +142,8 @@ loss_dict = {
     'masked_l1': MaskedL1Loss(),
     'masked_l2': MaskedL2Loss(),
     'weighted_l2': WeightedL2Loss(),
-    'angle': AngleLoss()
+    'angle': AngleLoss(),
+    'angle_detail': AngleDetailLoss(),
 }
 
 
@@ -119,10 +151,10 @@ loss_dict = {
 class SyntheticDepthDataset(Dataset):
 
     def __init__(self, data_path, k, output_type, setname='train'):
-        if setname in ['train']:
+        if setname in ['train', 'test']:
             self.training_case = np.array(
                 sorted(
-                    glob.glob(str(data_path / "train" / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
+                    glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
 
     def __len__(self):
         return len(self.training_case)
@@ -455,7 +487,7 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
-    output_list.append(normal_cnn_8bit)
+    output_list.append(diff_img)
 
     # cout
     # if cout is not None:

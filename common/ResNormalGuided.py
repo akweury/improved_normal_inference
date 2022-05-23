@@ -85,7 +85,6 @@ class NormalGuided(nn.Module):
 
 
     def forward(self, x1, x_img_1, cin):
-        self.resnet50(x_img_1)
 
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)

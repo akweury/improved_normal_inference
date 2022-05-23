@@ -9,23 +9,11 @@ import workspace.nnnn.network as nnnn
 import workspace.ng.network as ng
 import workspace.resng.network as resng
 import workspace.nconv.network as nconv
+import workspace.degares.network as degares
 
 
 def main():
     args = args_parser.args_parser()
-    if args.noise:
-        for folder in ["train", "test"]:
-            # add noise
-            original_folder = config.synthetic_data / folder
-            if args.machine == "remote":
-                dataset_folder = config.synthetic_data_noise_dfki / folder
-            elif args.machine == 'local':
-                dataset_folder = config.synthetic_data_noise / folder
-            else:
-                raise ValueError
-            noisy_a_folder(original_folder, dataset_folder)
-            # convert to tensor
-            convert2training_tensor(dataset_folder, args.neighbor, output_type=args.output_type)
 
     # config experiments
     exp_path = config.ws_path / args.exp
@@ -41,8 +29,11 @@ def main():
         model = resng.CNN()
     elif args.exp == "nconv":
         model = nconv.CNN()
+    elif args.exp == "degares":
+        model = degares.CNN()
     else:
         raise ValueError("Unknown exp path")
+
     if args.machine == 'local':
         dataset_path = config.synthetic_data_noise
     elif args.machine == 'remote':

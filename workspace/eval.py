@@ -19,29 +19,7 @@ from workspace.svd import eval as svd
 from torch.utils.data import Dataset, DataLoader
 import glob
 
-
-class SyntheticDepthDataset(Dataset):
-
-    def __init__(self, data_path, k, output_type):
-        self.input = np.array(
-            sorted(
-                glob.glob(str(data_path / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
-        self.gt = np.array(
-            sorted(glob.glob(str(data_path / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
-
-        assert (len(self.gt) == len(self.input))
-
-    def __len__(self):
-        return len(self.input)
-
-    def __getitem__(self, item):
-        if item < 0 or item >= self.__len__():
-            return None
-
-        input_tensor = torch.load(self.input[item])
-        gt_tensor = torch.load(self.gt[item])
-
-        return input_tensor, gt_tensor
+from workspace.train import SyntheticDepthDataset
 
 
 def eval(dataset_path, name, model_path, gpu=0):
@@ -50,7 +28,7 @@ def eval(dataset_path, name, model_path, gpu=0):
     # SVD model
     if model_path is None:
         # load dataset
-        dataset = SyntheticDepthDataset(dataset_path, 1, "normal_noise")
+        dataset = SyntheticDepthDataset(dataset_path, 1, "normal_noise", setname='test')
         data_loader = DataLoader(dataset, shuffle=True, batch_size=1, num_workers=1)
         loss_list, time_list = svd.eval(data_loader, 2)
         return loss_list, time_list
@@ -70,7 +48,7 @@ def eval(dataset_path, name, model_path, gpu=0):
     print("ok.")
     print("load dataset...", end="")
     # load dataset
-    dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise")
+    dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname='test')
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,
@@ -81,7 +59,7 @@ def eval(dataset_path, name, model_path, gpu=0):
     loss_list = np.zeros(data_loader.dataset.__len__())
     time_list = np.zeros(data_loader.dataset.__len__())
 
-    for i, (input, target) in enumerate(data_loader):
+    for i, (input, target, scale_factor) in enumerate(data_loader):
         with torch.no_grad():
             # put input and target to device
             input, target = input.to(device), target.to(device)

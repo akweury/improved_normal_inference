@@ -6,12 +6,13 @@ from torch.nn.modules.conv import _ConvNd
 from common.ResNet import ResNet
 from common.ResNet import Bottleneck
 from common.GConv import GConv
+from common.UNet import UNet
 
 
-class UNet(nn.Module):
+class DeGaResNet(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
-        self.__name__ = 'UNet'
+        self.__name__ = 'DeGaRes'
         kernel_down = (3, 3)
         kernel_down_2 = (5, 5)
         kernel_up = (3, 3)
@@ -36,9 +37,12 @@ class UNet(nn.Module):
         self.active_img = nn.LeakyReLU(0.01)
 
         self.epsilon = 1e-20
-        channel_size_1 = 4
-        channel_size_2 = 8
+        channel_size_1 = 32
+        channel_size_2 = 64
+        # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
+        self.resnet50 = ResNet(Bottleneck, layers=[1, 3, 4, 5])
+        self.edgeNet = UNet(3, 3)
         # branch 1
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
         self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
@@ -58,10 +62,13 @@ class UNet(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-    def forward(self, x1):
+    def forward(self, x1, x_img_1):
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
+
+        # img guided branch
+        x_img = self.resnet50(x_img_1)
 
         # Downsample 1
         x2 = self.dconv4(x1)
@@ -86,9 +93,13 @@ class UNet(nn.Module):
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
+        # merge image feature and vertex feature
+        x4 = torch.cat((x4, x_img), 1)
+
         # Upsample 1
         x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
-        x3 = self.uconv2(torch.cat((x3, x3_us), 1))
+        x3_mus = self.uconv1(x3_us)
+        x3 = self.uconv2(torch.cat((x3, x3_mus), 1))
 
         # Upsample 2
         x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
