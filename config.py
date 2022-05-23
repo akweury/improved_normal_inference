@@ -11,6 +11,7 @@ dataset = root / "dataset"
 ws_path = root / "workspace"
 output_path = root / "output"
 pncnn_path = root / "pncnn"
+paper_pic = root / "paper" / "pic"
 
 # basic dataset path
 geo_data = dataset / "data_geometrical_body"

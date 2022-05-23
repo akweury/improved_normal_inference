@@ -30,27 +30,29 @@ def preprocessing():
         path = config.synthetic_data_noise / "test"
     elif args.data == "real":
         path = config.real_data  # key tests 103, 166, 189,9
+    elif args.data == "paper":
+        path = config.paper_pic
     else:
         raise ValueError
     # test dataset indices
     all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
     all_names = np.array(all_names)
-    eval_indices = [int(name.split(".")[0]) for name in all_names]
-    eval_indices = eval_indices[:5]
+    # eval_indices = [int(name.split(".")[0]) for name in all_names]
+    eval_indices = [49]
 
     # load test model names
     models = {
         # "SVD": None,
         # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
     eval_res = np.zeros((len(models), len(eval_indices)))
 
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
-    folder_path = config.ws_path / "eval_output" / f"{eval_date}_{eval_time}"
+    folder_path = config.paper_pic / f"{eval_date}_{eval_time}"
     if not os.path.exists(str(folder_path)):
         os.mkdir(str(folder_path))
 
@@ -155,8 +157,8 @@ def main():
 
     for i, data_idx in enumerate(eval_idx):
         # read data
-        test_0 = torch.load(test_0_data[i])
-        test_1 = torch.load(test_1_data[i])
+        test_0 = torch.load(test_0_data[data_idx])
+        test_1 = torch.load(test_1_data[data_idx])
 
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         test_1_tensor = test_1['input_tensor'].unsqueeze(0)
@@ -181,10 +183,11 @@ def main():
         # mu.addText(x0_normalized_8bit, "Input(Vertex0)")
         # img_list.append(x0_normalized_8bit)
 
-        x0_normalized_8bit = mu.normalize2_8bit(vertex_1[:, :, :3])
-        x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
-        mu.addText(x0_normalized_8bit, "Input(Vertex1)")
-        img_list.append(x0_normalized_8bit)
+        # # add input
+        # x0_normalized_8bit = mu.normalize2_8bit(vertex_1[:, :, :3])
+        # x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
+        # mu.addText(x0_normalized_8bit, "Input(Vertex1)")
+        # img_list.append(x0_normalized_8bit)
 
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):

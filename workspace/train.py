@@ -457,12 +457,10 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
 
     # gt normal
     target = target.numpy()
-    if output_type == 'normal' or output_type == 'normal_noise':
-        target = mu.normal2RGB(target)
+    target_img = mu.normal2RGB(target)
     mask = target.sum(axis=2) == 0
-    target_ranges = mu.addHist(target)
-    target = cv.normalize(target, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    normal_gt_8bit = target
+    target_ranges = mu.addHist(target_img)
+    normal_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_gt_8bit, "gt")
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_gt_8bit)
