@@ -671,7 +671,7 @@ def normalise216bitImage(img):
 
 
 def hpf_torch(data):
-    data_array = np.uint8(data.to("cpu").numpy())
+    data_array = np.uint8(data.detach().to("cpu").permute(1, 2, 0).numpy())
     edges = cv.Canny(data_array, 100, 200, apertureSize=5, L2gradient=True)
     # left shift
     ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
