@@ -58,7 +58,10 @@ class UNet(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-    def forward(self, x1):
+    def forward(self, x_input, mask):
+        x1 = torch.zeros(size=mask.size()).to(x_input.device)
+        x1[mask] = x_input
+
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
