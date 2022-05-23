@@ -17,7 +17,6 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         self.degares3_3 = DeGaResNet(3, 3)
-        self.detailNet = UNet(3, 3)
 
     def forward(self, x):
         # general surface training
