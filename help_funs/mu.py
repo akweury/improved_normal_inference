@@ -670,9 +670,9 @@ def normalise216bitImage(img):
     return img_16bit
 
 
-def hpf_torch(normal):
-    normal_img = normal2RGB_torch(normal).permute(1, 2, 0).to("cpu").numpy()
-    edges = cv.Canny(normal_img, 100, 200, apertureSize=5, L2gradient=True)
+def hpf_torch(data):
+    data_array = np.uint8(data.to("cpu").numpy())
+    edges = cv.Canny(data_array, 100, 200, apertureSize=5, L2gradient=True)
     # left shift
     ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
     # right shift
@@ -682,17 +682,16 @@ def hpf_torch(normal):
     # down shift
     ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
 
-    detail = np.zeros(normal_img.shape)
+    detail = np.zeros(data_array.shape)
     detail[(ls + rs + us + ds) > 0] = 255
-    detail[normal_img == 0] = 0
-    normal_img[~(detail == 255)] = 0
+    detail[data_array == 0] = 0
+    data_array[~(detail == 255)] = 0
 
-    return torch.from_numpy(normal_img.sum(axis=2) == 0)
+    return torch.from_numpy(data_array.sum(axis=2) == 0)
 
 
 def hpf(img_path, visual=False):
     img = cv.imread(img_path, 0)
-
     edges = cv.Canny(img, 100, 200, apertureSize=5, L2gradient=True)
     # left shift
     ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]

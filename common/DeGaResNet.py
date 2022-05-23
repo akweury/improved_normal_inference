@@ -36,7 +36,6 @@ class DeGaResNet(nn.Module):
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
         self.active_img = nn.LeakyReLU(0.01)
-        self.detailNet = UNet(3, 3)
 
         self.epsilon = 1e-20
         channel_size_1 = 32
@@ -116,12 +115,4 @@ class DeGaResNet(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
 
-        mask_sharp_part = torch.zeros(size=(xout.size(0), 512, 512), dtype=torch.bool).to(xout.device)
-        # detail edge training
-        for i in range(xout.size(0)):
-            mask_sharp_part[i, :, :] = ~mu.hpf_torch(xout[i, :, :, :])
-
-        mask_sharp_part = mask_sharp_part.unsqueeze(1).repeat(1, 3, 1, 1)
-        x_out_sharp = self.detailNet(xout[mask_sharp_part], mask_sharp_part)
-
-        return torch.cat((xout, x_out_sharp, mask_sharp_part), 1)
+        return xout

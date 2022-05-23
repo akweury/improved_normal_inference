@@ -18,9 +18,9 @@ from pncnn.utils import args_parser
 if __name__ == '__main__':
     # data_file = str(config.synthetic_data / "test" / '00327.data0.json')
     depth_file = str(
-        config.ws_path / "nnnn" / "trained_model" / "output_2022-05-23_09_47_23" / "train_epoch_2999_0_loss_0.01001242.png")
+        config.ws_path / "00327.depth0_noise.png")
     img = mu.hpf(depth_file)
-
+    img[img.sum(axis=2) != 0] = 255
     cv.imwrite(str(Path(config.ws_path) / f"detail.png"), img)
 
     pass
