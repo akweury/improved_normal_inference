@@ -471,12 +471,12 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     xout = xout.detach().numpy()
     if output_type == 'normal' or output_type == 'normal_noise':
         xout = mu.filter_noise(xout, threshold=[-1, 1])
-        xout = mu.normal2RGB(xout)
+        pred_img = mu.normal2RGB(xout)
     else:
-        xout = mu.filter_noise(xout, threshold=[0, 255])
+        raise ValueError
 
-    xout[mask] = 0
-    normal_cnn_8bit = cv.normalize(xout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    pred_img[mask] = 0
+    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")
     if output_type != "noise":
         xout_ranges = mu.addHist(normal_cnn_8bit)
