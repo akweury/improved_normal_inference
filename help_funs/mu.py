@@ -670,16 +670,18 @@ def hpf_torch(data_normal):
     data_normal = data_normal.detach().to("cpu")
     data_img = normal2RGB_torch(data_normal).permute(1, 2, 0).numpy()
     edges = cv.Canny(data_img, 150, 250, apertureSize=3, L2gradient=True)
-    # left shift
-    ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
-    # right shift
-    rs = np.pad(edges, ((0, 0), (1, 0)), mode='constant')[:, :-1]
-    # up shift
-    us = np.pad(edges, ((0, 1), (0, 0)), mode='constant')[1:, :]
-    # down shift
-    ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
+
+    shifts = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
+    # shifts = [(0, 5), (0, 4), (0, 3), (0, 2),    (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
+    sharp_area = np.zeros(shape=edges.shape)
+    for (f, b) in shifts:
+        for (l, r) in shifts:
+            nf = 100000 if f == 0 else -f
+            nl = 100000 if l == 0 else -l
+            sharp_area += np.pad(edges, ((f, b), (l, r)), mode='constant')[b:nf, r:nl]
+
     mask_sharp_part = np.zeros(data_img.shape[:2])
-    mask_sharp_part[(ls + rs + us + ds) > 0] = 255
+    mask_sharp_part[sharp_area > 0] = 255
     # mask the non object pixels
     mask_sharp_part[np.sum(data_img, axis=2) == 0] = 0
 
