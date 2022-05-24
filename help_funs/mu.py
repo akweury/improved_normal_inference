@@ -674,18 +674,26 @@ def hpf_torch(data_normal):
     shifts = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
     # shifts = [(0, 5), (0, 4), (0, 3), (0, 2),    (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
     sharp_area = np.zeros(shape=edges.shape)
+    strict_sharp_area = np.zeros(shape=edges.shape)
     for (f, b) in shifts:
         for (l, r) in shifts:
             nf = 100000 if f == 0 else -f
             nl = 100000 if l == 0 else -l
             sharp_area += np.pad(edges, ((f, b), (l, r)), mode='constant')[b:nf, r:nl]
+            if (f, b) == (0, 0) and (l, r) == (0, 0):
+                strict_sharp_area += np.pad(edges, ((f, b), (l, r)), mode='constant')[b:nf, r:nl]
 
-    mask_sharp_part = np.zeros(data_img.shape[:2])
-    mask_sharp_part[sharp_area > 0] = 255
+    mask_sharp_part_extended = np.zeros(data_img.shape[:2])
+    mask_sharp_part_extended[sharp_area > 0] = 255
     # mask the non object pixels
-    mask_sharp_part[np.sum(data_img, axis=2) == 0] = 0
+    mask_sharp_part_extended[np.sum(data_img, axis=2) == 0] = 0
 
-    return torch.from_numpy(mask_sharp_part)
+    mask_sharp_part_strict = np.zeros(data_img.shape[:2])
+    mask_sharp_part_strict[strict_sharp_area > 0] = 255
+    # mask the non object pixels
+    mask_sharp_part_strict[np.sum(data_img, axis=2) == 0] = 0
+
+    return torch.from_numpy(mask_sharp_part_strict), torch.from_numpy(mask_sharp_part_extended)
 
 
 def hpf(img_path, visual=False):
