@@ -31,6 +31,9 @@ class CNN(nn.Module):
         mask_sharp_part_strict = mask_sharp_part_strict == 255
         mask_sharp_part_strict = mask_sharp_part_strict.unsqueeze(1).repeat(1, 3, 1, 1)
 
+        mask_sharp_part_extended = mask_sharp_part_extended == 255
+        mask_sharp_part_extended = mask_sharp_part_extended.unsqueeze(1).repeat(1, 3, 1, 1)
+
         # feed extended sharp part to model for training purpose
         x1 = torch.zeros(size=mask_sharp_part_extended.size()).to(x.device)
         x1[mask_sharp_part_extended] = x[:, :3, :, :][mask_sharp_part_extended]

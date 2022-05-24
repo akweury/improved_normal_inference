@@ -483,13 +483,13 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         # pred base normal
         xout_base = xout[:, :, :3]
         xout_base = mu.filter_noise(xout_base, threshold=[-1, 1])
-        xout_base[(np.sum(xout[:, :, 3:], axis=2) != 0)] = 0
+        xout_base[(np.sum(xout[:, :, 3:6], axis=2) != 0)] = 0
         pred_base_img = mu.normal2RGB(xout_base)
         pred_base_img[mask] = 0
         normal_cnn_base_8bit = cv.normalize(pred_base_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
 
         # pred sharp normal
-        xout_sharp = xout[:, :, 3:]
+        xout_sharp = xout[:, :, 3:6]
         xout_sharp = mu.filter_noise(xout_sharp, threshold=[-1, 1])
         pred__sharp_img = mu.normal2RGB(xout_sharp)
         pred__sharp_img[mask] = 0
