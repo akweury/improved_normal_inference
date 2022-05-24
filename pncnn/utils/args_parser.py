@@ -38,17 +38,10 @@ def args_parser():
 
     # Mode selection
 
-    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'],
-                        help='train a model or test a mode')
-    parser.add_argument('--noise', type=bool, default=False, choices=[False, True],
-                        help='add noise or not')
     parser.add_argument('--neighbor', type=int, default=2, help='the neighbors will be considered')
-
     parser.add_argument('--machine', type=str, default="local", help='choose the training machin, local or remote')
     parser.add_argument('--output_type', type=str, default="normal",
                         help='choose the meaning of output tensor, rgb or normal')
-    parser.add_argument('--cpu', '-c', action="store_true",
-                        help='Use CPU for training?')
 
     parser.add_argument('--args', '-a', type=str, default='', choices=['defaults', 'json'],
                         help='How to read args? (json file or dataset defaults)')
@@ -60,21 +53,11 @@ def args_parser():
     parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                         help='Path to latest checkpoint (default: none)')
 
-    parser.add_argument('--evaluate', '--eval', type=str, default=None,
-                        help='Path to the checkpoint to evaluate.')
-
-    parser.add_argument('--gpu', default=0, type=int,
-                        help='GPU ID (default: 0)')
-
     ########### General Dataset arguments ###########
     parser.add_argument('--dataset', default='kitti_depth', choices=datasets_list,
                         help='Dataset to use: ' + ' | '.join(datasets_list) + ' (default: kitti_depth)')
 
     parser.add_argument('--dataset-path', type=str, default='', help='Dataset path.')
-
-    parser.add_argument('--modality', '-m', default='d', choices=modality_list,
-                        help='Modalities to use: ' + ' | '.join(modality_list) + ' (default: d)')
-
     parser.add_argument('--batch_size', '-b', default=8, type=int, help='Mini-batch size (default: 8)')
 
     parser.add_argument('--train-on', default='full', type=str, help='The number of images to train on from the data.')
@@ -93,25 +76,6 @@ def args_parser():
 
     parser.add_argument('--train-disp', default=False, type=bool,
                         help='Train on disparity (1/depth) (default: False)')
-
-    parser.add_argument('--rgb2gray', default=False, type=bool,
-                        help='Convert RGB images to grayscale (default: False)')
-
-    parser.add_argument('--data_aug', default=False, type=bool,
-                        help='Perform data augmentation or not. (default: False)')
-
-    ########### NYUDepthv2 arguments ###########
-    parser.add_argument('-s', '--num-samples', default=200, type=int, metavar='N',
-                        help='number of sparse depth samples (default: 0)')
-    parser.add_argument('--max-depth', default=-1.0, type=float, metavar='D',
-                        help='cut-off depth of sparsifier, negative values means infinity (default: inf [m])')
-    from pncnn.dataloaders.nyu_transforms import UniformSampling, SimulatedStereo
-    sparsifier_names = [x.name for x in [UniformSampling, SimulatedStereo]]
-    parser.add_argument('--sparsifier', metavar='SPARSIFIER', default=UniformSampling.name, choices=sparsifier_names,
-                        help='sparsifier: ' + ' | '.join(sparsifier_names) + ' (default: ' + UniformSampling.name + ')')
-
-    parser.add_argument('--shift', default=None, type=float, help='Translation Perturbation in cm. (default: None')
-    parser.add_argument('--rotate', default=None, type=float, help='Rotation Perturbation in cm. (default: None')
 
     ########### Training arguments ###########
     parser.add_argument('--epochs', default=20, type=int,
@@ -133,10 +97,8 @@ def args_parser():
 
     parser.add_argument('--lr-decay-factor', default=0.1, type=float,
                         help='Learning rate decay factor(default: 0.1)')
-
     parser.add_argument('--weight-decay', '--wd', default=0, type=float,
                         help='Weight decay (default: 0)')
-
     parser.add_argument('--loss', '-l', default='l1', choices=losses_list,
                         help='Loss function: ' + ' | '.join(losses_list) + ' (default: l1)')
 
@@ -166,15 +128,10 @@ def args_parser():
 
 
 def initialize_args(args):
-    # Check the "defaults" argument
-    if args.args == 'defaults':  # Load the default parameters for the selected dataset
-        args_path = 'dataloaders/datasets_defaults/' + args.dataset + '_defaults.json'
-        load_args_from_file(args_path, args)
-    elif args.args == 'json':
-        # Path to the workspace directory
-        ws_path = config.ws_path
-        args_path = ws_path / args.exp / 'args.json'
-        load_args_from_file(args_path, args)
+    # Path to the workspace directory
+    ws_path = config.ws_path
+    args_path = ws_path / args.exp / 'args.json'
+    load_args_from_file(args_path, args)
     print_args(args)
     return args
 
