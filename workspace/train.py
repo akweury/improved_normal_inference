@@ -327,19 +327,12 @@ def train_epoch(nn_model, epoch):
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
     angle_loss_total = torch.tensor([0.0])
-    start = time.time()
     for i, (input, target, scale_factor) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target = input.to(nn_model.device), target.to(nn_model.device)
 
         # Wait for all kernels to finish
         torch.cuda.synchronize()
-
-        # record data load time
-        data_time = time.time() - start
-
-        # start count the model time
-        start = time.time()
 
         # Clear the gradients
         nn_model.optimizer.zero_grad()
@@ -373,9 +366,6 @@ def train_epoch(nn_model, epoch):
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
-            # print(f" angle loss: {angle_loss:.2e}")
-            # print(f' range(out):[{out.min():.1f} - {out.max():.1f}]  range(target): [{target.min():.1f} - {target.max():.1f}]')
-        start = time.time()
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
 
@@ -466,16 +456,52 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_gt_8bit)
 
-    # pred normal
-    xout = xout[:, :, 3:]
-    xout = mu.filter_noise(xout, threshold=[-1, 1])
-    pred_img = mu.normal2RGB(xout)
-    pred_img[mask] = 0
-    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(normal_cnn_8bit, "output")
-    xout_ranges = mu.addHist(normal_cnn_8bit)
-    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-    output_list.append(normal_cnn_8bit)
+    if exp_name == "degares":
+        # pred base normal
+        xout_base = xout[:, :, :3]
+        xout_base = mu.filter_noise(xout_base, threshold=[-1, 1])
+        xout_base[(np.sum(xout[:, :, 3:], axis=2) != 0)] = 0
+        pred_base_img = mu.normal2RGB(xout_base)
+        pred_base_img[mask] = 0
+        normal_cnn_base_8bit = cv.normalize(pred_base_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+
+        # pred sharp normal
+        xout_sharp = xout[:, :, 3:]
+        xout_sharp = mu.filter_noise(xout_sharp, threshold=[-1, 1])
+        pred__sharp_img = mu.normal2RGB(xout_sharp)
+        pred__sharp_img[mask] = 0
+        normal_cnn_sharp_8bit = cv.normalize(pred__sharp_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+
+        # pred combined normal
+        xout = xout_base + xout_sharp
+        normal_cnn_8bit = normal_cnn_base_8bit + normal_cnn_sharp_8bit
+
+        mu.addText(normal_cnn_base_8bit, "output_base")
+        xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
+        mu.addText(normal_cnn_base_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_base_8bit)
+
+        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
+        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
+        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_sharp_8bit)
+
+        mu.addText(normal_cnn_8bit, "output")
+        xout_ranges = mu.addHist(normal_cnn_8bit)
+        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_8bit)
+
+    else:
+        # pred normal
+        xout = xout[:, :, :3]
+        xout = mu.filter_noise(xout, threshold=[-1, 1])
+        pred_img = mu.normal2RGB(xout)
+        pred_img[mask] = 0
+        normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        mu.addText(normal_cnn_8bit, "output")
+        xout_ranges = mu.addHist(normal_cnn_8bit)
+        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_8bit)
 
     # err visualisation
     diff_img, diff_angle = mu.eval_img_angle(xout, target)
@@ -499,30 +525,6 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
     #     mu.addText(normal_cout_8bit, "c_out")
     #     mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
     #     output_list.append(normal_cout_8bit)
-
-    if exp_name == "degares":
-        # pred base normal
-        xout_base = xout[:, :, :3]
-        xout_base = mu.filter_noise(xout_base, threshold=[-1, 1])
-        xout_base[(np.sum(xout[:, :, 3:], axis=2) != 0)] = 0
-        pred_base_img = mu.normal2RGB(xout_base)
-        pred_base_img[mask] = 0
-        normal_cnn_base_8bit = cv.normalize(pred_base_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        mu.addText(normal_cnn_base_8bit, "output_base")
-        xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
-        mu.addText(normal_cnn_base_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_base_8bit)
-
-        # pred sharp normal
-        xout_sharp = xout[:, :, 3:]
-        xout_sharp = mu.filter_noise(xout_sharp, threshold=[-1, 1])
-        pred__sharp_img = mu.normal2RGB(xout_sharp)
-        pred__sharp_img[mask] = 0
-        normal_cnn_sharp_8bit = cv.normalize(pred__sharp_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
-        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
-        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_sharp_8bit)
 
     if output_type != "noise":
         output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
