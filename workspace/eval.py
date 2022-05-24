@@ -39,10 +39,7 @@ def eval(dataset_path, name, model_path, gpu=0):
     start_epoch = checkpoint['epoch']
     model = checkpoint['model']
 
-    if args.cpu:
-        device = torch.device("cpu")
-    else:
-        device = torch.device("cuda:" + str(gpu))
+    device = torch.device("cuda:0")
     model = model.to(device)
     model.eval()  # Swith to evaluate mode
     print("ok.")
@@ -78,17 +75,10 @@ def eval(dataset_path, name, model_path, gpu=0):
 
             # calculate loss
             out = mu.filter_noise(out, threshold=[-1, 1])
-            mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
 
-            output = out[0, :].permute(1, 2, 0)[:, :, :3]
-            target = target[0, :].permute(1, 2, 0)[:, :, :3]
-
-            output = output.to('cpu').numpy()
-            target = target.to('cpu').numpy()
-
-            diff_img, diff_angle = mu.eval_img_angle(output, target)
-
-            diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+            diff = mu.output_radians_loss(out[:, :3, :, :], target).to("cpu").detach().numpy()
+            if args.exp == "degares":
+                diff += mu.output_radians_loss(out[:, 3:6, :, :], target).to("cpu").detach().numpy()
 
             loss_list[i] = diff
             time_list[i] = gpu_time * 1000

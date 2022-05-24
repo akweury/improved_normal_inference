@@ -357,16 +357,9 @@ def train_epoch(nn_model, epoch):
         loss_total += loss.detach().to('cpu')
 
         if nn_model.args.angle_loss:
-            mask = (~torch.prod(out[:, :3, :, :] == 0, 1).bool()).unsqueeze(1)
-            angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum() / mask.sum()
-            angle_loss_total += angle_loss.to('cpu').detach().numpy()
-
+            angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target).to('cpu').detach().numpy()
             if nn_model.args.exp == "degares":
-                mask_sharp = (~torch.prod(out[:, 3:6, :, :] == 0, 1).bool()).unsqueeze(1)
-                angle_loss_sharp = mu.angle_between_2d_tensor(out[:, 3:6, :, :], target,
-                                                              mask=mask_sharp).sum() / mask_sharp.sum()
-                angle_loss_sharp_total += angle_loss_sharp.to('cpu').detach().numpy()
-
+                angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to('cpu').detach().numpy()
         # visualisation
         if i == 0:
             # print statistics
@@ -481,22 +474,13 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
 
     if exp_name == "degares":
         # pred base normal
-        xout_base = xout[:, :, :3]
-        xout_base = mu.filter_noise(xout_base, threshold=[-1, 1])
-        xout_base[(np.sum(xout[:, :, 3:6], axis=2) != 0)] = 0
-        pred_base_img = mu.normal2RGB(xout_base)
-        pred_base_img[mask] = 0
-        normal_cnn_base_8bit = cv.normalize(pred_base_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_cnn_base_8bit = mu.visual_output(xout[:, :, :3], mask)
 
         # pred sharp normal
-        xout_sharp = xout[:, :, 3:6]
-        xout_sharp = mu.filter_noise(xout_sharp, threshold=[-1, 1])
-        pred__sharp_img = mu.normal2RGB(xout_sharp)
-        pred__sharp_img[mask] = 0
-        normal_cnn_sharp_8bit = cv.normalize(pred__sharp_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        normal_cnn_sharp_8bit = mu.visual_output(xout[:, :, 3:6], mask)
 
         # pred combined normal
-        pred_normal = xout_base + xout_sharp
+        pred_normal = xout[:, :, :3] + xout[:, :, 3:6]
         normal_cnn_8bit = normal_cnn_base_8bit + normal_cnn_sharp_8bit
 
         mu.addText(normal_cnn_base_8bit, "output_base")

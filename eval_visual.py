@@ -13,56 +13,7 @@ import numpy as np
 from help_funs import file_io, mu
 import config
 from workspace.svd import eval as svd
-from help_funs import data_preprocess
 
-
-def preprocessing():
-    parser = argparse.ArgumentParser(description='Eval')
-
-    # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
-    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
-                        help="loading dataset from local or dfki machine")
-    args = parser.parse_args()
-
-    # load data file names
-    if args.data == "synthetic":
-        path = config.synthetic_data_noise / "test"
-    elif args.data == "real":
-        path = config.real_data  # key tests 103, 166, 189,9
-    elif args.data == "paper":
-        path = config.paper_pic
-    else:
-        raise ValueError
-    # test dataset indices
-    all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
-    all_names = np.array(all_names)
-    # eval_indices = [int(name.split(".")[0]) for name in all_names]
-    eval_indices = [49]
-
-    # load test model names
-    models = {
-        # "SVD": None,
-        # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
-        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-    }
-    eval_res = np.zeros((len(models), len(eval_indices)))
-
-    eval_time = datetime.datetime.now().strftime("%H_%M_%S")
-    eval_date = datetime.datetime.today().date()
-    folder_path = config.paper_pic / f"{eval_date}_{eval_time}"
-    if not os.path.exists(str(folder_path)):
-        os.mkdir(str(folder_path))
-
-    print(f"\n\n==================== Evaluation Start =============================\n"
-          f"Eval Type: Visualisation"
-          f"Eval Date: {eval_date}\n"
-          f"Eval Time: {eval_time}\n"
-          f"Eval Objects: {len(eval_indices)}\n"
-          f"Eval Models: {models.keys()}\n")
-    return models, eval_indices, path, folder_path, eval_res, eval_date, eval_time
 
 
 def eval_post_processing(normal, normal_img, normal_gt, name):
@@ -79,7 +30,7 @@ def eval_post_processing(normal, normal_img, normal_gt, name):
     return normal_img, diff_img, diff
 
 
-def evaluate(test_0_tensor, test_1_tensor, model_path):
+def evaluate(test_0_tensor, test_1_tensor, model_path, gt_mask):
     # load model
     if model_path is None:
         normal, normal_img, eval_point_counter, total_time = svd.eval_single(test_1_tensor, farthest_neighbour=2)
@@ -92,17 +43,16 @@ def evaluate(test_0_tensor, test_1_tensor, model_path):
     print('- Checkpoint was loaded successfully.')
 
     # load model
-    if args.cpu:
-        device = torch.device("cpu")
-    else:
-        device = torch.device("cuda:" + str(args.gpu))
+    device = torch.device("cuda:0")
     model = checkpoint['model'].to(device)
     k = args.neighbor
 
     if k == 0:
-        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, test_0_tensor, start_epoch, device)
+        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(args, model, test_0_tensor, start_epoch,
+                                                                            device, gt_mask)
     elif k == 1:
-        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(model, test_1_tensor, start_epoch, device)
+        normal, normal_img, eval_point_counter, total_time = evaluate_epoch(args, model, test_1_tensor, start_epoch,
+                                                                            device, gt_mask)
     else:
         raise ValueError
 
@@ -113,7 +63,7 @@ def evaluate(test_0_tensor, test_1_tensor, model_path):
 
 
 ############ EVALUATION FUNCTION ############
-def evaluate_epoch(model, input_tensor, epoch, device):
+def evaluate_epoch(args, model, input_tensor, epoch, device, gt_mask):
     model.eval()  # Swith to evaluate mode
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
@@ -123,15 +73,18 @@ def evaluate_epoch(model, input_tensor, epoch, device):
         output = model(input_tensor)
         gpu_time = time.time() - start
         # store the predicted normal
-        output = output[0, :].permute(1, 2, 0)[:, :, :3]
+        output = output[0, :].permute(1, 2, 0)
         output = output.to('cpu').numpy()
-    mask = input_tensor.sum(axis=1) == 0
-    mask = mask.to('cpu').numpy().reshape(512, 512)
-    eval_point_counter = np.sum(mask)
 
-    normal = mu.filter_noise(output, threshold=[-1, 1])
+    eval_point_counter = np.sum(gt_mask)
+    if args.exp == "degares":
+        normal = output[:, :, :3] + output[:, :, 3:6]
+        normal = mu.filter_noise(normal, threshold=[-1, 1])
+        normal_8bit = mu.visual_output(normal, ~gt_mask)
+    else:
+        normal_8bit = mu.visual_output(output[:, :, :3], ~gt_mask)
+        normal = mu.filter_noise(output[:, :, :3], threshold=[-1, 1])
 
-    normal_8bit = mu.normal2RGB(normal)
     normal_8bit = np.ascontiguousarray(normal_8bit, dtype=np.uint8)
 
     return normal, normal_8bit, eval_point_counter, gpu_time
@@ -139,12 +92,62 @@ def evaluate_epoch(model, input_tensor, epoch, device):
 
 def model_eval(model_path, test_0_tensor, test_1_tensor, gt, name):
     mask = gt.sum(axis=2) == 0
-    normal, img, _, _ = evaluate(test_0_tensor, test_1_tensor, model_path)
+    normal, img, _, _ = evaluate(test_0_tensor, test_1_tensor, model_path, ~mask)
     normal[mask] = 0
     img[mask] = 0
 
     normal_img, angle_err_img, err = eval_post_processing(normal, img, gt, name)
     return normal_img, angle_err_img, err
+
+
+def preprocessing():
+    parser = argparse.ArgumentParser(description='Eval')
+
+    # Mode selection
+    parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
+    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
+                        help="loading dataset from local or dfki machine")
+    args = parser.parse_args()
+
+    # load data file names
+    if args.data == "synthetic":
+        path = config.synthetic_data_noise / "train"
+    elif args.data == "real":
+        path = config.real_data  # key tests 103, 166, 189,9
+    elif args.data == "paper":
+        path = config.paper_pic
+    else:
+        raise ValueError
+    # test dataset indices
+    all_names = [os.path.basename(path) for path in sorted(glob.glob(str(path / f"*.image?.png"), recursive=True))]
+    all_names = np.array(all_names)
+    # eval_indices = [int(name.split(".")[0]) for name in all_names]
+    eval_indices = [6]
+
+    # load test model names
+    models = {
+        # "SVD": None,
+        # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
+        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+    }
+    eval_res = np.zeros((len(models), len(eval_indices)))
+
+    eval_time = datetime.datetime.now().strftime("%H_%M_%S")
+    eval_date = datetime.datetime.today().date()
+    folder_path = config.paper_pic / f"{eval_date}_{eval_time}"
+    if not os.path.exists(str(folder_path)):
+        os.mkdir(str(folder_path))
+
+    print(f"\n\n==================== Evaluation Start =============================\n"
+          f"Eval Type: Visualisation"
+          f"Eval Date: {eval_date}\n"
+          f"Eval Time: {eval_time}\n"
+          f"Eval Objects: {len(eval_indices)}\n"
+          f"Eval Models: {models.keys()}\n")
+    return models, eval_indices, path, folder_path, eval_res, eval_date, eval_time
 
 
 def main():

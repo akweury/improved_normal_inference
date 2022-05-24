@@ -41,7 +41,7 @@ def angle_between_2d(m1, m2):
     return deg
 
 
-def angle_between_2d_tensor(t1, t2, mask=None):
+def radians_between_2d_tensor(t1, t2, mask=None):
     """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
     # t1 = t1.permute(0, 2, 3, 1).to("cpu").detach().numpy()
     # t2 = t2.permute(0, 2, 3, 1).to("cpu").detach().numpy()
@@ -911,3 +911,18 @@ def normaliseVertex(vertex):
     vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factor
 
     return vertex
+
+
+def output_radians_loss(output, target):
+    mask = (~torch.prod(output == 0, 1).bool()).unsqueeze(1)
+    loss = radians_between_2d_tensor(output, target, mask=mask).sum() / mask.sum()
+
+    return loss
+
+
+def visual_output(xout, mask):
+    xout_std = filter_noise(xout, threshold=[-1, 1])
+    xout_img = normal2RGB(xout_std)
+    xout_img[mask] = 0
+    xout_8bit = cv.normalize(xout_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return xout_8bit
