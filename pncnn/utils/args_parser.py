@@ -62,9 +62,7 @@ def args_parser():
 
     parser.add_argument('--train-on', default='full', type=str, help='The number of images to train on from the data.')
 
-    parser.add_argument('--workers', default=4, type=int,
-                        help='Number of dataloader workers (default: 4)')
-
+    parser.add_argument('--sharp_penalty', default=1.5, type=float, help='penalty of sharp normal prediction')
     ########### KITTI-Depth arguments ###########
     parser.add_argument('--raw-kitti-path', type=str, default='', help='Dataset path')
 

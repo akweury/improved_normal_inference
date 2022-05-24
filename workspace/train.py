@@ -88,7 +88,7 @@ class AngleDetailLoss(nn.Module):
 
         # combine two kinds of normals
         outputs_smooth = outputs[:, :3, :, :]
-        outputs_sharp = outputs[:, 3:6, :, :] * args.penalty
+        outputs_sharp = outputs[:, 3:6, :, :] * args.sharp_penalty
         outputs_merged = outputs_sharp + outputs_smooth
 
         # mask of normals
@@ -231,7 +231,7 @@ class TrainingModel():
         data_loader = DataLoader(dataset,
                                  shuffle=True,
                                  batch_size=self.args.batch_size,
-                                 num_workers=self.args.workers)
+                                 num_workers=4)
 
         print('\n- Found {} images in "{}" folder.'.format(data_loader.dataset.__len__(), 'train'))
         print('- Dataset "{}" was loaded successfully!'.format(self.args.dataset))
