@@ -362,8 +362,8 @@ def train_epoch(nn_model, epoch):
             angle_loss_total += angle_loss.to('cpu').detach().numpy()
 
             if nn_model.args.exp == "degares":
-                mask_sharp = (~torch.prod(out[:, 3:, :, :] == 0, 1).bool()).unsqueeze(1)
-                angle_loss_sharp = mu.angle_between_2d_tensor(out[:, 3:, :, :], target,
+                mask_sharp = (~torch.prod(out[:, 3:6, :, :] == 0, 1).bool()).unsqueeze(1)
+                angle_loss_sharp = mu.angle_between_2d_tensor(out[:, 3:6, :, :], target,
                                                               mask=mask_sharp).sum() / mask_sharp.sum()
                 angle_loss_sharp_total += angle_loss_sharp.to('cpu').detach().numpy()
 
