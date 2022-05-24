@@ -383,13 +383,9 @@ def normal2RGB(normals):
     mask = np.sum(np.abs(normals), axis=2) != 0
     rgb = np.zeros(shape=normals.shape)
     # convert normal to RGB color
-    h, w, c = normals.shape
-    for i in range(h):
-        for j in range(w):
-            if mask[i, j]:
-                rgb[i, j] = normals[i, j] * 0.5 + 0.5
-                rgb[i, j, 2] = 1 - rgb[i, j, 2]
-                rgb[i, j] = (rgb[i, j] * 255)
+    rgb[mask] = normals[mask] * 0.5 + 0.5
+    rgb[:, :, 2][mask] = 1 - rgb[:, :, 2][mask]
+    rgb[mask] = rgb[mask] * 255
 
     # rgb = cv.normalize(rgb, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     rgb = np.rint(rgb)
