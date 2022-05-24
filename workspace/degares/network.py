@@ -29,7 +29,11 @@ class CNN(nn.Module):
             mask_sharp_part[i, :, :] = mu.hpf_torch(xout_base[i, :, :, :])
         mask_sharp_part = mask_sharp_part == 255
         mask_sharp_part = mask_sharp_part.unsqueeze(1).repeat(1, 3, 1, 1)
-        x_out_sharp = self.detailNet(x[:, :3, :, :][mask_sharp_part], mask_sharp_part)
+
+        x1 = torch.zeros(size=mask_sharp_part.size()).to(x.device)
+        x1[mask_sharp_part] = x[:, :3, :, :][mask_sharp_part]
+
+        x_out_sharp = self.detailNet(x1)
         x_out_sharp[~mask_sharp_part] = 0
 
         # set sharp edge in base to 0
@@ -37,4 +41,4 @@ class CNN(nn.Module):
         xout_base[(torch.sum(x_out_sharp, dim=1) > 0)] = 0
         xout_base = xout_base.permute(0, 3, 1, 2)
 
-        return torch.cat((xout_base, x_out_sharp), 1)
+        return torch.cat((xout_base, x_out_sharp, x1), 1)

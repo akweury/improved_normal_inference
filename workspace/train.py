@@ -496,13 +496,25 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         normal_cnn_sharp_8bit = cv.normalize(pred__sharp_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
 
         # pred combined normal
-        xout = xout_base + xout_sharp
+        pred_normal = xout_base + xout_sharp
         normal_cnn_8bit = normal_cnn_base_8bit + normal_cnn_sharp_8bit
 
         mu.addText(normal_cnn_base_8bit, "output_base")
         xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
         mu.addText(normal_cnn_base_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_base_8bit)
+
+        # sharp edge detection input
+
+        x1_normalized_8bit = mu.normalize2_8bit(xout[:, :, 6:9])
+        x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
+        mu.addText(x1_normalized_8bit, "Input(Sharp)")
+        output_list.append(x0_normalized_8bit)
+
+        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
+        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
+        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_sharp_8bit)
 
         mu.addText(normal_cnn_sharp_8bit, "output_sharp")
         xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
@@ -516,9 +528,9 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
 
     else:
         # pred normal
-        xout = xout[:, :, :3]
-        xout = mu.filter_noise(xout, threshold=[-1, 1])
-        pred_img = mu.normal2RGB(xout)
+        pred_normal = xout[:, :, :3]
+        pred_normal = mu.filter_noise(pred_normal, threshold=[-1, 1])
+        pred_img = mu.normal2RGB(pred_normal)
         pred_img[mask] = 0
         normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         mu.addText(normal_cnn_8bit, "output")
@@ -527,7 +539,7 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         output_list.append(normal_cnn_8bit)
 
     # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(xout, target)
+    diff_img, diff_angle = mu.eval_img_angle(pred_normal, target)
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
