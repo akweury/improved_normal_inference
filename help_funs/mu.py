@@ -671,8 +671,8 @@ def normalise216bitImage(img):
 
 
 def hpf_torch(data_normal):
-    data_normal = data_normal.detach().to("cpu").permute(1, 2, 0).numpy()
-    data_img = normal2RGB(data_normal)
+    data_normal = data_normal.detach().to("cpu")
+    data_img = normal2RGB_torch(data_normal).permute(1, 2, 0).numpy()
     edges = cv.Canny(data_img, 150, 250, apertureSize=3, L2gradient=True)
     # left shift
     ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
@@ -682,10 +682,10 @@ def hpf_torch(data_normal):
     us = np.pad(edges, ((0, 1), (0, 0)), mode='constant')[1:, :]
     # down shift
     ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
-    mask_sharp_part = np.zeros(data_normal.shape[:2])
+    mask_sharp_part = np.zeros(data_img.shape[:2])
     mask_sharp_part[(ls + rs + us + ds) > 0] = 255
     # mask the non object pixels
-    mask_sharp_part[np.sum(data_normal, axis=2) == 0] = 0
+    mask_sharp_part[np.sum(data_img, axis=2) == 0] = 0
 
     return torch.from_numpy(mask_sharp_part)
 
