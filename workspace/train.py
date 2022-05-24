@@ -368,7 +368,8 @@ def train_epoch(nn_model, epoch):
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                draw_output(input, out, nn_model.args.cout, target=target, exp_path=nn_model.output_folder,
+                draw_output(nn_model.args.exp, input, out, nn_model.args.cout, target=target,
+                            exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
 
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
@@ -432,16 +433,16 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, prefix):
+def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, output_type, prefix):
     if target.size() != (512, 512, 3):
         target = target[0, :].permute(1, 2, 0)[:, :, :3]
     # if xout.size() != (512, 512, 3):
-    if cout is not None:
-        cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
-        x1 = xout[0, :].permute(1, 2, 0)[:, :, 6:9]
-    else:
-        x1 = None
-    xout = xout[0, :].permute(1, 2, 0)[:, :, :3]
+    # if cout is not None:
+    #     cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
+    #     x1 = xout[0, :].permute(1, 2, 0)[:, :, 6:9]
+    # else:
+    #     x1 = None
+    xout = xout[0, :].permute(1, 2, 0).detach().numpy()
 
     output_list = []
 
@@ -466,19 +467,14 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     output_list.append(normal_gt_8bit)
 
     # pred normal
-    xout = xout.detach().numpy()
-    if output_type == 'normal' or output_type == 'normal_noise':
-        xout = mu.filter_noise(xout, threshold=[-1, 1])
-        pred_img = mu.normal2RGB(xout)
-    else:
-        raise ValueError
-
+    xout = xout[:, :, 3:]
+    xout = mu.filter_noise(xout, threshold=[-1, 1])
+    pred_img = mu.normal2RGB(xout)
     pred_img[mask] = 0
     normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")
-    if output_type != "noise":
-        xout_ranges = mu.addHist(normal_cnn_8bit)
-        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    xout_ranges = mu.addHist(normal_cnn_8bit)
+    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_cnn_8bit)
 
     # err visualisation
@@ -503,6 +499,30 @@ def draw_output(x0, xout, cout, target, exp_path, loss, epoch, i, output_type, p
     #     mu.addText(normal_cout_8bit, "c_out")
     #     mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
     #     output_list.append(normal_cout_8bit)
+
+    if exp_name == "degares":
+        # pred base normal
+        xout_base = xout[:, :, :3]
+        xout_base = mu.filter_noise(xout_base, threshold=[-1, 1])
+        xout_base[(np.sum(xout[:, :, 3:], axis=2) != 0)] = 0
+        pred_base_img = mu.normal2RGB(xout_base)
+        pred_base_img[mask] = 0
+        normal_cnn_base_8bit = cv.normalize(pred_base_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        mu.addText(normal_cnn_base_8bit, "output_base")
+        xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
+        mu.addText(normal_cnn_base_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_base_8bit)
+
+        # pred sharp normal
+        xout_sharp = xout[:, :, 3:]
+        xout_sharp = mu.filter_noise(xout_sharp, threshold=[-1, 1])
+        pred__sharp_img = mu.normal2RGB(xout_sharp)
+        pred__sharp_img[mask] = 0
+        normal_cnn_sharp_8bit = cv.normalize(pred__sharp_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
+        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
+        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_sharp_8bit)
 
     if output_type != "noise":
         output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)

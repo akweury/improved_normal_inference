@@ -682,12 +682,12 @@ def hpf_torch(data):
     # down shift
     ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
 
-    detail = np.zeros(data_array.shape)
-    detail[(ls + rs + us + ds) > 0] = 255
-    detail[data_array == 0] = 0
-    data_array[~(detail == 255)] = 0
+    mask_sharp_part = np.zeros(data_array.shape[:2])
+    mask_sharp_part[(ls + rs + us + ds) > 0] = 255
+    # mask the non object pixels
+    mask_sharp_part[np.sum(data_array, axis=2) == 0] = 0
 
-    return torch.from_numpy(data_array.sum(axis=2) == 0)
+    return torch.from_numpy(mask_sharp_part)
 
 
 def hpf(img_path, visual=False):
