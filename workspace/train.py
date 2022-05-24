@@ -86,19 +86,25 @@ class AngleDetailLoss(nn.Module):
         outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
         outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
 
-        # combine two kinds of normals
-        outputs_smooth = outputs[:, :3, :, :]
-        outputs_sharp = outputs[:, 3:6, :, :] * args.sharp_penalty
-        outputs_merged = outputs_sharp + outputs_smooth
-
-        # mask of normals
-        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
-        mask = mask.unsqueeze(1).repeat(1, 3, 1, 1)
-
         # smooth loss and sharp loss
         axis = args.epoch % 3
-        axis_diff = (outputs_merged - target)[:, axis, :, :][mask[:, 0, :, :]]
-        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
+
+        # mask of normals
+        mask_smooth = (torch.sum(torch.abs(outputs[:, axis, :, :]), dim=1) > 0)
+        mask_sharp = (torch.sum(torch.abs(outputs[:, axis + 3, :, :]), dim=1) > 0)
+
+        target_smooth = target[mask_smooth]
+        output_smooth = outputs[:, axis, :, :]
+        output_smooth = output_smooth[mask_smooth]
+
+        target_sharp = target[mask_sharp]
+        output_sharp = outputs[:, axis + 3, :, :]
+        output_sharp = output_sharp[mask_sharp]
+
+        axis_smooth_diff = output_smooth - target_smooth
+        axis_sharp_diff = output_sharp - target_sharp
+        loss = torch.sum(axis_smooth_diff ** 2) / (axis_smooth_diff.size(0)) + torch.sum(
+            axis_sharp_diff ** 2) * args.sharp_penalty / (axis_sharp_diff.size(0))
 
         return loss
 
