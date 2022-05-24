@@ -11,13 +11,13 @@ CUDA_VISIBLE_DEVICES=1 python3 create_dataset.py --machine remote --max_k 2
 #### resume a training work
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 main.py --exp resng --args json --mode train --batch_size 8 --resume model_name
+CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp degares --print-freq 100 --batch_size 5 --train-on 5 --resume model-name
 ```
 
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 main.py --exp nnnn --args json --mode train --batch_size 8
+CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp degares --print-freq 100 --batch_size 5 --train-on 5 
 ```
 
 #### evaluate the test dataset (no visualisation)

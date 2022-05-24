@@ -118,7 +118,8 @@ def args_parser():
 
     parser.add_argument('--eval_uncert', default=False, type=bool,
                         help='Evaluate uncertainty or not')
-
+    parser.add_argument('--angle_loss', default=False, type=bool,
+                        help='Calculate angle loss and plot')
     # Parse the arguments
     args = parser.parse_args()
 
