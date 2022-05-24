@@ -90,21 +90,22 @@ class AngleDetailLoss(nn.Module):
         axis = args.epoch % 3
 
         # mask of normals
-        mask_smooth = (torch.sum(torch.abs(outputs[:, axis, :, :]), dim=1) > 0)
-        mask_sharp = (torch.sum(torch.abs(outputs[:, axis + 3, :, :]), dim=1) > 0)
+        mask_smooth = (torch.abs(outputs[:, axis, :, :]) > 0)
+        mask_sharp = (torch.abs(outputs[:, axis + 3, :, :]) > 0)
 
-        target_smooth = target[mask_smooth]
+        target = target.permute(0, 2, 3, 1)
+        target_smooth = target[:, :, :, axis][mask_smooth]
         output_smooth = outputs[:, axis, :, :]
         output_smooth = output_smooth[mask_smooth]
 
-        target_sharp = target[mask_sharp]
+        target_sharp = target[:, :, :, axis][mask_sharp]
         output_sharp = outputs[:, axis + 3, :, :]
         output_sharp = output_sharp[mask_sharp]
 
         axis_smooth_diff = output_smooth - target_smooth
         axis_sharp_diff = output_sharp - target_sharp
-        loss = torch.sum(axis_smooth_diff ** 2) / (axis_smooth_diff.size(0)) + torch.sum(
-            axis_sharp_diff ** 2) * args.sharp_penalty / (axis_sharp_diff.size(0))
+        loss = torch.sum(axis_smooth_diff ** 2) / (axis_smooth_diff.size(0)) + \
+               torch.sum(axis_sharp_diff ** 2) * args.sharp_penalty / ((axis_sharp_diff.size(0)) + 1e-20)
 
         return loss
 
