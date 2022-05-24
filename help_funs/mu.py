@@ -671,16 +671,18 @@ def hpf_torch(data_normal):
     data_img = normal2RGB_torch(data_normal).permute(1, 2, 0).numpy()
     edges = cv.Canny(data_img, 150, 250, apertureSize=3, L2gradient=True)
 
-    shifts = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
+    shifts_extended = [(0, 3), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (3, 0)]
+    shifts_strict = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
+
     # shifts = [(0, 5), (0, 4), (0, 3), (0, 2),    (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
     sharp_area = np.zeros(shape=edges.shape)
     strict_sharp_area = np.zeros(shape=edges.shape)
-    for (f, b) in shifts:
-        for (l, r) in shifts:
+    for (f, b) in shifts_extended:
+        for (l, r) in shifts_extended:
             nf = 100000 if f == 0 else -f
             nl = 100000 if l == 0 else -l
             sharp_area += np.pad(edges, ((f, b), (l, r)), mode='constant')[b:nf, r:nl]
-            if (f, b) == (0, 0) and (l, r) == (0, 0):
+            if (f, b) in shifts_strict and (l, r) in shifts_strict:
                 strict_sharp_area += np.pad(edges, ((f, b), (l, r)), mode='constant')[b:nf, r:nl]
 
     mask_sharp_part_extended = np.zeros(data_img.shape[:2])

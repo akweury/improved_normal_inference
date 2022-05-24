@@ -509,12 +509,7 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         x1_normalized_8bit = mu.normalize2_8bit(xout[:, :, 6:9])
         x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
         mu.addText(x1_normalized_8bit, "Input(Sharp)")
-        output_list.append(x0_normalized_8bit)
-
-        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
-        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
-        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_sharp_8bit)
+        output_list.append(x1_normalized_8bit)
 
         mu.addText(normal_cnn_sharp_8bit, "output_sharp")
         xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
