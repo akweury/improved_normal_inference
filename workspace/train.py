@@ -86,21 +86,17 @@ class AngleDetailLoss(nn.Module):
         outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
         outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
 
+        # combine two kinds of normals
+        outputs_smooth = outputs[:, :3, :, :]
+        outputs_sharp = outputs[:, 3:6, :, :]
+        outputs_merged = outputs_sharp + outputs_smooth
+
         # mask of normals
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
         mask = mask.unsqueeze(1).repeat(1, 3, 1, 1)
-        outputs_smooth = outputs[:, :3, :, :]
-        outputs_sharp = outputs[:, 3:6, :, :]
-        mask_sharp = torch.sum(torch.abs(outputs_sharp), dim=1) > 0
-        mask_sharp = mask_sharp.unsqueeze(1).repeat(1, 3, 1, 1)
-        mask_smooth = (~mask_sharp) * mask
 
-        axis = args.epoch % 3
-        outputs_smooth[mask_sharp] = 0
-        outputs_sharp[mask_smooth] = 0
-
-        outputs_merged = outputs_sharp + outputs_smooth
         # smooth loss and sharp loss
+        axis = args.epoch % 3
         axis_diff = (outputs_merged - target)[:, axis, :, :][mask[:, 0, :, :]]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
@@ -214,6 +210,7 @@ class TrainingModel():
         self.loss = loss_dict[args.loss].to(self.device)
         self.losses = np.zeros((3, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
+        self.angle_sharp_losses = np.zeros((1, args.epochs))
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -327,10 +324,10 @@ def train_epoch(nn_model, epoch):
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
     angle_loss_total = torch.tensor([0.0])
+    angle_loss_sharp_total = torch.tensor([0.0])
     for i, (input, target, scale_factor) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target = input.to(nn_model.device), target.to(nn_model.device)
-
         # Wait for all kernels to finish
         torch.cuda.synchronize()
 
@@ -351,10 +348,18 @@ def train_epoch(nn_model, epoch):
 
         # gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
-        mask = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+
+        mask = (~torch.prod(out[:, :3, :, :] == 0, 1).bool()).unsqueeze(1)
         angle_loss = mu.angle_between_2d_tensor(out[:, :3, :, :], target, mask=mask).sum() / mask.sum()
         angle_loss_total += angle_loss.to('cpu').detach().numpy()
 
+        if nn_model.args.exp == "degares":
+            mask_sharp = (~torch.prod(out[:, 3:, :, :] == 0, 1).bool()).unsqueeze(1)
+            angle_loss_sharp = mu.angle_between_2d_tensor(out[:, 3:, :, :], target,
+                                                          mask=mask_sharp).sum() / mask_sharp.sum()
+            angle_loss_sharp_total += angle_loss_sharp.to('cpu').detach().numpy()
+
+        # visualisation
         if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
@@ -364,13 +369,18 @@ def train_epoch(nn_model, epoch):
                 draw_output(nn_model.args.exp, input, out, nn_model.args.cout, target=target,
                             exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
-
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
-    loss_avg = loss_total / len(nn_model.train_loader.dataset)
-    angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
 
+    loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses[epoch % 3, epoch] = loss_avg
+
+    angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
     nn_model.angle_losses[0, epoch] = angle_loss_avg
+
+    if nn_model.args.exp == "degares":
+        angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
+        nn_model.angle_sharp_losses[0, epoch] = angle_loss_sharp_avg
+
     if epoch % 10 == 9:
         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
                         log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
@@ -378,7 +388,12 @@ def train_epoch(nn_model, epoch):
                         log_y=True, label=1, epoch=epoch, start_epoch=nn_model.start_epoch)
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
                         log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True)
-        draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True,
+
+        if nn_model.args.exp == "degares":
+            draw_line_chart(np.array([nn_model.angle_sharp_losses[0]]), nn_model.output_folder, log_y=True,
+                            label="detail", epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle")
+
+        draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True, label="general",
                         epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
 
     # ---------------------------------------------- visualisation -------------------------------------------

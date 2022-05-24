@@ -670,9 +670,10 @@ def normalise216bitImage(img):
     return img_16bit
 
 
-def hpf_torch(data):
-    data_array = np.uint8(data.detach().to("cpu").permute(1, 2, 0).numpy())
-    edges = cv.Canny(data_array, 150, 250, apertureSize=3, L2gradient=True)
+def hpf_torch(data_normal):
+    data_normal = data_normal.detach().to("cpu").permute(1, 2, 0).numpy()
+    data_img = normal2RGB(data_normal)
+    edges = cv.Canny(data_img, 150, 250, apertureSize=3, L2gradient=True)
     # left shift
     ls = np.pad(edges, ((0, 0), (0, 1)), mode='constant')[:, 1:]
     # right shift
@@ -681,11 +682,10 @@ def hpf_torch(data):
     us = np.pad(edges, ((0, 1), (0, 0)), mode='constant')[1:, :]
     # down shift
     ds = np.pad(edges, ((1, 0), (0, 0)), mode='constant')[:-1, :]
-
-    mask_sharp_part = np.zeros(data_array.shape[:2])
+    mask_sharp_part = np.zeros(data_normal.shape[:2])
     mask_sharp_part[(ls + rs + us + ds) > 0] = 255
     # mask the non object pixels
-    mask_sharp_part[np.sum(data_array, axis=2) == 0] = 0
+    mask_sharp_part[np.sum(data_normal, axis=2) == 0] = 0
 
     return torch.from_numpy(mask_sharp_part)
 
@@ -723,7 +723,7 @@ def hpf(img_path, visual=False):
 
 
 def median_filter(depth):
-    padding = 3  # 2 optimal
+    padding = 1  # 2 optimal
 
     # add padding
     depth_padded = np.expand_dims(copy_make_border(depth, padding * 2), axis=2)
@@ -737,13 +737,62 @@ def median_filter(depth):
             if mask[i, j]:
                 neighbor = depth_padded[i - padding:i + padding + 1, j - padding:j + padding + 1].flatten()
                 neighbor = np.delete(neighbor, np.floor((padding * 2 + 1) ** 2 / 2).astype(np.int32))
-                # depth_padded[i, j] = mu.bi_interpolation(lower_left, lower_right, upper_left, upper_right, 0.5, 0.5)
                 depth_padded[i, j] = np.median(neighbor)
 
     # remove the padding
     pred_depth = depth_padded[padding:-padding, padding:-padding]
 
     return pred_depth.reshape(512, 512, 1)
+
+
+def median_filter_vectorize(depth):
+    depth = depth.reshape((512, 512))
+    neighbor = np.zeros(shape=(512, 512, 1))
+
+    # neighbor = np.c_[
+    #     neighbor, np.expand_dims(np.pad(depth, ((0, 2), (0, 2)), mode='constant')[2:, 2:], axis=2)]  # upper left
+    # neighbor = np.c_[
+    #     neighbor, np.expand_dims(np.pad(depth, ((0, 2), (0, 1)), mode='constant')[2:, 1:], axis=2)]  # upper left
+    # neighbor = np.c_[
+    #     neighbor, np.expand_dims(np.pad(depth, ((0, 2), (0, 0)), mode='constant')[2:, 0:], axis=2)]  # upper left
+
+    shifts = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
+    # shifts = [(0, 5), (0, 4), (0, 3), (0, 2),    (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
+
+    for (f, b) in shifts:
+        for (l, r) in shifts:
+            nf = 100000 if f == 0 else -f
+            nl = 100000 if l == 0 else -l
+            if (f, b) == (0, 0) and (l, r) == (0, 0):
+                continue
+            shift_depth = np.expand_dims(np.pad(depth, ((f, b), (l, r)), mode='constant')[b:nf, r:nl], axis=2)
+            neighbor = np.c_[neighbor, shift_depth]
+
+    # neighbor = np.c_[
+    #     neighbor, np.expand_dims(np.pad(depth, ((0, 1), (0, 1)), mode='constant')[1:, 1:], axis=2)]  # upper left
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((0, 1), (0, 0)), mode='constant')[1:, :], axis=2)]  # upper
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((0, 1), (1, 0)), mode='constant')[1:, :-1], axis=2)]  # upper right
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((0, 0), (1, 0)), mode='constant')[:, :-1], axis=2)]  # right
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((1, 0), (1, 0)), mode='constant')[:-1, :-1], axis=2)]  # lower right
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((1, 0), (0, 0)), mode='constant')[:-1, :], axis=2)]  # lower
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((1, 0), (0, 1)), mode='constant')[:-1, 1:], axis=2)]  # lower left
+    # neighbor = np.c_[neighbor,
+    #                  np.expand_dims(np.pad(depth, ((0, 0), (0, 1)), mode='constant')[:, 1:], axis=2)]  # left
+
+    depth_median = np.median(neighbor, axis=2)
+
+    # if any depth is known already, then use the original one
+    depth_mask = (depth != 0)
+    depth_median[depth_mask] = 0
+    depth_mended = depth + depth_median
+
+    return depth_mended.reshape((512, 512, 1))
 
 
 def pred_filter(img, pred_img):

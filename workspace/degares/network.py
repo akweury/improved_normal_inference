@@ -23,12 +23,18 @@ class CNN(nn.Module):
         # general surface training
         xout_base = self.degares3_3(x)
 
-        mask_sharp_part = torch.zeros(size=(x.size(0), 512, 512), dtype=torch.bool).to(x.device)
-        # detail edge training
+        # sharp edge training
+        mask_sharp_part = torch.zeros(size=(x.size(0), 512, 512)).to(x.device)
         for i in range(x.size(0)):
             mask_sharp_part[i, :, :] = mu.hpf_torch(xout_base[i, :, :, :])
-
+        mask_sharp_part = mask_sharp_part == 255
         mask_sharp_part = mask_sharp_part.unsqueeze(1).repeat(1, 3, 1, 1)
         x_out_sharp = self.detailNet(x[:, :3, :, :][mask_sharp_part], mask_sharp_part)
         x_out_sharp[~mask_sharp_part] = 0
+
+        # set sharp edge in base to 0
+        xout_base = xout_base.permute(0, 2, 3, 1)
+        xout_base[(torch.sum(x_out_sharp, dim=1) > 0)] = 0
+        xout_base = xout_base.permute(0, 3, 1, 2)
+
         return torch.cat((xout_base, x_out_sharp), 1)

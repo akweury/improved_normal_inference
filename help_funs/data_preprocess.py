@@ -136,15 +136,15 @@ def convert2training_tensor(path, k, output_type='normal'):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
         os.makedirs(str(path / "tensor"))
-    if output_type == "normal":
-        depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
-    elif output_type == "normal_noise":
+    if output_type == "normal_noise":
         depth_files = np.array(sorted(glob.glob(str(path / "*depth0_noise.png"), recursive=True)))
     else:
         raise ValueError("output_file is not supported. change it in args.json")
+
     gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
     img_files = np.array(sorted(glob.glob(str(path / "*image0.png"), recursive=True)))
+
     for item in range(len(data_files)):
         if os.path.exists(str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar")):
             continue
@@ -158,10 +158,17 @@ def convert2training_tensor(path, k, output_type='normal'):
                                               data['minDepth'],
                                               data['maxDepth'])
         if k == 2:
-            depth = mu.median_filter(depth)
+            # depth_filtered = mu.median_filter(depth)
+            depth_filtered_vectorize = mu.median_filter_vectorize(depth)
+            file_io.save_scaled16bitImage(depth_filtered_vectorize,
+                                          str(config.ws_path / "test.png"),
+                                          data['minDepth'], data['maxDepth'])
+            file_io.save_scaled16bitImage(depth,
+                                          str(config.ws_path / "test_original.png"),
+                                          data['minDepth'], data['maxDepth'])
+
         img = file_io.load_16bitImage(img_files[item])
-        data['R'] = np.identity(3)
-        data['t'] = np.zeros(3)
+        data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
                                  torch.tensor(data['R']).float(),

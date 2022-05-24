@@ -16,10 +16,13 @@ from help_funs import file_io, mu, chart
 from pncnn.utils import args_parser
 
 if __name__ == '__main__':
-    # data_file = str(config.synthetic_data / "test" / '00327.data0.json')
-    depth_file = str(config.synthetic_data_noise / "test" / "00349.normal0.png")
-    img = mu.hpf(depth_file)
+    data_file = str(config.synthetic_data / "test" / '00327.normal0.png')
+    # depth_file = str(config.ws_path / "a.png")
+    normal = file_io.load_24bitNormal(data_file).astype(np.float32)
 
-    cv.imwrite(str(config.root / "paper" / "pic" / f"00349.hpf0.png"), img)
+    data_tensor = torch.from_numpy(normal).permute(2, 0, 1)
+    img = mu.hpf_torch(data_tensor)
+
+    cv.imwrite(str(config.ws_path / f"aa.png"), img.numpy())
 
     pass
