@@ -88,7 +88,7 @@ class AngleDetailLoss(nn.Module):
 
         # combine two kinds of normals
         outputs_smooth = outputs[:, :3, :, :]
-        outputs_sharp = outputs[:, 3:6, :, :]
+        outputs_sharp = outputs[:, 3:6, :, :] * args.penalty
         outputs_merged = outputs_sharp + outputs_smooth
 
         # mask of normals

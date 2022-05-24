@@ -20,5 +20,5 @@
   "loss_milestone": 15,
   "lr_decay_step": 1,
   "lr_decay_factor": 0.1,
-  "angle_loss": false
+  "angle_loss": true
 }

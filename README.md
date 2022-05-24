@@ -17,7 +17,7 @@ CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp degares --print-fr
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp degares --print-freq 100 --batch_size 5 --train-on 5 
+CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp degares --print-freq 100 --batch_size 5 --train-on 5
 ```
 
 #### evaluate the test dataset (no visualisation)
