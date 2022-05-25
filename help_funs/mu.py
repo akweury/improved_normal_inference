@@ -926,3 +926,28 @@ def visual_output(xout, mask):
     xout_img[mask] = 0
     xout_8bit = cv.normalize(xout_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return xout_8bit
+
+
+def visual_normal(normal, name, histogram=True):
+    normal_img = normal2RGB(normal)
+    addText(normal_img, name, font_size=0.8)
+    # show histogram under the image, show range of RGB color on upper right corner.
+    if histogram:
+        out_ranges = addHist(normal_img)
+        addText(normal_img, str(out_ranges), pos="upper_right", font_size=0.5)
+
+    return normal_img
+
+
+def visual_vertex(vertex, name):
+    vertex_8bit = normalize2_8bit(vertex)
+    vertex_8bit = image_resize(vertex_8bit, width=512, height=512)
+    addText(vertex_8bit, name, font_size=0.8)
+    return vertex_8bit
+
+
+def visual_img(img, name, upper_right=None):
+    addText(img, f"{name}")
+    if upper_right is not None:
+        addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
+    return img

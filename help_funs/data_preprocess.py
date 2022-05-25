@@ -49,7 +49,7 @@ def evaluate_epoch(model, input_tensor, device):
 
 
 def noisy_a_folder(folder_path, output_path):
-    # # get noise model
+    # get noise model
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -163,9 +163,6 @@ def convert2training_tensor(path, k, output_type='normal'):
             file_io.save_scaled16bitImage(depth_filtered_vectorize,
                                           str(config.ws_path / "test.png"),
                                           data['minDepth'], data['maxDepth'])
-            file_io.save_scaled16bitImage(depth,
-                                          str(config.ws_path / "test_original.png"),
-                                          data['minDepth'], data['maxDepth'])
 
         img = file_io.load_16bitImage(img_files[item])
         data['R'], data['t'] = np.identity(3), np.zeros(3)
@@ -218,11 +215,6 @@ def convert2training_tensor(path, k, output_type='normal'):
                          'scale_factors': scale_factors}
         torch.save(training_case, str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar"))
         print(f'File {item}/{len(data_files)} converted to tensor. K = {k}')
-
-
-def high_pass_filter(img, threshold=20):
-    img[img < threshold] = 0
-    return img
 
 
 # def convert2training_tensor2(path, k, input_size=1000):

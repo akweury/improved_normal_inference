@@ -51,7 +51,7 @@ def eval(dataloader, farthest_neighbour):
 
 def eval_single(v, farthest_neighbour):
     normal, normal_img = mu.vertex2normal(v, farthest_neighbour)
-    return normal, normal_img, None, None
+    return normal
 
 
 if __name__ == '__main__':

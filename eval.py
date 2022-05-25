@@ -4,15 +4,9 @@ output: a complete depth map
 """
 import os
 import argparse
-from pathlib import Path
-
-import glob
-import torch
 import datetime
 import numpy as np
-from help_funs import file_io, mu
 import config
-from torch.utils.data import Dataset
 
 from workspace import eval
 from help_funs import chart
@@ -36,10 +30,9 @@ def main():
 
     models = {
         # "SVD": None,
-        # "Neigh_9999": config.ws_path / "nnn24" / "trained_model" / "full_normal_2999" / "checkpoint-9999.pth.tar",
         "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
-        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
     # load test model names
