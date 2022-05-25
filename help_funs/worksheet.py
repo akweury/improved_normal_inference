@@ -1,16 +1,6 @@
-import mu
-import file_io
-import json
-
-import os
-from pathlib import Path
-import json
 import numpy as np
 import torch
 import cv2 as cv
-import glob
-import shutil
-import matplotlib.pyplot as plt
 import config
 from help_funs import file_io, mu, chart
 from pncnn.utils import args_parser
@@ -32,8 +22,13 @@ def test_png():
     cv.imwrite(str(config.ws_path / "degares" / "output" / "output_2022-05-24_15_14_04" / f"aa.png"), img)
 
 
+def print_cuda_info():
+    print(f"Cuda is available: {torch.cuda.is_available()}")
+    print(f"Device count: {torch.cuda.device_count()}")
+    print(f"Current Device: {torch.cuda.current_device()}")
+    print(f"Device Name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+
+
 if __name__ == '__main__':
     # test_torch()
-    test_png()
-
-    pass
+    print_cuda_info()
