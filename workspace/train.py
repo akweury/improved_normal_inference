@@ -481,7 +481,7 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
 
         # pred combined normal
         pred_normal = xout[:, :, :3] + xout[:, :, 3:6]
-        normal_cnn_8bit = normal_cnn_base_8bit + normal_cnn_sharp_8bit
+        normal_cnn_8bit = mu.visual_output(pred_normal, mask)
 
         mu.addText(normal_cnn_base_8bit, "output_base")
         xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
