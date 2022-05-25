@@ -672,9 +672,9 @@ def hpf_torch(data_normal):
     edges = cv.Canny(data_img, 150, 250, apertureSize=3, L2gradient=True)
 
     shifts_extended = [(0, 3), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (3, 0)]
-    shifts_strict = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
+    shifts_strict = [(0, 1), (0, 0), (1, 0)]
 
-    # shifts = [(0, 5), (0, 4), (0, 3), (0, 2),    (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
+    # shifts = [(0, 5), (0, 4), (0, 3), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
     sharp_area = np.zeros(shape=edges.shape)
     strict_sharp_area = np.zeros(shape=edges.shape)
     for (f, b) in shifts_extended:

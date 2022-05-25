@@ -109,7 +109,7 @@ def start(models_path_dict):
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
                 start_epoch = checkpoint['epoch']
-                print(f'- model {name} was loaded successfully.')
+                print(f'- model {name} evaluation...')
 
                 # load model
                 device = torch.device("cuda:0")
@@ -147,10 +147,10 @@ if __name__ == '__main__':
     # load test model names
     models = {
         # "SVD": None,
-        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
     }
 
     start(models)
