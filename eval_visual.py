@@ -147,10 +147,13 @@ if __name__ == '__main__':
     # load test model names
     models = {
         # "SVD": None,
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        "DeGaRes2": config.ws_path / "degares" / "trained_model" / "checkpoint-1056.pth.tar",
+
         "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+
     }
 
     start(models)
