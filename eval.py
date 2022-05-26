@@ -32,7 +32,7 @@ def main():
         # "SVD": None,
         "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
     # load test model names

@@ -419,8 +419,8 @@ For the training detail, this model is trained on the whole dataset with 500 ite
 
 
 
-\section{Detail Enhance using Canny Edge Detector}
 
+\section{GaRes Model}
 
 Figure \ref{fig:washington_gt_ngpred} shows the ground truth and predicted normal map of a Washington statue. In the predicted normal map, as shown on the right side, the relief on the side of stone chair is lack of sharpness compare to the ground truth on the left side. 
 \begin{figure}[!h]
@@ -440,3 +440,7 @@ It is obvious to see, that the error goes higher in the coarse surface, like fin
 	\label{fig:canny_edge_details}
 	\caption{Left: Normal Map; Middle: Detected Edge of Normal Map using Canny Edge Detection Algorithm; Right: Error of predicted normal map.}
 \end{figure}
+
+
+\section{Detailed Gated ResNet Normal Neural Network}
+Use edge detector algorithms for further improvement.
