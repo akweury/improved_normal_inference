@@ -671,7 +671,7 @@ def hpf_torch(data_normal):
     data_img = normal2RGB_torch(data_normal).permute(1, 2, 0).numpy()
     edges = cv.Canny(data_img, 100, 150)
 
-    shifts_extended = [(0, 3), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (3, 0)]
+    shifts_extended = [(0, 2), (0, 1), (0, 0), (1, 0), (2, 0)]
     shifts_strict = [(0, 1), (0, 0), (1, 0)]
 
     # shifts = [(0, 5), (0, 4), (0, 3), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
