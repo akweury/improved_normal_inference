@@ -8,6 +8,8 @@ Created in 24-03-2022 at 13:19
 import sys
 from os.path import dirname
 
+import config
+
 sys.path.append(dirname(__file__))
 
 import time
@@ -45,7 +47,10 @@ def eval(dataset_path, name, model_path, gpu=0):
     print("ok.")
     print("load dataset...", end="")
     # load dataset
-    dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname='test')
+    if dataset_path == config.real_data:
+        dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname=None)
+    else:
+        dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname="test")
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,

@@ -160,6 +160,10 @@ class SyntheticDepthDataset(Dataset):
             self.training_case = np.array(
                 sorted(
                     glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
+        else:
+            self.training_case = np.array(
+                sorted(
+                    glob.glob(str(data_path / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
 
     def __len__(self):
         return len(self.training_case)

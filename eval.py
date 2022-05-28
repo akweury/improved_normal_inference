@@ -30,14 +30,18 @@ def main():
 
     models = {
         # "SVD": None,
-        "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
     # load test model names
-
-    dataset_path = config.synthetic_data_noise
+    if args.data == 'synthetic':
+        dataset_path = config.synthetic_data_noise
+    elif args.data == 'real':
+        dataset_path = config.real_data
+    else:
+        raise ValueError
 
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()

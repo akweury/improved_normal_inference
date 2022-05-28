@@ -51,7 +51,7 @@ def preprocessing(models):
     if args.data == "synthetic":
         path = config.synthetic_data_noise / "test_small" / "tensor"
     elif args.data == "real":
-        path = config.real_data  # key tests 103, 166, 189,9
+        path = config.real_data / "test_tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
         path = config.paper_pic
     else:
@@ -147,12 +147,11 @@ if __name__ == '__main__':
     # load test model names
     models = {
         # "SVD": None,
-        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-        "DeGaRes2": config.ws_path / "degares" / "trained_model" / "checkpoint-1056.pth.tar",
-
-        "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+        "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint-1056.pth.tar",
+        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
 
     }
 
