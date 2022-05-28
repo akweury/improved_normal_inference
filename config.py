@@ -25,3 +25,6 @@ synthetic_data_noise_dfki = Path("/datasets/sha/data_synthetic_noise")
 # real dataset path
 real_data = dataset / "data_real"
 real_data_dfki = Path("/datasets/sha/data_real")
+
+# pretrained model
+resng_model = ws_path / "resng" / "trained_model" / "checkpoint.pth.tar"

@@ -36,8 +36,8 @@ class UNet(nn.Module):
         self.active_img = nn.LeakyReLU(0.01)
 
         self.epsilon = 1e-20
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_1 = 4
+        channel_size_2 = 8
 
         # branch 1
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)

@@ -5,7 +5,7 @@ sys.path.append(dirname(__file__))
 
 import torch
 import torch.nn as nn
-from common.DeGaResNet import DeGaResNet
+from common.ResNormalGuided import NormalGuided
 from common.UNet import UNet
 from help_funs import mu
 
@@ -16,18 +16,23 @@ class CNN(nn.Module):
         self.__name__ = 'DeGaRes'
 
         # input confidence estimation network
-        self.degares3_3 = DeGaResNet(3, 3)
+        self.nconv3_3 = NormalGuided(3, 3)
         self.detailNet = UNet(3, 3)
 
     def forward(self, x):
         # general surface training
-        xout_base = self.degares3_3(x)
+        x_vertex = x[:, :3, :, :]
+        x_img = x[:, 3:4, :, :]
+        device = x_vertex.get_device()
+        c0 = mu.binary(x_vertex).to(device)
+        xout, cout = self.nconv3_3(x_vertex, x_img, c0)
 
         # sharp edge training
         mask_sharp_part_strict = torch.zeros(size=(x.size(0), 512, 512)).to(x.device)
         mask_sharp_part_extended = torch.zeros(size=(x.size(0), 512, 512)).to(x.device)
+
         for i in range(x.size(0)):
-            mask_sharp_part_strict[i, :, :], mask_sharp_part_extended[i, :, :] = mu.hpf_torch(xout_base[i, :, :, :])
+            mask_sharp_part_strict[i, :, :], mask_sharp_part_extended[i, :, :] = mu.hpf_torch(xout[i, :, :, :])
         mask_sharp_part_strict = mask_sharp_part_strict == 255
         mask_sharp_part_strict = mask_sharp_part_strict.unsqueeze(1).repeat(1, 3, 1, 1)
 
@@ -43,7 +48,7 @@ class CNN(nn.Module):
         x_out_sharp[~mask_sharp_part_strict] = 0
 
         # set sharp edge in base to 0
-        xout_base = xout_base.permute(0, 2, 3, 1)
+        xout_base = xout.permute(0, 2, 3, 1)
         xout_base[(torch.sum(x_out_sharp, dim=1) > 0)] = 0
         xout_base = xout_base.permute(0, 3, 1, 2)
 

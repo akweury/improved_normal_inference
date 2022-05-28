@@ -22,6 +22,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
 from help_funs import mu
+import config
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
@@ -203,17 +204,18 @@ class NoiseDataset(Dataset):
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
     def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
+        self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
         self.device = torch.device(f"cuda:0")
         self.exp_name = self.args.exp
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
+        self.optimizer = None
+        self.parameters = None
         self.model = self.init_network(network)
         self.train_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
-        self.parameters = self.init_parameters()
-        self.optimizer = self.init_optimizer()
         self.loss = loss_dict[args.loss].to(self.device)
         self.losses = np.zeros((3, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
@@ -222,6 +224,7 @@ class TrainingModel():
         self.init_lr_decayer()
         self.print_info(args)
         self.save_model()
+        self.pretrained_weight = None
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
@@ -254,43 +257,55 @@ class TrainingModel():
     def init_network(self, network):
         if self.args.resume:
             print(f'------------------ Resume a training work ----------------------- ')
-            chkpt_path = self.args.resume
-            assert os.path.isfile(chkpt_path), f"No checkpoint found at:{chkpt_path}"
-
-            checkpoint = torch.load(chkpt_path)
+            assert os.path.isfile(self.args.resume), f"No checkpoint found at:{self.args.resume}"
+            checkpoint = torch.load(self.args.resume)
+            self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
+            model = checkpoint['model'].to(self.device)  # resume model
+            self.optimizer = checkpoint['optimizer']  # resume optimizer
             # self.args = checkpoint['args']
-            self.start_epoch = checkpoint['epoch'] + 1
-            print(f"- checkout {checkpoint['epoch']} was loaded successfully!")
+            self.parameters = filter(lambda p: p.requires_grad, model.parameters())
 
-            model = checkpoint['model'].to(self.device)
+            print(f"- checkout {checkpoint['epoch']} was loaded successfully!")
             return model
         else:
             print(f"------------ start a new training work -----------------")
-            model = network.to(self.device)
-            return model
 
-    def init_parameters(self, ):
-        return filter(lambda p: p.requires_grad, self.model.parameters())
+            # init model
+            model = network.to(self.device)
+            self.parameters = filter(lambda p: p.requires_grad, model.parameters())
+
+            # init optimizer
+            if self.args.optimizer.lower() == 'sgd':
+                self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
+            elif self.args.optimizer.lower() == 'adam':
+                self.optimizer = Adam(self.parameters, lr=self.args.lr, weight_decay=0, amsgrad=True)
+            else:
+                raise ValueError
+
+            if self.exp_name == "degares":
+                # load weight from pretrained resng model
+                print(f'load model {config.resng_model}')
+                pretrained_model = torch.load(config.resng_model)
+                resng = pretrained_model['model']
+                self.missing_keys = model.load_state_dict(resng.state_dict(), strict=False)
+
+                # load optimizer
+                self.optimizer = pretrained_model['optimizer']
+
+                # Print model's state_dict
+                print("ResNg's state_dict:")
+                for param_tensor in resng.state_dict():
+                    print(param_tensor, "\t", resng.state_dict()[param_tensor].size())
+                print("DeGaRes's state_dict:")
+                for param_tensor in model.state_dict():
+                    print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+
+            return model
 
     def init_lr_decayer(self):
         milestones = [int(x) for x in self.args.lr_scheduler.split(",")]
         self.lr_decayer = lr_scheduler.MultiStepLR(self.optimizer, milestones=milestones,
                                                    gamma=self.args.lr_decay_factor)
-
-    def init_optimizer(self):
-        if self.args.optimizer.lower() == 'sgd':
-            optimizer = SGD(self.parameters,
-                            lr=self.args.lr,
-                            momentum=self.args.momentum,
-                            weight_decay=self.args.weight_decay)
-        elif self.args.optimizer.lower() == 'adam':
-            optimizer = Adam(self.parameters,
-                             lr=self.args.lr,
-                             weight_decay=self.args.weight_decay,
-                             amsgrad=True)
-        else:
-            raise ValueError
-        return optimizer
 
     def print_info(self, args):
         print(f'\n------------------- Starting experiment {self.exp_name} ------------------ \n')
