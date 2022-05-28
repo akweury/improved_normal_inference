@@ -290,7 +290,7 @@ class TrainingModel():
                 self.missing_keys = model.load_state_dict(resng.state_dict(), strict=False)
 
                 # load optimizer
-                self.optimizer = pretrained_model['optimizer']
+                # self.optimizer = pretrained_model['optimizer']
 
                 # Print model's state_dict
                 print("ResNg's state_dict:")
