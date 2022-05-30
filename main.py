@@ -10,6 +10,7 @@ import workspace.ng.network as ng
 import workspace.resng.network as resng
 import workspace.nconv.network as nconv
 import workspace.degares.network as degares
+import workspace.ag.network as ag
 
 
 def main():
@@ -17,6 +18,7 @@ def main():
 
     # config experiments
     exp_path = config.ws_path / args.exp
+
     if args.exp == "nnn":
         model = nnn.CNN()
     elif args.exp == "nnn24":
@@ -31,6 +33,8 @@ def main():
         model = nconv.CNN()
     elif args.exp == "degares":
         model = degares.CNN()
+    elif args.exp == "ag":
+        model = ag.CNN()
     else:
         raise ValueError("Unknown exp path")
 

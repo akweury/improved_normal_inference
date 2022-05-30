@@ -1,0 +1,20 @@
+{
+  "machine": "local",
+  "output_type": "normal_noise",
+  "neighbor": 0,
+  "exp": "ag",
+  "resume": null,
+  "train_on": "10",
+  "epochs": 10001,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "lr_scheduler": "9999",
+  "momentum": 0.9,
+  "loss": "angleAlbedo",
+  "penalty": 1.4,
+  "angle_loss_weight": 10,
+  "loss_milestone": 15,
+  "lr_decay_step": 1,
+  "lr_decay_factor": 0.1,
+  "print_freq": 100
+}

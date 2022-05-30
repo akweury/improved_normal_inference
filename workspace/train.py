@@ -76,6 +76,41 @@ class AngleLoss(nn.Module):
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
+class AngleAlbedoLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, args):
+        normal_out = outputs[:, :3, :, :]
+        albedo_out = outputs[:, 3:4, :, :]
+        img_out = outputs[:, 4, :, :]
+
+        normals_target = target[:, :3, :, :]
+        img = target[:, 3, :, :]
+        mask_too_high = torch.gt(normal_out, 1).bool().detach()
+        mask_too_low = torch.lt(normal_out, -1).bool().detach()
+        normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
+        normal_out[mask_too_low] = normal_out[mask_too_low] * args.penalty
+
+        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
+        # mask of non-zero positions
+        mask = torch.sum(torch.abs(normals_target[:, :3, :, :]), dim=1) > 0
+        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
+
+        axis = args.epoch % 3
+        axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
+        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
+
+        img_diff = (img - img_out)[mask]
+        img_diff[torch.isnan(img_diff)] = 0
+
+        albedo_loss = torch.sum(img_diff ** 2 / img_diff.size(0))
+        # print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
+
+        return albedo_loss + loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
+
+
 class AngleDetailLoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -149,6 +184,7 @@ loss_dict = {
     'weighted_l2': WeightedL2Loss(),
     'angle': AngleLoss(),
     'angle_detail': AngleDetailLoss(),
+    'angleAlbedo': AngleAlbedoLoss(),
 }
 
 
@@ -476,7 +512,7 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         input = mu.tenor2numpy(x0[:1, :1, :, :])
     else:
         input = mu.tenor2numpy(x0[:1, :3, :, :])
-    x0_normalized_8bit = mu.normalize2_8bit(input)
+    x0_normalized_8bit = mu.normalize2_32bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
     output_list.append(x0_normalized_8bit)
@@ -509,7 +545,7 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
 
         # sharp edge detection input
 
-        x1_normalized_8bit = mu.normalize2_8bit(xout[:, :, 6:9])
+        x1_normalized_8bit = mu.normalize2_32bit(xout[:, :, 6:9])
         x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
         mu.addText(x1_normalized_8bit, "Input(Sharp)")
         output_list.append(x1_normalized_8bit)
@@ -523,6 +559,18 @@ def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, outp
         xout_ranges = mu.addHist(normal_cnn_8bit)
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
+
+    elif exp_name == "ag":
+        # pred base normal
+        normal_cnn_8bit = mu.visual_output(xout[:, :, :3], mask)
+
+        mu.addText(normal_cnn_8bit, "output")
+        xout_base_ranges = mu.addHist(normal_cnn_8bit)
+        mu.addText(normal_cnn_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_8bit)
+
+        # albedo visualization
+        output_list.append(mu.visual_albedo(xout[:, :, 3:4], "Albedo"))
 
     else:
         # pred normal

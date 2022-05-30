@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 
 import config
 from help_funs.data_preprocess import noisy_a_folder, convert2training_tensor
@@ -12,8 +14,11 @@ parser.add_argument('--data', type=str, default="synthetic", choices=['synthetic
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0,1",
                     help="loading dataset from local or dfki machine")
+parser.add_argument('--clear', type=str, default="false",
+                    help="flag that is used to clear old dataset")
 
 args = parser.parse_args()
+
 if args.data == "synthetic":
     for folder in ["train", "test"]:
         original_folder = config.synthetic_data / folder
@@ -24,13 +29,16 @@ if args.data == "synthetic":
         else:
             raise ValueError
         noisy_a_folder(original_folder, dataset_folder)
+        if args.clear == "true":
+            shutil.rmtree(str(dataset_folder / "tensor"))
         for k in args.max_k.split(','):
-            print(f"K = {k}, {folder}")
+            print(f"K = {k}, {dataset_folder}")
             convert2training_tensor(dataset_folder, k=int(k), output_type="normal_noise")
+
 elif args.data == "real":
-    original_folder = config.real_data
+    dataset_folder = config.real_data
     for k in args.max_k.split(','):
-        print(f"K = {k}, {original_folder}")
-        convert2training_tensor(original_folder, k=int(k), output_type="normal_noise")
+        print(f"K = {k}, {dataset_folder}")
+        convert2training_tensor(dataset_folder, k=int(k), output_type="normal_noise")
 else:
     raise ValueError

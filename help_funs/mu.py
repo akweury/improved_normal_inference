@@ -30,6 +30,30 @@ def angle_between(v1, v2):
     return deg
 
 
+def vertex2light_direction(vertex_map, light_sorce):
+    light_direction = light_sorce - vertex_map
+    light_direction_map = light_direction / np.linalg.norm(light_direction, ord=2, axis=2, keepdims=True)
+
+    return light_direction_map
+
+
+def vertex2light_direction_tensor(vertex_map, light_sorce):
+    light_direction = light_sorce - vertex_map
+    light_direction_map = light_direction / (torch.norm(light_direction, p=2, dim=1, keepdim=True) + 1e-20)
+
+    return light_direction_map
+
+
+def albedo_tensor(I, N, L):
+    rho = I.reshape(1, 1, 512, 512) / (torch.sum(N * L, dim=1, keepdim=True) + 1e-20)
+    return rho
+
+
+def albedo(I, N, L):
+    rho = I.reshape(512, 512) / (np.sum(N * L, axis=-1) + 1e-20)
+    return rho
+
+
 def angle_between_2d(m1, m2):
     """ Returns the angle in radians between matrix 'm1' and 'm2'::"""
     m1_u = m1 / (np.linalg.norm(m1, axis=2, ord=2, keepdims=True) + 1e-9)
@@ -216,9 +240,10 @@ def normalize3channel(numpy_array):
     return numpy_array, mins, maxs
 
 
-def normalize(numpy_array, data):
+def normalize(numpy_array, data=None):
     if numpy_array.ndim != 2:
-        raise ValueError
+        if numpy_array.shape == (512, 512):
+            numpy_array = numpy_array.reshape(512, 512, 1)
 
     mask = numpy_array == 0
     if data is not None:
@@ -291,7 +316,7 @@ def cameraVisualization():
     return points
 
 
-def normalize2_8bit(img_scaled, data=None):
+def normalize2_32bit(img_scaled, data=None):
     if img_scaled.ndim == 2:
         raise ValueError
 
@@ -302,8 +327,15 @@ def normalize2_8bit(img_scaled, data=None):
     else:
         raise ValueError
 
-    img_8bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    return img_8bit
+    img_32bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return img_32bit
+
+
+def normalize2_16bit(img):
+    newImg = img.reshape(512, 512)
+    normalized_img, _, _ = normalize(newImg)
+    img_16bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    return img_16bit
 
 
 # --------------------------- convert operations -----------------------------------------------------------------------
@@ -889,7 +921,7 @@ def visual_input(depth, data, output_name):
     input_torch = input_torch.permute(2, 0, 1)
     input_torch = input_torch.unsqueeze(0)
     input = tenor2numpy(input_torch[:1, :3, :, :])
-    x0_normalized_8bit = normalize2_8bit(input)
+    x0_normalized_8bit = normalize2_32bit(input)
     x0_normalized_8bit = image_resize(x0_normalized_8bit, width=512, height=512)
 
     output = cv.cvtColor(x0_normalized_8bit, cv.COLOR_RGB2BGR)
@@ -940,7 +972,7 @@ def visual_normal(normal, name, histogram=True):
 
 
 def visual_vertex(vertex, name):
-    vertex_8bit = normalize2_8bit(vertex)
+    vertex_8bit = normalize2_32bit(vertex)
     vertex_8bit = image_resize(vertex_8bit, width=512, height=512)
     addText(vertex_8bit, name, font_size=0.8)
     return vertex_8bit
@@ -950,4 +982,10 @@ def visual_img(img, name, upper_right=None):
     addText(img, f"{name}")
     if upper_right is not None:
         addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
+    return img
+
+
+def visual_albedo(rho, name):
+    img = cv.normalize(np.uint8(rho), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    addText(img, f"{name}(albedo)", font_size=0.8)
     return img

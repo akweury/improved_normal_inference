@@ -160,6 +160,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
+
         if k == 2:
             # depth_filtered = mu.median_filter(depth)
             depth_filtered_vectorize = mu.median_filter_vectorize(depth)
@@ -186,9 +187,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
         vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
 
+        light_direction = mu.vertex2light_direction(vertex, data['lightPos'])
+
         # case of resng, ng
         if k == 0:
-            vectors = np.c_[vertex, np.expand_dims(img, axis=2)]
+            vectors = np.c_[vertex, np.expand_dims(img, axis=2), light_direction]
         elif k == 1:
             vectors = vertex
         elif k == 2:
@@ -207,15 +210,23 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         # gt normal
         gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
+        target = np.c_[gt_normal, np.expand_dims(img, axis=2)]
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)
-        gt_tensor = torch.from_numpy(gt_normal).permute(2, 0, 1)
+        gt_tensor = torch.from_numpy(target).permute(2, 0, 1)
 
         # save tensors
         training_case = {'input_tensor': input_tensor,
                          'gt_tensor': gt_tensor,
-                         'scale_factors': scale_factors}
+                         'scale_factors': scale_factors,
+                         'light_source': data['lightPos'],
+                         'K': data['K'],
+                         'R': data['R'],
+                         't': data['t'],
+                         'minDepth': data['minDepth'],
+                         'maxDepth': data['maxDepth'],
+                         }
         torch.save(training_case, str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar"))
         print(f'File {item}/{len(data_files)} converted to tensor. K = {k}')
 

@@ -81,7 +81,6 @@ def preprocessing(models):
 def start(models_path_dict):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names = preprocessing(models_path_dict)
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
-    test_2_data = np.array(sorted(glob.glob(str(dataset_path / f"*_2_*"), recursive=True)))
 
     # iterate evaluate images
     for i, data_idx in enumerate(all_names):
@@ -93,9 +92,11 @@ def start(models_path_dict):
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         gt = mu.tenor2numpy(gt_tensor)
         vertex_0 = mu.tenor2numpy(test_0_tensor)[:, :, :3]
+        img_0 = mu.tenor2numpy(test_0_tensor)[:, :, 3:]
         mask = gt.sum(axis=2) == 0
 
-        img_list, diff_list = [mu.visual_vertex(vertex_0, "Input(Vertex)"), mu.visual_normal(gt, "GT")], []
+        img_list, diff_list, albedo_list = [mu.visual_vertex(vertex_0, "Input(Vertex)"),
+                                            mu.visual_normal(gt, "GT")], [], []
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
 
@@ -122,10 +123,14 @@ def start(models_path_dict):
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                 else:
                     raise ValueError
-
             # visual normal
             normal[mask] = 0
             img_list.append(mu.visual_normal(normal, name))
+
+            # albedo
+            L = mu.vertex2light_direction(vertex_0, test_0['light_source'])
+            rho = mu.albedo(img_0, normal, L)
+            albedo_list.append(mu.visual_albedo(rho, name))
 
             # visual error
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
@@ -136,9 +141,11 @@ def start(models_path_dict):
         # save the results
         output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
         output_diff = cv.hconcat(diff_list)
+        output_albedo = cv.hconcat(albedo_list)
 
         cv.imwrite(str(folder_path / f"eval_{i}_normal.png"), output)
         cv.imwrite(str(folder_path / f"eval_{i}_error.png"), output_diff)
+        cv.imwrite(str(folder_path / f"eval_{i}_albedo.png"), output_albedo)
 
         print(f"{data_idx} has been evaluated.")
 

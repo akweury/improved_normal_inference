@@ -134,7 +134,7 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     # xout = out[:, :3, :, :]
     # cout = out[:, 3:6, :, :]
 
-    x0_normalized_8bit = mu.normalize2_8bit(mu.tenor2numpy(x0[:1, :, :, :]))
+    x0_normalized_8bit = mu.normalize2_32bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
 
     normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target[:1, :, :, :]))

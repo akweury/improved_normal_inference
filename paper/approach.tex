@@ -562,10 +562,34 @@ Based on the implementation mentioned above, we propose a Gated Convolutional Ne
 \end{figure}
 
 
+\newpage
+\section{Add the light information}
 
+stores for every pixel the direction of incoming light.
+find a mapping H, such that $ l_{in} = H(v, l_{s}) $ for pixel $ v $, $ l_s $ is the position of light source, $ l_{in} $ is direction of incoming light of pixel $ v $. Iterate all the pixels, we get the light direction map $ L $.
 
+Let $ I $ denotes image, $ N $ denotes normal map, $ L $ denotes light direction map.
 
+lambertian reflection
+\[I = \rho N*L\]
+where $ * $ denotes scalar product,
+the albedo rho can be computed by 
+\[\rho = \frac{I}{N*L}\]
 
+in NN, it is 
+\[\rho = conv2d(\frac{I}{N*L})\]
+
+The corresponding loss term is 
+\[\|I-\rho(N*L) \|_{F_2}\]
+in this case, the normal is supposed to be more crispy than the previous implement.
+
+In a first step, we should compute initial albedos from the predicted
+normals and check if everything is correct. (Normals need to be in
+spatial space again, not in tangent space, and we need to use cameras
+extrinsics R and t from the data file to triangulate the vertex maps
+correctly)...
+
+\[\rho = \frac{I}{N*L}\]
 
 
 
