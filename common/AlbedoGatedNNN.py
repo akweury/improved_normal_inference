@@ -115,7 +115,6 @@ class AlbedoGatedNNN(nn.Module):
         xout_normal = self.conv2(xout)
 
         L = mu.vertex2light_direction_tensor(x0, light_source)
-        print((torch.sum(xout_normal * L, dim=1, keepdim=True) + 1e-20).shape)
         rho = x_img / (torch.sum(xout_normal * L, dim=1, keepdim=True) + 1e-20)
         xout_rho = self.active(self.aconv1(rho))
         xout_img = xout_rho * (torch.sum(xout_normal * L, dim=1, keepdim=True))
