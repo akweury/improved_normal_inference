@@ -83,10 +83,10 @@ class AngleAlbedoLoss(nn.Module):
     def forward(self, outputs, target, args):
         normal_out = outputs[:, :3, :, :]
         albedo_out = outputs[:, 3:4, :, :]
-        img_out = outputs[:, 4:5, :, :]
+        img_out = outputs[:, 4, :, :]
 
         normals_target = target[:, :3, :, :]
-        img_target = target[:, 3:4, :, :]
+        img_target = target[:, 3, :, :]
         mask_too_high = torch.gt(normal_out, 1).bool().detach()
         mask_too_low = torch.lt(normal_out, -1).bool().detach()
         normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
