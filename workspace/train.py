@@ -562,6 +562,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
 
     elif exp_name == "ag":
         # pred base normal
+        pred_normal = xout[:, :, :3]
         normal_cnn_8bit = mu.visual_output(xout[:, :, :3], mask)
 
         mu.addText(normal_cnn_8bit, "output")
