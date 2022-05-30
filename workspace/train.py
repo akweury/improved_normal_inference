@@ -422,7 +422,7 @@ def train_epoch(nn_model, epoch):
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                draw_output(nn_model.args.exp, input, out, nn_model.args.cout, target=target,
+                draw_output(nn_model.args.exp, input, out, target=target,
                             exp_path=nn_model.output_folder,
                             loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
             print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
@@ -494,7 +494,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, x0, xout, cout, target, exp_path, loss, epoch, i, output_type, prefix):
+def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_type, prefix):
     if target.size() != (512, 512, 3):
         target = target[0, :].permute(1, 2, 0)[:, :, :3]
     # if xout.size() != (512, 512, 3):
