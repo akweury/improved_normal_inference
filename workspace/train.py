@@ -103,7 +103,7 @@ class AngleAlbedoLoss(nn.Module):
         axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
-        img_diff = (img_target - img_out)[mask_noise]
+        img_diff = (img_target - img_out)[mask]
         img_diff[torch.isnan(img_diff)] = 0
 
         albedo_loss = torch.sum(img_diff ** 2 / img_diff.size(0)) * args.albedo_penalty
