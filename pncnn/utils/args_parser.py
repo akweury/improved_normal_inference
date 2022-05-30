@@ -53,9 +53,7 @@ def args_parser():
     parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                         help='Path to latest checkpoint (default: none)')
 
-    ########### General Dataset arguments ###########
-    parser.add_argument('--dataset', default='kitti_depth', choices=datasets_list,
-                        help='Dataset to use: ' + ' | '.join(datasets_list) + ' (default: kitti_depth)')
+    ########### General Dataset arguments ##########
 
     parser.add_argument('--dataset-path', type=str, default='', help='Dataset path.')
     parser.add_argument('--batch_size', '-b', default=8, type=int, help='Mini-batch size (default: 8)')

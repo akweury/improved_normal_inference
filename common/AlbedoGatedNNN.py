@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.conv import _ConvNd
 
-from help_funs import mu
-
 
 # Normalized Convolution Layer
 class GConv(_ConvNd):
@@ -48,7 +46,6 @@ class AlbedoGatedNNN(nn.Module):
         channel_size_1 = 32
         channel_size_2 = 64
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
-        self.active = nn.LeakyReLU(0.01)
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
         self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
@@ -66,13 +63,8 @@ class AlbedoGatedNNN(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-        self.aconv1 = nn.Conv2d(1, 1, kernel_down, stride, padding_down)
-
     def forward(self, xin):
-        x0 = xin[:, :3, :, :]
-        x_img = xin[:, 3:4, :, :]
-        light_source = xin[:, 4:7, :, :]
-        x1 = self.dconv1(x0)
+        x1 = self.dconv1(xin)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
@@ -114,9 +106,4 @@ class AlbedoGatedNNN(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout_normal = self.conv2(xout)
 
-        L = mu.vertex2light_direction_tensor(x0, light_source)
-        rho = x_img / (torch.sum(xout_normal * L, dim=1, keepdim=True) + 1e-20)
-        xout_rho = self.active(self.aconv1(rho))
-        xout_img = xout_rho * (torch.sum(xout_normal * L, dim=1, keepdim=True))
-
-        return xout_normal, xout_rho, xout_img
+        return xout_normal

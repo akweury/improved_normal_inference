@@ -83,10 +83,10 @@ class AngleAlbedoLoss(nn.Module):
     def forward(self, outputs, target, args):
         normal_out = outputs[:, :3, :, :]
         albedo_out = outputs[:, 3:4, :, :]
-        img_out = outputs[:, 4, :, :]
+        img_out = outputs[:, 4:5, :, :]
 
         normals_target = target[:, :3, :, :]
-        img = target[:, 3, :, :]
+        img_target = target[:, 3:4, :, :]
         mask_too_high = torch.gt(normal_out, 1).bool().detach()
         mask_too_low = torch.lt(normal_out, -1).bool().detach()
         normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
@@ -95,14 +95,15 @@ class AngleAlbedoLoss(nn.Module):
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         # mask of non-zero positions
-        mask = torch.sum(torch.abs(normals_target[:, :3, :, :]), dim=1) > 0
+        mask = torch.sum(torch.abs(normals_target), dim=1) > 0
+        mask_noise = torch.abs(img_target) > 0
         # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
 
         axis = args.epoch % 3
         axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
-        img_diff = (img - img_out)[mask]
+        img_diff = (img_target - img_out)[mask_noise]
         img_diff[torch.isnan(img_diff)] = 0
 
         albedo_loss = torch.sum(img_diff ** 2 / img_diff.size(0)) * args.albedo_penalty
@@ -284,7 +285,6 @@ class TrainingModel():
                                  num_workers=4)
 
         print('\n- Found {} images in "{}" folder.'.format(data_loader.dataset.__len__(), 'train'))
-        print('- Dataset "{}" was loaded successfully!'.format(self.args.dataset))
 
         return data_loader
 
@@ -412,7 +412,7 @@ def train_epoch(nn_model, epoch):
         loss_total += loss.detach().to('cpu')
 
         if nn_model.args.angle_loss:
-            angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target).to('cpu').detach().numpy()
+            angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
             if nn_model.args.exp == "degares":
                 angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to('cpu').detach().numpy()
         # visualisation

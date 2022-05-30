@@ -12,6 +12,7 @@
   "penalty": 1.4,
   "albedo_penalty": 1e-7,
   "angle_loss_weight": 10,
+  "angle_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
   "lr_decay_factor": 0.1
