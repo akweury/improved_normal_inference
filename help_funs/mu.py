@@ -987,5 +987,7 @@ def visual_img(img, name, upper_right=None):
 
 def visual_albedo(rho, name):
     img = cv.normalize(np.uint8(rho), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    img = cv.merge((img, img, img))
+
     addText(img, f"{name}(albedo)", font_size=0.8)
     return img
