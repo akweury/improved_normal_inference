@@ -35,10 +35,14 @@ class CNN(nn.Module):
         # light source inpainting
         L = mu.vertex2light_direction_tensor(x0, light_source)
         L = self.lsInpainting1(L)
+        L = self.lsInpainting2(L)
+        L = self.lsInpainting3(L)
 
         # rho inpainting
         rho = x_img0 / (torch.sum(x_normal_out * L, dim=1, keepdim=True) + 1e-20)
-        x_rho_out = self.albedoInpainting1(rho)
+        rho = self.albedoInpainting1(rho)
+        rho = self.albedoInpainting2(rho)
+        x_rho_out = self.albedoInpainting3(rho)
         x_img_out = x_rho_out * (torch.sum(x_normal_out * L, dim=1, keepdim=True))
 
         out = torch.cat((x_normal_out, x_rho_out, x_img_out), 1)
