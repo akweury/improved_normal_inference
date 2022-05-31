@@ -407,7 +407,7 @@ def train_epoch(nn_model, epoch):
         if nn_model.args.angle_loss:
             angle_loss_total = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
 
-            angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
+            # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
             if nn_model.args.exp == "degares":
                 angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to('cpu').detach().numpy()
         # visualisation
@@ -425,7 +425,7 @@ def train_epoch(nn_model, epoch):
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses[epoch % 3, epoch] = loss_avg
     if nn_model.args.angle_loss:
-        angle_loss_avg = angle_loss_total / len(nn_model.train_loader.dataset)
+        angle_loss_avg = angle_loss_total.to("cpu") / len(nn_model.train_loader.dataset)
         nn_model.angle_losses[0, epoch] = angle_loss_avg
 
         if nn_model.args.exp == "degares":
