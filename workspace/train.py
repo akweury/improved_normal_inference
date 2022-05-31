@@ -567,13 +567,17 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
         G = np.sum(xout_normal * xout_l, axis=-1)
         G = np.abs(G)
         G[mask] = 0
-
         xout_im = xout_rho * G
         xout_im = np.uint8(xout_im / (xout_im.max() + 1e-20) * 255)
         xout_im = cv.normalize(xout_im, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         xout_im = cv.merge((xout_im, xout_im, xout_im))
-        output_list.append(mu.visual_img(xout_im, "img"))
+        output_list.append(mu.visual_img(xout_im, "img_out"))
 
+        # image ground truth
+        img_gt = mu.tenor2numpy(x0[:1, 3:4, :, :])
+        img_gt = cv.normalize(np.uint8(img_gt), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        img_gt = cv.merge((img_gt, img_gt, img_gt))
+        output_list.append(mu.visual_img(img_gt, "img_gt"))
     else:
         # pred normal
         pred_normal = xout[:, :, :3]
@@ -592,22 +596,6 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
-
-    # cout
-    # if cout is not None:
-    #     cout = cout.detach().numpy()
-    #     if output_type == 'normal' or 'normal_noise':
-    #         cout = mu.filter_noise(cout, threshold=[0, 1])
-    #         cout = mu.normal2RGB(cout)
-    #     else:
-    #         cout = mu.filter_noise(cout, threshold=[0, 255])
-    #
-    #     normal_cout_8bit = cv.normalize(cout, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    #     normal_cout_8bit = cv.applyColorMap(normal_cout_8bit, cv.COLORMAP_BONE)
-    #     cout_ranges = mu.addHist(cout)
-    #     mu.addText(normal_cout_8bit, "c_out")
-    #     mu.addText(normal_cout_8bit, str(cout_ranges), pos="upper_right", font_size=0.5)
-    #     output_list.append(normal_cout_8bit)
 
     if output_type != "noise":
         output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)

@@ -223,6 +223,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         # case of resng, ng
         if k == 0:
+            vertex[mask] = 0
             vectors = np.c_[vertex, np.expand_dims(img, axis=2), light_direction]
         elif k == 1:
             vectors = vertex
@@ -238,7 +239,6 @@ def convert2training_tensor(path, k, output_type='normal'):
             vectors = np.c_[vertex, np.expand_dims(img, axis=2), hp_vertex]
         else:
             raise ValueError
-        vectors[mask] = 0
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)
