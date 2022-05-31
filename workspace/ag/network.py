@@ -37,7 +37,9 @@ class CNN(nn.Module):
         L = self.active(self.lsInpainting3(L))
 
         # rho inpainting
-        rho = x_img0 / (torch.sum(x_normal_out * L, dim=1, keepdim=True) + 1e-20)
+        G = torch.abs(torch.sum(x_normal_out * L, dim=1, keepdim=True))
+        rho = x_img0 / (G + 1e-20)
+        rho = rho / rho.max()
         rho = self.albedoInpainting1(rho)
         rho = self.albedoInpainting2(rho)
         x_rho_out = self.active(self.albedoInpainting3(rho))

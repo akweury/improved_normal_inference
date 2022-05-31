@@ -569,7 +569,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
         G[mask] = 0
 
         xout_im = xout_rho * G
-        xout_im = np.uint8(xout_im / xout_im.max() * 255)
+        xout_im = np.uint8(xout_im / (xout_im.max() + 1e-20) * 255)
         xout_im = cv.normalize(xout_im, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         xout_im = cv.merge((xout_im, xout_im, xout_im))
         output_list.append(mu.visual_img(xout_im, "img"))
