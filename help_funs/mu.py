@@ -41,7 +41,7 @@ def angle_between_tensor(v1, v2):
     rad = torch.arccos(torch.clip(torch.sum(v1_u * v2_u, dim=1), -1.0, 1.0))
     deg = torch.rad2deg(rad)
     deg[deg > 90] = 180 - deg[deg > 90]
-    return deg
+    return deg.float()
 
 def vertex2light_direction(vertex_map, light_sorce):
     light_direction = light_sorce - vertex_map
@@ -868,8 +868,8 @@ def eval_angle_tensor(output, target):
     output_perm = output.permute(0, 2, 3, 1)
     target_perm = target.permute(0, 2, 3, 1)
     mask = target_perm.sum(dim=-1) == 0
-    angle_matrix = torch.zeros(target_perm.shape[:3])
-    angle_matrix[~mask] = angle_between_tensor(target_perm[~mask], output_perm[~mask])
+    angle_matrix = torch.zeros(target_perm.shape[:3]).float().to(output.device)
+    angle_matrix[~mask] = angle_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
     return angle_matrix
 
 
