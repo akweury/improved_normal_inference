@@ -102,7 +102,7 @@ class AngleAlbedoLoss(nn.Module):
         # mask of non-zero positions
         # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
 
-        return albedo_loss  # + loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
+        return albedo_loss + loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
 class AngleDetailLoss(nn.Module):
