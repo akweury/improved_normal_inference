@@ -10,7 +10,7 @@
   "momentum": 0.9,
   "loss": "angleAlbedo",
   "penalty": 1.4,
-  "albedo_penalty": 1e-7,
+  "albedo_penalty": 1e-4,
   "angle_loss_weight": 10,
   "angle_loss": true,
   "loss_milestone": 15,
