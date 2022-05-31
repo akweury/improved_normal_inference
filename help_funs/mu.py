@@ -1,8 +1,7 @@
 import cv2 as cv
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import json
-import matplotlib.pyplot as plt
 
 
 # --------------------------- evaluate operations ----------------------------------------------------------------------
@@ -29,6 +28,20 @@ def angle_between(v1, v2):
     deg[deg > 90] = 180 - deg[deg > 90]
     return deg
 
+
+def angle_between_tensor(v1, v2):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
+    v1 = v1.reshape(-1, 3)
+    v2 = v2.reshape(-1, 3)
+    # inner = np.sum(v1.reshape(-1, 3) * v2.reshape(-1, 3), axis=1)
+    # norms = np.linalg.norm(v1, axis=1, ord=2) * np.linalg.norm(v2, axis=1, ord=2)
+    v1_u = v1 / (torch.norm(v1, dim=1, keepdim=True) + 1e-20)
+    v2_u = v2 / (torch.norm(v2, dim=1, keepdim=True) + 1e-20)
+
+    rad = torch.arccos(torch.clip(torch.sum(v1_u * v2_u, dim=1), -1.0, 1.0))
+    deg = torch.rad2deg(rad)
+    deg[deg > 90] = 180 - deg[deg > 90]
+    return deg
 
 def vertex2light_direction(vertex_map, light_sorce):
     light_direction = light_sorce - vertex_map
@@ -849,6 +862,15 @@ def eval_img_angle(output, target):
     img = angle2rgb(angle_matrix)
     img[mask] = 0
     return img, angle_matrix
+
+
+def eval_angle_tensor(output, target):
+    output_perm = output.permute(0, 2, 3, 1)
+    target_perm = target.permute(0, 2, 3, 1)
+    mask = target_perm.sum(dim=-1) == 0
+    angle_matrix = torch.zeros(target_perm.shape[:3])
+    angle_matrix[~mask] = angle_between_tensor(target_perm[~mask], output_perm[~mask])
+    return angle_matrix
 
 
 def angle2rgb(angle_matrix):
