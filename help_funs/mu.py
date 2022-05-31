@@ -468,24 +468,11 @@ def rgb2normal(color):
 def rgb2normal_tensor(color):
     color = color.permute(0, 2, 3, 1)
     mask = color.sum(dim=-1) == 0
-    assert torch.sum(color != color) == 0
     color_norm = torch.zeros(color.shape).to(color.device)
     color_norm[~mask] = color[~mask] / 255.0
-    assert torch.sum(color_norm != color_norm) == 0
     color_norm[~mask][:, 2] = 1 - color_norm[~mask][:, 2]
-    assert torch.sum(color_norm != color_norm) == 0
     color_norm[~mask] = (color_norm[~mask] - 0.5) / 0.5
-    assert torch.sum(color_norm != color_norm) == 0
 
-    # batch_size, c, h, w = color.shape
-    # for b in range(batch_size):
-    #     for i in range(h):
-    #         for j in range(w):
-    #             if not mask[b, i, j]:
-    #                 color_norm[b, :, i, j] = color[b, :, i, j] / 255.0
-    #                 color_norm[b, 2, i, j] = 1 - color_norm[b, 2, i, j]
-    #                 color_norm[b, :, i, j] = (color_norm[b, :, i, j] - 0.5) / 0.5
-    # color_norm = color_norm / (np.linalg.norm(color_norm, axis=2, ord=2, keepdims=True)+1e-8)
     return color_norm
 
 

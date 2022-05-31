@@ -27,14 +27,13 @@ class CNN(nn.Module):
     def forward(self, xin):
         x0 = xin[:, :3, :, :]
         x_img0 = xin[:, 3:4, :, :]
-        light_source = xin[:, 4:7, :, :]
+        light_direction = xin[:, 4:7, :, :]
 
         # x0: vertex array
         x_normal_out = self.agconv3_3(x0)
 
         # light source inpainting
-        L = mu.vertex2light_direction_tensor(x0, light_source)
-        L = self.lsInpainting1(L)
+        L = self.lsInpainting1(light_direction)
         L = self.lsInpainting2(L)
         L = self.lsInpainting3(L)
 
@@ -43,7 +42,6 @@ class CNN(nn.Module):
         rho = self.albedoInpainting1(rho)
         rho = self.albedoInpainting2(rho)
         x_rho_out = self.albedoInpainting3(rho)
-        x_img_out = x_rho_out * (torch.sum(x_normal_out * L, dim=1, keepdim=True))
 
-        out = torch.cat((x_normal_out, x_rho_out, x_img_out), 1)
+        out = torch.cat((x_normal_out, x_rho_out), 1)
         return out

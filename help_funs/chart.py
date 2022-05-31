@@ -87,46 +87,46 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, labels=None, 
 #                  y_label="RGB_difference")
 
 
-def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
-    target = target[0, :]
-    xout = xout[0, :]
-    # xout = out[:, :3, :, :]
-    # cout = out[:, 3:6, :, :]
-
-    # input normal
-    input = mu.tenor2numpy(x0[:1, :, :, :])
-    x0_normalized_8bit = mu.normal2RGB(input)
-    x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
-    mu.addText(x0_normalized_8bit, "Input(Normals)")
-
-    # gt normal
-    target = target.numpy()
-    target_color = mu.normal2RGB_single(target).reshape(3)
-    normal_gt_8bit = mu.pure_color_img(target_color, (512, 512, 3))
-    mu.addText(normal_gt_8bit, "gt")
-
-    # minimum difference between input normal and gt normal
-    best_angle, diff = mu.choose_best(input, target)
-    diff_min = np.min(diff)
-    mu.addText(normal_gt_8bit, f'e={diff_min:.2f}', pos='lower_right', font_size=1.0)
-
-    # normalize output normal
-    xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
-    xout_color = mu.normal2RGB_single(xout_normal).reshape(3)
-    normal_cnn_8bit = mu.pure_color_img(xout_color, (512, 512, 3))
-    mu.addText(normal_cnn_8bit, "output")
-
-    # angle difference between output and target
-    xout_normal = mu.rgb2normal(xout_color)
-    tartget_normal = mu.rgb2normal(target_color)
-    difference_angle = mu.angle_between(xout_normal, tartget_normal).item()
-    mu.addText(normal_cnn_8bit, f'e={difference_angle:.2f}', pos='lower_right', font_size=1.0)
-
-    # ------------------ combine together ----------------------------------------------
-
-    output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
-    cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
-    # mu.show_images(output, f"nnnx")
+# def draw_output_svd(x0, xout, target, exp_path, loss, epoch, i, prefix):
+#     target = target[0, :]
+#     xout = xout[0, :]
+#     # xout = out[:, :3, :, :]
+#     # cout = out[:, 3:6, :, :]
+#
+#     # input normal
+#     input = mu.tenor2numpy(x0[:1, :, :, :])
+#     x0_normalized_8bit = mu.normal2RGB(input)
+#     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
+#     mu.addText(x0_normalized_8bit, "Input(Normals)")
+#
+#     # gt normal
+#     target = target.numpy()
+#     target_color = mu.normal2RGB_single(target).reshape(3)
+#     normal_gt_8bit = mu.pure_color_img(target_color, (512, 512, 3))
+#     mu.addText(normal_gt_8bit, "gt")
+#
+#     # minimum difference between input normal and gt normal
+#     best_angle, diff = mu.choose_best(input, target)
+#     diff_min = np.min(diff)
+#     mu.addText(normal_gt_8bit, f'e={diff_min:.2f}', pos='lower_right', font_size=1.0)
+#
+#     # normalize output normal
+#     xout_normal = xout.detach().numpy() / np.linalg.norm(xout.detach().numpy())
+#     xout_color = mu.normal2RGB_single(xout_normal).reshape(3)
+#     normal_cnn_8bit = mu.pure_color_img(xout_color, (512, 512, 3))
+#     mu.addText(normal_cnn_8bit, "output")
+#
+#     # angle difference between output and target
+#     xout_normal = mu.rgb2normal(xout_color)
+#     tartget_normal = mu.rgb2normal(target_color)
+#     difference_angle = mu.angle_between(xout_normal, tartget_normal).item()
+#     mu.addText(normal_cnn_8bit, f'e={difference_angle:.2f}', pos='lower_right', font_size=1.0)
+#
+#     # ------------------ combine together ----------------------------------------------
+#
+#     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit])
+#     cv.imwrite(str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.3f}.png"), output)
+#     # mu.show_images(output, f"nnnx")
 
 
 def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):

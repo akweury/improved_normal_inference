@@ -1,15 +1,13 @@
-import os
-from pathlib import Path
+import glob
 import json
+import os
+import shutil
+
 import numpy as np
 import torch
-import cv2 as cv
-import glob
-import shutil
 
 import config
 from help_funs import file_io, mu
-from pncnn.utils import args_parser
 
 
 def noisy_1channel(img):
@@ -131,6 +129,21 @@ def neighbor_vectors(vertex, i=1):
     return vectors
 
 
+def vectex_normalization(vertex, mask):
+    # move all the vertex as close to original point as possible, and noramlized all the vertex
+    x_range = vertex[:, :, 0][~mask].max() - vertex[:, :, 0][~mask].min()
+    y_range = vertex[:, :, 1][~mask].max() - vertex[:, :, 1][~mask].min()
+    z_range = vertex[:, :, 2][~mask].max() - vertex[:, :, 2][~mask].min()
+    zzz = np.argmax(np.array([x_range, y_range, z_range]))
+    scale_factors = [x_range, y_range, z_range]
+    shift_vector = np.array([vertex[:, :, 0][~mask].min(), vertex[:, :, 1][~mask].min(), vertex[:, :, 2][~mask].min()])
+    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factors[0]
+    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
+    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
+
+    return vertex, scale_factors, shift_vector
+
+
 def convert2training_tensor(path, k, output_type='normal'):
     if not os.path.exists(str(path)):
         raise FileNotFoundError
@@ -141,6 +154,7 @@ def convert2training_tensor(path, k, output_type='normal'):
             depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
         else:
             depth_files = np.array(sorted(glob.glob(str(path / "*depth0_noise.png"), recursive=True)))
+            depth_gt_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
     else:
         raise ValueError("output_file is not supported. change it in args.json")
 
@@ -160,6 +174,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
+        depth_gt = file_io.load_scaled16bitImage(depth_gt_files[item],
+                                                 data['minDepth'],
+                                                 data['maxDepth'])
+        mask = depth.sum(axis=2) == 0
+        mask_gt = depth_gt.sum(axis=2) == 0
 
         if k == 2:
             # depth_filtered = mu.median_filter(depth)
@@ -169,25 +188,38 @@ def convert2training_tensor(path, k, output_type='normal'):
                                           data['minDepth'], data['maxDepth'])
 
         img = file_io.load_16bitImage(img_files[item])
+        img[mask_gt] = 0
         data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
                                  torch.tensor(data['R']).float(),
                                  torch.tensor(data['t']).float())
-        mask = vertex.sum(axis=2) == 0
+        vertex_gt = mu.depth2vertex(torch.tensor(depth_gt).permute(2, 0, 1),
+                                    torch.tensor(data['K']),
+                                    torch.tensor(data['R']).float(),
+                                    torch.tensor(data['t']).float())
 
-        # move all the vertex as close to original point as possible, and noramlized all the vertex
-        x_range = vertex[:, :, 0][~mask].max() - vertex[:, :, 0][~mask].min()
-        y_range = vertex[:, :, 1][~mask].max() - vertex[:, :, 1][~mask].min()
-        z_range = vertex[:, :, 2][~mask].max() - vertex[:, :, 2][~mask].min()
-        zzz = np.argmax(np.array([x_range, y_range, z_range]))
-        scale_factors = [x_range, y_range, z_range]
+        vertex, scale_factors, shift_vector = vectex_normalization(vertex, mask)
+        vertex_gt, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
+        light_pos = (data['lightPos'] - shift_vector) / scale_factors[0]
+        light_direction = mu.vertex2light_direction(vertex, light_pos)
+        light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos)
+        light_direction_gt[mask_gt] = 0
+        light_direction[mask] = 0
 
-        vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factors[0]
-        vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
-        vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
+        # gt normal
+        gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
+        gt_normal = gt_normal / (np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)
+        G = np.sum(gt_normal * light_direction_gt, axis=-1)
+        G = np.abs(G)
+        G[mask_gt] = 0
+        rho_gt = img / (G + 1e-20)
+        rho_gt = rho_gt / rho_gt.max()  # normalize rho gt
+        # mu.show_images(np.uint8((rho_gt* G)/(rho_gt* G).max() * 255), "img")
+        # rho_gt[~mask_gt] = (rho_gt[~mask_gt] - rho_gt.min()) / (rho_gt.max() - rho_gt.min()) * 255
 
-        light_direction = mu.vertex2light_direction(vertex, data['lightPos'])
+        # mu.show_images(rho_gt, "a")
+        target = np.c_[gt_normal, rho_gt.reshape(512, 512, 1)]
 
         # case of resng, ng
         if k == 0:
@@ -207,10 +239,6 @@ def convert2training_tensor(path, k, output_type='normal'):
         else:
             raise ValueError
         vectors[mask] = 0
-
-        # gt normal
-        gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        target = np.c_[gt_normal, np.expand_dims(img, axis=2)]
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)

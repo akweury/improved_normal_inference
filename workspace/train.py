@@ -4,25 +4,25 @@
 Created on Wed Mar 16 18:49:51 2022
 @Author: J. Sha
 """
-import os
-import time
-import shutil
+import datetime
 import glob
 import json
+import os
+import shutil
 from pathlib import Path
-import datetime
-import numpy as np
-import matplotlib.pyplot as plt
-import cv2 as cv
-import torch
-from torch import nn
-import torch.nn.functional as F
-from torch.optim import SGD, Adam, lr_scheduler
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
 
-from help_funs import mu
+import cv2 as cv
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torch.nn.functional as F
+from torch import nn
+from torch.optim import SGD, Adam, lr_scheduler
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
+
 import config
+from help_funs import mu
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
@@ -82,31 +82,25 @@ class AngleAlbedoLoss(nn.Module):
 
     def forward(self, outputs, target, args):
         normal_out = outputs[:, :3, :, :]
-        albedo_out = outputs[:, 3:4, :, :]
-        img_out = outputs[:, 4, :, :]
-
         normals_target = target[:, :3, :, :]
-        img_target = target[:, 3, :, :]
         mask_too_high = torch.gt(normal_out, 1).bool().detach()
         mask_too_low = torch.lt(normal_out, -1).bool().detach()
         normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
         normal_out[mask_too_low] = normal_out[mask_too_low] * args.penalty
-
-        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
-        # mask of non-zero positions
         mask = torch.sum(torch.abs(normals_target), dim=1) > 0
-        mask_noise = torch.abs(img_target) > 0
-        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
-
         axis = args.epoch % 3
         axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
-        img_diff = (img_target - img_out)[mask]
-        img_diff[torch.isnan(img_diff)] = 0
-
-        albedo_loss = torch.sum(img_diff ** 2 / img_diff.size(0)) * args.albedo_penalty
+        albedo_out = outputs[:, 3, :, :]
+        albedo_target = target[:, 3, :, :]
+        albedo_diff = (albedo_target - albedo_out)[mask]
+        albedo_diff[torch.isnan(albedo_diff)] = 0
+        albedo_loss = torch.sum(albedo_diff ** 2 / albedo_diff.size(0)) * args.albedo_penalty
+        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
+        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
+        # mask of non-zero positions
+        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
 
         return albedo_loss + loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 

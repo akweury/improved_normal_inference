@@ -30,6 +30,7 @@ if args.data == "synthetic":
             raise ValueError
         noisy_a_folder(original_folder, dataset_folder)
         if args.clear == "true":
+            print("remove the old dataset...")
             shutil.rmtree(str(dataset_folder / "tensor"))
         for k in args.max_k.split(','):
             print(f"K = {k}, {dataset_folder}")
