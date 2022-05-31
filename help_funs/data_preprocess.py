@@ -256,7 +256,7 @@ def convert2training_tensor(path, k, output_type='normal'):
                          'maxDepth': data['maxDepth'],
                          }
         torch.save(training_case, str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar"))
-        print(f'File {item}/{len(data_files)} converted to tensor. K = {k}')
+        print(f'File {item + 1}/{len(data_files)} converted to tensor. K = {k}')
 
 
 # def convert2training_tensor2(path, k, input_size=1000):
