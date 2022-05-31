@@ -7,7 +7,6 @@ import torch
 import torch.nn as nn
 from common.AlbedoGatedNNN import AlbedoGatedNNN
 from common.AlbedoGatedNNN import GConv
-from help_funs import mu
 
 
 class CNN(nn.Module):
@@ -35,13 +34,13 @@ class CNN(nn.Module):
         # light source inpainting
         L = self.lsInpainting1(light_direction)
         L = self.lsInpainting2(L)
-        L = self.lsInpainting3(L)
+        L = self.active(self.lsInpainting3(L))
 
         # rho inpainting
         rho = x_img0 / (torch.sum(x_normal_out * L, dim=1, keepdim=True) + 1e-20)
         rho = self.albedoInpainting1(rho)
         rho = self.albedoInpainting2(rho)
-        x_rho_out = self.albedoInpainting3(rho)
+        x_rho_out = self.active(self.albedoInpainting3(rho))
 
-        out = torch.cat((x_normal_out, x_rho_out), 1)
+        out = torch.cat((x_normal_out, x_rho_out, L), 1)
         return out

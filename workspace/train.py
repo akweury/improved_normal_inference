@@ -488,8 +488,9 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
 
 
 def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_type, prefix):
-    if target.size() != (512, 512, 3):
-        target = target[0, :].permute(1, 2, 0)[:, :, :3]
+    target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+    target_rho = target[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
+    target_l = target[0, :].permute(1, 2, 0)[:, :, 4:7].detach().numpy()
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
     #     cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
@@ -511,9 +512,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
     output_list.append(x0_normalized_8bit)
 
     # gt normal
-    target = target.numpy()
-    target_img = mu.normal2RGB(target)
-    mask = target.sum(axis=2) == 0
+    target_img = mu.normal2RGB(target_normal)
+    mask = target_normal.sum(axis=2) == 0
     target_ranges = mu.addHist(target_img)
     normal_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_gt_8bit, "gt")
@@ -563,8 +563,15 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
         mu.addText(normal_cnn_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-        # albedo visualization
-        output_list.append(mu.visual_albedo(xout[:, :, 3:4], "Albedo"))
+        # lambertian reflection visualization
+        G = np.sum(target_normal * target_l, dim=-1)
+        G = np.abs(G)
+        G[mask] = 0
+
+        xout_im = target_rho * G
+        xout_im = np.uint8(xout_im / xout_im.max() * 255)
+        xout_im = cv.normalize(xout_im, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        output_list.append(mu.visual_img(xout_im, ""))
 
     else:
         # pred normal
@@ -579,7 +586,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
         output_list.append(normal_cnn_8bit)
 
     # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(pred_normal, target)
+    diff_img, diff_angle = mu.eval_img_angle(pred_normal, target_normal)
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
