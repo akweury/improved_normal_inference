@@ -870,7 +870,11 @@ def eval_angle_tensor(output, target):
     mask = target_perm.sum(dim=-1) == 0
     angle_matrix = torch.zeros(target_perm.shape[:3]).float().to(output.device)
     angle_matrix[~mask] = angle_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
-    return angle_matrix
+
+    mask = (~torch.prod(output_perm == 0, -1).bool()).unsqueeze(1)
+    loss_avg = angle_matrix.sum() / mask.sum()
+
+    return loss_avg
 
 
 def angle2rgb(angle_matrix):
