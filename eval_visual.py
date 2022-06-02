@@ -2,16 +2,17 @@
 input: an image, the incomplete depth map of the image
 output: predicted normal map
 """
-import os
 import argparse
-import time
-import glob
-import cv2 as cv
-import torch
 import datetime
+import glob
+import os
+
+import cv2 as cv
 import numpy as np
-from help_funs import file_io, mu
+import torch
+
 import config
+from help_funs import mu
 from workspace.svd import eval as svd
 
 
@@ -90,10 +91,11 @@ def start(models_path_dict):
         # unpack model
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
-        gt = mu.tenor2numpy(gt_tensor)
-        vertex_0 = mu.tenor2numpy(test_0_tensor)[:, :, :3]
-        img_0 = mu.tenor2numpy(test_0_tensor)[:, :, 3:]
+        gt = mu.tenor2numpy(gt_tensor[:, :3, :, :])
+        vertex_0 = mu.tenor2numpy(test_0_tensor[:, :3, :, :])[:, :, :3]
+        img_0 = mu.tenor2numpy(test_0_tensor[:, 3:4, :, :])
         mask = gt.sum(axis=2) == 0
+        mask_input = vertex_0.sum(axis=2) == 0
 
         img_list, diff_list, albedo_list = [mu.visual_vertex(vertex_0, "Input(Vertex)"),
                                             mu.visual_normal(gt, "GT")], [], []
@@ -124,7 +126,7 @@ def start(models_path_dict):
                 else:
                     raise ValueError
             # visual normal
-            normal[mask] = 0
+            normal[mask_input] = 0
             img_list.append(mu.visual_normal(normal, name))
 
             # albedo
@@ -133,6 +135,7 @@ def start(models_path_dict):
             albedo_list.append(mu.visual_albedo(rho, name))
 
             # visual error
+            gt[mask_input] = 0
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
             diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
             diff_list.append(mu.visual_img(diff_img, name, upper_right=int(diff)))

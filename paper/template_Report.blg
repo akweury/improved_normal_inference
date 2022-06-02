@@ -9,6 +9,8 @@ Reallocating 'name_of_file' (item size: 1) to 13 items.
 A level-1 auxiliary file: approach.aux
 Reallocating 'name_of_file' (item size: 1) to 16 items.
 A level-1 auxiliary file: experiments.aux
+Reallocating 'name_of_file' (item size: 1) to 15 items.
+A level-1 auxiliary file: discussion.aux
 Reallocating 'name_of_file' (item size: 1) to 13 items.
 A level-1 auxiliary file: formular.aux
 Reallocating 'name_of_file' (item size: 1) to 6 items.
@@ -23,7 +25,7 @@ Warning--empty journal in nconv
 Warning--empty journal in efficientDet
 You've used 21 entries,
             2118 wiz_defined-function locations,
-            608 strings with 7947 characters,
+            609 strings with 7961 characters,
 and the built_in function-call counts, 7445 in all, are:
 = -- 670
 > -- 458
