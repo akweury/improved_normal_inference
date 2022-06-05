@@ -215,10 +215,8 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         # albedo
         G = np.sum(gt_normal * light_direction_gt, axis=-1)
-        G = np.abs(G)
         G[mask_gt] = 0
         albedo_gt = img / (G + 1e-20)
-        albedo_gt = albedo_gt / albedo_gt.max()  # normalize rho gt
 
         # mu.show_images(np.uint8((albedo_gt* G)/(albedo_gt* G).max() * 255), "img")
         # albedo_gt[~mask_gt] = (albedo_gt[~mask_gt] - albedo_gt.min()) / (albedo_gt.max() - albedo_gt.min()) * 255

@@ -2,6 +2,12 @@
 
 ### Command for remote machine
 
+#### copy dataset from local to remote
+
+```
+scp D:\TUK\improved_normal_inference\dataset\data_synthetic\train.zip sha@pc-2103:/datasets/sha
+```
+
 #### Create dataset
 
 ```

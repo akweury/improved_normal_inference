@@ -29,6 +29,8 @@ if args.data == "synthetic":
         else:
             raise ValueError
         noisy_a_folder(original_folder, dataset_folder)
+        if not os.path.exists(str(dataset_folder / "tensor")):
+            os.makedirs(str(dataset_folder / "tensor"))
         if args.clear == "true":
             print("remove the old dataset...")
             shutil.rmtree(str(dataset_folder / "tensor"))
