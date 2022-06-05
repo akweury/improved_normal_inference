@@ -1,3 +1,4 @@
+From considering neighborhoods in the same plane then using PCA for estimation to recently deep learning based methods, the task of surface normal inference is also been well studied in last 30 years. 
 
 
 \section{Sparse Input processing}
@@ -45,13 +46,13 @@ It is worth to noticed that, the output of normal inference CNN model is not one
 Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 3 times and upsampled 3 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
 
 
-\begin{figure}[!h]
-	\centering
-	\includegraphics[width=\textwidth]{./ref/u-net-illustration-correct-scale2}
-	\caption{U-net architecture (example for 32x32 pixels in the lowest resolution). Each blue box corresponds to a multi-channel feature map. The number of channels is denoted on top of the box. The x-y-size is provided at the lower left edge of the box. White boxes represent copied feature maps. The arrows denote the different operations.
-	}
-	\label{fig:u-net}
-\end{figure}
+%%\begin{figure}[!h]
+%%	\centering
+%%	\includegraphics[width=\textwidth]{./ref/u-net-illustration-correct-scale2}
+%%	\caption{U-net architecture (example for 32x32 pixels in the lowest resolution). Each blue box corresponds to a multi-channel feature map. The number of channels is denoted on top of the box. The x-y-size is provided at the lower left edge of the box. White boxes represent copied feature maps. The arrows denote the different operations.
+%%	}
+%%	\label{fig:u-net}
+%% \end{figure}
 
 
 
