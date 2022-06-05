@@ -21,10 +21,12 @@ args = parser.parse_args()
 
 if args.data == "synthetic":
     for folder in ["train", "test"]:
-        original_folder = config.synthetic_data / folder
+
         if args.machine == "remote":
+            original_folder = config.synthetic_data_dfki / folder
             dataset_folder = config.synthetic_data_noise_dfki / folder
         elif args.machine == 'local':
+            original_folder = config.synthetic_data / folder
             dataset_folder = config.synthetic_data_noise / folder
         else:
             raise ValueError
