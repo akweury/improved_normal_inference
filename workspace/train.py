@@ -96,7 +96,7 @@ class AngleAlbedoLoss(nn.Module):
         # light loss
         light_target = target[:, 5:8, :, :]
         light_output = outputs[:, 3:6, :, :]
-        l_diff = (light_output - light_target)[mask]
+        l_diff = (light_output - light_target).permute(0, 2, 3, 1)[mask]
         loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
 
         # N*L loss
@@ -424,7 +424,7 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
-            loss_0th = loss / int(nn_model.batch_size)
+            loss_0th = loss / int(nn_model.args.batch_size)
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
                 draw_output(nn_model.args.exp, input, out, target=target,
                             exp_path=nn_model.output_folder,
@@ -500,9 +500,10 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
 
 def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_type, prefix):
     target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+    target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
+    target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
-    xout_rho = xout[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
-    xout_l = xout[0, :].permute(1, 2, 0)[:, :, 4:7].detach().numpy()
+    xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
     #     cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
@@ -523,10 +524,10 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
     output_list.append(x0_normalized_8bit)
 
     # gt normal
-    target_img = mu.normal2RGB(target_normal)
+    normal_img = mu.normal2RGB(target_normal)
     mask = target_normal.sum(axis=2) == 0
-    target_ranges = mu.addHist(target_img)
-    normal_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    target_ranges = mu.addHist(normal_img)
+    normal_gt_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_gt_8bit, "gt")
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_gt_8bit)
@@ -566,7 +567,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
 
     elif exp_name == "ag":
         # pred base normal
-
+        xout_normal[mask] = 0
+        xout_light[mask] = 0
         normal_cnn_8bit = mu.visual_output(xout_normal, mask)
 
         mu.addText(normal_cnn_8bit, "output")
@@ -574,21 +576,19 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, output_typ
         mu.addText(normal_cnn_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-        # lambertian reflection visualization
-        G = np.sum(xout_normal * xout_l, axis=-1)
-        G = np.abs(G)
-        G[mask] = 0
-        xout_im = xout_rho * G
-        xout_im = np.uint8(xout_im / (xout_im.max() + 1e-20) * 255)
-        xout_im = cv.normalize(xout_im, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        xout_im = cv.merge((xout_im, xout_im, xout_im))
-        output_list.append(mu.visual_img(xout_im, "img_out"))
+        # albedo output visualization
+        xout_albedo = np.uint8(target_img / (np.sum(xout_normal * xout_light, axis=-1) + 1e-20))
+        xout_albedo = cv.normalize(xout_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        xout_albedo = cv.merge((xout_albedo, xout_albedo, xout_albedo))
+        output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
 
-        # image ground truth
-        img_gt = mu.tenor2numpy(x0[:1, 3:4, :, :])
-        img_gt = cv.normalize(np.uint8(img_gt), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        img_gt = cv.merge((img_gt, img_gt, img_gt))
-        output_list.append(mu.visual_img(img_gt, "img_gt"))
+        # albedo ground truth visualization
+        target_albedo = target_img / (np.sum(target_normal * target_light, axis=-1) + 1e-20)
+        target_albedo = np.uint8(target_albedo)
+        target_albedo = cv.normalize(target_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        target_albedo = cv.merge((target_albedo, target_albedo, target_albedo))
+        output_list.append(mu.visual_img(target_albedo, "albedo_target"))
+
     else:
         # pred normal
         pred_normal = xout[:, :, :3]
