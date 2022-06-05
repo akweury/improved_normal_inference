@@ -201,25 +201,35 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         vertex, scale_factors, shift_vector = vectex_normalization(vertex, mask)
         vertex_gt, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
+
+        # gt normal
+        gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
+        gt_normal = gt_normal / (np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)
+
+        # light
         light_pos = (data['lightPos'] - shift_vector) / scale_factors[0]
         light_direction = mu.vertex2light_direction(vertex, light_pos)
         light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos)
         light_direction_gt[mask_gt] = 0
         light_direction[mask] = 0
 
-        # gt normal
-        gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-        gt_normal = gt_normal / (np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)
+        # albedo
         G = np.sum(gt_normal * light_direction_gt, axis=-1)
         G = np.abs(G)
         G[mask_gt] = 0
-        rho_gt = img / (G + 1e-20)
-        rho_gt = rho_gt / rho_gt.max()  # normalize rho gt
-        # mu.show_images(np.uint8((rho_gt* G)/(rho_gt* G).max() * 255), "img")
-        # rho_gt[~mask_gt] = (rho_gt[~mask_gt] - rho_gt.min()) / (rho_gt.max() - rho_gt.min()) * 255
+        albedo_gt = img / (G + 1e-20)
+        albedo_gt = albedo_gt / albedo_gt.max()  # normalize rho gt
 
-        # mu.show_images(rho_gt, "a")
-        target = np.c_[gt_normal, rho_gt.reshape(512, 512, 1)]
+        # mu.show_images(np.uint8((albedo_gt* G)/(albedo_gt* G).max() * 255), "img")
+        # albedo_gt[~mask_gt] = (albedo_gt[~mask_gt] - albedo_gt.min()) / (albedo_gt.max() - albedo_gt.min()) * 255
+        # mu.show_images(albedo_gt, "a")
+
+        target = np.c_[
+            gt_normal,  # 0,1,2
+            np.sum(gt_normal * light_direction_gt, axis=-1, keepdims=True),  # 3
+            np.expand_dims(img, axis=2),  # 4
+            light_direction_gt  # 5,6,7
+        ]
 
         # case of resng, ng
         if k == 0:

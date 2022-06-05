@@ -81,6 +81,7 @@ class AngleAlbedoLoss(nn.Module):
         super().__init__()
 
     def forward(self, outputs, target, args):
+        # normal l2 loss
         normal_out = outputs[:, :3, :, :]
         normals_target = target[:, :3, :, :]
         mask_too_high = torch.gt(normal_out, 1).bool().detach()
@@ -92,17 +93,24 @@ class AngleAlbedoLoss(nn.Module):
         axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
-        albedo_out = outputs[:, 3, :, :]
-        albedo_target = target[:, 3, :, :]
-        albedo_diff = (albedo_target - albedo_out)[mask]
-        albedo_diff[torch.isnan(albedo_diff)] = 0
-        albedo_loss = torch.sum(albedo_diff ** 2 / albedo_diff.size(0)) * args.albedo_penalty
+        # light loss
+        light_target = target[:, 5:8, :, :]
+        light_output = outputs[:, 3:6, :, :]
+        l_diff = (light_output - light_target)[mask]
+        loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
+
+        # N*L loss
+        G_target = target[:, 3, :, :]
+        G_output = torch.sum(normal_out * light_target, dim=1)
+        G_diff = (G_output - G_target)[mask]
+        loss += torch.sum(G_diff ** 2) / (G_diff.size(0))
+
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
         # mask of non-zero positions
         # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
 
-        return albedo_loss + loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
+        return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
 class AngleDetailLoss(nn.Module):
@@ -416,11 +424,12 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, = input.to("cpu"), out.to("cpu"), target.to("cpu")
+            loss_0th = loss / int(nn_model.batch_size)
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
                 draw_output(nn_model.args.exp, input, out, target=target,
                             exp_path=nn_model.output_folder,
-                            loss=loss, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
-            print(f"\t loss: {loss:.2e}\t axis: {epoch % 3}")
+                            loss=loss_0th, epoch=epoch, i=i, output_type=nn_model.args.output_type, prefix="train")
+            print(f"\t loss: {loss_0th:.2e}\t axis: {epoch % 3}")
 
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses[epoch % 3, epoch] = loss_avg
