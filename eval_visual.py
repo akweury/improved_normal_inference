@@ -120,13 +120,16 @@ def start(models_path_dict):
                 k = args.neighbor
 
                 if k == 0:
-                    normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
+                    if args.exp == "ag":
+                        normal = evaluate_epoch(args, model, test_0_tensor, device)
+                    else:
+                        normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif k == 1:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                 else:
                     raise ValueError
             # visual normal
-            normal[mask_input] = 0
+            # normal[mask_input] = 0
             img_list.append(mu.visual_normal(normal, name))
 
             # albedo
@@ -157,6 +160,7 @@ if __name__ == '__main__':
     # load test model names
     models = {
         # "SVD": None,
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",

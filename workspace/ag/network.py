@@ -9,6 +9,33 @@ from common.AlbedoGatedNNN import AlbedoGatedNNN
 from common.AlbedoGatedNNN import GConv
 
 
+class LightNet(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super().__init__()
+        self.__name__ = 'lignet'
+        kernel_size = (3, 3)
+        padding_size = (1, 1)
+        stride = (1, 1)
+
+        channel_size_1 = 32
+        self.active_leaky_relu = nn.LeakyReLU(0.01)
+        self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting3 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting4 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting5 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
+        self.lsInpainting6 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
+
+    def forward(self, xin):
+        L = self.lsInpainting1(xin)
+        L = self.lsInpainting2(L)
+        L = self.lsInpainting3(L)
+        L = self.lsInpainting4(L)
+        L = self.active_leaky_relu(self.lsInpainting5(L))
+        xout_light = self.lsInpainting6(L)
+        return xout_light
+
+
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -18,9 +45,7 @@ class CNN(nn.Module):
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.active_sigmoid = nn.Sigmoid()
 
-        self.lsInpainting1 = GConv(3, 3, (3, 3), (1, 1), (1, 1))
-        self.lsInpainting2 = nn.Conv2d(3, 3, (3, 3), (1, 1), (1, 1))
-        self.lsInpainting3 = nn.Conv2d(3, 3, (3, 3), (1, 1), (1, 1))
+        self.lightInpainting = LightNet(3, 3)
 
         self.nl_layer = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
         self.rho_layer = GConv(2, 1, (3, 3), (1, 1), (1, 1))
@@ -30,26 +55,13 @@ class CNN(nn.Module):
         self.albedoInpainting3 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
 
     def forward(self, xin):
-        x0 = xin[:, :3, :, :]
-        x_img0 = xin[:, 3:4, :, :]
-        light_direction = xin[:, 4:7, :, :]
-
         # x0: vertex array
+        x0 = xin[:, :3, :, :]
         x_normal_out = self.agconv3_3(x0)
 
         # light source inpainting
-        L = self.lsInpainting1(light_direction)
-        L = self.active_leaky_relu(self.lsInpainting2(L))
-        L = self.lsInpainting3(L)
+        light_direction = xin[:, 4:7, :, :]
+        L = self.lightInpainting(light_direction)
 
-        # G = torch.abs(torch.sum(x_normal_out * L, dim=1, keepdim=True))
-        G = self.active_leaky_relu(self.nl_layer(torch.cat((L, x_normal_out), 1)))
-
-        # rho = (x_img0 / (G + 1e-20)) / (x_img0 / (G + 1e-20)).max()
-        rho = self.active_leaky_relu(self.rho_layer(torch.cat((G, x_img0), 1)))
-        rho = self.active_leaky_relu(self.albedoInpainting1(rho))
-        rho = self.active_leaky_relu(self.albedoInpainting2(rho))
-        x_rho_out = self.albedoInpainting3(rho)
-
-        out = torch.cat((x_normal_out, x_rho_out, L), 1)
+        out = torch.cat((x_normal_out, L), 1)
         return out
