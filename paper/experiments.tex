@@ -1,3 +1,60 @@
+\section{Dataset}
+The depth map captured by Kinect is usually semi-dense with a number of missing pixels, as shown in Figure \ref{fig:depth_map_kinect}. Consequently, the ground truth of inferenced normal map is incomplete, either. 
+
+
+
+
+
+\begin{figure}[!h]
+	\centering
+	{\includegraphics[width=0.4\textwidth]{./pic/00028.depth0.png}}
+	\label{fig:depth_map_kinect}
+	\caption{Depth Map of an object captured by Kinect}
+\end{figure}
+
+In view of this this kind of situation, a set of generated synthetic 3D scene via Unity is used as training dataset.  The main advantage using generated scene is the complete information of all the information in the synthetic world. The depth map can be captured loss-free. The corresponding normal map can also be safely considered as ground truth. To construct the dataset, 22 3D models have been used and 1000 different scenes have been captured with different pose of each model. 3 kinds of images are recorded in each scene:
+
+\begin{itemize}
+	\item Depth map
+	\item Grayscale image
+	\item Normal Map
+\end{itemize}
+
+\subsection{Noise}
+The raw depth maps captured by Kinect usually have missing pixels. As shown in picture \ref{fig:depth_map_kinect}.
+Observing the depth map, the missing pixels can be divided into two groups.
+\begin{itemize}
+	\item random missed single pixels
+	\item missed dark areas
+\end{itemize}
+Since the input of evaluation is incomplete Kinect depth map, thus the input of training should have the similar pattern as well. That is, adding the similar noise to synthetic depth map.
+For the two kinds of depth noise, first can be simulated by adding uniformly distributed black pixels to the whole depth map, whereas the second can be dealed with a high-pass filter to filter out dark pixels and set them to 0.
+
+%% add noise image
+\begin{figure}[!h]
+	\centering
+	\begin{tikzpicture}
+		\node[inner sep=0pt] (depthmap) at (0,0)
+		{\includegraphics[width=.2\textwidth]{./pic/00440.depth0.png}};
+		\draw [-stealth](2,0) -- (3,0);
+		\node[inner sep=0pt] (depthmap) at (5,0)
+		{\includegraphics[width=.2\textwidth]{./pic/00440.depth0_noise.png}};
+	\end{tikzpicture}
+\end{figure}
+
+Specifically, for each pixel with index $ (i,j) $ in a synthetic depth map $ D $, if its value less than a threshold $ B $, then set it to $ 0 $, i.e.
+\[D(i,j) = \begin{cases}
+	0 & D(i,j) \le B \\
+	D(i,j) & D(i,j) > B
+\end{cases}  \]
+
+for the rest of the pixels, the following two equal-opportunity situations will occur,
+\begin{itemize}
+	\item pixel value remain same
+	\item pixel value set to $ 0 $
+\end{itemize}
+
+
 The model is trained with PyTorch 1.10.2, CUDA 10.2.89, GPU with single NVIDIA GEFORCE GTX 1080Ti.
 
 

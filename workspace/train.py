@@ -103,7 +103,7 @@ class AngleAlbedoLoss(nn.Module):
         G_target = target[:, 3, :, :]
         G_output = outputs[:, 3, :, :]
         G_diff = (G_output - G_target)[mask]
-        loss += torch.sum(G_diff ** 2) / (G_diff.size(0))
+        loss = torch.sum(G_diff ** 2) / (G_diff.size(0))
 
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
