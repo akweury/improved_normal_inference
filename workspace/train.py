@@ -103,7 +103,7 @@ class AngleAlbedoLoss(nn.Module):
         G_target = target[:, 3, :, :]
         G_output = outputs[:, 3, :, :]
         G_diff = (G_output - G_target)[mask]
-        loss = torch.sum(G_diff ** 2) / (G_diff.size(0))
+        loss += torch.sum(G_diff ** 2) / (G_diff.size(0))
 
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
@@ -307,6 +307,9 @@ class TrainingModel():
             # self.args = checkpoint['args']
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
 
+            self.losses[:, :checkpoint['epoch']] = checkpoint['losses']
+            self.angle_losses[:, :checkpoint['epoch']] = checkpoint['angle_losses']
+
             print(f"- checkout {checkpoint['epoch']} was loaded successfully!")
             return model
         else:
@@ -359,7 +362,10 @@ class TrainingModel():
         state = {'args': self.args,
                  'epoch': epoch,
                  'model': self.model,
-                 'optimizer': self.optimizer}
+                 'optimizer': self.optimizer,
+                 'angle_losses': self.angle_losses[:, :epoch],
+                 'losses': self.losses[:, :epoch],
+                 }
 
         torch.save(state, checkpoint_filename)
 
@@ -464,7 +470,7 @@ def train_epoch(nn_model, epoch):
         draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
                         log_y=True, label=1, epoch=epoch, start_epoch=nn_model.start_epoch)
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
-                        log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True)
+                        log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True, title="Loss")
         if nn_model.args.angle_loss:
             if nn_model.args.exp == "degares":
                 draw_line_chart(np.array([nn_model.angle_sharp_losses[0]]), nn_model.output_folder, log_y=True,
@@ -501,6 +507,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.yscale('log')
 
     plt.legend()
+    plt.grid(True)
     if not os.path.exists(str(path)):
         os.mkdir(path)
 
