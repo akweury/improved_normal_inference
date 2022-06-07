@@ -51,6 +51,12 @@ S.~Holzer, R.~B. Rusu, M.~Dixon, S.~Gedikli, and N.~Navab.
 \newblock In {\em 2012 IEEE/RSJ International Conference on Intelligent Robots
   and Systems}, pages 2684--2689, 2012.
 
+\bibitem{SFS}
+Berthold Horn.
+\newblock Shape from shading: A method for obtaining the shape of a smooth
+  opaque object from one view.
+\newblock 10 2004.
+
 \bibitem{guided}
 Jiashen Hua and Xiaojin Gong.
 \newblock A normalized convolutional neural network for guided sparse depth

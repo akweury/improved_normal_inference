@@ -174,9 +174,12 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
-        depth_gt = file_io.load_scaled16bitImage(depth_gt_files[item],
-                                                 data['minDepth'],
-                                                 data['maxDepth'])
+        if path == config.real_data:
+            depth_gt = depth.copy()
+        else:
+            depth_gt = file_io.load_scaled16bitImage(depth_gt_files[item],
+                                                     data['minDepth'],
+                                                     data['maxDepth'])
         mask = depth.sum(axis=2) == 0
         mask_gt = depth_gt.sum(axis=2) == 0
 

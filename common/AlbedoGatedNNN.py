@@ -104,6 +104,6 @@ class AlbedoGatedNNN(nn.Module):
         x1 = self.uconv3(torch.cat((x1, x1_us), 1))
 
         xout = self.conv1(x1)  # 512, 512
-        xout_normal = self.conv2(xout)
+        # xout_normal = self.conv2(xout)
 
-        return xout_normal
+        return xout

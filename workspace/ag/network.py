@@ -25,15 +25,19 @@ class LightNet(nn.Module):
         self.lsInpainting4 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting5 = nn.Conv2d(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting6 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
+        self.merge = nn.Conv2d(out_ch * 2, 1, kernel_size, stride, padding_size)
 
-    def forward(self, xin):
-        L = self.lsInpainting1(xin)
+    def forward(self, lin, nin):
+        L = self.lsInpainting1(lin)
         L = self.lsInpainting2(L)
         L = self.lsInpainting3(L)
         L = self.lsInpainting4(L)
         L = self.active_leaky_relu(self.lsInpainting5(L))
         xout_light = self.lsInpainting6(L)
-        return xout_light
+
+        scaleProd = self.merge(torch.cat((xout_light, nin), 1))
+
+        return scaleProd
 
 
 class CNN(nn.Module):
@@ -61,7 +65,8 @@ class CNN(nn.Module):
 
         # light source inpainting
         light_direction = xin[:, 3:6, :, :]
-        L = self.lightInpainting(light_direction)
 
-        out = torch.cat((x_normal_out, L), 1)
+        scaleProd = self.lightInpainting(light_direction, x_normal_out)
+
+        out = torch.cat((x_normal_out, scaleProd), 1)
         return out

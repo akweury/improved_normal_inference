@@ -50,9 +50,9 @@ def preprocessing(models):
 
     # load data file names
     if args.data == "synthetic":
-        path = config.synthetic_data_noise / "test_small" / "tensor"
+        path = config.synthetic_data_noise / "test" / "tensor"
     elif args.data == "real":
-        path = config.real_data / "test_tensor"  # key tests 103, 166, 189,9
+        path = config.real_data / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
         path = config.paper_pic
     else:
@@ -160,7 +160,8 @@ if __name__ == '__main__':
     # load test model names
     models = {
         # "SVD": None,
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint.pth.tar",
+        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint.pth.tar",
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1473.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",

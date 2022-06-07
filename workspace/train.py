@@ -94,14 +94,14 @@ class AngleAlbedoLoss(nn.Module):
         loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
 
         # light loss
-        light_target = target[:, 5:8, :, :]
-        light_output = outputs[:, 3:6, :, :]
-        l_diff = (light_output - light_target).permute(0, 2, 3, 1)[mask]
-        loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
+        # light_target = target[:, 5:8, :, :]
+        # light_output = outputs[:, 3:6, :, :]
+        # l_diff = (light_output - light_target).permute(0, 2, 3, 1)[mask]
+        # loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
 
         # N*L loss
         G_target = target[:, 3, :, :]
-        G_output = torch.sum(normal_out * light_target, dim=1)
+        G_output = outputs[:, 3, :, :]
         G_diff = (G_output - G_target)[mask]
         loss += torch.sum(G_diff ** 2) / (G_diff.size(0))
 
@@ -267,6 +267,7 @@ class TrainingModel():
         self.print_info(args)
         self.save_model()
         self.pretrained_weight = None
+        self.best_loss = 1e+20
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
@@ -437,6 +438,7 @@ def train_epoch(nn_model, epoch):
                             prefix="train")
             print(f"\t loss: {loss_0th:.2e}\t axis: {epoch % 3}")
 
+    # save loss
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses[epoch % 3, epoch] = loss_avg
     if nn_model.args.angle_loss:
@@ -447,6 +449,15 @@ def train_epoch(nn_model, epoch):
             angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
             nn_model.angle_sharp_losses[0, epoch] = angle_loss_sharp_avg
 
+    # indicate for best model saving
+    if nn_model.best_loss > loss_avg:
+        nn_model.best_loss = loss_avg
+        print(f'best loss updated to {loss_avg}.')
+        is_best = True
+    else:
+        is_best = False
+
+    # draw line chart
     if epoch % 10 == 9:
         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
                         log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
@@ -462,8 +473,10 @@ def train_epoch(nn_model, epoch):
             draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True, label="general",
                             epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
 
-    # ---------------------------------------------- visualisation -------------------------------------------
+    return is_best
 
+
+# ---------------------------------------------- visualisation -------------------------------------------
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
                     label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
@@ -631,13 +644,13 @@ def main(args, exp_dir, network, train_dataset):
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
-        train_epoch(nn_model, epoch)
+        is_best = train_epoch(nn_model, epoch)
 
         # Learning rate scheduler
         nn_model.lr_decayer.step()
 
         # Save checkpoint in case evaluation crashed
-        nn_model.save_checkpoint(False, epoch)
+        nn_model.save_checkpoint(is_best, epoch)
 
 
 if __name__ == '__main__':
