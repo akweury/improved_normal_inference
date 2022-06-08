@@ -255,13 +255,13 @@ class TrainingModel():
         self.output_folder = self.init_output_folder()
         self.optimizer = None
         self.parameters = None
+        self.losses = np.zeros((3, args.epochs))
+        self.angle_losses = np.zeros((1, args.epochs))
+        self.angle_sharp_losses = np.zeros((1, args.epochs))
         self.model = self.init_network(network)
         self.train_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
         self.loss = loss_dict[args.loss].to(self.device)
-        self.losses = np.zeros((3, args.epochs))
-        self.angle_losses = np.zeros((1, args.epochs))
-        self.angle_sharp_losses = np.zeros((1, args.epochs))
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
