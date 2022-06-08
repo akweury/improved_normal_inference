@@ -92,11 +92,12 @@ class AngleAlbedoLoss(nn.Module):
 
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
 
-        N_diff = torch.sum((outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask], dim=-1)
+        N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
         G_diff = (outputs[:, 3, :, :] - target[:, 3, :, :])[mask]
 
         diff_sum = torch.cat((N_diff, G_diff), -1)
-        loss = torch.sum(diff_sum ** 2) / (diff_sum.size(0) * 0.5)
+        loss = torch.sum(N_diff ** 2) / (N_diff.size(0) * 0.5)
+        loss += torch.sum(G_diff ** 2) / (G_diff.size(0) * 0.5)
 
         # light loss
         # light_target = target[:, 5:8, :, :]
