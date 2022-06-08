@@ -17,7 +17,7 @@ class LightNet(nn.Module):
         padding_size = (1, 1)
         stride = (1, 1)
 
-        channel_size_1 = 16
+        channel_size_1 = 32
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)

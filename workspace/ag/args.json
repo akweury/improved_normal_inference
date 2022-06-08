@@ -4,7 +4,7 @@
   "exp": "ag",
   "resume": null,
   "epochs": 10001,
-  "optimizer": "adam",
+  "optimizer": "sgd",
   "lr": 0.001,
   "lr_scheduler": "9999",
   "momentum": 0.9,
