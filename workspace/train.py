@@ -82,16 +82,21 @@ class AngleAlbedoLoss(nn.Module):
 
     def forward(self, outputs, target, args):
         # normal l2 loss
-        normal_out = outputs[:, :3, :, :]
-        normals_target = target[:, :3, :, :]
-        mask_too_high = torch.gt(normal_out, 1).bool().detach()
-        mask_too_low = torch.lt(normal_out, -1).bool().detach()
-        normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
-        normal_out[mask_too_low] = normal_out[mask_too_low] * args.penalty
-        mask = torch.sum(torch.abs(normals_target), dim=1) > 0
-        axis = args.epoch % 3
-        axis_diff = (normal_out - normals_target)[:, axis, :, :][mask]
-        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
+        # normal_out = outputs[:, :3, :, :]
+        # normals_target = target[:, :3, :, :]
+        # mask_too_high = torch.gt(normal_out, 1).bool().detach()
+        # mask_too_low = torch.lt(normal_out, -1).bool().detach()
+        # normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
+        # normal_out[mask_too_low] = normal_out[mask_too_low] * args.penalty
+        # axis = args.epoch % 3
+
+        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+
+        N_diff = torch.sum((outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask], dim=-1)
+        G_diff = (outputs[:, 3, :, :] - target[:, 3, :, :])[mask]
+
+        diff_sum = torch.cat((N_diff, G_diff), -1)
+        loss = torch.sum(diff_sum ** 2) / (diff_sum.size(0) * 0.5)
 
         # light loss
         # light_target = target[:, 5:8, :, :]
@@ -100,10 +105,8 @@ class AngleAlbedoLoss(nn.Module):
         # loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
 
         # N*L loss
-        G_target = target[:, 3, :, :]
-        G_output = outputs[:, 3, :, :]
-        G_diff = (G_output - G_target)[mask]
-        loss += torch.sum(G_diff ** 2) / (G_diff.size(0))
+        # G_target = target[:, 3, :, :]
+        # G_output = outputs[:, 3, :, :]
 
         # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
         # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
@@ -420,11 +423,13 @@ def train_epoch(nn_model, epoch):
         # gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
 
-        if nn_model.args.angle_loss:
-            angle_loss_total = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
-            # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
-            if nn_model.args.exp == "degares":
-                angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to('cpu').detach().numpy()
+        if not nn_model.args.fast_train:
+            if nn_model.args.angle_loss:
+                angle_loss_total = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
+                # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
+                if nn_model.args.exp == "degares":
+                    angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to(
+                        'cpu').detach().numpy()
 
         # visualisation
         if i == 0:
@@ -448,13 +453,14 @@ def train_epoch(nn_model, epoch):
     # save loss
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
     nn_model.losses[epoch % 3, epoch] = loss_avg
-    if nn_model.args.angle_loss:
-        angle_loss_avg = angle_loss_total.to("cpu")
-        nn_model.angle_losses[0, epoch] = angle_loss_avg
+    if not nn_model.args.fast_train:
+        if nn_model.args.angle_loss:
+            angle_loss_avg = angle_loss_total.to("cpu")
+            nn_model.angle_losses[0, epoch] = angle_loss_avg
 
-        if nn_model.args.exp == "degares":
-            angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
-            nn_model.angle_sharp_losses[0, epoch] = angle_loss_sharp_avg
+            if nn_model.args.exp == "degares":
+                angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
+                nn_model.angle_sharp_losses[0, epoch] = angle_loss_sharp_avg
 
     # indicate for best model saving
     if nn_model.best_loss > loss_avg:
@@ -658,7 +664,13 @@ def main(args, exp_dir, network, train_dataset):
         nn_model.lr_decayer.step()
 
         # Save checkpoint in case evaluation crashed
-        nn_model.save_checkpoint(is_best, epoch)
+        if nn_model.args.fast_train:
+            save_modulo = 100
+        else:
+            save_modulo = 1
+
+        if epoch % save_modulo == 0:
+            nn_model.save_checkpoint(is_best, epoch)
 
 
 if __name__ == '__main__':
