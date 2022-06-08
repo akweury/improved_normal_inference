@@ -303,7 +303,8 @@ class TrainingModel():
             checkpoint = torch.load(self.args.resume)
             self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
             model = checkpoint['model'].to(self.device)  # resume model
-            self.optimizer = checkpoint['optimizer']  # resume optimizer
+            # self.optimizer = checkpoint['optimizer']  # resume optimizer
+            self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
 
