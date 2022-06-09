@@ -17,26 +17,35 @@ class LightNet(nn.Module):
         padding_size = (1, 1)
         stride = (1, 1)
 
-        channel_size_1 = 8
+        channel_size_1 = 16
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting3 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting4 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting5 = nn.Conv2d(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting6 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
-        self.merge = nn.Conv2d(out_ch * 2, 1, kernel_size, stride, padding_size)
+        self.lsInpainting5 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting6 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting7 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting8 = nn.Conv2d(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
+        self.lsInpainting9 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
+        self.merge = nn.Conv2d(out_ch * 2, 3, kernel_size, stride, padding_size)
+        self.prod1 = nn.Conv2d(3, 1, kernel_size, stride, padding_size)
+        self.prod2 = nn.Conv2d(1, 1, kernel_size, stride, padding_size)
 
     def forward(self, lin, nin):
         L = self.lsInpainting1(lin)
         L = self.lsInpainting2(L)
         L = self.lsInpainting3(L)
         L = self.lsInpainting4(L)
-        L = self.active_leaky_relu(self.lsInpainting5(L))
-        xout_light = self.lsInpainting6(L)
+        L = self.lsInpainting5(L)
+        L = self.lsInpainting6(L)
+        L = self.lsInpainting7(L)
+        L = self.active_leaky_relu(self.lsInpainting8(L))
+        xout_light = self.lsInpainting9(L)
 
-        scaleProd = self.merge(torch.cat((xout_light, nin), 1))
-
+        scaleProd = self.active_leaky_relu(self.merge(torch.cat((xout_light, nin), 1)))
+        scaleProd = self.active_leaky_relu(self.prod1(scaleProd))
+        scaleProd = self.prod2(scaleProd)
         return scaleProd
 
 
