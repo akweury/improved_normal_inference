@@ -5,7 +5,7 @@ from torch.nn.modules.conv import _ConvNd
 
 from common.ResNet import ResNet
 from common.ResNet import Bottleneck
-from common.nconv2d import NConv2d
+from common.NCNN import NConv2d
 
 
 # Normalized Convolution Layer
@@ -20,7 +20,7 @@ class NConv(_ConvNd):
         self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
         self.nconv = NConv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding)
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, dilation=dilation)
-        self.active = nn.LeakyReLU(0.01)
+        self.active = nn.ReLU()
 
     def forward(self, x, cin=None, n=False):
         if n:
@@ -36,7 +36,7 @@ class NConv(_ConvNd):
 class NormalizedNet(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
-        self.__name__ = 'nconv'
+        self.__name__ = 'ncnn'
         kernel_down = (3, 3)
         kernel_down_2 = (5, 5)
         kernel_up = (3, 3)

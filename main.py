@@ -1,16 +1,14 @@
 import config
-from help_funs.data_preprocess import noisy_a_folder, convert2training_tensor
-from workspace import train
-from pncnn.utils import args_parser
-
+import workspace.ag.network as ag
+import workspace.degares.network as degares
+import workspace.ncnn.network as ncnn
+import workspace.ng.network as ng
 import workspace.nnn.network as nnn
 import workspace.nnn24.network as nnn24
 import workspace.nnnn.network as nnnn
-import workspace.ng.network as ng
 import workspace.resng.network as resng
-import workspace.nconv.network as nconv
-import workspace.degares.network as degares
-import workspace.ag.network as ag
+from pncnn.utils import args_parser
+from workspace import train
 
 
 def main():
@@ -29,8 +27,8 @@ def main():
         model = ng.CNN()
     elif args.exp == "resng":
         model = resng.CNN()
-    elif args.exp == "nconv":
-        model = nconv.CNN()
+    elif args.exp == "ncnn":
+        model = ncnn.CNN(args.num_channels)
     elif args.exp == "degares":
         model = degares.CNN()
     elif args.exp == "ag":

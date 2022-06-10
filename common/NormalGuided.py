@@ -28,7 +28,7 @@ class GConv(_ConvNd):
 
 
 class NormalGuided(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch, channel_size_1=32):
         super().__init__()
         self.__name__ = 'ng'
         kernel_down = (3, 3)
@@ -52,8 +52,7 @@ class NormalGuided(nn.Module):
         self.active_img = nn.LeakyReLU(0.01)
 
         self.epsilon = 1e-20
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_2 = channel_size_1 * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         # branch 1

@@ -70,7 +70,7 @@ class VkittiDatasetWrapper(Dataset):
 # Load the KITII masks to use with vKITTI
 # TODO: Replace with something cleaner
 np.random.seed(0)
-random_masking_masks = [] #np.load('/ssd/code/nconv-gen-conf/scripts/generate_input_masks_from_kitti/train_masks_10k.np.npz')['masks']
+random_masking_masks = []  # np.load('/ssd/code/ncnn-gen-conf/scripts/generate_input_masks_from_kitti/train_masks_10k.np.npz')['masks']
 mask_idxs = np.random.randint(0, len(random_masking_masks), len(random_masking_masks))
 class RandomMasking(Transform):
     def __init__(self, transforms=[]):
@@ -265,7 +265,7 @@ class VKittiSample:
 
 
 def main():
-    exp_dir = '/home/abdel62/python_workspace/nconv-gen-conf/workspace/abdo/vkitti/exp_gen_conf'
+    exp_dir = '/home/abdel62/python_workspace/ncnn-gen-conf/workspace/abdo/vkitti/exp_gen_conf'
     # Read parameters file
     with open(os.path.join(exp_dir, 'params.json'), 'r') as fp:
         params = json.load(fp)
