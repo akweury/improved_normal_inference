@@ -599,7 +599,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-    elif exp_name == "ag":
+    elif exp_name in ["ag", "ncnn"]:
         # pred base normal
         xout_normal[mask] = 0
         xout_light[mask] = 0
@@ -622,6 +622,14 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         target_albedo = cv.normalize(target_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         target_albedo = cv.merge((target_albedo, target_albedo, target_albedo))
         output_list.append(mu.visual_img(target_albedo, "albedo_target"))
+
+        diff_albedo = np.abs(xout_albedo - target_albedo)
+        diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U),
+                                           cv.COLORMAP_HOT)
+        diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
+        mu.addText(diff_albedo_img, "Albedo_Error")
+        mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
+        output_list.append(diff_albedo_img)
 
     else:
         # pred normal
