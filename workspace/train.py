@@ -625,7 +625,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
 
     else:
         # pred normal
-        pred_normal = xout[:, :, :3]
+        pred_normal = xout_normal[:, :, :3]
         pred_normal = mu.filter_noise(pred_normal, threshold=[-1, 1])
         pred_img = mu.normal2RGB(pred_normal)
         pred_img[mask] = 0
