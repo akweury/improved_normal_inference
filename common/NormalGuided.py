@@ -2,33 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.conv import _ConvNd
-
-
-# Normalized Convolution Layer
-class GConv(_ConvNd):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=(1, 1),
-                 padding=(0, 0), dilation=(1, 1), groups=1, bias=True):
-        # Call _ConvNd constructor
-        super(GConv, self).__init__(in_channels, out_channels, kernel_size,
-                                    stride, padding, dilation, False, (0, 0),
-                                    groups, bias, padding_mode='zeros')
-
-        self.conv_g = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
-        self.conv_f = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
-
-        self.active_f = nn.LeakyReLU(0.01)
-        self.active_g = nn.Sigmoid()
-
-    def forward(self, x):
-        # Normalized Convolution
-        x_g = self.active_g(self.conv_g(x))
-        x_f = self.active_f(self.conv_f(x))
-        x = x_f * x_g
-        return x
+from common.Layers import GConv
 
 
 class NormalGuided(nn.Module):
-    def __init__(self, in_ch, out_ch, channel_size_1=32):
+    def __init__(self, in_ch, out_ch, channel_size_1):
         super().__init__()
         self.__name__ = 'ng'
         kernel_down = (3, 3)
@@ -117,12 +95,12 @@ class NormalGuided(nn.Module):
         x_img_4 = self.active_img(self.img_conv3(x_img_4))
 
         # dilated conv
-        x4 = self.dilated1(x4)
-        x4 = self.dilated2(x4)
-        x4 = self.dilated3(x4)
-        x4 = self.dilated4(x4)
-        x4 = self.dconv2(x4)
-        x4 = self.dconv3(x4)
+        # x4 = self.dilated1(x4)
+        # x4 = self.dilated2(x4)
+        # x4 = self.dilated3(x4)
+        # x4 = self.dilated4(x4)
+        # x4 = self.dconv2(x4)
+        # x4 = self.dconv3(x4)
 
         # merge image feature and vertex feature
         x4 = torch.cat((x4, x_img_4), 1)

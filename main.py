@@ -24,7 +24,7 @@ def main():
     # elif args.exp == "nnn24":
     #     model = nnn24.CNN()
     elif args.exp == "ng":
-        model = ng.CNN()
+        model = ng.CNN(args.num_channels)
     elif args.exp == "resng":
         model = resng.CNN()
     elif args.exp == "degares":

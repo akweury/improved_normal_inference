@@ -8,12 +8,12 @@ from common.NormalGuided import NormalGuided
 
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, channel_num):
         super().__init__()
         self.__name__ = 'ng'
 
         # input confidence estimation network
-        self.nconv3_3 = NormalGuided(3, 3)
+        self.nconv3_3 = NormalGuided(3, 3, channel_size_1=channel_num)
 
     def forward(self, x):
         # x0: vertex array

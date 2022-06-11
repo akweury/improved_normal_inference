@@ -158,15 +158,15 @@ def start(models_path_dict):
 
 if __name__ == '__main__':
     # load test model names
+
     models = {
         # "SVD": None,
-        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint.pth.tar",
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-2600.pth.tar",
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",
+        # "AG2": config.ws_path / "ag" / "trained_model" / "checkpoint-2600.pth.tar",
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-        "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar"
+        # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar"
 
     }
-
     start(models)
