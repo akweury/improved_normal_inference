@@ -40,6 +40,7 @@ def args_parser():
 
     parser.add_argument('--neighbor', type=int, default=2, help='the neighbors will be considered')
     parser.add_argument('--machine', type=str, default="local", help='choose the training machin, local or remote')
+    parser.add_argument('--num_channels', type=int, help='choose the number of channels in the model')
     parser.add_argument('--output_type', type=str, default="normal",
                         help='choose the meaning of output tensor, rgb or normal')
 
