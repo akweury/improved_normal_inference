@@ -95,8 +95,8 @@ class AngleAlbedoLoss(nn.Module):
         N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
         G_diff = (outputs[:, 3, :, :] - target[:, 3, :, :])[mask]
 
-        loss = torch.sum(N_diff ** 2) / (N_diff.size(0) * 0.5)
-        loss += torch.sum(G_diff ** 2) / (G_diff.size(0) * 0.5)
+        loss = torch.sum(N_diff ** 2) / N_diff.size(0)
+        loss += torch.sum(G_diff ** 2) / G_diff.size(0)
 
         # light loss
         # light_target = target[:, 5:8, :, :]
@@ -155,7 +155,7 @@ class L1Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, outputs, target, *args):
+    def forward(self, outputs, target):
         outputs = outputs[:, :3, :, :]
         return F.l1_loss(outputs, target)
 

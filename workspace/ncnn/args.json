@@ -3,7 +3,7 @@
   "output_type": "normal_noise",
   "cout": true,
   "exp": "ncnn",
-  "num_channels": 4,
+  "num_channels": 32,
   "workspace": "",
   "resume": null,
   "gpu": 2,
