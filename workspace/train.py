@@ -57,6 +57,7 @@ class AngleLoss(nn.Module):
 
     def forward(self, outputs, target, args):
         outputs = outputs[:, :3, :, :]
+        target = target[:, :3, :, :]
         mask_too_high = torch.gt(outputs, 1).bool().detach()
         mask_too_low = torch.lt(outputs, -1).bool().detach()
         outputs[mask_too_high] = outputs[mask_too_high] * args.penalty

@@ -5,7 +5,7 @@ from torch.nn.modules.conv import _ConvNd
 
 from common.ResNet import ResNet
 from common.ResNet import Bottleneck
-from common.GConv import GConv
+from common.Layers import GConv
 
 
 class UNet(nn.Module):

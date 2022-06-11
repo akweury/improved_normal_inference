@@ -3,7 +3,7 @@ import workspace.ag.network as ag
 import workspace.degares.network as degares
 import workspace.ncnn.network as ncnn
 import workspace.ng.network as ng
-import workspace.nnn.network as nnn
+import workspace.sconv.network as nnn
 import workspace.nnn24.network as nnn24
 import workspace.nnnn.network as nnnn
 import workspace.resng.network as resng
@@ -17,8 +17,8 @@ def main():
     # config experiments
     exp_path = config.ws_path / args.exp
 
-    if args.exp == "nnn":
-        model = nnn.CNN()
+    if args.exp == "sconv":
+        model = nnn.CNN(args.num_channels)
     elif args.exp == "nnn24":
         model = nnn24.CNN()
     elif args.exp == "nnnn":
