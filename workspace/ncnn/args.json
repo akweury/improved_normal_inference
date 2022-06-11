@@ -12,7 +12,7 @@
   "workers": 1,
   "epochs": 100001,
   "optimizer": "adam",
-  "lr": 0.0001,
+  "lr": 0.001,
   "lr_scheduler": "99999",
   "momentum": 0.9,
   "loss": "angleLight",
