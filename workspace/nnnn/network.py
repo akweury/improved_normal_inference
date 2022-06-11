@@ -3,11 +3,11 @@ from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
-import torch
 import torch.nn as nn
 from common.NormalizedNNN import NormalizedNNN
+
+
 # from common.Nconv import NormalizedNet
-from help_funs import mu
 
 
 class CNN(nn.Module):
@@ -20,5 +20,5 @@ class CNN(nn.Module):
 
     def forward(self, x0):
         # x0: vertex array
-        xout = self.nconv3_3(x0)
+        xout = self.nconv3_3(x0[:, :3, :, :])
         return xout

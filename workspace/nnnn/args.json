@@ -1,7 +1,7 @@
 {
   "machine": "local",
   "output_type": "normal_noise",
-  "neighbor": 1,
+  "neighbor": 0,
   "exp": "nnnn",
   "workspace": "",
   "resume": null,
