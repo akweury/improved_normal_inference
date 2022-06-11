@@ -27,16 +27,7 @@ def evaluate_epoch(args, model, input_tensor, device):
         # store the predicted normal
         output = output[0, :].permute(1, 2, 0)
         output = output.to('cpu').numpy()
-
-    if args.exp == "degares":
-        normal = output[:, :, :3] + output[:, :, 3:6]
-        normal = mu.filter_noise(normal, threshold=[-1, 1])
-    else:
-        normal = mu.filter_noise(output[:, :, :3], threshold=[-1, 1])
-
-    # normal_8bit = np.ascontiguousarray(normal_8bit, dtype=np.uint8)
-
-    return normal
+    return output
 
 
 def preprocessing(models):
@@ -92,13 +83,16 @@ def start(models_path_dict):
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         gt = mu.tenor2numpy(gt_tensor[:, :3, :, :])
+        light_gt = mu.tenor2numpy(gt_tensor[:, 5:8, :, :])
         vertex_0 = mu.tenor2numpy(test_0_tensor[:, :3, :, :])[:, :, :3]
         img_0 = mu.tenor2numpy(test_0_tensor[:, 3:4, :, :])
         mask = gt.sum(axis=2) == 0
         mask_input = vertex_0.sum(axis=2) == 0
+        rho_gt = mu.albedo(img_0, gt, light_gt)
 
-        img_list, diff_list, albedo_list = [mu.visual_vertex(vertex_0, "Input(Vertex)"),
-                                            mu.visual_normal(gt, "GT")], [], []
+        img_list, diff_list, albedo_list, albedo_diff_list = [mu.visual_vertex(vertex_0, "Input(Vertex)"),
+                                                              mu.visual_normal(gt, "GT")], [], [
+                                                                 mu.visual_albedo(rho_gt, 'GT')], []
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
 
@@ -119,23 +113,32 @@ def start(models_path_dict):
                 model = checkpoint['model'].to(device)
                 k = args.neighbor
 
-                if k == 0:
-                    if args.exp == "ag":
-                        normal = evaluate_epoch(args, model, test_0_tensor, device)
-                    else:
-                        normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
-                elif k == 1:
+                if args.exp == "ag":
+                    xout = evaluate_epoch(args, model, test_0_tensor, device)
+                    normal = xout[:, :, :3]
+                    light = xout[:, :, 3:6]
+                    rho = mu.albedo(img_0, normal, light)
+                    albedo_list.append(mu.visual_albedo(rho, name))
+
+                    # visual albedo error
+                    diff_albedo = np.abs(np.uint8(rho) - np.uint8(rho_gt))
+                    diff_albedo_img = cv.applyColorMap(
+                        cv.normalize(diff_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U),
+                        cv.COLORMAP_HOT)
+                    diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
+                    mu.addText(diff_albedo_img, name)
+                    mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
+                    albedo_diff_list.append(diff_albedo_img)
+
+
+                elif args.exp == "ng":
+                    normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
+                elif args.exp == "nnnn":
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                 else:
                     raise ValueError
             # visual normal
-            # normal[mask_input] = 0
             img_list.append(mu.visual_normal(normal, name))
-
-            # albedo
-            L = mu.vertex2light_direction(vertex_0, test_0['light_source'])
-            rho = mu.albedo(img_0, normal, L)
-            albedo_list.append(mu.visual_albedo(rho, name))
 
             # visual error
             gt[mask_input] = 0
@@ -148,10 +151,12 @@ def start(models_path_dict):
         output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
         output_diff = cv.hconcat(diff_list)
         output_albedo = cv.hconcat(albedo_list)
+        output_diff_albedo = cv.hconcat(albedo_diff_list)
 
         cv.imwrite(str(folder_path / f"eval_{i}_normal.png"), output)
         cv.imwrite(str(folder_path / f"eval_{i}_error.png"), output_diff)
         cv.imwrite(str(folder_path / f"eval_{i}_albedo.png"), output_albedo)
+        cv.imwrite(str(folder_path / f"eval_{i}_albedo_error.png"), output_diff_albedo)
 
         print(f"{data_idx} has been evaluated.")
 

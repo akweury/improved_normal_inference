@@ -33,7 +33,7 @@ def main():
     elif args.exp == "ncnn":
         model = ncnn.CNN(args.num_channels)
     elif args.exp == "ag":
-        model = ag.CNN()
+        model = ag.CNN(args.num_channels)
     else:
         raise ValueError("Unknown exp path")
 

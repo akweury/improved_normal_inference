@@ -10,14 +10,14 @@ from common.AlbedoGatedNNN import GConv
 
 
 class LightNet(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         self.__name__ = 'lignet'
         kernel_size = (3, 3)
         padding_size = (1, 1)
         stride = (1, 1)
 
-        channel_size_1 = 16
+        channel_size_1 = channel_num
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
@@ -50,15 +50,15 @@ class LightNet(nn.Module):
 
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, channel_num):
         super().__init__()
         self.__name__ = 'ag'
 
-        self.agconv3_3 = AlbedoGatedNNN(3, 3)
+        self.agconv3_3 = AlbedoGatedNNN(3, 3, channel_num)
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.active_sigmoid = nn.Sigmoid()
 
-        self.lightInpainting = LightNet(3, 3)
+        self.lightInpainting = LightNet(3, 3, channel_num)
 
         self.nl_layer = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
         self.rho_layer = GConv(2, 1, (3, 3), (1, 1), (1, 1))

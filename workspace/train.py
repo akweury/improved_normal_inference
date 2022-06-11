@@ -277,6 +277,7 @@ class TrainingModel():
         self.parameters = None
         self.losses = np.zeros((3, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
+        self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
         self.model = self.init_network(network)
         self.train_loader = self.create_dataloader(dataset_path)
@@ -414,7 +415,8 @@ def train_epoch(nn_model, epoch):
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
-    angle_loss_total = torch.tensor([0.0])
+    angle_loss_avg = torch.tensor([0.0])
+    angle_loss_avg_light = torch.tensor([0.0])
     angle_loss_sharp_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -442,11 +444,9 @@ def train_epoch(nn_model, epoch):
 
         if not nn_model.args.fast_train:
             if nn_model.args.angle_loss:
-                angle_loss_total = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
+                angle_loss_avg = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
+                angle_loss_avg_light = mu.eval_albedo_tensor(out[:, 3, :, :], target[:, 3, :, :])
                 # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
-                if nn_model.args.exp == "degares":
-                    angle_loss_sharp_total += mu.output_radians_loss(out[:, 3:6, :, :], target).to(
-                        'cpu').detach().numpy()
 
         # visualisation
         if i == 0:
@@ -472,8 +472,10 @@ def train_epoch(nn_model, epoch):
     nn_model.losses[epoch % 3, epoch] = loss_avg
     if not nn_model.args.fast_train:
         if nn_model.args.angle_loss:
-            angle_loss_avg = angle_loss_total.to("cpu")
+            angle_loss_avg = angle_loss_avg.to("cpu")
+            angle_loss_avg_light = angle_loss_avg_light.to("cpu")
             nn_model.angle_losses[0, epoch] = angle_loss_avg
+            nn_model.angle_losses_light[0, epoch] = angle_loss_avg_light
 
             if nn_model.args.exp == "degares":
                 angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
@@ -496,13 +498,11 @@ def train_epoch(nn_model, epoch):
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
                         log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True, title="Loss")
         if nn_model.args.angle_loss:
-            if nn_model.args.exp == "degares":
-                draw_line_chart(np.array([nn_model.angle_sharp_losses[0]]), nn_model.output_folder, log_y=True,
-                                label="detail", epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle")
-
-            draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True, label="general",
+            draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True, label="normal",
+                            epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle")
+            draw_line_chart(np.array([nn_model.angle_losses_light[0]]), nn_model.output_folder, log_y=True,
+                            label="albedo",
                             epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
-
     return is_best
 
 
@@ -631,21 +631,22 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         xout_albedo = np.uint8(target_img / (np.sum(xout_normal * xout_light, axis=-1) + 1e-20))
         xout_albedo = cv.normalize(xout_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         xout_albedo = cv.merge((xout_albedo, xout_albedo, xout_albedo))
-        output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
 
         # albedo ground truth visualization
         target_albedo = target_img / (np.sum(target_normal * target_light, axis=-1) + 1e-20)
         target_albedo = np.uint8(target_albedo)
         target_albedo = cv.normalize(target_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         target_albedo = cv.merge((target_albedo, target_albedo, target_albedo))
-        output_list.append(mu.visual_img(target_albedo, "albedo_target"))
 
-        diff_albedo = np.abs(xout_albedo - target_albedo)
+        diff_albedo = np.abs(np.uint8(xout_albedo) - np.uint8(target_albedo))
         diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U),
                                            cv.COLORMAP_HOT)
         diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
         mu.addText(diff_albedo_img, "Albedo_Error")
         mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
+
+        output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
+        output_list.append(mu.visual_img(target_albedo, "albedo_target"))
         output_list.append(diff_albedo_img)
 
     else:

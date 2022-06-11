@@ -28,7 +28,7 @@ class GConv(_ConvNd):
 
 
 class AlbedoGatedNNN(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         self.__name__ = 'ag'
         kernel_down = (3, 3)
@@ -43,8 +43,8 @@ class AlbedoGatedNNN(nn.Module):
         dilate3 = (8, 8)
         dilate4 = (16, 16)
 
-        channel_size_1 = 32
-        channel_size_2 = 64
+        channel_size_1 = channel_num
+        channel_size_2 = channel_num * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
         self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
         self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)

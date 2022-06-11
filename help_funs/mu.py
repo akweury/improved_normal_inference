@@ -877,6 +877,13 @@ def eval_angle_tensor(output, target):
     return loss_avg
 
 
+def eval_albedo_tensor(output, target):
+    mask = (~torch.prod(output == 0, -1).bool()).unsqueeze(1)
+    loss = torch.sum(torch.abs(output - target)) / mask.sum()
+
+    return loss
+
+
 def angle2rgb(angle_matrix):
     angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_HOT)
