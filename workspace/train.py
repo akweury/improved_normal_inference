@@ -77,6 +77,21 @@ class AngleLoss(nn.Module):
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
 
 
+class AngleLightLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, args):
+        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+
+        N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
+        l_diff = (outputs[:, 3:6, :, :] - target[:, 5:8, :, :]).permute(0, 2, 3, 1)[mask]
+        loss = torch.sum(N_diff ** 2) / N_diff.size(0)
+        loss += torch.sum(l_diff ** 2) / l_diff.size(0)
+
+        return loss
+
+
 class AngleAlbedoLoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -191,6 +206,7 @@ loss_dict = {
     'angle': AngleLoss(),
     'angle_detail': AngleDetailLoss(),
     'angleAlbedo': AngleAlbedoLoss(),
+    'angleLight': AngleLightLoss(),
 }
 
 

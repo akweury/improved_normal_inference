@@ -2,7 +2,6 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "sconv",
-  "num_channels": 4,
   "resume": null,
   "epochs": 100001,
   "optimizer": "adam",

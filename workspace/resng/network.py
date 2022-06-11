@@ -26,12 +26,5 @@ class CNN(nn.Module):
         c0 = mu.binary(x_vertex).to(device)
 
         xout, cout = self.nconv3_3(x_vertex, x_img, c0)
-        # TODO: if any element of cout is less than a threshold epsilon, set it to 0.
         out = torch.cat((xout, cout, x_img), 1)
         return out
-
-    def minor_filter(self, tensor):
-        eps = 0.01
-        tensor[tensor < eps] = 0
-
-        return tensor

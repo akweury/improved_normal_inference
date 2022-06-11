@@ -94,14 +94,6 @@ class NormalizedNNN(nn.Module):
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
-        # # dilated conv
-        # x4 = self.dilated1(x4)
-        # x4 = self.dilated2(x4)
-        # x4 = self.dilated3(x4)
-        # x4 = self.dilated4(x4)
-        # x4 = self.dconv2(x4)
-        # x4 = self.dconv3(x4)
-
         # Upsample 1
         x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
         x3 = self.uconv1(torch.cat((x3, x3_us), 1))
