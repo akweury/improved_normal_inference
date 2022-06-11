@@ -20,6 +20,8 @@ parser.add_argument('--data', type=str, default="synthetic", choices=['synthetic
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0,1",
                     help="loading dataset from local or dfki machine")
+parser.add_argument('--noise', type=str, default="true",
+                    help="add noise to the dataset")
 parser.add_argument('--clear', type=str, default="false",
                     help="flag that is used to clear old dataset")
 
@@ -32,11 +34,10 @@ def convert2training_tensor(path, k, output_type='normal'):
     if not os.path.exists(str(path / "tensor")):
         os.makedirs(str(path / "tensor"))
     if output_type == "normal_noise":
-        if path == config.real_data:
-            depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
-        else:
-            depth_files = np.array(sorted(glob.glob(str(path / "*depth0_noise.png"), recursive=True)))
-            depth_gt_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+        depth_files = np.array(sorted(glob.glob(str(path / "*depth0_noise.png"), recursive=True)))
+        depth_gt_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+    elif output_type == "normal":
+        depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
     else:
         raise ValueError("output_file is not supported. change it in args.json")
 
@@ -56,12 +57,12 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
-        if path == config.real_data:
-            depth_gt = depth.copy()
-        else:
+        if output_type == "normal_noise":
             depth_gt = file_io.load_scaled16bitImage(depth_gt_files[item],
                                                      data['minDepth'],
                                                      data['maxDepth'])
+        else:
+            depth_gt = depth
         mask = depth.sum(axis=2) == 0
         mask_gt = depth_gt.sum(axis=2) == 0
 
@@ -163,20 +164,31 @@ if args.data == "synthetic":
             dataset_folder = config.synthetic_data_noise / folder
         else:
             raise ValueError
-        noisy_a_folder(original_folder, dataset_folder)
-        if not os.path.exists(str(dataset_folder / "tensor")):
-            os.makedirs(str(dataset_folder / "tensor"))
-        if args.clear == "true":
-            print("remove the old dataset...")
-            shutil.rmtree(str(dataset_folder / "tensor"))
-        for k in args.max_k.split(','):
-            print(f"K = {k}, {dataset_folder}")
-            convert2training_tensor(dataset_folder, k=int(k), output_type="normal_noise")
+        if args.noise == "true":
+            noisy_a_folder(original_folder, dataset_folder)
+            if not os.path.exists(str(dataset_folder / "tensor")):
+                os.makedirs(str(dataset_folder / "tensor"))
+            if args.clear == "true":
+                print("remove the old dataset...")
+                shutil.rmtree(str(dataset_folder / "tensor"))
+            for k in args.max_k.split(','):
+                print(f"K = {k}, {dataset_folder}")
+                convert2training_tensor(dataset_folder, k=int(k), output_type="normal_noise")
+        else:
+            if not os.path.exists(str(original_folder / "tensor")):
+                os.makedirs(str(original_folder / "tensor"))
+            if args.clear == "true":
+                print("remove the old dataset...")
+                shutil.rmtree(str(original_folder / "tensor"))
+            for k in args.max_k.split(','):
+                print(f"K = {k}, {original_folder}")
+                convert2training_tensor(original_folder, k=int(k), output_type="normal")
+
 
 elif args.data == "real":
     dataset_folder = config.real_data
     for k in args.max_k.split(','):
         print(f"K = {k}, {dataset_folder}")
-        convert2training_tensor(dataset_folder, k=int(k), output_type="normal_noise")
+        convert2training_tensor(dataset_folder, k=int(k), output_type="normal")
 else:
     raise ValueError

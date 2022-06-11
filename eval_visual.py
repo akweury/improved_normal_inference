@@ -40,8 +40,10 @@ def preprocessing(models):
     args = parser.parse_args()
 
     # load data file names
-    if args.data == "synthetic":
+    if args.data == "synthetic_noise":
         path = config.synthetic_data_noise / "test" / "tensor"
+    elif args.data == "synthetic":
+        path = config.synthetic_data / "test" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
         path = config.real_data / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
@@ -100,7 +102,9 @@ def start(models_path_dict):
 
             # load model
             if name == "SVD":
-                normal = svd.eval_single(vertex_0, farthest_neighbour=2)
+                print(f'- model {name} evaluation...')
+                camPos = torch.tensor(test_0['t'])
+                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
 
             else:
                 checkpoint = torch.load(model)
@@ -112,11 +116,11 @@ def start(models_path_dict):
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
                 k = args.neighbor
-
                 if args.exp == "ag":
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
                     normal = xout[:, :, :3]
                     light = xout[:, :, 3:6]
+                    light[mask] = 0
                     rho = mu.albedo(img_0, normal, light)
                     albedo_list.append(mu.visual_albedo(rho, name))
 
@@ -137,6 +141,9 @@ def start(models_path_dict):
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                 else:
                     raise ValueError
+
+            normal[mask] = 0
+
             # visual normal
             img_list.append(mu.visual_normal(normal, name))
 
@@ -161,17 +168,94 @@ def start(models_path_dict):
         print(f"{data_idx} has been evaluated.")
 
 
+def start2(models_path_dict):
+    models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names = preprocessing(models_path_dict)
+    test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
+
+    # iterate evaluate images
+    for i, data_idx in enumerate(all_names):
+        # read data
+        test_0 = torch.load(test_0_data[i])
+
+        # unpack model
+        test_0_tensor = test_0['input_tensor'].unsqueeze(0)
+        gt_tensor = test_0['gt_tensor'].unsqueeze(0)
+        gt = mu.tenor2numpy(gt_tensor[:, :3, :, :])
+        light_gt = mu.tenor2numpy(gt_tensor[:, 5:8, :, :])
+        vertex_0 = mu.tenor2numpy(test_0_tensor[:, :3, :, :])[:, :, :3]
+        img_0 = mu.tenor2numpy(test_0_tensor[:, 3:4, :, :])
+        mask = gt.sum(axis=2) == 0
+        mask_input = vertex_0.sum(axis=2) == 0
+        rho_gt = mu.albedo(img_0, gt, light_gt)
+
+        img_8bit = cv.normalize(np.uint8(img_0), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        img = cv.merge((img_8bit, img_8bit, img_8bit))
+
+        input_list, gt_list, output_list, error_list = [mu.visual_img(img, "Image"),
+                                                        mu.visual_vertex(vertex_0, "Input(Vertex)")], [
+                                                           mu.visual_normal(gt, "GT")], [], []
+        # evaluate CNN models
+        for model_idx, (name, model) in enumerate(models.items()):
+
+            # normal, img, _, _ = evaluate(test_0_tensor, test_1_tensor, model, ~mask)
+
+            # load model
+            if name == "SVD":
+                print(f'- model {name} evaluation...')
+                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+
+            else:
+                checkpoint = torch.load(model)
+                args = checkpoint['args']
+                start_epoch = checkpoint['epoch']
+                print(f'- model {name} evaluation...')
+
+                # load model
+                device = torch.device("cuda:0")
+                model = checkpoint['model'].to(device)
+                k = args.neighbor
+                if args.exp == "ng":
+                    normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
+                elif args.exp == "nnnn":
+                    normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
+                else:
+                    raise ValueError
+
+            normal[mask] = 0
+
+            # visual normal
+            output_list.append(mu.visual_normal(normal, name))
+
+            # visual error
+            gt[mask_input] = 0
+            diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+            diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+            error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff)))
+            eval_res[model_idx, i] = diff
+
+        # save the results
+
+        output = cv.cvtColor(cv.vconcat(output_list), cv.COLOR_RGB2BGR)
+        gt = cv.cvtColor(cv.hconcat(gt_list), cv.COLOR_RGB2BGR)
+        left = mu.vconcat_resize([mu.hconcat_resize(input_list), gt])
+        right = mu.hconcat_resize([mu.vconcat_resize([output]), mu.vconcat_resize(error_list)])
+        im_tile_resize = mu.hconcat_resize([left, right])
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}.png"), im_tile_resize)
+
+        print(f"{data_idx} has been evaluated.")
+
+
 if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
+        "SVD": None,
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",
+        # "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",
         # "AG2": config.ws_path / "ag" / "trained_model" / "checkpoint-2600.pth.tar",
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar"
 
     }
-    start(models)
+    start2(models)

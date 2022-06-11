@@ -13,7 +13,7 @@ class CNN(nn.Module):
         self.__name__ = 'ng'
 
         # input confidence estimation network
-        self.nconv3_3 = NormalGuided(3, 3, channel_size_1=channel_num)
+        self.nconv3_3 = NormalGuided(3, 3, channel_num=channel_num)
 
     def forward(self, x):
         # x0: vertex array

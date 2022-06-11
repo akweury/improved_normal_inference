@@ -43,6 +43,7 @@ def angle_between_tensor(v1, v2):
     deg[deg > 90] = 180 - deg[deg > 90]
     return deg.float()
 
+
 def vertex2light_direction(vertex_map, light_sorce):
     light_direction = light_sorce - vertex_map
     light_direction_map = light_direction / np.linalg.norm(light_direction, ord=2, axis=2, keepdims=True)
@@ -355,12 +356,12 @@ def normalize2_16bit(img):
 
 
 def normal_point2view_point(normal, point, view_point):
-    if np.dot(normal, (point - view_point)) > 0:
+    if np.dot(normal, (point - view_point.reshape(3))) > 0:
         normal = -normal
     return normal
 
 
-def compute_normal(vertex, mask, k):
+def compute_normal(vertex, cam_pos, mask, k):
     normals = np.zeros(shape=vertex.shape)
     for i in range(k, vertex.shape[0]):
         for j in range(k, vertex.shape[1]):
@@ -377,7 +378,7 @@ def compute_normal(vertex, mask, k):
 
                 u, s, vh = np.linalg.svd(plane_vectors)
                 normal = vh.T[:, -1]
-                normal = normal_point2view_point(normal, vertex[i][j], np.array([0, 0, 0]))
+                normal = normal_point2view_point(normal, vertex[i][j], -cam_pos)
                 if np.linalg.norm(normal) != 1:
                     normal = normal / np.linalg.norm(normal)
                 normals[i, j] = normal
@@ -506,21 +507,21 @@ def depth2vertex(depth, K, R, t):
     return np.array(vertex)
 
 
-def vertex2normal(vertex, k_idx):
+def vertex2normal(vertex, cam_pos, k_idx):
     mask = np.sum(np.abs(vertex), axis=2) != 0
-    normals = compute_normal(vertex, mask, k_idx)
+    normals = compute_normal(vertex, cam_pos, mask, k_idx)
     normals_rgb = normal2RGB(normals)
     return normals, normals_rgb
 
 
-def depth2normal(depth, k_idx, K, R, t):
+def depth2normal(depth, cam_pos, k_idx, K, R, t):
     if depth.ndim == 2:
         depth = np.expand_dims(depth, axis=2)
     vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                           torch.tensor(K),
                           torch.tensor(R).float(),
                           torch.tensor(t).float())
-    return vertex2normal(vertex, k_idx)
+    return vertex2normal(vertex, cam_pos, k_idx)
 
 
 # -------------------------------------- openCV Utils ------------------------------------------
@@ -619,7 +620,7 @@ def concat_vh(list_2d):
                        for list_h in list_2d])
 
 
-def vconcat_resize(img_list, interpolation):
+def vconcat_resize(img_list, interpolation=cv.INTER_CUBIC):
     w_min = min(img.shape[1] for img in img_list)
     im_list_resize = [cv.resize(img,
                                 (w_min, int(img.shape[0] * w_min / img.shape[1])), interpolation=interpolation)
@@ -627,7 +628,7 @@ def vconcat_resize(img_list, interpolation):
     return cv.vconcat(im_list_resize)
 
 
-def hconcat_resize(img_list, interpolation):
+def hconcat_resize(img_list, interpolation=cv.INTER_CUBIC):
     h_min = min(img.shape[0] for img in img_list)
     im_list_resize = [cv.resize(img,
                                 (int(img.shape[1] * h_min / img.shape[0]),
