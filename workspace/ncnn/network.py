@@ -5,7 +5,7 @@ sys.path.append(dirname(__file__))
 
 import torch
 import torch.nn as nn
-from common.NormalGuided import NormalGuided
+from common.NormalizedNNN2 import NormalizedNNN2
 from common.NCNN import NCNN
 
 
@@ -16,7 +16,7 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         self.lh = NCNN(3, 3, channel_num=channel_num)
-        self.normal = NormalGuided(3, 3, channel_num=channel_num)
+        self.normal = NormalizedNNN2(3, 3, channel_num=channel_num)
 
     def forward(self, x):
         # x0: vertex array
@@ -29,7 +29,7 @@ class CNN(nn.Module):
         c_in = mask.unsqueeze(1).float()
 
         l_out = self.lh(x_light, c_in)
-        n_out = self.normal(x_vertex, x_img)
+        n_out = self.normal(x_vertex)
 
         out = torch.cat((n_out, l_out), 1)
         return out

@@ -65,7 +65,7 @@ class NConv2d(_ConvNd):
         self.eps = 1e-20
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
         # self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
-        self.active_ReLU = nn.ReLU()
+        self.active_LeakyReLU = nn.LeakyReLU(0.01)
 
     def forward(self, data, conf):
 
@@ -84,8 +84,12 @@ class NConv2d(_ConvNd):
 
         # Add bias
         nconv += self.bias.view(1, self.bias.size(0), 1, 1).expand_as(nconv)
-        conf = torch.sum(conf, dim=1, keepdim=True)
         # Propagate confidence
         cout = F.max_pool2d(conf, self.kernel_size, self.stride, self.padding)
-        nconv = self.active_ReLU(nconv)
+        mask = torch.sum(cout, dim=1) > 0
+        cout = cout.permute(0, 2, 3, 1)
+        cout[mask] = 1
+        cout = cout.permute(0, 3, 1, 2)
+
+        nconv = self.active_LeakyReLU(nconv)
         return nconv, cout

@@ -82,7 +82,7 @@ class NCNN(nn.Module):
         c1_us = F.interpolate(c2, c1.size()[2:], mode='nearest')  # 512, 512
         x1, c1 = self.uconv3(torch.cat((x1, x1_us), 1), torch.cat((c1, c1_us), 1))
 
-        xout = self.conv1(x1)  # 512, 512
-        xout = self.conv2(xout)
+        xout = self.active_g(self.conv1(x1))  # 512, 512
+        xout = self.active_g(self.conv2(xout))
 
         return xout

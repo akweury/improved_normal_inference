@@ -421,6 +421,7 @@ def train_epoch(nn_model, epoch):
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target = input.to(nn_model.device), target.to(nn_model.device)
+
         # Wait for all kernels to finish
         torch.cuda.synchronize()
 
@@ -430,8 +431,16 @@ def train_epoch(nn_model, epoch):
         # Forward pass
         out = nn_model.model(input)
 
+        if nn_model.args.exp == "ncnn":
+            target[:, 5:8, :, :] = (target[:, 5:8, :, :] + 1) * 0.5
+            target[:, :3, :, :] = (target[:, :3, :, :] + 1) * 0.5
+
         # Compute the loss
         loss = nn_model.loss(out, target, nn_model.args)
+
+        if nn_model.args.exp == "ncnn":
+            target[:, 5:8, :, :] = (target[:, 5:8, :, :] * 2) - 1
+            target[:, :3, :, :] = (target[:, :3, :, :] * 2) - 1
 
         # Backward pass
         loss.backward()
@@ -554,6 +563,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
     xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
+
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
     #     cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
@@ -620,6 +630,9 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         # pred base normal
         xout_normal[mask] = 0
         xout_light[mask] = 0
+        if exp_name == "ncnn":
+            xout_normal = xout_normal * 2 - 1
+            xout_light = xout_light * 2 - 1
         normal_cnn_8bit = mu.visual_output(xout_normal, mask)
 
         mu.addText(normal_cnn_8bit, "output")
