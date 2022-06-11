@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.nn.modules.conv import _ConvNd
 
 
@@ -50,3 +52,40 @@ class Conv(_ConvNd):
             return self.active_ReLU(self.conv(x))
         else:
             raise ValueError
+
+
+# Normalized Convolution Layer
+class NConv2d(_ConvNd):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=(1, 1),
+                 padding=(1, 1), dilation=(1, 1), groups=1, bias=True):
+        # Call _ConvNd constructor
+        super(NConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, False, (0, 0),
+                                      groups, bias, padding_mode='zeros')
+
+        self.eps = 1e-20
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+        # self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+        self.active_ReLU = nn.ReLU()
+
+    def forward(self, data, conf):
+
+        channel_num = data.size(1)
+        if conf.size(1) == 1:
+            conf = conf.repeat(1, channel_num, 1, 1)
+        else:
+            conf_0 = conf[:, :1, :, :].repeat(1, channel_num // 2, 1, 1)
+            conf_1 = conf[:, 1:2, :, :].repeat(1, channel_num // 2, 1, 1)
+            conf = torch.cat((conf_0, conf_1), 1)
+
+        denom = self.conv(conf)
+        nomin = self.conv(data * conf)
+
+        nconv = nomin / (denom + self.eps)
+
+        # Add bias
+        nconv += self.bias.view(1, self.bias.size(0), 1, 1).expand_as(nconv)
+        conf = torch.sum(conf, dim=1, keepdim=True)
+        # Propagate confidence
+        cout = F.max_pool2d(conf, self.kernel_size, self.stride, self.padding)
+        nconv = self.active_ReLU(nconv)
+        return nconv, cout

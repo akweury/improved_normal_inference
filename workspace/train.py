@@ -633,8 +633,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         xout_albedo = cv.merge((xout_albedo, xout_albedo, xout_albedo))
 
         # albedo ground truth visualization
-        target_albedo = target_img / (np.sum(target_normal * target_light, axis=-1) + 1e-20)
-        target_albedo = np.uint8(target_albedo)
+        target_albedo = np.uint8(target_img / (np.sum(target_normal * target_light, axis=-1) + 1e-20))
         target_albedo = cv.normalize(target_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         target_albedo = cv.merge((target_albedo, target_albedo, target_albedo))
 

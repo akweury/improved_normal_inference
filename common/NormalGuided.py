@@ -6,7 +6,7 @@ from common.Layers import GConv
 
 
 class NormalGuided(nn.Module):
-    def __init__(self, in_ch, out_ch, channel_size_1):
+    def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         self.__name__ = 'ng'
         kernel_down = (3, 3)
@@ -30,33 +30,33 @@ class NormalGuided(nn.Module):
         self.active_img = nn.LeakyReLU(0.01)
 
         self.epsilon = 1e-20
-        channel_size_2 = channel_size_1 * 2
+        channel_size_2 = channel_num * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         # branch 1
-        self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+        self.dconv1 = GConv(in_ch, channel_num, kernel_down, stride, padding_down)
+        self.dconv2 = GConv(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.dconv3 = GConv(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.dconv4 = GConv(channel_num, channel_num, kernel_down, stride_2, padding_down)
 
-        self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate1)
-        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate2)
-        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate3)
-        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down, dilate4)
+        self.dilated1 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate1)
+        self.dilated2 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate2)
+        self.dilated3 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate3)
+        self.dilated4 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate4)
 
-        self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv4 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv1 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv2 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv3 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv4 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
 
-        self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv1 = nn.Conv2d(channel_num, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
         # branch 2
-        self.img_conv1 = nn.Conv2d(1, channel_size_1, kernel_down, stride, padding_down)
-        self.img_conv2 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.img_conv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.img_conv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+        self.img_conv1 = nn.Conv2d(1, channel_num, kernel_down, stride, padding_down)
+        self.img_conv2 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.img_conv3 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.img_conv4 = nn.Conv2d(channel_num, channel_num, kernel_down, stride_2, padding_down)
 
     def forward(self, x1, x_img_1):
         x1 = self.dconv1(x1)

@@ -22,6 +22,5 @@
   "lr_decay_step": 1,
   "lr_decay_factor": 0.1,
   "weight_decay": 0,
-  "print_freq": 100,
   "fast_train": true
 }

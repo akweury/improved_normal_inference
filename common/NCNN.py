@@ -1,83 +1,88 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.modules.conv import _ConvNd
+
+from common.Layers import NConv2d
 
 
 class NCNN(nn.Module):
-    def __init__(self, in_ch, out_ch, num_channels=64):
+    def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
-        self.__name__ = 'NCNN'
+        self.__name__ = 'ncnn'
+        kernel_down = (3, 3)
+        kernel_down_2 = (5, 5)
+        kernel_up = (3, 3)
+        kernel_up_2 = (5, 5)
+        padding_down = (1, 1)
+        padding_down_2 = (2, 2)
+        padding_up = (1, 1)
+        padding_up_2 = (2, 2)
+        stride = (1, 1)
+        stride_2 = (2, 2)
 
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
-        self.nconv1 = NConv2d(in_ch, num_channels, (3, 3))
-        self.nconv2 = NConv2d(num_channels, num_channels, (3, 3))
-        self.nconv3 = NConv2d(num_channels, num_channels, (3, 3))
-        self.nconv4 = NConv2d(num_channels, num_channels, (3, 3))
-        self.nconv5 = NConv2d(num_channels, num_channels, (3, 3))
+        dilate1 = (2, 2)
+        dilate2 = (4, 4)
+        dilate3 = (8, 8)
+        dilate4 = (16, 16)
 
-        self.conv1 = nn.Conv2d(num_channels, num_channels, (3, 3), padding=(1, 1))
-        self.conv2 = nn.Conv2d(num_channels, num_channels, (3, 3), padding=(1, 1))
-        self.conv3 = nn.Conv2d(num_channels, num_channels, (3, 3), padding=(1, 1))
-        self.conv4 = nn.Conv2d(num_channels, num_channels, (3, 3), padding=(1, 1))
-        self.conv5 = nn.Conv2d(num_channels, num_channels, (3, 3), padding=(1, 1))
+        self.active_f = nn.LeakyReLU(0.01)
+        self.active_g = nn.Sigmoid()
+        self.active_img = nn.LeakyReLU(0.01)
 
-        self.conv6 = nn.Conv2d(num_channels, out_ch, (1, 1))
+        self.epsilon = 1e-20
+        channel_size_2 = channel_num * 2
+        # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
-    def forward(self, x0, c0):
-        x1, c1 = self.nconv1(x0, c0)
-        x1 = self.relu(x1)
+        # branch 1
+        self.dconv1 = NConv2d(in_ch, channel_num, kernel_down, stride, padding_down)
+        self.dconv2 = NConv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.dconv3 = NConv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.dconv4 = NConv2d(channel_num, channel_num, kernel_down, stride_2, padding_down)
 
-        x1, c1 = self.nconv2(x1, c1)
-        x1 = self.relu(x1)
-        x1, c1 = self.nconv3(x1, c1)
-        x1 = self.relu(x1)
-        x1, c1 = self.nconv4(x1, c1)
-        x1 = self.relu(x1)
-        x1, c1 = self.nconv5(x1, c1)
-        x1 = self.relu(x1)
+        self.uconv1 = NConv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv2 = NConv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv3 = NConv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv4 = NConv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
 
-        x2 = self.relu(self.conv1(x1))
-        x2 = self.relu(self.conv2(x2))
-        x2 = self.relu(self.conv3(x2))
-        x2 = self.relu(self.conv4(x2))
-        x2 = self.relu(self.conv5(x2))
+        self.conv1 = nn.Conv2d(channel_num, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-        xout = self.sigmoid(self.conv6(x2))
+    def forward(self, x0, cin):
+        x1, c1 = self.dconv1(x0, cin)
+        x1, c1 = self.dconv2(x1, c1)
+        x1, c1 = self.dconv3(x1, c1)
 
-        return xout, c1
+        # Downsample 1
+        x2, c2 = self.dconv4(x1, c1)
+        x2, c2 = self.dconv2(x2, c2)
+        x2, c2 = self.dconv3(x2, c2)
 
+        # Downsample 2
+        x3, c3 = self.dconv4(x2, c2)
+        x3, c3 = self.dconv2(x3, c3)
+        x3, c3 = self.dconv3(x3, c3)
 
-# Normalized Convolution Layer
-class NConv2d(_ConvNd):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=(1, 1),
-                 padding=(1, 1), dilation=(1, 1), groups=1, bias=True):
-        # Call _ConvNd constructor
-        super(NConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, False, (0, 0),
-                                      groups, bias, padding_mode='zeros')
+        # Downsample 3
+        x4, c4 = self.dconv4(x3, c3)
+        x4, c4 = self.dconv2(x4, c4)
+        x4, c4 = self.dconv3(x4, c4)
 
-        self.eps = 1e-20
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
-        # self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+        # Upsample 1
+        x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
+        c3_us = F.interpolate(c4, c3.size()[2:], mode='nearest')  # 128,128
+        x3, c3 = self.uconv1(torch.cat((x3, x3_us), 1), torch.cat((c3, c3_us), 1))
 
-    def forward(self, data, conf):
-        # Normalized Convolution
-        # denom = F.conv2d(conf, self.weight, None, self.stride,
-        #                  self.padding, self.dilation, self.groups)
-        # nomin = F.conv2d(data * conf, self.weight, None, self.stride,
-        #                  self.padding, self.dilation, self.groups)
-        channel_num = data.size(1)
-        conf = conf.repeat(1, channel_num, 1, 1)
-        denom = self.conv(conf)
-        nomin = self.conv(data * conf)
+        # Upsample 2
+        x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
+        c2_us = F.interpolate(c3, c2.size()[2:], mode='nearest')
+        x2, c2 = self.uconv2(torch.cat((x2, x2_us), 1), torch.cat((c2, c2_us), 1))
 
-        nconv = nomin / (denom + self.eps)
+        # # Upsample 3
+        x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
+        c1_us = F.interpolate(c2, c1.size()[2:], mode='nearest')  # 512, 512
+        x1, c1 = self.uconv3(torch.cat((x1, x1_us), 1), torch.cat((c1, c1_us), 1))
 
-        # Add bias
-        nconv += self.bias.view(1, self.bias.size(0), 1, 1).expand_as(nconv)
-        conf = torch.sum(conf, dim=1, keepdim=True)
-        # Propagate confidence
-        cout = F.max_pool2d(conf, self.kernel_size, self.stride, self.padding)
+        xout = self.conv1(x1)  # 512, 512
+        xout = self.conv2(xout)
 
-        return nconv, cout
+        return xout
