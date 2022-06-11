@@ -80,7 +80,7 @@ class NormalGuided(nn.Module):
         self.img_conv3 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.img_conv4 = nn.Conv2d(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-    def forward(self, x1, x_img_1, cin):
+    def forward(self, x1, x_img_1):
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
@@ -143,4 +143,4 @@ class NormalGuided(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
 
-        return xout, cin
+        return xout

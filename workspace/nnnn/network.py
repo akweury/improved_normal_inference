@@ -11,20 +11,14 @@ from help_funs import mu
 
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, channel_num):
         super().__init__()
         self.__name__ = 'nnnn'
 
         # input confidence estimation network
-        self.nconv3_3 = NormalizedNNN(3, 3)
+        self.nconv3_3 = NormalizedNNN(3, 3, channel_num)
 
     def forward(self, x0):
         # x0: vertex array
-        # c0: confidence of each element in x0
-        device = x0.get_device()
-        c0 = mu.binary(x0).to(device)
-
-        xout, cout = self.nconv3_3(x0, c0)
-        out = torch.cat((xout, cout, x0), 1)
-        return out
-
+        xout = self.nconv3_3(x0)
+        return xout

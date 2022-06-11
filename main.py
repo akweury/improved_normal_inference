@@ -19,18 +19,19 @@ def main():
 
     if args.exp == "sconv":
         model = nnn.CNN(args.num_channels)
-    elif args.exp == "nnn24":
-        model = nnn24.CNN()
     elif args.exp == "nnnn":
-        model = nnnn.CNN()
+        model = nnnn.CNN(args.num_channels)
+    # elif args.exp == "nnn24":
+    #     model = nnn24.CNN()
     elif args.exp == "ng":
         model = ng.CNN()
     elif args.exp == "resng":
         model = resng.CNN()
-    elif args.exp == "ncnn":
-        model = ncnn.CNN(args.num_channels)
     elif args.exp == "degares":
         model = degares.CNN()
+
+    elif args.exp == "ncnn":
+        model = ncnn.CNN(args.num_channels)
     elif args.exp == "ag":
         model = ag.CNN()
     else:
