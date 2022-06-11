@@ -16,20 +16,19 @@ class CNN(nn.Module):
 
         # input confidence estimation network
         self.lh = NCNN(3, 3, channel_num=channel_num)
-        self.normal = NormalizedNNN2(3, 3, channel_num=channel_num)
+        self.normal = NCNN(3, 3, channel_num=channel_num)
 
     def forward(self, x):
         # x0: vertex array
         # c0: confidence of each element in x0
         x_vertex = x[:, :3, :, :]
-        x_img = x[:, 3:4, :, :]
         x_light = x[:, 4:7, :, :]
 
         mask = torch.sum(torch.abs(x[:, :3, :, :]), dim=1) > 0
         c_in = mask.unsqueeze(1).float()
 
         l_out = self.lh(x_light, c_in)
-        n_out = self.normal(x_vertex)
+        n_out = self.normal(x_vertex, c_in)
 
         out = torch.cat((n_out, l_out), 1)
         return out
