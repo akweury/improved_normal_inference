@@ -196,6 +196,9 @@ def start2(models_path_dict):
         input_list, output_list, error_list = [mu.visual_img(img, "Image"),
                                                mu.visual_vertex(vertex_0, "Input(Vertex)"),
                                                gt_img], [], []
+
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_point_cloud_noise.png"),
+                   mu.visual_vertex(vertex_0, ""))
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
 

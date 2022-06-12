@@ -1,8 +1,11 @@
+import json
+
+import cv2 as cv
 import numpy as np
 import torch
-import cv2 as cv
+
 import config
-from help_funs import file_io, mu
+from help_funs import file_io, mu, data_preprocess
 
 
 def test_torch():
@@ -31,5 +34,31 @@ def print_cuda_info():
 
 
 if __name__ == '__main__':
-    test_torch()
+    # test_torch()
     # print_cuda_info()
+    folder_path = config.paper_pic
+    depth_file = str(config.dataset / "data_synthetic" / "test" / "00601.depth0.png")
+    data_file = str(config.dataset / "data_synthetic" / "test" / "00601.data0.json")
+    img_file = str(config.dataset / "data_synthetic" / "test" / "00601.image0.png")
+
+    # input vertex
+    f = open(data_file)
+    data = json.load(f)
+    f.close()
+
+    depth = file_io.load_scaled16bitImage(depth_file,
+                                          data['minDepth'],
+                                          data['maxDepth'])
+
+    mask = depth.sum(axis=2) == 0
+
+    img = file_io.load_16bitImage(img_file)
+    img[mask] = 0
+    data['R'], data['t'] = np.identity(3), np.zeros(3)
+    vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
+                             torch.tensor(data['K']),
+                             torch.tensor(data['R']).float(),
+                             torch.tensor(data['t']).float())
+
+    vertex, scale_factors, shift_vector = data_preprocess.vectex_normalization(vertex, mask)
+    cv.imwrite(str(folder_path / f"fancy_eval_point_cloud.png"), mu.visual_vertex(vertex, ""))
