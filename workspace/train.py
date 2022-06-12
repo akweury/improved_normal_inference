@@ -562,7 +562,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
     target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
-    xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
+    xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
+    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
 
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
@@ -629,10 +630,10 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
     elif exp_name in ["ag", "ncnn"]:
         # pred base normal
         xout_normal[mask] = 0
-        xout_light[mask] = 0
+        xout_scaleProd[mask] = 0
         if exp_name == "ncnn":
             xout_normal = xout_normal * 2 - 1
-            xout_light = xout_light * 2 - 1
+            xout_scaleProd = xout_scaleProd * 2 - 1
         normal_cnn_8bit = mu.visual_output(xout_normal, mask)
 
         mu.addText(normal_cnn_8bit, "output")
@@ -641,7 +642,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         output_list.append(normal_cnn_8bit)
 
         # albedo output visualization
-        xout_albedo = np.uint8(target_img / (np.sum(xout_normal * xout_light, axis=-1) + 1e-20))
+        xout_albedo = np.uint8(target_img / (xout_scaleProd + 1e-20))
         xout_albedo = cv.normalize(xout_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         xout_albedo = cv.merge((xout_albedo, xout_albedo, xout_albedo))
 

@@ -507,21 +507,21 @@ def depth2vertex(depth, K, R, t):
     return np.array(vertex)
 
 
-def vertex2normal(vertex, cam_pos, k_idx):
-    mask = np.sum(np.abs(vertex), axis=2) != 0
+def vertex2normal(vertex, mask, cam_pos, k_idx):
+    # mask = np.sum(np.abs(vertex), axis=2) != 0
     normals = compute_normal(vertex, cam_pos, mask, k_idx)
     normals_rgb = normal2RGB(normals)
     return normals, normals_rgb
 
 
-def depth2normal(depth, cam_pos, k_idx, K, R, t):
+def depth2normal(depth, mask, cam_pos, k_idx, K, R, t):
     if depth.ndim == 2:
         depth = np.expand_dims(depth, axis=2)
     vertex = depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                           torch.tensor(K),
                           torch.tensor(R).float(),
                           torch.tensor(t).float())
-    return vertex2normal(vertex, cam_pos, k_idx)
+    return vertex2normal(vertex, mask, cam_pos, k_idx)
 
 
 # -------------------------------------- openCV Utils ------------------------------------------
@@ -1000,7 +1000,7 @@ def visual_vertex(vertex, name):
 
 
 def visual_img(img, name, upper_right=None):
-    addText(img, f"{name}")
+    addText(img, f"{name}", font_size=0.8)
     if upper_right is not None:
         addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
     return img

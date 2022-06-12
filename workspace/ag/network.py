@@ -73,7 +73,7 @@ class CNN(nn.Module):
         x_normal_out = self.agconv3_3(x0)
 
         # light source inpainting
-        light_direction = xin[:, 3:6, :, :]
+        light_direction = xin[:, 4:7, :, :]
 
         scaleProd = self.lightInpainting(light_direction, x_normal_out)
 

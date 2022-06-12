@@ -191,9 +191,11 @@ def start2(models_path_dict):
         img_8bit = cv.normalize(np.uint8(img_0), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         img = cv.merge((img_8bit, img_8bit, img_8bit))
 
-        input_list, gt_list, output_list, error_list = [mu.visual_img(img, "Image"),
-                                                        mu.visual_vertex(vertex_0, "Input(Vertex)")], [
-                                                           mu.visual_normal(gt, "GT")], [], []
+        # black_img = cv.normalize(np.uint8(np.zeros(shape=(512, 512, 3))), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        gt_img = cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR)
+        input_list, output_list, error_list = [mu.visual_img(img, "Image"),
+                                               mu.visual_vertex(vertex_0, "Input(Vertex)"),
+                                               gt_img], [], []
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
 
@@ -202,8 +204,9 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
-
+                normal = svd.eval_single(vertex_0, ~mask, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+                cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_svd.png"),
+                           cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
             else:
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
@@ -213,11 +216,18 @@ def start2(models_path_dict):
                 # load model
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
-                k = args.neighbor
                 if args.exp == "ng":
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif args.exp == "nnnn":
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
+                    normal[mask] = 0
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal.png"),
+                               cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
+                elif args.exp == "ag":
+                    normal = evaluate_epoch(args, model, test_0_tensor, device)[:, :, :3]
+                    normal[mask] = 0
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_ag.png"),
+                               cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
                 else:
                     raise ValueError
 
@@ -227,20 +237,23 @@ def start2(models_path_dict):
             output_list.append(mu.visual_normal(normal, name))
 
             # visual error
-            gt[mask_input] = 0
+            # gt[mask_input] = 0
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
             diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-            error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff)))
+            error_list.append(mu.visual_img(diff_img, name + '_error', upper_right=int(diff)))
             eval_res[model_idx, i] = diff
 
         # save the results
 
-        output = cv.cvtColor(cv.vconcat(output_list), cv.COLOR_RGB2BGR)
-        gt = cv.cvtColor(cv.hconcat(gt_list), cv.COLOR_RGB2BGR)
-        left = mu.vconcat_resize([mu.hconcat_resize(input_list), gt])
-        right = mu.hconcat_resize([mu.vconcat_resize([output]), mu.vconcat_resize(error_list)])
-        im_tile_resize = mu.hconcat_resize([left, right])
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}.png"), im_tile_resize)
+        output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+        left = mu.hconcat_resize(input_list)
+        right_normal = mu.hconcat_resize([output])
+        right_error = mu.hconcat_resize(error_list)
+        # im_tile_resize = mu.hconcat_resize([left, right])
+
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
 
         print(f"{data_idx} has been evaluated.")
 
@@ -250,12 +263,11 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        # "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",
-        # "AG2": config.ws_path / "ag" / "trained_model" / "checkpoint-2600.pth.tar",
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-900.pth.tar",  # image guided
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-4600.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-        # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar"
+        # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
 
     }
     start2(models)

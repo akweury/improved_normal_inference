@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --print-freq 10
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp ncnn --print-freq 100 --num-channels 32 --batch_size 5  --train-on 50
+CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp ng --print-freq 100 --batch_size 8 --train-on 500 --num-channels 32
 ```
 
 #### evaluate the test dataset (no visualisation)

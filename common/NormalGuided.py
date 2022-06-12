@@ -94,14 +94,6 @@ class NormalGuided(nn.Module):
         x_img_4 = self.active_img(self.img_conv2(x_img_4))
         x_img_4 = self.active_img(self.img_conv3(x_img_4))
 
-        # dilated conv
-        # x4 = self.dilated1(x4)
-        # x4 = self.dilated2(x4)
-        # x4 = self.dilated3(x4)
-        # x4 = self.dilated4(x4)
-        # x4 = self.dconv2(x4)
-        # x4 = self.dconv3(x4)
-
         # merge image feature and vertex feature
         x4 = torch.cat((x4, x_img_4), 1)
 
