@@ -879,7 +879,8 @@ def eval_angle_tensor(output, target):
 
 
 def eval_albedo_tensor(output, target):
-    mask = (~torch.prod(target == 0, -1).bool()).unsqueeze(1)
+    mask = torch.abs(target) > 0
+
     diff = (output - target)[mask]
     loss = torch.sum(diff ** 2) / diff.size(0)
     return loss
