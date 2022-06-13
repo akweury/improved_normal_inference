@@ -44,6 +44,7 @@ class NormalGuided(nn.Module):
         self.uconv3 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
         self.uconv4 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
         self.uconv5 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv6 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
 
         self.conv1 = nn.Conv2d(channel_size_2, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
@@ -125,8 +126,8 @@ class NormalGuided(nn.Module):
 
         # # Upsample 3
         x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
-        x1_mus = self.uconv4(x1_us)
-        x1 = self.uconv5(torch.cat((x1, x1_mus), 1))
+        x1_mus = self.uconv5(x1_us)
+        x1 = self.uconv6(torch.cat((x1, x1_mus), 1))
 
         x1_img_us = F.interpolate(x_img_2, x_img_1.size()[2:], mode='nearest')  # 128,128
         x_img_1 = self.img_uconv3(torch.cat((x_img_1, x1_img_us), 1))
