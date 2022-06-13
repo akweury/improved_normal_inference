@@ -266,11 +266,11 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-900.pth.tar",  # image guided
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-4600.pth.tar",  # with light direction
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-1900.pth.tar",  # image guided
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1115.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
 
     }
     start2(models)

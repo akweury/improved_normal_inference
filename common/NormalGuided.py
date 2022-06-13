@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.modules.conv import _ConvNd
+
 from common.Layers import GConv
 
 
@@ -39,60 +39,64 @@ class NormalGuided(nn.Module):
         self.dconv3 = GConv(channel_num, channel_num, kernel_down, stride, padding_down)
         self.dconv4 = GConv(channel_num, channel_num, kernel_down, stride_2, padding_down)
 
-        self.dilated1 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate1)
-        self.dilated2 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate2)
-        self.dilated3 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate3)
-        self.dilated4 = GConv(channel_num, channel_num, kernel_down, stride, padding_down, dilate4)
-
         self.uconv1 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
         self.uconv3 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
         self.uconv4 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.uconv5 = GConv(channel_size_2, channel_num, kernel_up, stride, padding_up)
 
-        self.conv1 = nn.Conv2d(channel_num, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv1 = nn.Conv2d(channel_size_2, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
         # branch 2
-        self.img_conv1 = nn.Conv2d(1, channel_num, kernel_down, stride, padding_down)
-        self.img_conv2 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
-        self.img_conv3 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
-        self.img_conv4 = nn.Conv2d(channel_num, channel_num, kernel_down, stride_2, padding_down)
+        self.img_dconv1 = nn.Conv2d(1, channel_num, kernel_down, stride, padding_down)
+        self.img_dconv2 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.img_dconv3 = nn.Conv2d(channel_num, channel_num, kernel_down, stride, padding_down)
+        self.img_dconv4 = nn.Conv2d(channel_num, channel_num, kernel_down, stride_2, padding_down)
+
+        self.img_uconv1 = nn.Conv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.img_uconv2 = nn.Conv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.img_uconv3 = nn.Conv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+        self.img_uconv4 = nn.Conv2d(channel_size_2, channel_num, kernel_up, stride, padding_up)
+
+        self.img_conv1 = nn.Conv2d(channel_num * 2, out_ch, (1, 1), (1, 1), (0, 0))
+        self.img_conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x1, x_img_1):
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
-        x_img_1 = self.active_img(self.img_conv1(x_img_1))
-        x_img_1 = self.active_img(self.img_conv2(x_img_1))
-        x_img_1 = self.active_img(self.img_conv3(x_img_1))
+        x_img_1 = self.active_img(self.img_dconv1(x_img_1))
+        x_img_1 = self.active_img(self.img_dconv2(x_img_1))
+        x_img_1 = self.active_img(self.img_dconv3(x_img_1))
 
         # Downsample 1
         x2 = self.dconv4(x1)
         x2 = self.dconv2(x2)
         x2 = self.dconv3(x2)
 
-        x_img_2 = self.active_img(self.img_conv4(x_img_1))
-        x_img_2 = self.active_img(self.img_conv2(x_img_2))
-        x_img_2 = self.active_img(self.img_conv3(x_img_2))
+        x_img_2 = self.active_img(self.img_dconv4(x_img_1))
+        x_img_2 = self.active_img(self.img_dconv2(x_img_2))
+        x_img_2 = self.active_img(self.img_dconv3(x_img_2))
 
         # Downsample 2
         x3 = self.dconv4(x2)
         x3 = self.dconv2(x3)
         x3 = self.dconv3(x3)
 
-        x_img_3 = self.active_img(self.img_conv4(x_img_2))
-        x_img_3 = self.active_img(self.img_conv2(x_img_3))
-        x_img_3 = self.active_img(self.img_conv3(x_img_3))
+        x_img_3 = self.active_img(self.img_dconv4(x_img_2))
+        x_img_3 = self.active_img(self.img_dconv2(x_img_3))
+        x_img_3 = self.active_img(self.img_dconv3(x_img_3))
 
         # Downsample 3
         x4 = self.dconv4(x3)
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
-        x_img_4 = self.active_img(self.img_conv4(x_img_3))
-        x_img_4 = self.active_img(self.img_conv2(x_img_4))
-        x_img_4 = self.active_img(self.img_conv3(x_img_4))
+        x_img_4 = self.active_img(self.img_dconv4(x_img_3))
+        x_img_4 = self.active_img(self.img_dconv2(x_img_4))
+        x_img_4 = self.active_img(self.img_dconv3(x_img_4))
 
         # merge image feature and vertex feature
         x4 = torch.cat((x4, x_img_4), 1)
@@ -102,13 +106,33 @@ class NormalGuided(nn.Module):
         x3_mus = self.uconv1(x3_us)
         x3 = self.uconv2(torch.cat((x3, x3_mus), 1))
 
+        x3_img_us = F.interpolate(x_img_4, x_img_3.size()[2:], mode='nearest')  # 128,128
+        x_img_3 = self.img_uconv1(torch.cat((x_img_3, x3_img_us), 1))
+
+        # merge image feature and vertex feature 2
+        x3 = torch.cat((x3, x_img_3), 1)
+
         # Upsample 2
         x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
-        x2 = self.uconv3(torch.cat((x2, x2_us), 1))
+        x2_mus = self.uconv3(x2_us)
+        x2 = self.uconv4(torch.cat((x2, x2_mus), 1))
+
+        x2_img_us = F.interpolate(x_img_3, x_img_2.size()[2:], mode='nearest')  # 128,128
+        x_img_2 = self.img_uconv2(torch.cat((x_img_2, x2_img_us), 1))
+
+        # merge image feature and vertex feature 3
+        x2 = torch.cat((x2, x_img_2), 1)
 
         # # Upsample 3
         x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
-        x1 = self.uconv4(torch.cat((x1, x1_us), 1))
+        x1_mus = self.uconv4(x1_us)
+        x1 = self.uconv5(torch.cat((x1, x1_mus), 1))
+
+        x1_img_us = F.interpolate(x_img_2, x_img_1.size()[2:], mode='nearest')  # 128,128
+        x_img_1 = self.img_uconv3(torch.cat((x_img_1, x1_img_us), 1))
+
+        # merge image feature and vertex feature 3
+        x1 = torch.cat((x1, x_img_1), 1)
 
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
