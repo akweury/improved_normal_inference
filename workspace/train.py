@@ -490,7 +490,7 @@ def train_epoch(nn_model, epoch):
                                     exp_path=nn_model.output_folder,
                                     epoch=epoch,
                                     i=j,
-                                    train_idx=test_idx,
+                                    train_idx=test_idx[1:2],
                                     output_type=nn_model.args.output_type,
                                     prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
