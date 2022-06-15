@@ -492,7 +492,7 @@ def train_epoch(nn_model, epoch):
                                     i=j,
                                     train_idx=test_idx,
                                     output_type=nn_model.args.output_type,
-                                    prefix=f"eval_{test_idx}_")
+                                    prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
     # save loss
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
