@@ -282,7 +282,7 @@ class TrainingModel():
         self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
         self.model = self.init_network(network)
-        self.train_loader = self.create_dataloader(dataset_path)
+        self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
         self.loss = loss_dict[args.loss].to(self.device)
         self.criterion = nn.CrossEntropyLoss()
@@ -294,24 +294,27 @@ class TrainingModel():
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
-        if self.args.exp == "noise_net":
-            dataset = NoiseDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
-        else:
-            dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
+
+        train_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
+        test_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='test')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
-            training_idxs = np.array(random.sample(range(0, len(dataset)), int(train_on)))
-            dataset.training_case = dataset.training_case[training_idxs]
+            training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
+            train_dataset.training_case = train_dataset.training_case[training_idxs]
 
-        data_loader = DataLoader(dataset,
-                                 shuffle=True,
-                                 batch_size=self.args.batch_size,
-                                 num_workers=4)
+        test_dataset.training_case = test_dataset.training_case[:3]
+        train_data_loader = DataLoader(train_dataset,
+                                       shuffle=True,
+                                       batch_size=self.args.batch_size,
+                                       num_workers=4)
+        test_data_loader = DataLoader(test_dataset,
+                                      batch_size=self.args.batch_size,
+                                      num_workers=4)
+        print('\n- Found {} images in "{}" folder.'.format(train_data_loader.dataset.__len__(), 'train'))
+        print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'test'))
 
-        print('\n- Found {} images in "{}" folder.'.format(data_loader.dataset.__len__(), 'train'))
-
-        return data_loader
+        return train_data_loader, test_data_loader
 
     def init_output_folder(self):
         folder_path = self.exp_dir / f"output_{date_now}_{time_now}"
@@ -466,17 +469,30 @@ def train_epoch(nn_model, epoch):
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, train_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), train_idx.to('cpu')
             loss_0th = loss / int(nn_model.args.batch_size)
-            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                draw_output(nn_model.args.exp, input, out,
-                            target=target,
-                            exp_path=nn_model.output_folder,
-                            loss=loss_0th,
-                            epoch=epoch,
-                            i=i,
-                            train_idx=train_idx,
-                            output_type=nn_model.args.output_type,
-                            prefix="train")
             print(f"\t loss: {loss_0th:.2e}\t axis: {epoch % 3}")
+
+            # evaluation
+            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+                for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
+                    with torch.no_grad():
+                        # put input and target to device
+                        input, target = input.to(nn_model.device), target.to(nn_model.device)
+
+                        # Wait for all kernels to finish
+                        torch.cuda.synchronize()
+
+                        # Forward pass
+                        out = nn_model.model(input)
+                        input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
+                            'cpu')
+                        draw_output(nn_model.args.exp, input, out,
+                                    target=target,
+                                    exp_path=nn_model.output_folder,
+                                    epoch=epoch,
+                                    i=j,
+                                    train_idx=test_idx,
+                                    output_type=nn_model.args.output_type,
+                                    prefix=f"eval_{test_idx}_")
 
     # save loss
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
@@ -559,7 +575,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx, output_type, prefix):
+def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, output_type, prefix):
     target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
     target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
@@ -690,7 +706,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
     else:
         output = cv.hconcat(output_list)
-    output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}_loss_{loss:.8f}.png")
+    output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}.png")
     cv.imwrite(output_name, output)
 
 
