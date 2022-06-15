@@ -191,12 +191,15 @@ def start2(models_path_dict):
         img_8bit = cv.normalize(np.uint8(img_0), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         img = cv.merge((img_8bit, img_8bit, img_8bit))
 
-        # black_img = cv.normalize(np.uint8(np.zeros(shape=(512, 512, 3))), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        black_img = cv.normalize(np.uint8(np.zeros(shape=(512, 512, 3))), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         gt_img = cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR)
-        input_list, output_list, error_list = [mu.visual_img(img, "Image"),
-                                               mu.visual_vertex(vertex_0, "Input(Vertex)"),
-                                               gt_img], [], []
-
+        # input_list, output_list, error_list = [mu.visual_img(img, "Image"),
+        #                                        mu.visual_vertex(vertex_0, "Input(Vertex)"),
+        #                                        gt_img], [], []
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_gt.png"), black_img)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), img)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
+                   cv.cvtColor(mu.visual_normal(gt, "GT", histogram=False), cv.COLOR_RGB2BGR), )
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_point_cloud_noise.png"),
                    mu.visual_vertex(vertex_0, ""))
         # evaluate CNN models
@@ -237,26 +240,30 @@ def start2(models_path_dict):
             normal[mask] = 0
 
             # visual normal
-            output_list.append(mu.visual_normal(normal, name))
+            # output_list.append(mu.visual_normal(normal, name))
 
+            cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                       cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
             # visual error
             # gt[mask_input] = 0
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
             diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-            error_list.append(mu.visual_img(diff_img, name + '_error', upper_right=int(diff)))
+            cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
+                       mu.visual_img(diff_img, name + '_error', upper_right=int(diff)))
+
             eval_res[model_idx, i] = diff
 
         # save the results
 
-        output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
-        left = mu.hconcat_resize(input_list)
-        right_normal = mu.hconcat_resize([output])
-        right_error = mu.hconcat_resize(error_list)
+        # output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+        # left = mu.hconcat_resize(input_list)
+        # right_normal = mu.hconcat_resize([output])
+        # right_error = mu.hconcat_resize(error_list)
         # im_tile_resize = mu.hconcat_resize([left, right])
 
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
 
         print(f"{data_idx} has been evaluated.")
 
@@ -266,8 +273,8 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-1900.pth.tar",  # image guided
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1115.pth.tar",  # with light direction
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
+        "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",

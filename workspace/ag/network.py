@@ -54,28 +54,28 @@ class CNN(nn.Module):
         super().__init__()
         self.__name__ = 'ag'
 
-        self.agconv3_3 = AlbedoGatedNNN(3, 3, channel_num)
+        self.normal3_3 = AlbedoGatedNNN(3, 3, channel_num)
+        self.light3_3 = AlbedoGatedNNN(3, 3, channel_num)
         self.active_leaky_relu = nn.LeakyReLU(0.01)
         self.active_sigmoid = nn.Sigmoid()
-
-        self.lightInpainting = LightNet(3, 3, channel_num)
 
         self.nl_layer = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
         self.rho_layer = GConv(2, 1, (3, 3), (1, 1), (1, 1))
 
-        self.albedoInpainting1 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
-        self.albedoInpainting2 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
-        self.albedoInpainting3 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
+        self.scaleProd1 = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
+        self.scaleProd2 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
 
     def forward(self, xin):
         # x0: vertex array
         x0 = xin[:, :3, :, :]
-        x_normal_out = self.agconv3_3(x0)
+        x_normal_out = self.normal3_3(x0)
 
         # light source inpainting
         light_direction = xin[:, 4:7, :, :]
+        light_out = self.light3_3(light_direction)
 
-        scaleProd = self.lightInpainting(light_direction, x_normal_out)
+        scaleProd = self.active_leaky_relu(self.scaleProd1(torch.cat((x_normal_out, light_out), 1)))
+        scaleProd = self.scaleProd2(scaleProd)
 
-        out = torch.cat((x_normal_out, scaleProd), 1)
+        out = torch.cat((x_normal_out, light_out, scaleProd), 1)
         return out

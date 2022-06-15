@@ -109,10 +109,12 @@ class AngleAlbedoLoss(nn.Module):
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
 
         N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
-        G_diff = (outputs[:, 3, :, :] - target[:, 3, :, :])[mask]
+        L_diff = (outputs[:, 3:6, :, :] - target[:, 5:8, :, :]).permute(0, 2, 3, 1)[mask]
+        ScaleProd_diff = (outputs[:, 6, :, :] - target[:, 3, :, :])[mask]
 
         loss = torch.sum(N_diff ** 2) / N_diff.size(0)
-        loss += torch.sum(G_diff ** 2) / G_diff.size(0)
+        loss += torch.sum(L_diff ** 2) / L_diff.size(0)
+        loss += torch.sum(ScaleProd_diff ** 2) / ScaleProd_diff.size(0)
 
         # light loss
         # light_target = target[:, 5:8, :, :]
@@ -563,7 +565,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
     if exp_name == "ag":
-        xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
+        xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
+        xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
     # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
 
     # if xout.size() != (512, 512, 3):
@@ -591,7 +594,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
     mask = target_normal.sum(axis=2) == 0
     target_ranges = mu.addHist(normal_img)
     normal_gt_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(normal_gt_8bit, "gt")
+    mu.addText(normal_gt_8bit, "GT")
     mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(normal_gt_8bit)
 
@@ -623,45 +626,46 @@ def draw_output(exp_name, x0, xout, target, exp_path, loss, epoch, i, train_idx,
         mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_sharp_8bit)
 
-        mu.addText(normal_cnn_8bit, "output")
+        mu.addText(normal_cnn_8bit, "Output")
         xout_ranges = mu.addHist(normal_cnn_8bit)
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-    elif exp_name in ["ag", "ncnn"]:
+    elif exp_name in ["ag"]:
         # pred base normal
         xout_normal[mask] = 0
         xout_scaleProd[mask] = 0
+        xout_light[mask] = 0
         if exp_name == "ncnn":
             xout_normal = xout_normal * 2 - 1
             xout_scaleProd = xout_scaleProd * 2 - 1
         normal_cnn_8bit = mu.visual_output(xout_normal, mask)
 
-        mu.addText(normal_cnn_8bit, "output")
+        mu.addText(normal_cnn_8bit, "Output")
         xout_base_ranges = mu.addHist(normal_cnn_8bit)
         mu.addText(normal_cnn_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-        # albedo output visualization
-        xout_albedo = np.uint8(target_img / (xout_scaleProd + 1e-20))
-        xout_albedo = cv.normalize(xout_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        xout_albedo = cv.merge((xout_albedo, xout_albedo, xout_albedo))
+        # light output visualization
+        xout_light_img = mu.normalize2_32bit(xout_light)
+        xout_light_img = mu.image_resize(xout_light_img, width=512, height=512)
+        mu.addText(xout_light_img, "Light_Output")
+        mu.addText(xout_light_img, str(train_idx[0]), pos='lower_left', font_size=0.3)
+        output_list.append(xout_light_img)
 
-        # albedo ground truth visualization
-        target_albedo = np.uint8(target_img / (np.sum(target_normal * target_light, axis=-1) + 1e-20))
-        target_albedo = cv.normalize(target_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        target_albedo = cv.merge((target_albedo, target_albedo, target_albedo))
+        # light ground truth visualization
+        target_light_img = mu.normalize2_32bit(target_light)
+        target_light_img = mu.image_resize(target_light_img, width=512, height=512)
+        mu.addText(target_light_img, "Light_GT")
+        mu.addText(target_light_img, str(train_idx[0]), pos='lower_left', font_size=0.3)
+        output_list.append(target_light_img)
 
-        diff_albedo = np.abs(np.uint8(xout_albedo) - np.uint8(target_albedo))
-        diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U),
-                                           cv.COLORMAP_HOT)
-        diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
-        mu.addText(diff_albedo_img, "Albedo_Error")
-        mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
-
-        output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
-        output_list.append(mu.visual_img(target_albedo, "albedo_target"))
-        output_list.append(diff_albedo_img)
+        # light error visualization
+        diff_light_img, diff_light_angle = mu.eval_img_angle(xout_light, target_light)
+        diff_light = np.sum(np.abs(diff_light_angle)) / np.count_nonzero(diff_light_angle)
+        mu.addText(diff_light_img, "Light_Error")
+        mu.addText(diff_light_img, f"angle error: {int(diff_light)}", pos="upper_right", font_size=0.65)
+        output_list.append(diff_light_img)
 
     else:
         # pred normal
