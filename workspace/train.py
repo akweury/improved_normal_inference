@@ -124,10 +124,10 @@ class AngleAlbedoLoss(nn.Module):
         # G_output = outputs[:, 3, :, :]
 
         # add angle loss
-        light_rad_loss = mu.eval_angle_tensor(outputs[:, 3:6, :, :], target[:, 5:8, :, :]) * args.angle_loss_weight
-        normal_rad_loss = mu.eval_angle_tensor(outputs[:, :3, :, :], target[:, :3, :, :]) * args.angle_loss_weight
-        loss += light_rad_loss
-        loss += normal_rad_loss
+        # light_rad_loss = mu.eval_angle_tensor(outputs[:, 3:6, :, :], target[:, 5:8, :, :]) * args.angle_loss_weight
+        # normal_rad_loss = mu.eval_angle_tensor(outputs[:, :3, :, :], target[:, :3, :, :]) * args.angle_loss_weight
+        # loss += light_rad_loss
+        # loss += normal_rad_loss
 
         return loss
 
