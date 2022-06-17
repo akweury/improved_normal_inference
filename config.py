@@ -18,7 +18,7 @@ geo_data = dataset / "data_geometrical_body"
 
 # synthetic dataset path
 synthetic_data = dataset / "data_synthetic"
-synthetic_data_dfki = Path("/datasets/sha/synthetic")
+synthetic_data_dfki = Path("/datasets/sha/data_synthetic")
 synthetic_data_nobg = dataset / "data_synthetic_nobg"
 synthetic_data_noise = dataset / "data_synthetic_noise"
 synthetic_data_noise_dfki = Path("/datasets/sha/data_synthetic_noise")
