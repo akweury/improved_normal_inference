@@ -106,11 +106,13 @@ class AngleAlbedoLoss(nn.Module):
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
 
         axis_target = torch.cat((target[:, :3, :, :], target[:, 5:8, :, :]), 1)
-        axis_output = target[:, :6, :, :]
-        axis_diff = (axis_output - axis_target)[:, axis, :, :][mask]
+        axis_output = outputs[:, :6, :, :]
+        axis_diff_normal = (axis_output - axis_target)[:, axis, :, :][mask]
+        axis_diff_light = (axis_output - axis_target)[:, axis + 3, :, :][mask]
         ScaleProd_diff = (outputs[:, 6, :, :] - target[:, 3, :, :])[mask]
 
-        loss = torch.sum(axis_diff ** 2) / axis_diff.size(0)
+        loss = torch.sum(axis_diff_normal ** 2) / axis_diff_normal.size(0)
+        loss += torch.sum(axis_diff_light ** 2) / axis_diff_light.size(0)
         loss += torch.sum(ScaleProd_diff ** 2) / ScaleProd_diff.size(0)
 
         # light loss
