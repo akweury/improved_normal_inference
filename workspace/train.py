@@ -216,7 +216,7 @@ loss_dict = {
 class SyntheticDepthDataset(Dataset):
 
     def __init__(self, data_path, k, output_type, setname='train'):
-        if setname in ['train', 'test']:
+        if setname in ['train', 'val', 'test']:
             self.training_case = np.array(
                 sorted(
                     glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
@@ -296,7 +296,7 @@ class TrainingModel():
         train_on = self.args.train_on
 
         train_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
-        test_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='test')
+        test_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='val')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -312,7 +312,7 @@ class TrainingModel():
                                       batch_size=self.args.batch_size,
                                       num_workers=4)
         print('\n- Found {} images in "{}" folder.'.format(train_data_loader.dataset.__len__(), 'train'))
-        print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'test'))
+        print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'val'))
 
         return train_data_loader, test_data_loader
 
