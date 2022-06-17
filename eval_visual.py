@@ -274,7 +274,7 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
         "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
-        "AG": config.ws_path / "ag" / "trained_model" / "model_best.pth.tar",  # with light direction
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1845.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",

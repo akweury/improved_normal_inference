@@ -39,9 +39,9 @@ def angle_between_tensor(v1, v2):
     v2_u = v2 / (torch.norm(v2, dim=1, keepdim=True) + 1e-20)
 
     rad = torch.arccos(torch.clip(torch.sum(v1_u * v2_u, dim=1), -1.0, 1.0))
-    deg = torch.rad2deg(rad)
-    deg[deg > 90] = 180 - deg[deg > 90]
-    return deg.float()
+    # deg = torch.rad2deg(rad)
+    # deg[deg > 90] = 180 - deg[deg > 90]
+    return rad.float()
 
 
 def vertex2light_direction(vertex_map, light_sorce):

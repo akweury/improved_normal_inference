@@ -98,22 +98,19 @@ class AngleAlbedoLoss(nn.Module):
 
     def forward(self, outputs, target, args):
         # normal l2 loss
-        # normal_out = outputs[:, :3, :, :]
-        # normals_target = target[:, :3, :, :]
-        # mask_too_high = torch.gt(normal_out, 1).bool().detach()
-        # mask_too_low = torch.lt(normal_out, -1).bool().detach()
-        # normal_out[mask_too_high] = normal_out[mask_too_high] * args.penalty
-        # normal_out[mask_too_low] = normal_out[mask_too_low] * args.penalty
-        # axis = args.epoch % 3
-
+        mask_too_high = torch.gt(outputs, 1).bool().detach()
+        mask_too_low = torch.lt(outputs, -1).bool().detach()
+        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
+        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
+        axis = args.epoch % 3
         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
 
-        N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
-        L_diff = (outputs[:, 3:6, :, :] - target[:, 5:8, :, :]).permute(0, 2, 3, 1)[mask]
+        axis_target = torch.cat((target[:, :3, :, :], target[:, 5:8, :, :]), 1)
+        axis_output = target[:, :6, :, :]
+        axis_diff = (axis_output - axis_target)[:, axis, :, :][mask]
         ScaleProd_diff = (outputs[:, 6, :, :] - target[:, 3, :, :])[mask]
 
-        loss = torch.sum(N_diff ** 2) / N_diff.size(0)
-        loss += torch.sum(L_diff ** 2) / L_diff.size(0)
+        loss = torch.sum(axis_diff ** 2) / axis_diff.size(0)
         loss += torch.sum(ScaleProd_diff ** 2) / ScaleProd_diff.size(0)
 
         # light loss
@@ -126,12 +123,13 @@ class AngleAlbedoLoss(nn.Module):
         # G_target = target[:, 3, :, :]
         # G_output = outputs[:, 3, :, :]
 
-        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
-        # mask of non-zero positions
-        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
+        # add angle loss
+        light_rad_loss = mu.eval_angle_tensor(outputs[:, 3:6, :, :], target[:, 5:8, :, :]) * args.angle_loss_weight
+        normal_rad_loss = mu.eval_angle_tensor(outputs[:, :3, :, :], target[:, :3, :, :]) * args.angle_loss_weight
+        loss += light_rad_loss
+        loss += normal_rad_loss
 
-        return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
+        return loss
 
 
 class AngleDetailLoss(nn.Module):

@@ -50,7 +50,7 @@ def noisy_a_folder(folder_path, output_path):
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    for idx in range(1000):
+    for idx in range(2000):
         if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0_noise.png"))):
             continue
         image_file, ply_file, json_file, depth_gt_file, _, normal_file = file_io.get_file_name(idx, folder_path)
