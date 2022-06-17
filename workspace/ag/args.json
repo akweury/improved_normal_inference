@@ -11,7 +11,7 @@
   "loss": "angleAlbedo",
   "penalty": 1.4,
   "albedo_penalty": 1e+6,
-  "angle_loss_weight": 1e-1,
+  "angle_loss_weight": 1e-2,
   "angle_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
