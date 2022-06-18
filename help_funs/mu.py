@@ -1,3 +1,5 @@
+import time
+
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,7 +31,7 @@ def angle_between(v1, v2):
     return deg
 
 
-def angle_between_tensor(v1, v2):
+def radian_between_tensor(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
     v1 = v1.reshape(-1, 3)
     v2 = v2.reshape(-1, 3)
@@ -43,6 +45,13 @@ def angle_between_tensor(v1, v2):
     # deg = torch.rad2deg(rad)
     # deg[deg > 90] = 180 - deg[deg > 90]
     return rad.float()
+
+
+def avg_angle_between_tensor(v1, v2):
+    radian_diff = radian_between_tensor(v1, v2)
+    deg_diff = torch.rad2deg(radian_diff)
+    avg_angle = deg_diff.sum() / deg_diff.size()[0]
+    return avg_angle.to("cpu")
 
 
 def vertex2light_direction(vertex_map, light_sorce):
@@ -510,9 +519,11 @@ def depth2vertex(depth, K, R, t):
 
 def vertex2normal(vertex, mask, cam_pos, k_idx):
     # mask = np.sum(np.abs(vertex), axis=2) != 0
+    start = time.time()
     normals = compute_normal(vertex, cam_pos, mask, k_idx)
+    gpu_time = time.time() - start
     normals_rgb = normal2RGB(normals)
-    return normals, normals_rgb
+    return normals, normals_rgb, gpu_time
 
 
 def depth2normal(depth, mask, cam_pos, k_idx, K, R, t):
@@ -871,7 +882,7 @@ def eval_angle_tensor(output, target):
     target_perm = target.permute(0, 2, 3, 1)
     mask = target_perm.sum(dim=-1) == 0
     angle_matrix = torch.zeros(target_perm.shape[:3]).float().to(output.device)
-    angle_matrix[~mask] = angle_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
+    angle_matrix[~mask] = radian_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
 
     mask = (~torch.prod(output_perm == 0, -1).bool()).unsqueeze(1)
     loss_avg = angle_matrix.sum() / mask.sum()

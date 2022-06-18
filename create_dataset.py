@@ -91,7 +91,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         # gt normal
         gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
         gt_normal = gt_normal / (
-                    np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)  # normal normalization
+                np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)  # normal normalization
 
         # light
         light_pos = (data['lightPos'] - shift_vector) / scale_factors[0]

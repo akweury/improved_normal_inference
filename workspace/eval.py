@@ -15,25 +15,23 @@ sys.path.append(dirname(__file__))
 import time
 import torch
 import numpy as np
-from help_funs import mu, data_preprocess
-from pncnn.utils import args_parser
+from help_funs import mu
 from workspace.svd import eval as svd
-from torch.utils.data import Dataset, DataLoader
-import glob
+from torch.utils.data import DataLoader
 
 from workspace.train import SyntheticDepthDataset
 
 
-def eval(dataset_path, name, model_path, gpu=0):
+def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     print(f"---------- Start {name} Evaluation --------")
     print(f"load checkpoint... ", end="")
     # SVD model
     if model_path is None:
         # load dataset
-        dataset = SyntheticDepthDataset(dataset_path, 1, "normal_noise", setname='test')
-        data_loader = DataLoader(dataset, shuffle=True, batch_size=1, num_workers=1)
-        loss_list, time_list = svd.eval(data_loader, 2)
-        return loss_list, time_list
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="val")
+        data_loader = DataLoader(dataset, shuffle=False, batch_size=1, num_workers=1)
+        loss_list, time_list, size_list = svd.eval(data_loader, 2)
+        return loss_list, time_list, size_list
 
     # load model
     checkpoint = torch.load(model_path)
@@ -48,9 +46,9 @@ def eval(dataset_path, name, model_path, gpu=0):
     print("load dataset...", end="")
     # load dataset
     if dataset_path == config.real_data:
-        dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname=None)
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname=None)
     else:
-        dataset = SyntheticDepthDataset(dataset_path, args.neighbor, "normal_noise", setname="test")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="val")
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,
@@ -60,9 +58,13 @@ def eval(dataset_path, name, model_path, gpu=0):
 
     loss_list = np.zeros(data_loader.dataset.__len__())
     time_list = np.zeros(data_loader.dataset.__len__())
+    size_list = np.zeros(data_loader.dataset.__len__())
 
     for i, (input, target, scale_factor) in enumerate(data_loader):
         with torch.no_grad():
+            mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+            mask = mask.permute(1, 2, 0).squeeze(-1)
+            size_list[i] = mask.sum()
             # put input and target to device
             input, target = input.to(device), target.to(device)
 
@@ -81,16 +83,17 @@ def eval(dataset_path, name, model_path, gpu=0):
             # calculate loss
             out = mu.filter_noise(out, threshold=[-1, 1])
 
-            diff = mu.output_radians_loss(out[:, :3, :, :], target).to("cpu").detach().numpy()
-            if args.exp == "degares":
-                diff += mu.output_radians_loss(out[:, 3:6, :, :], target).to("cpu").detach().numpy()
+            normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+            normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+            diff = mu.avg_angle_between_tensor(normal[mask], normal_target[mask]).to("cpu").detach().numpy()
 
             loss_list[i] = diff
             time_list[i] = gpu_time * 1000
+
             print(
                 f"[{name}] Test Case: {i + 1}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
 
-    return loss_list, time_list
+    return loss_list, time_list, size_list
 
 
 def eval_post_processing(normal, normal_img, normal_gt, name):

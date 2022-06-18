@@ -10,11 +10,13 @@ from help_funs import file_io
 
 
 def noisy_1channel(img):
-    img = img.reshape(512, 512)
-    h, w = img.shape
-    noise = np.random.randint(2, size=(h, w))
-    noise_img = img * noise
-    return noise_img
+    img_shape = img.shape
+    img_1d = img.reshape(512 * 512)
+    noise_factor = np.random.uniform(0, 0.5)
+    indices = np.random.choice(np.arange(img_1d.size), replace=False, size=int(img_1d.size * noise_factor))
+    img_1d[indices] = 0
+    noise_img = img_1d.reshape(img_shape)
+    return noise_img, noise_factor
 
 
 def noisy(img):
@@ -62,25 +64,20 @@ def noisy_a_folder(folder_path, output_path):
             # get noise mask
             img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
             # img[img < 20] = 0
-            depth = noisy_1channel(depth)
-            # noise_mask = noise_mask == 0
-            # input_tensor = torch.from_numpy(img.astype(np.float32))  # (depth, dtype=torch.float)
-            # input_tensor = input_tensor.permute(2, 0, 1)
-            #
-            # img_noise = evaluate_epoch(model, input_tensor, device)
-            # noise_mask = img_noise.sum(axis=2) == 0
-            # add noise
-            # depth[noise_mask] = 0
+            depth, noise_factor = noisy_1channel(depth)
 
             # save files to the new folders
             file_io.save_scaled16bitImage(depth,
                                           str(output_path / (str(idx).zfill(5) + ".depth0_noise.png")),
                                           data['minDepth'], data['maxDepth'])
             # img_noise = mu.normalise216bitImage(img)
+            data['noise_factor'] = noise_factor
+            with open(str(output_path / (str(idx).zfill(5) + ".data0.json")), 'w') as f:
+                json.dump(data, f)
+
             # file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
             shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
             shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
-            shutil.copyfile(json_file, str(output_path / (str(idx).zfill(5) + ".data0.json")))
             shutil.copyfile(normal_file, str(output_path / (str(idx).zfill(5) + ".normal0.png")))
 
             print(f'File {idx} added noise.')
@@ -141,79 +138,6 @@ def vectex_normalization(vertex, mask):
     vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
 
     return vertex, scale_factors, shift_vector
-
-
-# def convert2training_tensor2(path, k, input_size=1000):
-#     if not os.path.exists(str(path)):
-#         raise FileNotFoundError
-#     if not os.path.exists(str(path / "tensor")):
-#         os.makedirs(str(path / "tensor"))
-#
-#     depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
-#     gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
-#     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
-#     for item in range(len(data_files)):
-#         f = open(data_files[item])
-#         data = json.load(f)
-#         f.close()
-#
-#         depth = file_io.load_scaled16bitImage(depth_files[item],
-#                                               data['minDepth'],
-#                                               data['maxDepth'])
-#         data['R'] = np.identity(3)
-#         data['t'] = np.zeros(3)
-#         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
-#                                  torch.tensor(data['K']),
-#                                  torch.tensor(data['R']).float(),
-#                                  torch.tensor(data['t']).float())
-#         mask = vertex.sum(axis=2) == 0
-#         # move all the vertex as close to original point as possible,
-#         vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, :1][~mask].min()) / vertex[:, :, :1][
-#             ~mask].max()
-#         vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1:2][~mask].min()) / vertex[:, :, 1:2][
-#             ~mask].max()
-#         vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2:3][~mask].min()) / vertex[:, :, 2:3][
-#             ~mask].max()
-#
-#         # gt
-#         gt = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
-#         gt[mask] = 0
-#         gt = gt.reshape(-1, 3)
-#         gt = gt[gt.sum(axis=1) != 0]
-#         # calculate delta x, y, z of between each point and its neighbors
-#         vectors = neighbor_vectors_k(vertex, k)
-#         vectors[mask] = 0
-#         vectors = vectors[vectors.sum(axis=2) != 0]
-#         vectors = vectors.reshape(-1, (((k - 1) * 2 + 1) ** 2 - 1), 3)
-#         vertex = vertex.reshape(-1, 3)
-#         vertex = vertex[vertex.sum(axis=1) != 0]
-#         assert gt.shape[0] == vectors.shape[0] == vertex.shape[0]
-#
-#         # align the input to the standard shape
-#         random_idx = np.random.choice(vectors.shape[0], input_size)
-#         vectors = vectors[random_idx]
-#         vertex = vertex[random_idx]
-#         gt = gt[random_idx]
-#
-#         normals, idx_gt, error = mu.generate_normals_all(vectors, vertex, gt)
-#
-#         # visualise to check if it is correct
-#         best_error_avg = np.average(error)
-#         error_validition = mu.angle_between(normals, gt)
-#         error_avg = np.average(error_validition)
-#
-#         # save vectors and idx_gt
-#         input_torch = torch.from_numpy(vectors.astype(np.float32))  # (depth, dtype=torch.float)
-#         input_torch = input_torch.permute(0, 2, 1)
-#
-#         idx_gt = (idx_gt).astype(np.float32)
-#         gt_torch = torch.from_numpy(idx_gt)  # tensor(gt, dtype=torch.float)
-#         gt_torch = gt_torch.permute(1, 0)
-#
-#         # save tensors
-#         torch.save(input_torch, str(path / "tensor" / f"{str(item).zfill(5)}_input_x.pt"))
-#         torch.save(gt_torch, str(path / "tensor" / f"{str(item).zfill(5)}_gt_x.pt"))
-#         print(f'File {item} converted to tensor.')
 
 
 if __name__ == '__main__':

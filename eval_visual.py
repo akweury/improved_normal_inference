@@ -34,7 +34,7 @@ def preprocessing(models):
     parser = argparse.ArgumentParser(description='Eval')
 
     # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
+    parser.add_argument('--data', type=str, default='synthetic_noise', help="choose evaluate dataset")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
@@ -273,8 +273,8 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1845.pth.tar",  # with light direction
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
+        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1845.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",

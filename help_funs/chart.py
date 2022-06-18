@@ -2,9 +2,9 @@ import datetime
 import os.path
 from pathlib import Path
 
-import numpy as np
-import matplotlib.pyplot as plt
 import cv2 as cv
+import matplotlib.pyplot as plt
+import numpy as np
 
 from help_funs import mu
 
@@ -42,6 +42,37 @@ def line_chart(data, path, title=None, x_scale=None, y_scale=None, labels=None, 
         os.mkdir(path)
     plt.savefig(
         str(Path(path) / f"{title}_{y_label}_{date_now}_{time_now}.png"))
+
+    if show:
+        plt.show()
+    if cla_leg:
+        plt.cla()
+
+
+def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, labels=None,
+                  x_label=None, y_label=None, show=False, log_y=False, cla_leg=False):
+    if data_x.shape[1] <= 1:
+        return
+    for i, row in enumerate(data_x):
+        plt.scatter(data_x[i], data_y[i], label=labels[i])
+
+    if title is not None:
+        plt.title(title)
+
+    if y_label is not None:
+        plt.ylabel(y_label)
+    if x_label is not None:
+        plt.xlabel(x_label)
+
+    if log_y:
+        plt.yscale('log')
+
+    plt.legend()
+
+    if not os.path.exists(str(path)):
+        os.mkdir(path)
+    plt.savefig(
+        str(Path(path) / f"{title}_{date_now}_{time_now}.png"))
 
     if show:
         plt.show()

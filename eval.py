@@ -2,22 +2,25 @@
 input: an image, the incomplete depth map of the image
 output: a complete depth map
 """
-import os
 import argparse
 import datetime
-import numpy as np
-import config
+import json
+import os
 
-from workspace import eval
+import numpy as np
+
+import config
 from help_funs import chart
+from workspace import eval
 
 
 def get_args():
     parser = argparse.ArgumentParser(description='Eval')
 
     # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic', help="choose evaluate dataset")
+    parser.add_argument('--data', type=str, default='synthetic_noise', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
+    parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
@@ -25,25 +28,7 @@ def get_args():
     return args
 
 
-def main():
-    args = get_args()
-
-    models = {
-        # "SVD": None,
-        "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
-        "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-    }
-    # load test model names
-    if args.data == 'synthetic':
-        dataset_path = config.synthetic_data_noise
-    elif args.data == 'real':
-        dataset_path = config.real_data
-    else:
-        raise ValueError
-
+def main(models, test_folder, args):
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
     folder_path = config.ws_path / "eval_output" / f"{eval_date}_{eval_time}"
@@ -59,26 +44,56 @@ def main():
     time_avg = {}
     losses = []
     times = []
+    sizes = []
     # evaluate CNN models one by one
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
-        loss_list, time_list = eval.eval(dataset_path, name, model, gpu=args.gpu)
+        loss_list, time_list, size_list = eval.eval(test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
         losses.append(loss_list)
         times.append(time_list[5:])
+        sizes.append(size_list)
 
     chart.line_chart(np.array(losses), folder_path, "Loss Evaluation", y_label="Radius", labels=list(models.keys()),
                      cla_leg=True)
     chart.line_chart(np.array(times), folder_path, "Time Evaluation", y_label="Milliseconds",
-                     labels=list(models.keys()))
-
+                     labels=list(models.keys()), cla_leg=True)
+    chart.scatter_chart(np.array(sizes), np.array(losses), folder_path, "Loss Evaluation", y_label="Angles",
+                        x_label="Point Num", labels=list(models.keys()))
     # save the evaluation
+    saved_json = {'loss_avg': loss_avg,
+                  'time_avg': time_avg,
+                  'losses': losses,
+                  'sizes': sizes,
+                  'times': times,
+                  'args': args,
+                  'test_folder': test_folder,
+                  }
+
     with open(str(folder_path / "evaluation.txt"), 'w') as f:
-        f.write(str(loss_avg))
-        f.write(str(time_avg))
+        f.write(json.dumps(saved_json))
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Eval')
+    # Mode selection
+    parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
+    parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
+    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
+                        help="loading dataset from local or dfki machine")
+    args = parser.parse_args()
+
+    models = {
+
+        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
+        "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "SVD": None,
+        # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
+        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
+        # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
+    }
+    test_folder = config.synthetic_data
+
+    main(models, test_folder, args)
