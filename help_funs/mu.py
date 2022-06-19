@@ -908,7 +908,7 @@ def filter_bg(normal_img):
     freq = np.bincount((normal_img[:, :, 0] * 1000000 + normal_img[:, :, 1] * 1000 + normal_img[:, :, 2]).reshape(-1))
     freq_idx = np.nonzero(freq)[0]
     freq_list = np.vstack((freq_idx, freq[freq_idx])).T
-    most_freq_color_sum = freq_list[freq_list[:, 1].argsort()[::-1][:15]][:, 0]
+    most_freq_color_sum = freq_list[freq_list[:, 1].argsort()[::-1][:300]][:, 0]
     most_freq_color_b = most_freq_color_sum % 1000
     most_freq_color_g = (most_freq_color_sum - most_freq_color_b) / 1000 % 1000
     most_freq_color_r = (((most_freq_color_sum - most_freq_color_b) / 1000 - most_freq_color_g) / 1000)
@@ -918,7 +918,7 @@ def filter_bg(normal_img):
         bg_mask = (np.sum(normal_img == color, axis=2) == 3)
         normal_img[bg_mask] = 0
 
-    return normal_img
+    return normal_img.astype(np.uint8)
 
 
 def filter_gray_color(img):

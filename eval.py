@@ -68,7 +68,6 @@ def main(models, test_folder, args):
                   'losses': losses,
                   'sizes': sizes,
                   'times': times,
-                  'args': args,
                   'test_folder': test_folder,
                   }
 
@@ -89,7 +88,7 @@ if __name__ == '__main__':
 
         # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
-        "SVD": None,
+        # "SVD": None,
         # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",

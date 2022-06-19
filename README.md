@@ -11,7 +11,7 @@ scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic50.zip sha@
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --machine remote --max_k 0 --clear false
+CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --machine remote --max_k 0 --clear true
 ```
 
 #### resume a training work
@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --print-freq 10
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ng --print-freq 100 --batch_size 4 --train-on 20 --num-channels 32
+CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp nnnn --print-freq 100 --batch_size 8 --train-on 20 --num-channels 64
 ```
 
 #### evaluate the test dataset (no visualisation)

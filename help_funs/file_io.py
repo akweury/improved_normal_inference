@@ -56,14 +56,14 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
     ply_file.close()
 
 
-def save_scaled16bitImage(img, img_name, minVal, maxVal):
-    img = img.reshape(512, 512)
+def save_scaled16bitImage(image, img_name, minVal, maxVal):
+    img = image.reshape(512, 512)
     img[np.isnan(img) != 0] = 0
     mask = (img == 0)
 
     img[~mask] = (img[~mask] - minVal) / (maxVal - minVal) * 65535
     img = np.array(img, dtype=np.int32)
-    img = write_np2img(img, img_name)
+    write_np2img(img, img_name)
     return img
 
 

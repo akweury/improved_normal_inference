@@ -199,7 +199,7 @@ def start2(models_path_dict):
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_gt.png"), black_img)
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), img)
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
-                   cv.cvtColor(mu.visual_normal(gt, "GT", histogram=False), cv.COLOR_RGB2BGR), )
+                   cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR), )
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_point_cloud_noise.png"),
                    mu.visual_vertex(vertex_0, ""))
         # evaluate CNN models
@@ -210,7 +210,7 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal = svd.eval_single(vertex_0, ~mask, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
                 cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_svd.png"),
                            cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
             else:
@@ -226,24 +226,27 @@ def start2(models_path_dict):
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif args.exp == "nnnn":
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"),
+                               cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
                     normal[mask] = 0
-                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal.png"),
-                               cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
+                    # cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal.png"),
+                    #            cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
                 elif args.exp == "ag":
                     normal = evaluate_epoch(args, model, test_0_tensor, device)[:, :, :3]
                     normal[mask] = 0
-                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_ag.png"),
-                               cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
+                    # cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_ag.png"),
+                    #            cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
                 else:
                     raise ValueError
 
             normal[mask] = 0
 
+            cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                       cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+
             # visual normal
             # output_list.append(mu.visual_normal(normal, name))
 
-            cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                       cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
             # visual error
             # gt[mask_input] = 0
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
@@ -274,7 +277,7 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
-        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-1845.pth.tar",  # with light direction
+        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",

@@ -37,28 +37,29 @@ if __name__ == '__main__':
     # test_torch()
     # print_cuda_info()
     folder_path = config.paper_pic
-    depth_file = str(config.dataset / "data_synthetic" / "test" / "00601.depth0.png")
-    data_file = str(config.dataset / "data_synthetic" / "test" / "00601.data0.json")
-    img_file = str(config.dataset / "data_synthetic" / "test" / "00601.image0.png")
+    depth_file = str(config.dataset / "data_synthetic" / "train" / "00042.depth0.png")
+    data_file = str(config.dataset / "data_synthetic" / "train" / "00042.data0.json")
 
-    # input vertex
-    f = open(data_file)
-    data = json.load(f)
-    f.close()
+    img_list = []
+    for noised_factor in [0, 0.1, 0.2, 0.3, 0.4, 0.5]:
+        # input vertex
+        f = open(data_file)
+        data = json.load(f)
+        f.close()
 
-    depth = file_io.load_scaled16bitImage(depth_file,
-                                          data['minDepth'],
-                                          data['maxDepth'])
+        depth = file_io.load_scaled16bitImage(depth_file,
+                                              data['minDepth'],
+                                              data['maxDepth'])
 
-    mask = depth.sum(axis=2) == 0
+        mask = depth.sum(axis=2) == 0
 
-    img = file_io.load_16bitImage(img_file)
-    img[mask] = 0
-    data['R'], data['t'] = np.identity(3), np.zeros(3)
-    vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
-                             torch.tensor(data['K']),
-                             torch.tensor(data['R']).float(),
-                             torch.tensor(data['t']).float())
-
-    vertex, scale_factors, shift_vector = data_preprocess.vectex_normalization(vertex, mask)
-    cv.imwrite(str(folder_path / f"fancy_eval_point_cloud.png"), mu.visual_vertex(vertex, ""))
+        depth_noised, noised_factor = data_preprocess.noisy_1channel(depth, noised_factor)
+        img = file_io.save_scaled16bitImage(depth_noised,
+                                            str(folder_path / f"depth_noised_f_{noised_factor}.png"),
+                                            data['minDepth'], data['maxDepth'])
+        img = img / 65535
+        img = cv.normalize(img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        img = cv.merge((img, img, img))
+        img_list.append(img)
+    output = cv.hconcat(img_list)
+    cv.imwrite(str(folder_path / f"add_noise_depth.png"), output)
