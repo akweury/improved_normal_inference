@@ -490,7 +490,7 @@ def train_epoch(nn_model, epoch):
                                     exp_path=nn_model.output_folder,
                                     epoch=epoch,
                                     i=j,
-                                    train_idx=test_idx[1:2],
+                                    train_idx=test_idx,
                                     output_type=nn_model.args.output_type,
                                     prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
@@ -577,13 +577,15 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
 
 def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, output_type, prefix):
     target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
+    # xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
+    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
     target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
     if exp_name == "ag":
         xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
         xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
-    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
 
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
@@ -602,7 +604,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, outpu
     x0_normalized_8bit = mu.normalize2_32bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
-    mu.addText(x0_normalized_8bit, str(train_idx[0]), pos='lower_left', font_size=0.3)
+    mu.addText(x0_normalized_8bit, str(train_idx), pos='lower_left', font_size=0.3)
     output_list.append(x0_normalized_8bit)
 
     # gt normal
