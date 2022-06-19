@@ -1,0 +1,86 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Declaration of Authorship}{iii}{section*.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Abstract}{vii}{section*.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Acknowledgements}{ix}{section*.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}From 3D to 2D}{1}{section.15}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.2}Kinect and Surface Normal}{1}{section.16}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.3}Standard Methods}{1}{section.17}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.4}Deep Learning based Method}{1}{section.18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.5}Challenges of Normal Inference}{2}{section.19}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.6}Main Works of this thesis}{2}{section.22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.23}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Sparse Input processing}{5}{section.24}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}Normal Inference}{6}{section.25}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}Approaches}{7}{chapter.26}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Neighbor based surface normal estimation}{7}{section.27}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}Gated Convolution neural network for surface normal estimation}{8}{section.33}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.1}Gated Convolution}{8}{subsection.36}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.2}Architecture}{9}{subsection.39}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.3}Loss Function}{9}{subsection.41}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{10}{section.43}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{10}{subsection.44}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.2}Add the light information}{10}{subsection.46}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.47}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.48}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.49}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.2}Surface Normal}{14}{subsection.52}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.3}Point Cloud}{14}{subsection.53}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud calculation}{15}{subsection.54}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.5}Point Cloud Normalization}{15}{subsection.55}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.6}Noise}{16}{subsection.58}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.7}Fit to PyTorch}{16}{subsection.60}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}Real Dataset}{17}{section.62}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}Metrics for evaluation}{17}{section.63}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.64}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{19}{section.65}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.69}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.3}GaRes Model}{20}{section.70}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}Conclusion}{21}{chapter.71}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Dataset}{23}{appendix.72}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}Dataset}{23}{section.73}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{23}{section.77}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{27}{appendix*.78}%

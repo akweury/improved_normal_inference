@@ -12,7 +12,7 @@ date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
-def line_chart(data, path, title=None, x_scale=None, y_scale=None, labels=None, y_label=None, show=False, log_y=False,
+def line_chart(data, path, labels, title=None, x_scale=None, y_scale=None, y_label=None, show=False, log_y=False,
                cla_leg=False):
     if data.shape[1] <= 1:
         return

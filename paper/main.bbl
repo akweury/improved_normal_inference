@@ -1,0 +1,1147 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Ben-Shabat_2019_CVPR}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=BSY}{%
+         family={Ben-Shabat},
+         familyi={B\bibinithyphendelim S\bibinitperiod},
+         given={Yizhak},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=LM}{%
+         family={Lindenbaum},
+         familyi={L\bibinitperiod},
+         given={Michael},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Fischer},
+         familyi={F\bibinitperiod},
+         given={Anath},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BSYLMFA1}
+    \strng{fullhash}{BSYLMFA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{booktitle}{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}
+    \field{title}{Nesti-Net: Normal Estimation for Unstructured 3D Point Clouds
+  Using Convolutional Neural Networks}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{gru}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=CK}{%
+         family={Cho},
+         familyi={C\bibinitperiod},
+         given={Kyunghyun},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=vMB}{%
+         prefix={van},
+         prefixi={v\bibinitperiod},
+         family={Merrienboer},
+         familyi={M\bibinitperiod},
+         given={Bart},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=BD}{%
+         family={Bahdanau},
+         familyi={B\bibinitperiod},
+         given={Dzmitry},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=BY}{%
+         family={Bengio},
+         familyi={B\bibinitperiod},
+         given={Yoshua},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computation and Language (cs.CL), Machine Learning (stat.ML), FOS:
+  Computer and information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{CK+1}
+    \strng{fullhash}{CKMBvBDBY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2014}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1409.1259
+    \endverb
+    \field{title}{On the Properties of Neural Machine Translation:
+  Encoder-Decoder Approaches}
+    \verb{url}
+    \verb https://arxiv.org/abs/1409.1259
+    \endverb
+    \field{year}{2014}
+  \endentry
+
+  \entry{Eigen}{misc}{}
+    \name{author}{3}{}{%
+      {{hash=ED}{%
+         family={Eigen},
+         familyi={E\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=PC}{%
+         family={Puhrsch},
+         familyi={P\bibinitperiod},
+         given={Christian},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=FR}{%
+         family={Fergus},
+         familyi={F\bibinitperiod},
+         given={Rob},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{EDPCFR1}
+    \strng{fullhash}{EDPCFR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2014}
+    \field{labeldatesource}{}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1406.2283
+    \endverb
+    \field{title}{Depth Map Prediction from a Single Image using a Multi-Scale
+  Deep Network}
+    \verb{url}
+    \verb https://arxiv.org/abs/1406.2283
+    \endverb
+    \field{year}{2014}
+  \endentry
+
+  \entry{ncnn}{article}{}
+    \name{author}{3}{}{%
+      {{hash=EA}{%
+         family={Eldesokey},
+         familyi={E\bibinitperiod},
+         given={Abdelrahman},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=FM}{%
+         family={Felsberg},
+         familyi={F\bibinitperiod},
+         given={Michael},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=KFS}{%
+         family={Khan},
+         familyi={K\bibinitperiod},
+         given={Fahad\bibnamedelima Shahbaz},
+         giveni={F\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{2}{%
+      {Institute of Electrical}%
+      {Electronics Engineers ({IEEE})}%
+    }
+    \strng{namehash}{EAFMKFS1}
+    \strng{fullhash}{EAFMKFS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{extradate}{1}
+    \field{labeldatesource}{}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \verb{doi}
+    \verb 10.1109/tpami.2019.2929170
+    \endverb
+    \field{number}{10}
+    \field{pages}{2423\bibrangedash 2436}
+    \field{title}{Confidence Propagation through {CNNs} for Guided Sparse Depth
+  Regression}
+    \verb{url}
+    \verb https://doi.org/10.1109%2Ftpami.2019.2929170
+    \endverb
+    \field{volume}{42}
+    \field{journaltitle}{{IEEE} Transactions on Pattern Analysis and Machine
+  Intelligence}
+    \field{year}{2020}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{pncnn0}{article}{}
+    \name{author}{3}{}{%
+      {{hash=EA}{%
+         family={Eldesokey},
+         familyi={E\bibinitperiod},
+         given={Abdelrahman},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=FM}{%
+         family={Felsberg},
+         familyi={F\bibinitperiod},
+         given={Michael},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=KFS}{%
+         family={Khan},
+         familyi={K\bibinitperiod},
+         given={Fahad\bibnamedelima Shahbaz},
+         giveni={F\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{2}{%
+      {Institute of Electrical}%
+      {Electronics Engineers ({IEEE})}%
+    }
+    \strng{namehash}{EAFMKFS1}
+    \strng{fullhash}{EAFMKFS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{extradate}{2}
+    \field{labeldatesource}{}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \verb{doi}
+    \verb 10.1109/tpami.2019.2929170
+    \endverb
+    \field{number}{10}
+    \field{pages}{2423\bibrangedash 2436}
+    \field{title}{Confidence Propagation through {CNNs} for Guided Sparse Depth
+  Regression}
+    \verb{url}
+    \verb https://doi.org/10.1109%2Ftpami.2019.2929170
+    \endverb
+    \field{volume}{42}
+    \field{journaltitle}{{IEEE} Transactions on Pattern Analysis and Machine
+  Intelligence}
+    \field{year}{2020}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{pncnn}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=EA}{%
+         family={Eldesokey},
+         familyi={E\bibinitperiod},
+         given={Abdelrahman},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=FM}{%
+         family={Felsberg},
+         familyi={F\bibinitperiod},
+         given={Michael},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=HK}{%
+         family={Holmquist},
+         familyi={H\bibinitperiod},
+         given={Karl},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=PM}{%
+         family={Persson},
+         familyi={P\bibinitperiod},
+         given={Mikael},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), Machine Learning
+  (cs.LG), FOS: Computer and information sciences, FOS: Computer and
+  information sciences}
+    \strng{namehash}{EA+1}
+    \strng{fullhash}{EAFMHKPM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{labeldatesource}{}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \verb{doi}
+    \verb 10.48550/ARXIV.2006.03349
+    \endverb
+    \field{title}{Uncertainty-Aware CNNs for Depth Completion: Uncertainty from
+  Beginning to End}
+    \verb{url}
+    \verb https://arxiv.org/abs/2006.03349
+    \endverb
+    \field{year}{2020}
+  \endentry
+
+  \entry{geometry_based_solution}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=FDF}{%
+         family={Fouhey},
+         familyi={F\bibinitperiod},
+         given={David\bibnamedelima F.},
+         giveni={D\bibinitperiod\bibinitdelim F\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Gupta},
+         familyi={G\bibinitperiod},
+         given={Abhinav},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=HM}{%
+         family={Hebert},
+         familyi={H\bibinitperiod},
+         given={Martial},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{FDFGAHM1}
+    \strng{fullhash}{FDFGAHM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2013}
+    \field{labeldatesource}{}
+    \field{sortinit}{F}
+    \field{sortinithash}{F}
+    \field{booktitle}{2013 IEEE International Conference on Computer Vision}
+    \verb{doi}
+    \verb 10.1109/ICCV.2013.421
+    \endverb
+    \field{pages}{3392\bibrangedash 3399}
+    \field{title}{Data-Driven 3D Primitives for Single Image Understanding}
+    \field{year}{2013}
+  \endentry
+
+  \entry{resnet}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=HK}{%
+         family={He},
+         familyi={H\bibinitperiod},
+         given={Kaiming},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=ZX}{%
+         family={Zhang},
+         familyi={Z\bibinitperiod},
+         given={Xiangyu},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=RS}{%
+         family={Ren},
+         familyi={R\bibinitperiod},
+         given={Shaoqing},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Sun},
+         familyi={S\bibinitperiod},
+         given={Jian},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{HK+1}
+    \strng{fullhash}{HKZXRSSJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1512.03385
+    \endverb
+    \field{title}{Deep Residual Learning for Image Recognition}
+    \verb{url}
+    \verb https://arxiv.org/abs/1512.03385
+    \endverb
+    \field{year}{2015}
+  \endentry
+
+  \entry{lstm}{article}{}
+    \name{author}{2}{}{%
+      {{hash=HS}{%
+         family={Hochreiter},
+         familyi={H\bibinitperiod},
+         given={Sepp},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Schmidhuber},
+         familyi={S\bibinitperiod},
+         given={Jürgen},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HSSJ1}
+    \strng{fullhash}{HSSJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1997}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \verb{doi}
+    \verb 10.1162/neco.1997.9.8.1735
+    \endverb
+    \field{pages}{1735\bibrangedash 80}
+    \field{title}{Long Short-term Memory}
+    \field{volume}{9}
+    \field{journaltitle}{Neural computation}
+    \field{month}{12}
+    \field{year}{1997}
+  \endentry
+
+  \entry{Holzer.S}{inproceedings}{}
+    \name{author}{5}{}{%
+      {{hash=HS}{%
+         family={Holzer},
+         familyi={H\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=RRB}{%
+         family={Rusu},
+         familyi={R\bibinitperiod},
+         given={R.\bibnamedelima B.},
+         giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=DM}{%
+         family={Dixon},
+         familyi={D\bibinitperiod},
+         given={M.},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=GS}{%
+         family={Gedikli},
+         familyi={G\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=NN}{%
+         family={Navab},
+         familyi={N\bibinitperiod},
+         given={N.},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HS+1}
+    \strng{fullhash}{HSRRBDMGSNN1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2012}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{booktitle}{2012 IEEE/RSJ International Conference on Intelligent
+  Robots and Systems}
+    \verb{doi}
+    \verb 10.1109/IROS.2012.6385999
+    \endverb
+    \field{pages}{2684\bibrangedash 2689}
+    \field{title}{Adaptive neighborhood selection for real-time surface normal
+  estimation from organized point cloud data using integral images}
+    \field{year}{2012}
+  \endentry
+
+  \entry{SFS}{article}{}
+    \name{author}{1}{}{%
+      {{hash=HB}{%
+         family={Horn},
+         familyi={H\bibinitperiod},
+         given={Berthold},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HB1}
+    \strng{fullhash}{HB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2004}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Shape from Shading: A Method for Obtaining the Shape of a
+  Smooth Opaque Object from One View}
+    \verb{url}
+    \verb http://hdl.handle.net/1721.1/6885
+    \endverb
+    \field{month}{10}
+    \field{year}{2004}
+  \endentry
+
+  \entry{guided}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=HJ}{%
+         family={Hua},
+         familyi={H\bibinitperiod},
+         given={Jiashen},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=GX}{%
+         family={Gong},
+         familyi={G\bibinitperiod},
+         given={Xiaojin},
+         giveni={X\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {AAAI Press}%
+    }
+    \strng{namehash}{HJGX1}
+    \strng{fullhash}{HJGX1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{booktitle}{Proceedings of the 27th International Joint Conference on
+  Artificial Intelligence}
+    \field{isbn}{9780999241127}
+    \field{pages}{2283–2290}
+    \field{series}{IJCAI'18}
+    \field{title}{A Normalized Convolutional Neural Network for Guided Sparse
+  Depth Upsampling}
+    \list{location}{1}{%
+      {Stockholm, Sweden}%
+    }
+    \field{year}{2018}
+  \endentry
+
+  \entry{nconv}{article}{}
+    \name{author}{2}{}{%
+      {{hash=KH}{%
+         family={Knutsson},
+         familyi={K\bibinitperiod},
+         given={Hans},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=WCF}{%
+         family={Westin},
+         familyi={W\bibinitperiod},
+         given={Carl-Fredrik},
+         giveni={C\bibinithyphendelim F\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KHWCF1}
+    \strng{fullhash}{KHWCF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1993}
+    \field{labeldatesource}{}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{title}{Normalized and Difierential Convolution Methods for
+  Interpolation and Filtering of Incomplete and Uncertain Data}
+    \field{month}{01}
+    \field{year}{1993}
+  \endentry
+
+  \entry{img2depth}{misc}{}
+    \name{author}{5}{}{%
+      {{hash=LI}{%
+         family={Laina},
+         familyi={L\bibinitperiod},
+         given={Iro},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=RC}{%
+         family={Rupprecht},
+         familyi={R\bibinitperiod},
+         given={Christian},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=BV}{%
+         family={Belagiannis},
+         familyi={B\bibinitperiod},
+         given={Vasileios},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=TF}{%
+         family={Tombari},
+         familyi={T\bibinitperiod},
+         given={Federico},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=NN}{%
+         family={Navab},
+         familyi={N\bibinitperiod},
+         given={Nassir},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{LI+1}
+    \strng{fullhash}{LIRCBVTFNN1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1606.00373
+    \endverb
+    \field{title}{Deeper Depth Prediction with Fully Convolutional Residual
+  Networks}
+    \verb{url}
+    \verb https://arxiv.org/abs/1606.00373
+    \endverb
+    \field{year}{2016}
+  \endentry
+
+  \entry{data3}{online}{}
+    \name{author}{1}{}{%
+      {{hash=MM}{%
+         family={McGuire},
+         familyi={M\bibinitperiod},
+         given={Morgan},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MM1}
+    \strng{fullhash}{MM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labeldatesource}{nodate}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{Artec3D}
+    \verb{url}
+    \verb https://www.artec3d.com/3d-models/art-and-design
+    \endverb
+  \endentry
+
+  \entry{data2}{online}{}
+    \name{author}{1}{}{%
+      {{hash=MM}{%
+         family={McGuire},
+         familyi={M\bibinitperiod},
+         given={Morgan},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MM1}
+    \strng{fullhash}{MM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{Computer Graphics Archive}
+    \verb{url}
+    \verb https://casual-effects.com/data
+    \endverb
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{gated_activation}{misc}{}
+    \name{author}{6}{}{%
+      {{hash=OAvd}{%
+         family={Oord},
+         familyi={O\bibinitperiod},
+         given={Aaron van\bibnamedelima den},
+         giveni={A\bibinitperiod\bibinitdelim v\bibinitperiod\bibinitdelim
+  d\bibinitperiod},
+      }}%
+      {{hash=KN}{%
+         family={Kalchbrenner},
+         familyi={K\bibinitperiod},
+         given={Nal},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=VO}{%
+         family={Vinyals},
+         familyi={V\bibinitperiod},
+         given={Oriol},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=EL}{%
+         family={Espeholt},
+         familyi={E\bibinitperiod},
+         given={Lasse},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Graves},
+         familyi={G\bibinitperiod},
+         given={Alex},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=KK}{%
+         family={Kavukcuoglu},
+         familyi={K\bibinitperiod},
+         given={Koray},
+         giveni={K\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), Machine Learning
+  (cs.LG), FOS: Computer and information sciences, FOS: Computer and
+  information sciences}
+    \strng{namehash}{OAvd+1}
+    \strng{fullhash}{OAvdKNVOELGAKK1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{}
+    \field{sortinit}{O}
+    \field{sortinithash}{O}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1606.05328
+    \endverb
+    \field{title}{Conditional Image Generation with PixelCNN Decoders}
+    \verb{url}
+    \verb https://arxiv.org/abs/1606.05328
+    \endverb
+    \field{year}{2016}
+  \endentry
+
+  \entry{inpainting2}{article}{}
+    \name{author}{5}{}{%
+      {{hash=QF}{%
+         family={Qi},
+         familyi={Q\bibinitperiod},
+         given={Fei},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=HJ}{%
+         family={Han},
+         familyi={H\bibinitperiod},
+         given={Junyu},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=WP}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Pengjin},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=SG}{%
+         family={Shi},
+         familyi={S\bibinitperiod},
+         given={Guangming},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=LF}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Fu},
+         giveni={F\bibinitperiod},
+      }}%
+    }
+    \keyw{Depth map, Inpainting, Information fusion, Non-local means, Kinect}
+    \strng{namehash}{QF+1}
+    \strng{fullhash}{QFHJWPSGLF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2013}
+    \field{labeldatesource}{}
+    \field{sortinit}{Q}
+    \field{sortinithash}{Q}
+    \verb{doi}
+    \verb https://doi.org/10.1016/j.patrec.2012.06.003
+    \endverb
+    \field{issn}{0167-8655}
+    \field{note}{Extracting Semantics from Multi-Spectrum Video}
+    \field{number}{1}
+    \field{pages}{70\bibrangedash 76}
+    \field{title}{Structure guided fusion for depth map inpainting}
+    \verb{url}
+    \verb https://www.sciencedirect.com/science/article/pii/S0167865512001912
+    \endverb
+    \field{volume}{34}
+    \field{journaltitle}{Pattern Recognition Letters}
+    \field{year}{2013}
+  \endentry
+
+  \entry{GeoNet}{inproceedings}{}
+    \name{author}{5}{}{%
+      {{hash=QX}{%
+         family={Qi},
+         familyi={Q\bibinitperiod},
+         given={Xiaojuan},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=LR}{%
+         family={Liao},
+         familyi={L\bibinitperiod},
+         given={Renjie},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=LZ}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Zhengzhe},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=UR}{%
+         family={Urtasun},
+         familyi={U\bibinitperiod},
+         given={Raquel},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=JJ}{%
+         family={Jia},
+         familyi={J\bibinitperiod},
+         given={Jiaya},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{QX+1}
+    \strng{fullhash}{QXLRLZURJJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{Q}
+    \field{sortinithash}{Q}
+    \field{booktitle}{Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition (CVPR)}
+    \field{title}{GeoNet: Geometric Neural Network for Joint Depth and Surface
+  Normal Estimation}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{yolov3}{misc}{}
+    \name{author}{2}{}{%
+      {{hash=RJ}{%
+         family={Redmon},
+         familyi={R\bibinitperiod},
+         given={Joseph},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Farhadi},
+         familyi={F\bibinitperiod},
+         given={Ali},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{RJFA1}
+    \strng{fullhash}{RJFA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1804.02767
+    \endverb
+    \field{title}{YOLOv3: An Incremental Improvement}
+    \verb{url}
+    \verb https://arxiv.org/abs/1804.02767
+    \endverb
+    \field{year}{2018}
+  \endentry
+
+  \entry{unet}{misc}{}
+    \name{author}{3}{}{%
+      {{hash=RO}{%
+         family={Ronneberger},
+         familyi={R\bibinitperiod},
+         given={Olaf},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=FP}{%
+         family={Fischer},
+         familyi={F\bibinitperiod},
+         given={Philipp},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=BT}{%
+         family={Brox},
+         familyi={B\bibinitperiod},
+         given={Thomas},
+         giveni={T\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ROFPBT1}
+    \strng{fullhash}{ROFPBT1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{eprint}
+    \verb 1505.04597
+    \endverb
+    \field{title}{U-Net: Convolutional Networks for Biomedical Image
+  Segmentation}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{cs.CV}
+    \field{year}{2015}
+  \endentry
+
+  \entry{data4}{online}{}
+    \field{labeltitlesource}{title}
+    \field{labeldatesource}{nodate}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{Smithsonian 3D Digitization}
+    \verb{url}
+    \verb https://www.3d.si.edu/explore
+    \endverb
+  \endentry
+
+  \entry{efficientDet}{article}{}
+    \name{author}{3}{}{%
+      {{hash=TM}{%
+         family={Tan},
+         familyi={T\bibinitperiod},
+         given={Mingxing},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PR}{%
+         family={Pang},
+         familyi={P\bibinitperiod},
+         given={Ruoming},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=LQV}{%
+         family={Le},
+         familyi={L\bibinitperiod},
+         given={Quoc\bibnamedelima V.},
+         giveni={Q\bibinitperiod\bibinitdelim V\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), Machine Learning
+  (cs.LG), Image and Video Processing (eess.IV), FOS: Computer and information
+  sciences, FOS: Computer and information sciences, FOS: Electrical
+  engineering, electronic engineering, information engineering, FOS: Electrical
+  engineering, electronic engineering, information engineering}
+    \strng{namehash}{TMPRLQV1}
+    \strng{fullhash}{TMPRLQV1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1911.09070
+    \endverb
+    \field{title}{EfficientDet: Scalable and Efficient Object Detection}
+    \verb{url}
+    \verb https://arxiv.org/abs/1911.09070
+    \endverb
+    \field{year}{2019}
+  \endentry
+
+  \entry{inpainting1}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=YNE}{%
+         family={Yang},
+         familyi={Y\bibinitperiod},
+         given={Na-Eun},
+         giveni={N\bibinithyphendelim E\bibinitperiod},
+      }}%
+      {{hash=KYG}{%
+         family={Kim},
+         familyi={K\bibinitperiod},
+         given={Yong-Gon},
+         giveni={Y\bibinithyphendelim G\bibinitperiod},
+      }}%
+      {{hash=PRH}{%
+         family={Park},
+         familyi={P\bibinitperiod},
+         given={Rae-Hong},
+         giveni={R\bibinithyphendelim H\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{YNEKYGPRH1}
+    \strng{fullhash}{YNEKYGPRH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2012}
+    \field{labeldatesource}{}
+    \field{sortinit}{Y}
+    \field{sortinithash}{Y}
+    \field{booktitle}{2012 IEEE International Conference on Signal Processing,
+  Communication and Computing (ICSPCC 2012)}
+    \verb{doi}
+    \verb 10.1109/ICSPCC.2012.6335696
+    \endverb
+    \field{pages}{658\bibrangedash 661}
+    \field{title}{Depth hole filling using the depth distribution of
+  neighboring regions of depth holes in the Kinect sensor}
+    \field{year}{2012}
+  \endentry
+
+  \entry{gconv}{misc}{}
+    \name{author}{6}{}{%
+      {{hash=YJ}{%
+         family={Yu},
+         familyi={Y\bibinitperiod},
+         given={Jiahui},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=LZ}{%
+         family={Lin},
+         familyi={L\bibinitperiod},
+         given={Zhe},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=YJ}{%
+         family={Yang},
+         familyi={Y\bibinitperiod},
+         given={Jimei},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=SX}{%
+         family={Shen},
+         familyi={S\bibinitperiod},
+         given={Xiaohui},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=LX}{%
+         family={Lu},
+         familyi={L\bibinitperiod},
+         given={Xin},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=HT}{%
+         family={Huang},
+         familyi={H\bibinitperiod},
+         given={Thomas},
+         giveni={T\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), Graphics (cs.GR),
+  Machine Learning (cs.LG), FOS: Computer and information sciences, FOS:
+  Computer and information sciences}
+    \strng{namehash}{YJ+1}
+    \strng{fullhash}{YJLZYJSXLXHT1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{Y}
+    \field{sortinithash}{Y}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1806.03589
+    \endverb
+    \field{title}{Free-Form Image Inpainting with Gated Convolution}
+    \verb{url}
+    \verb https://arxiv.org/abs/1806.03589
+    \endverb
+    \field{year}{2018}
+  \endentry
+
+  \entry{zhou2021fast}{misc}{}
+    \name{author}{6}{}{%
+      {{hash=ZJ}{%
+         family={Zhou},
+         familyi={Z\bibinitperiod},
+         given={Jun},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=JW}{%
+         family={Jin},
+         familyi={J\bibinitperiod},
+         given={Wei},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=WM}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Mingjie},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=LX}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Xiuping},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=LZ}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Zhiyang},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=LZ}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Zhaobin},
+         giveni={Z\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ZJ+1}
+    \strng{fullhash}{ZJJWWMLXLZLZ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{}
+    \field{sortinit}{Z}
+    \field{sortinithash}{Z}
+    \verb{eprint}
+    \verb 2103.16066
+    \endverb
+    \field{title}{Fast and Accurate Normal Estimation for Point Cloud via Patch
+  Stitching}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{cs.CV}
+    \field{year}{2021}
+  \endentry
+\enddatalist
+\endinput

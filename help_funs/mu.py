@@ -570,6 +570,7 @@ def addHist(img):
         histr, histr_x = np.histogram(img[:, :, i], bins=np.arange(hist_min, hist_max + 1))
         histr = np.delete(histr, np.where(histr == histr.max()), axis=0)
 
+        # plot histogram on the image
         thick = 2
         histr = histr / max(histr.max(), 100)
         for i in range(histr.shape[0]):
@@ -579,6 +580,36 @@ def addHist(img):
             max(0, i * width - thick):min(w - 1, i * width + thick)] = col
     plt.close('all')
     return color_ranges
+
+
+def rgb_diff(img1, img2):
+    diff = np.zeros(shape=(3, 256))
+    h, w = img1.shape[:2]
+    color = ([255, 0, 0], [0, 255, 0], [0, 0, 255])
+    for i, col in enumerate(color):
+        histr1, histr_x1 = np.histogram(img1[:, :, i], bins=256, range=(0, 255))
+        histr2, histr_x2 = np.histogram(img2[:, :, i], bins=256, range=(0, 255))
+
+        histr1[0] = 0
+        histr2[0] = 0
+
+        diff[i, :] = histr1 - histr2
+    return diff
+
+
+def normal_diff(img1, img2):
+    diff = np.zeros(shape=(3, 256))
+    h, w = img1.shape[:2]
+    color = ([255, 0, 0], [0, 255, 0], [0, 0, 255])
+    for i, col in enumerate(color):
+        histr1, histr_x1 = np.histogram(img1[:, :, i], bins=256, range=(0, 255))
+        histr2, histr_x2 = np.histogram(img2[:, :, i], bins=256, range=(0, 255))
+
+        histr1[0] = 0
+        histr2[0] = 0
+
+        diff[i, :] = histr1 - histr2
+    return diff
 
 
 def pure_color_img(color, size):
@@ -1025,3 +1056,7 @@ def visual_albedo(rho, name):
 
     addText(img, f"{name}(albedo)", font_size=0.8)
     return img
+
+
+def save_array(arr, save_path):
+    np.save(save_path, arr)

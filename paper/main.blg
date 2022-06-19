@@ -1,0 +1,87 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: biblatex.bst
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+Reallocating 'name_of_file' (item size: 1) to 8 items.
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter01.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter02.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter03.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter04.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter05.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: Chapters/Chapter06.aux
+Reallocating 'name_of_file' (item size: 1) to 25 items.
+A level-1 auxiliary file: Appendices/AppendixA.aux
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: main-blx.bib
+Database file #2: example.bib
+Repeated entry---line 257 of file example.bib
+ : @inproceedings{nconv
+ :                     ,
+I'm skipping whatever remains of this entry
+Biblatex version: 3.16
+Reallocating 'wiz_functions' (item size: 4) to 9000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+You've used 27 entries,
+            6393 wiz_defined-function locations,
+            1368 strings with 15180 characters,
+and the built_in function-call counts, 184780 in all, are:
+= -- 13140
+> -- 3224
+< -- 903
++ -- 4881
+- -- 1294
+* -- 13914
+:= -- 20488
+add.period$ -- 0
+call.type$ -- 27
+change.case$ -- 442
+chr.to.int$ -- 65
+cite$ -- 52
+duplicate$ -- 20254
+empty$ -- 16434
+format.name$ -- 2045
+if$ -- 37253
+int.to.chr$ -- 0
+int.to.str$ -- 69
+missing$ -- 0
+newline$ -- 1109
+num.names$ -- 1247
+pop$ -- 9671
+preamble$ -- 1
+purify$ -- 631
+quote$ -- 0
+skip$ -- 5051
+stack$ -- 0
+substring$ -- 22181
+swap$ -- 4641
+text.length$ -- 801
+text.prefix$ -- 26
+top$ -- 1
+type$ -- 906
+warning$ -- 0
+while$ -- 2946
+width$ -- 0
+write$ -- 1083
+(There was 1 error message)

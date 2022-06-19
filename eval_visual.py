@@ -197,9 +197,11 @@ def start2(models_path_dict):
         #                                        mu.visual_vertex(vertex_0, "Input(Vertex)"),
         #                                        gt_img], [], []
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_gt.png"), black_img)
+        mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
+
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), img)
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
-                   cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR), )
+                   cv.cvtColor(mu.visual_normal(gt, "", histogram=False), cv.COLOR_RGB2BGR), )
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_point_cloud_noise.png"),
                    mu.visual_vertex(vertex_0, ""))
         # evaluate CNN models
@@ -240,9 +242,9 @@ def start2(models_path_dict):
                     raise ValueError
 
             normal[mask] = 0
-
+            mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
             cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                       cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+                       cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
 
             # visual normal
             # output_list.append(mu.visual_normal(normal, name))
@@ -276,8 +278,8 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
-        "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
+        "NG": config.ws_path / "ng" / "trained_model" / "checkpoint-2800.pth.tar",  # image guided
+        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",

@@ -1,11 +1,11 @@
-import json
+import shutil
 
 import cv2 as cv
 import numpy as np
 import torch
 
 import config
-from help_funs import file_io, mu, data_preprocess
+from help_funs import file_io, mu, chart
 
 
 def test_torch():
@@ -37,29 +37,14 @@ if __name__ == '__main__':
     # test_torch()
     # print_cuda_info()
     folder_path = config.paper_pic
-    depth_file = str(config.dataset / "data_synthetic" / "train" / "00042.depth0.png")
-    data_file = str(config.dataset / "data_synthetic" / "train" / "00042.data0.json")
 
-    img_list = []
-    for noised_factor in [0, 0.1, 0.2, 0.3, 0.4, 0.5]:
-        # input vertex
-        f = open(data_file)
-        data = json.load(f)
-        f.close()
+    gcnn_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.npy"))
+    gt_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_gt.npy"))
 
-        depth = file_io.load_scaled16bitImage(depth_file,
-                                              data['minDepth'],
-                                              data['maxDepth'])
-
-        mask = depth.sum(axis=2) == 0
-
-        depth_noised, noised_factor = data_preprocess.noisy_1channel(depth, noised_factor)
-        img = file_io.save_scaled16bitImage(depth_noised,
-                                            str(folder_path / f"depth_noised_f_{noised_factor}.png"),
-                                            data['minDepth'], data['maxDepth'])
-        img = img / 65535
-        img = cv.normalize(img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        img = cv.merge((img, img, img))
-        img_list.append(img)
-    output = cv.hconcat(img_list)
-    cv.imwrite(str(folder_path / f"add_noise_depth.png"), output)
+    diff = mu.rgb_diff(gcnn_normal, gt_normal)
+    mu.save_array(diff, str(folder_path / f"rgb-diff" / "diff"))
+    diff_plot = chart.line_chart(diff, str(folder_path / f"rgb-diff"), ["red", "green", "blue"])
+    shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.png"),
+                    str(folder_path / f"rgb-diff" / "gcnn.png"))
+    shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_groundtruth.png"),
+                    str(folder_path / f"rgb-diff" / "gt.png"))
