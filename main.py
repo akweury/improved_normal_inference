@@ -4,7 +4,7 @@ import workspace.degares.network as degares
 import workspace.ncnn.network as ncnn
 import workspace.ng.network as ng
 import workspace.sconv.network as nnn
-import workspace.nnn24.network as nnn24
+import workspace.fugrc.network as fugrc
 import workspace.nnnn.network as nnnn
 import workspace.resng.network as resng
 from pncnn.utils import args_parser
@@ -29,7 +29,8 @@ def main():
         model = resng.CNN()
     elif args.exp == "degares":
         model = degares.CNN()
-
+    elif args.exp == "fugrc":
+        model = fugrc.CNN(args.num_channels)
     elif args.exp == "ncnn":
         model = ncnn.CNN(args.num_channels)
     elif args.exp == "ag":

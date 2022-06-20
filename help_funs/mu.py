@@ -597,19 +597,30 @@ def rgb_diff(img1, img2):
     return diff
 
 
+def normal_histo(normal):
+    mask = np.sum(normal, axis=2) == 0
+    histo = np.zeros(shape=(3, 100))
+    hist_x = None
+    for i in range(3):
+        histr1, hist_x = np.histogram(normal[:, :, i][~mask], bins=100, range=(-2, 2))
+        histo[i, :] = histr1
+    return histo, hist_x
+
+
 def normal_diff(img1, img2):
     diff = np.zeros(shape=(3, 256))
     h, w = img1.shape[:2]
     color = ([255, 0, 0], [0, 255, 0], [0, 0, 255])
+    hist_x = None
     for i, col in enumerate(color):
-        histr1, histr_x1 = np.histogram(img1[:, :, i], bins=256, range=(0, 255))
-        histr2, histr_x2 = np.histogram(img2[:, :, i], bins=256, range=(0, 255))
+        histr1, hist_x = np.histogram(img1[:, :, i], bins=256, range=(-1, 1))
+        histr2, hist_x = np.histogram(img2[:, :, i], bins=256, range=(-1, 1))
 
         histr1[0] = 0
         histr2[0] = 0
 
         diff[i, :] = histr1 - histr2
-    return diff
+    return diff, hist_x
 
 
 def pure_color_img(color, size):
@@ -718,6 +729,10 @@ def show_images(array, title):
     cv.imshow(title, array)
     cv.waitKey(0)
     cv.destroyAllWindows()
+
+
+def show_normal(normal, title="Normal"):
+    show_images(cv.cvtColor(visual_normal(normal, ""), cv.COLOR_RGB2BGR), title)
 
 
 def show_grid(grid, title):

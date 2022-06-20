@@ -1,37 +1,26 @@
 import shutil
 
-import cv2 as cv
 import numpy as np
 import torch
 
 import config
-from help_funs import file_io, mu, chart
+from help_funs import mu, chart
 
 
-def test_torch():
-    # depth_file = str(config.ws_path / "a.png")
-    data_file = str(config.synthetic_data / "train" / '00102.normal0.png')
-    normal = file_io.load_24bitNormal(data_file).astype(np.float32)
-    data_tensor = torch.from_numpy(normal).permute(2, 0, 1)
-    img, img_extended = mu.hpf_torch(data_tensor)
-    cv.imwrite(str(config.ws_path / f"aa.png"), img.numpy())
+def gau_histo(gt_normal, sigma):
+    gt_normal = torch.from_numpy(gt_normal)
+    mask = gt_normal != 0
+    min = -2
+    max = 2
+    bins = 100
+    delta = float(max - min) / float(bins)
+    centers = min + delta * (torch.arange(bins).float() + 0.5)
 
-
-#
-#
-# def test_png():
-#     depth_file = str(
-#         config.ws_path / "degares" / "output" / "output_2022-05-24_15_14_04" / "train_epoch_199_0_loss_0.16585270.png")
-#     img = mu.hpf(depth_file)
-#     cv.imwrite(str(config.ws_path / "degares" / "output" / "output_2022-05-24_15_14_04" / f"aa.png"), img)
-
-
-def print_cuda_info():
-    print(f"Cuda is available: {torch.cuda.is_available()}")
-    print(f"Device count: {torch.cuda.device_count()}")
-    print(f"Current Device: {torch.cuda.current_device()}")
-    print(f"Device Name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-
+    output_histo = gt_normal[mask].unsqueeze(0) - centers.unsqueeze(1)
+    output_histo = torch.exp(-0.5 * (output_histo / sigma) ** 2) / (sigma * np.sqrt(np.pi * 2)) * delta
+    output_histo = output_histo.sum(dim=-1)
+    output_histo = (output_histo - output_histo.min()) / (output_histo.max() - output_histo.min())  # normalization
+    return output_histo
 
 if __name__ == '__main__':
     # test_torch()
@@ -40,11 +29,20 @@ if __name__ == '__main__':
 
     gcnn_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.npy"))
     gt_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_gt.npy"))
-
-    diff = mu.rgb_diff(gcnn_normal, gt_normal)
-    mu.save_array(diff, str(folder_path / f"rgb-diff" / "diff"))
-    diff_plot = chart.line_chart(diff, str(folder_path / f"rgb-diff"), ["red", "green", "blue"])
     shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.png"),
-                    str(folder_path / f"rgb-diff" / "gcnn.png"))
+                    str(folder_path / f"normal-histo-diff" / "gcnn.png"))
     shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_groundtruth.png"),
-                    str(folder_path / f"rgb-diff" / "gt.png"))
+                    str(folder_path / f"normal-histo-diff" / "gt.png"))
+
+    histo_gcnn, hist_x = mu.normal_histo(gcnn_normal)
+    histo_gt, _ = mu.normal_histo(gt_normal)
+
+    tensor_histo = histo_gt[0, :]
+    tensor_histo = (tensor_histo - tensor_histo.min()) / (tensor_histo.max() - tensor_histo.min())
+
+    gaussian_histo = gau_histo(gt_normal[:, :, 0], 3 * 25).numpy()
+
+    mu.save_array(histo_gcnn, str(folder_path / f"normal-histo-diff" / "gcnn-histo"))
+
+    chart.line_chart(histo_gcnn, str(folder_path / f"normal-histo-diff"), ["x", "y", "z"], x=hist_x[1:])
+    chart.line_chart(histo_gt, str(folder_path / f"normal-histo-diff"), ["x_gt", "y_gt", "z_gt"], x=hist_x[1:])

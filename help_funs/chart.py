@@ -12,7 +12,8 @@ date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
-def line_chart(data, path, labels, title=None, x_scale=None, y_scale=None, y_label=None, show=False, log_y=False,
+def line_chart(data, path, labels, x=None, title=None, x_scale=None, y_scale=None, y_label=None, show=False,
+               log_y=False,
                cla_leg=False):
     if data.shape[1] <= 1:
         return
@@ -23,7 +24,8 @@ def line_chart(data, path, labels, title=None, x_scale=None, y_scale=None, y_lab
         x_scale = [1, 1]
 
     for i, row in enumerate(data):
-        x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
+        if x is None:
+            x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
         y = row
         plt.plot(x, y, label=labels[i])
 
