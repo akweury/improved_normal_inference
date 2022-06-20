@@ -21,8 +21,8 @@ class FGCNN(nn.Module):
         # self.epsilon = 1e-20
         channel_size_1 = channel_num
         channel_size_2 = channel_num * 2
-        channel_size_3 = channel_num * 4
-        channel_size_4 = channel_num * 8
+        channel_size_3 = channel_num * 2
+        channel_size_4 = channel_num * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         self.init1 = GRB(in_ch, channel_size_1, kernel_down, True, stride, padding_down)
@@ -57,7 +57,7 @@ class FGCNN(nn.Module):
         self.u3l3 = GRB(channel_size_1, channel_size_1, kernel_up, False, stride, padding_up)
 
         self.out1 = ResidualBlock(channel_size_1, out_ch, (1, 1), False, (1, 1), (0, 0))
-        self.out2 = Conv(out_ch, out_ch, (1, 1), (1, 1), (0, 0), active_function="Tanh")
+        self.out2 = Conv(out_ch, out_ch, (1, 1), (1, 1), (0, 0), active_function="")
 
     def forward(self, xin):
         x1 = self.init1(xin)

@@ -33,6 +33,8 @@ class Conv(_ConvNd):
             return self.active_ReLU(self.conv(x))
         elif self.active_name == "Tanh":
             return self.active_Tanh(self.conv(x))
+        elif self.active_name == "":
+            return self.conv(x)
         else:
             raise ValueError
 

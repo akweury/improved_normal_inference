@@ -506,7 +506,7 @@ def train_epoch(nn_model, epoch):
         if not nn_model.args.fast_train:
             if nn_model.args.angle_loss:
                 angle_loss_avg = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
-                angle_loss_avg_light = mu.eval_albedo_tensor(out[:, 3, :, :], target[:, 3, :, :])
+                # angle_loss_avg_light = mu.eval_albedo_tensor(out[:, 3, :, :], target[:, 3, :, :])
                 # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
 
         # visualisation
