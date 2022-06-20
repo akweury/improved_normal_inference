@@ -659,7 +659,7 @@ def train_fugrc(nn_model, epoch):
             loss_logs['total_loss'].append(loss.item())
         else:
             loss = nn_model.loss(out, target, nn_model.args)
-            print(f"loss: {loss}")
+            # print(f"loss: {loss}")
         # Backward pass
         loss.backward()
 
