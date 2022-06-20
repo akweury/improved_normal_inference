@@ -687,7 +687,6 @@ def train_fugrc(nn_model, epoch):
                                 epoch=epoch,
                                 i=j,
                                 train_idx=test_idx,
-                                output_type=nn_model.args.output_type,
                                 prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
     # save loss
@@ -756,7 +755,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, output_type, prefix):
+def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefix):
     target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
     # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
     # xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
@@ -882,10 +881,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, outpu
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
 
-    if output_type != "noise":
-        output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
-    else:
-        output = cv.hconcat(output_list)
+    output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}.png")
     cv.imwrite(output_name, output)
 
