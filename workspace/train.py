@@ -575,7 +575,6 @@ def train_epoch(nn_model, epoch):
                                     epoch=epoch,
                                     i=j,
                                     train_idx=test_idx,
-                                    output_type=nn_model.args.output_type,
                                     prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
     # save loss
