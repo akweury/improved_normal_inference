@@ -133,10 +133,10 @@ def main():
     else:
         raise ValueError("Unknown exp path")
 
-    if args.dataset in ['synthetic128local', 'synthetic256local', 'synthetic512local']:
+    if args.machine == "local":
         dataset_path = config.synthetic_data_noise_local / args.dataset
-    elif args.dataset in ['synthetic128dfki', 'synthetic256dfki', 'synthetic512dfki']:
-        dataset_path = config.synthetic_data_noise_dfki
+    elif args.machine == "remote":
+        dataset_path = config.synthetic_data_noise_dfki / args.dataset
     else:
         raise ValueError
 
