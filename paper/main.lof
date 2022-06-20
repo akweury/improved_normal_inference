@@ -15,30 +15,32 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }}{10}{figure.caption.40}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }}{11}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }}{12}{figure.caption.47}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Depth Map of an object captured by Kinect\relax }}{14}{figure.caption.50}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{14}{figure.caption.52}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Some point clouds in training dataset\relax }}{14}{figure.caption.51}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Noise-intensity on 0, 10, 20, 30, 40, 50. Object Name: elephant-zun-lid.\relax }}{16}{figure.caption.59}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Noise-intensity on 0, 10, 20, 30, 40, 50. Object Name: elephant-zun-lid.\relax }}{16}{figure.caption.60}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }}{19}{figure.caption.66}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }}{17}{figure.caption.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces GCNN Normal Inference on Synthetic Dataset (object: dragon)\relax }}{20}{figure.caption.67}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces GCNN Normal Inference on Synthetic Dataset (object: dragon)\relax }}{18}{figure.caption.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Evaluation on Real Dataset\relax }}{20}{figure.caption.68}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Evaluation on Real Dataset\relax }}{18}{figure.caption.69}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.4}{\ignorespaces guided-GCNN Normal Inference on Synthetic Dataset (object: dragon). GCNN result is shown on (d) and (e) as comparison.\relax }}{18}{figure.caption.71}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Normal Inference on different models with errors. (object: dragon)\relax }}{19}{figure.caption.73}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{24}{figure.caption.74}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{24}{figure.caption.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{25}{figure.caption.75}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{25}{figure.caption.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{26}{figure.caption.76}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{26}{figure.caption.79}%

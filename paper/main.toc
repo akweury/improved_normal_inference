@@ -39,48 +39,52 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.2.3}Loss Function}{9}{subsection.41}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{10}{section.43}%
+\contentsline {subsubsection}{Perceptual Loss}{9}{section*.42}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{10}{subsection.44}%
+\contentsline {subsubsection}{L2 Loss}{9}{section*.43}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Add the light information}{10}{subsection.46}%
+\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{11}{section.45}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.47}%
+\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{11}{subsection.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.48}%
+\contentsline {subsection}{\numberline {3.3.2}Add the light information}{11}{subsection.48}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.49}%
+\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Surface Normal}{14}{subsection.52}%
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.50}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Point Cloud}{14}{subsection.53}%
+\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud calculation}{15}{subsection.54}%
+\contentsline {subsection}{\numberline {4.1.2}Data Files}{13}{subsection.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Point Cloud Normalization}{15}{subsection.55}%
+\contentsline {subsection}{\numberline {4.1.3}Point Cloud}{14}{subsection.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Noise}{16}{subsection.58}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud calculation}{14}{subsection.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.7}Fit to PyTorch}{16}{subsection.60}%
+\contentsline {subsection}{\numberline {4.1.5}Point Cloud Normalization}{15}{subsection.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Real Dataset}{17}{section.62}%
+\contentsline {subsection}{\numberline {4.1.6}Noise}{15}{subsection.59}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}Metrics for evaluation}{17}{section.63}%
+\contentsline {subsection}{\numberline {4.1.7}Fit to PyTorch}{16}{subsection.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.64}%
+\contentsline {section}{\numberline {4.2}Real Dataset}{16}{section.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{19}{section.65}%
+\contentsline {section}{\numberline {4.3}Metrics for evaluation}{16}{section.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.69}%
+\contentsline {chapter}{\numberline {5}Experiments}{17}{chapter.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}GaRes Model}{20}{section.70}%
+\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{17}{section.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{21}{chapter.71}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{18}{section.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{23}{appendix.72}%
+\contentsline {section}{\numberline {5.3}model comparison}{19}{section.72}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{23}{section.73}%
+\contentsline {chapter}{\numberline {6}Conclusion}{21}{chapter.74}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{23}{section.77}%
+\contentsline {chapter}{\numberline {A}Dataset}{23}{appendix.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{27}{appendix*.78}%
+\contentsline {section}{\numberline {A.1}Dataset}{23}{section.76}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{23}{section.80}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{27}{appendix*.81}%

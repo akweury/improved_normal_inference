@@ -715,7 +715,7 @@ def tenor2numpy(tensor):
     elif tensor.size() == (1, 1, 512, 512):
         return tensor.permute(2, 3, 1, 0).sum(dim=3).detach().numpy()
     else:
-        print("Unsupported input tensor size.")
+        raise ValueError("Unsupported input tensor size.")
 
 
 def show_tensor(tensor, title):

@@ -778,10 +778,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, outpu
     output_list = []
 
     # input normal
-    if output_type == "noise":
-        input = mu.tenor2numpy(x0[:1, :1, :, :])
-    else:
-        input = mu.tenor2numpy(x0[:1, :3, :, :])
+    input = x0[:1, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
     x0_normalized_8bit = mu.normalize2_32bit(input)
     x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
