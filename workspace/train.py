@@ -616,7 +616,7 @@ def train_epoch(nn_model, epoch):
     return is_best
 
 
-def train_fugrc(nn_model, epoch):
+def train_fugrc(nn_model, epoch, loss_network):
     nn_model.args.epoch = epoch
     print(
         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
@@ -624,7 +624,6 @@ def train_fugrc(nn_model, epoch):
     nn_model.model.train()
     loss_logs = {'content_loss': [], 'style_loss': [], 'tv_loss': [], 'total_loss': []}
     # loss network
-    loss_network = torchvision.models.__dict__[nn_model.args.vgg_flag](pretrained=True).features.to(nn_model.device)
     # loss_network = None
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -892,11 +891,12 @@ def main(args, exp_dir, network, train_dataset):
 
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
+    loss_network = torchvision.models.__dict__[nn_model.args.vgg_flag](pretrained=True).features.to(nn_model.device)
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
         if nn_model.args.exp == "fugrc":
-            is_best = train_fugrc(nn_model, epoch)
+            is_best = train_fugrc(nn_model, epoch, loss_network)
         else:
             is_best = train_epoch(nn_model, epoch)
         # Learning rate scheduler
