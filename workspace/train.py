@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
+import torchvision
 from torch import nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
@@ -26,6 +27,50 @@ from help_funs import mu
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
+mse_criterion = torch.nn.MSELoss(reduction='mean')
+
+
+# https://github.com/tyui592/Perceptual_loss_for_real_time_style_transfer/blob/master/train.py#L76
+def extract_features(model, x, layers):
+    features = list()
+    for index, layer in enumerate(model):
+        x = layer(x.float())
+        if index in layers:
+            features.append(x)
+    return features
+
+
+def gram(x):
+    b, c, h, w = x.size()
+    g = torch.bmm(x.view(b, c, h * w), x.view(b, c, h * w).transpose(1, 2))
+    return g.div(h * w)
+
+
+def calc_Content_Loss(features, targets, weights=None):
+    if weights is None:
+        weights = [1 / len(features)] * len(features)
+
+    content_loss = 0
+    for f, t, w in zip(features, targets, weights):
+        content_loss += mse_criterion(f, t) * w
+
+    return content_loss
+
+
+def calc_Gram_Loss(features, targets, weights=None):
+    if weights is None:
+        weights = [1 / len(features)] * len(features)
+
+    gram_loss = 0
+    for f, t, w in zip(features, targets, weights):
+        gram_loss += mse_criterion(gram(f), gram(t)) * w
+    return gram_loss
+
+
+def calc_TV_Loss(x):
+    tv_loss = torch.mean(torch.abs(x[:, :, :, :-1] - x[:, :, :, 1:]))
+    tv_loss += torch.mean(torch.abs(x[:, :, :-1, :] - x[:, :, 1:, :]))
+    return tv_loss
 
 
 # -------------------------------------------------- loss function ---------------------------------------------------
@@ -262,7 +307,7 @@ loss_dict = {
 # ----------------------------------------- Dataset Loader -------------------------------------------------------------
 class SyntheticDepthDataset(Dataset):
 
-    def __init__(self, data_path, k, output_type, setname='train'):
+    def __init__(self, data_path, k=0, output_type="normal_noise", setname='train'):
         if setname in ['train', 'val', 'test']:
             self.training_case = np.array(
                 sorted(
@@ -342,8 +387,8 @@ class TrainingModel():
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
 
-        train_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='train')
-        test_dataset = SyntheticDepthDataset(dataset_path, self.args.neighbor, self.args.output_type, setname='val')
+        train_dataset = SyntheticDepthDataset(dataset_path, setname='train')
+        test_dataset = SyntheticDepthDataset(dataset_path, setname='val')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -483,16 +528,8 @@ def train_epoch(nn_model, epoch):
         # Forward pass
         out = nn_model.model(input)
 
-        if nn_model.args.exp == "ncnn":
-            target[:, 5:8, :, :] = (target[:, 5:8, :, :] + 1) * 0.5
-            target[:, :3, :, :] = (target[:, :3, :, :] + 1) * 0.5
-
         # Compute the loss
         loss = nn_model.loss(out, target, nn_model.args)
-
-        if nn_model.args.exp == "ncnn":
-            target[:, 5:8, :, :] = (target[:, 5:8, :, :] * 2) - 1
-            target[:, :3, :, :] = (target[:, :3, :, :] * 2) - 1
 
         # Backward pass
         loss.backward()
@@ -558,7 +595,7 @@ def train_epoch(nn_model, epoch):
     # indicate for best model saving
     if nn_model.best_loss > loss_avg:
         nn_model.best_loss = loss_avg
-        print(f'best loss updated to {loss_avg}.')
+        print(f'best loss updated to {loss_avg:.2e}')
         is_best = True
     else:
         is_best = False
@@ -577,6 +614,106 @@ def train_epoch(nn_model, epoch):
             draw_line_chart(np.array([nn_model.angle_losses_light[0]]), nn_model.output_folder, log_y=True,
                             label="albedo",
                             epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
+    return is_best
+
+
+def train_fugrc(nn_model, epoch):
+    nn_model.args.epoch = epoch
+    print(
+        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
+    # ------------ switch to train mode -------------------
+    nn_model.model.train()
+    loss_logs = {'content_loss': [], 'style_loss': [], 'tv_loss': [], 'total_loss': []}
+    # loss network
+    loss_network = torchvision.models.__dict__[nn_model.args.vgg_flag](pretrained=True).features.to(nn_model.device)
+    # loss_network = None
+    for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
+        # put input and target to device
+        input, target = input[:, :3, :, :].to(nn_model.device), target[:, :3, :, :].to(nn_model.device)
+
+        # Wait for all kernels to finish
+        torch.cuda.synchronize()
+
+        # Clear the gradients
+        nn_model.optimizer.zero_grad()
+
+        # Forward pass
+        out = nn_model.model(input)
+
+        target_content_features = extract_features(loss_network, input, nn_model.args.content_layers)
+        target_style_features = extract_features(loss_network, target, nn_model.args.style_layers)
+
+        output_content_features = extract_features(loss_network, out, nn_model.args.content_layers)
+        output_style_features = extract_features(loss_network, out, nn_model.args.style_layers)
+
+        # Compute the loss
+        content_loss = calc_Content_Loss(output_content_features, target_content_features)
+        style_loss = calc_Gram_Loss(output_style_features, target_style_features)
+        tv_loss = calc_TV_Loss(out)
+
+        loss = content_loss * nn_model.args.content_weight + style_loss * nn_model.args.style_weight + tv_loss * nn_model.args.tv_weight
+
+        loss_logs['content_loss'].append(float(content_loss))
+        loss_logs['style_loss'].append(float(style_loss))
+        loss_logs['tv_loss'].append(tv_loss.item())
+        loss_logs['total_loss'].append(loss.item())
+
+        # Backward pass
+        loss.backward()
+
+        # Update the parameters
+        nn_model.optimizer.step()
+
+        # print statistics
+        np.set_printoptions(precision=5)
+        torch.set_printoptions(sci_mode=True, precision=3)
+        loss = loss / int(nn_model.args.batch_size)
+
+        if epoch % 10 == 0:
+            print(f"\t loss: {loss:.2e}")
+
+        # evaluation
+        if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+            for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
+                with torch.no_grad():
+                    # put input and target to device
+                    input, target = input.to(nn_model.device), target.to(nn_model.device)
+                    # Wait for all kernels to finish
+                    torch.cuda.synchronize()
+                    # Forward pass
+                    out = nn_model.model(input)
+                    input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
+                        'cpu')
+                    draw_output(nn_model.args.exp, input, out,
+                                target=target,
+                                exp_path=nn_model.output_folder,
+                                epoch=epoch,
+                                i=j,
+                                train_idx=test_idx,
+                                output_type=nn_model.args.output_type,
+                                prefix=f"eval_epoch_{epoch}_{test_idx}_")
+
+    # save loss
+    nn_model.losses[0, epoch] = (np.sum(loss_logs['total_loss']) / len(nn_model.train_loader.dataset))
+    nn_model.losses[1, epoch] = (np.sum(loss_logs['content_loss']) / len(nn_model.train_loader.dataset))
+    nn_model.losses[2, epoch] = (np.sum(loss_logs['style_loss']) / len(nn_model.train_loader.dataset))
+
+    # indicate for best model saving
+    if nn_model.best_loss > nn_model.losses[0, epoch]:
+        nn_model.best_loss = nn_model.losses[0, epoch]
+        print(f'best loss updated to {nn_model.losses[0, epoch]}.')
+        is_best = True
+    else:
+        is_best = False
+
+    # draw line chart
+    if epoch % 10 == 9:
+        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+                        log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
+        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+                        log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
+        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+                        log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True, title="Loss")
     return is_best
 
 
@@ -767,19 +904,15 @@ def main(args, exp_dir, network, train_dataset):
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
-        is_best = train_epoch(nn_model, epoch)
-
+        if nn_model.args.exp == "fugrc":
+            is_best = train_fugrc(nn_model, epoch)
+        else:
+            is_best = train_epoch(nn_model, epoch)
         # Learning rate scheduler
         nn_model.lr_decayer.step()
 
         # Save checkpoint in case evaluation crashed
-        if nn_model.args.fast_train:
-            save_modulo = 100
-        else:
-            save_modulo = 1
-
-        if epoch % save_modulo == 0:
-            nn_model.save_checkpoint(is_best, epoch)
+        nn_model.save_checkpoint(is_best, epoch)
 
 
 if __name__ == '__main__':

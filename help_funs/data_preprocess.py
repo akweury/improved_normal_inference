@@ -10,8 +10,10 @@ from help_funs import file_io
 
 
 def noisy_1channel(img, noise_factor=None):
+    if len(img.shape) == 3:
+        img = img.sum(axis=-1)
     img_shape = img.shape
-    img_1d = img.reshape(512 * 512)
+    img_1d = img.reshape(img_shape[0] * img_shape[1])
     if noise_factor == None:
         noise_factor = np.random.uniform(0, 0.5)
     indices = np.random.choice(np.arange(img_1d.size), replace=False, size=int(img_1d.size * noise_factor))

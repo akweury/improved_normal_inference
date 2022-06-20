@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
-parser.add_argument('--data', type=str, default="synthetic", choices=['synthetic', 'real'],
+parser.add_argument('--data', type=str, default="synthetic",
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0,1",
                     help="loading dataset from local or dfki machine")
@@ -154,15 +154,15 @@ def convert2training_tensor(path, k, output_type='normal'):
         print(f'File {item + 1}/{len(data_files)} converted to tensor. K = {k}')
 
 
-if args.data == "synthetic":
+if args.data in ["synthetic128", "synthetic256", "synthetic512"]:
     for folder in ["train", "test", "val"]:
 
         if args.machine == "remote":
-            original_folder = config.synthetic_data_dfki / folder
-            dataset_folder = config.synthetic_data_noise_dfki / folder
+            original_folder = config.synthetic_data_dfki / args.data / folder
+            dataset_folder = config.synthetic_data_noise_dfki / args.data / folder
         elif args.machine == 'local':
-            original_folder = config.synthetic_data / folder
-            dataset_folder = config.synthetic_data_noise / folder
+            original_folder = config.synthetic_data / args.data / folder
+            dataset_folder = config.synthetic_data_noise / args.data / folder
         else:
             raise ValueError
         if args.noise == "true":

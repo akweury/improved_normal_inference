@@ -57,7 +57,9 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
 
 
 def save_scaled16bitImage(image, img_name, minVal, maxVal):
-    img = image.reshape(512, 512)
+    if len(image.shape) != 2:
+        raise ValueError
+    img = image.copy()
     img[np.isnan(img) != 0] = 0
     mask = (img == 0)
 
@@ -111,13 +113,13 @@ def load_24bitNormal(root):
     nml[np.isnan(nml)] = 0
     nml = nml[:, :, [2, 1, 0]]
     mask = (nml[:, :, 0] == 0) & (nml[:, :, 1] == 0) & (nml[:, :, 2] == 0)
-
+    w, h = mask.shape
     nml[:, :, 0] = (~mask) * (nml[:, :, 0] / 255.0 * 2.0 - 1.0)
     nml[:, :, 1] = (~mask) * (nml[:, :, 1] / 255.0 * 2.0 - 1.0)
     nml[:, :, 2] = (~mask) * (1.0 - nml[:, :, 2] / 255.0 * 2.0)
 
     nml = R.transpose(0, 1) @ torch.tensor(nml).permute(2, 0, 1).reshape(3, -1)
-    nml = nml.reshape(3, 512, 512).permute(1, 2, 0)
+    nml = nml.reshape(3, w, h).permute(1, 2, 0)
 
     return np.array(nml).astype(np.float32)
 
