@@ -19,12 +19,8 @@ geo_data = dataset / "data_geometrical_body"
 synthetic_data = dataset / "data_synthetic"
 synthetic_data_dfki = Path("/datasets/sha/data_synthetic")
 synthetic_data_nobg = dataset / "data_synthetic_nobg"
-synthetic_data_noise_128_local = dataset / "data_synthetic_noise" / "synthetic128"
-synthetic_data_noise_256_local = dataset / "data_synthetic_noise" / "synthetic256"
-synthetic_data_noise_512_local = dataset / "data_synthetic_noise" / "synthetic512"
-synthetic_data_noise_128_dfki = Path("/datasets/sha/data_synthetic_noise/synthetic128")
-synthetic_data_noise_256_dfki = Path("/datasets/sha/data_synthetic_noise/synthetic256")
-synthetic_data_noise_512_dfki = Path("/datasets/sha/data_synthetic_noise/synthetic512")
+synthetic_data_noise_local = dataset / "data_synthetic_noise"
+synthetic_data_noise_dfki = Path("/datasets/sha/data_synthetic_noise")
 
 # real dataset path
 real_data = dataset / "data_real"

@@ -11,7 +11,7 @@ scp D:\TUK\improved_normal_inference\dataset\synthetic128.zip sha@pc-2103:/datas
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --machine remote --max_k 0 --clear true
+CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --data synthetic128 --machine remote --max_k 0 --clear true
 ```
 
 #### resume a training work

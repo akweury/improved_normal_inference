@@ -162,7 +162,7 @@ if args.data in ["synthetic128", "synthetic256", "synthetic512"]:
             dataset_folder = config.synthetic_data_noise_dfki / args.data / folder
         elif args.machine == 'local':
             original_folder = config.synthetic_data / args.data / folder
-            dataset_folder = config.synthetic_data_noise / args.data / folder
+            dataset_folder = config.synthetic_data_noise_local / args.data / folder
         else:
             raise ValueError
         if args.noise == "true":
