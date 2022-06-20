@@ -779,7 +779,6 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
     # input normal
     input = x0[:1, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
     x0_normalized_8bit = mu.normalize2_32bit(input)
-    x0_normalized_8bit = mu.image_resize(x0_normalized_8bit, width=512, height=512)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
     mu.addText(x0_normalized_8bit, str(train_idx), pos='lower_left', font_size=0.3)
     output_list.append(x0_normalized_8bit)
