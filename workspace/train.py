@@ -669,9 +669,6 @@ def train_fugrc(nn_model, epoch):
         torch.set_printoptions(sci_mode=True, precision=3)
         loss = loss / int(nn_model.args.batch_size)
 
-        if epoch % 10 == 0:
-            print(f"\t loss: {loss:.2e}")
-
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
