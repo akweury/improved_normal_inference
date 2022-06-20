@@ -594,7 +594,7 @@ def train_epoch(nn_model, epoch):
     # indicate for best model saving
     if nn_model.best_loss > loss_avg:
         nn_model.best_loss = loss_avg
-        print(f'best loss updated to {float(loss_avg):.2e}')
+        print(f'best loss updated to {float(loss_avg):.8e}')
         is_best = True
     else:
         is_best = False
@@ -659,6 +659,7 @@ def train_fugrc(nn_model, epoch):
             loss_logs['total_loss'].append(loss.item())
         else:
             loss = nn_model.loss(out, target, nn_model.args)
+            print(f"loss: {loss}")
         # Backward pass
         loss.backward()
 
