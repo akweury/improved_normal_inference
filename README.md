@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --print-freq 10
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp fugrc --print-freq 100 --batch_size 4 --train-on 1000 --num-channels 4
+CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp fugrc --num-channels 4 --dataset synthetic128dfki
 ```
 
 #### evaluate the test dataset (no visualisation)

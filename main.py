@@ -37,7 +37,7 @@ def paser():
     ########### General Dataset arguments ##########
 
     parser.add_argument('--dataset', type=str, default='', help='Dataset Name.')
-    parser.add_argument('--batch_size', '-b', default=8, type=int, help='Mini-batch size (default: 8)')
+    parser.add_argument('--batch_size', '-b', default=4, type=int, help='Mini-batch size (default: 4)')
 
     parser.add_argument('--train-on', default='full', type=str, help='The number of images to train on from the data.')
 
@@ -56,7 +56,7 @@ def paser():
 
     parser.add_argument('--penalty', '-pena', default=1.2, help='penalty of output value which out of range [0-255]')
     ########### Logging ###########
-    parser.add_argument('--print-freq', default=10, type=int,
+    parser.add_argument('--print-freq', default=100, type=int,
                         help='Printing evaluation criterion frequency (default: 10)')
     parser.add_argument('--angle_loss', default=False, type=bool,
                         help='Calculate angle loss and plot')
