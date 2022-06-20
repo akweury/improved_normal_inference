@@ -639,24 +639,26 @@ def train_fugrc(nn_model, epoch):
         # Forward pass
         out = nn_model.model(input)
 
-        target_content_features = extract_features(loss_network, input, nn_model.args.content_layers)
-        target_style_features = extract_features(loss_network, target, nn_model.args.style_layers)
+        if nn_model.args.loss == "perceptual_loss":
+            target_content_features = extract_features(loss_network, input, nn_model.args.content_layers)
+            target_style_features = extract_features(loss_network, target, nn_model.args.style_layers)
 
-        output_content_features = extract_features(loss_network, out, nn_model.args.content_layers)
-        output_style_features = extract_features(loss_network, out, nn_model.args.style_layers)
+            output_content_features = extract_features(loss_network, out, nn_model.args.content_layers)
+            output_style_features = extract_features(loss_network, out, nn_model.args.style_layers)
 
-        # Compute the loss
-        content_loss = calc_Content_Loss(output_content_features, target_content_features)
-        style_loss = calc_Gram_Loss(output_style_features, target_style_features)
-        tv_loss = calc_TV_Loss(out)
+            # Compute the loss
+            content_loss = calc_Content_Loss(output_content_features, target_content_features)
+            style_loss = calc_Gram_Loss(output_style_features, target_style_features)
+            tv_loss = calc_TV_Loss(out)
 
-        loss = content_loss * nn_model.args.content_weight + style_loss * nn_model.args.style_weight + tv_loss * nn_model.args.tv_weight
+            loss = content_loss * nn_model.args.content_weight + style_loss * nn_model.args.style_weight + tv_loss * nn_model.args.tv_weight
 
-        loss_logs['content_loss'].append(float(content_loss))
-        loss_logs['style_loss'].append(float(style_loss))
-        loss_logs['tv_loss'].append(tv_loss.item())
-        loss_logs['total_loss'].append(loss.item())
-
+            loss_logs['content_loss'].append(float(content_loss))
+            loss_logs['style_loss'].append(float(style_loss))
+            loss_logs['tv_loss'].append(tv_loss.item())
+            loss_logs['total_loss'].append(loss.item())
+        else:
+            loss = nn_model.loss(out, target, nn_model.args)
         # Backward pass
         loss.backward()
 
@@ -666,7 +668,6 @@ def train_fugrc(nn_model, epoch):
         # print statistics
         np.set_printoptions(precision=5)
         torch.set_printoptions(sci_mode=True, precision=3)
-        loss = loss / int(nn_model.args.batch_size)
 
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
