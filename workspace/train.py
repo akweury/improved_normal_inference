@@ -595,7 +595,7 @@ def train_epoch(nn_model, epoch):
     # indicate for best model saving
     if nn_model.best_loss > loss_avg:
         nn_model.best_loss = loss_avg
-        print(f'best loss updated to {loss_avg:.2e}')
+        print(f'best loss updated to {float(loss_avg):.2e}')
         is_best = True
     else:
         is_best = False
