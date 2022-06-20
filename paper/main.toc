@@ -57,34 +57,34 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {4.1.2}Data Files}{13}{subsection.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Point Cloud}{14}{subsection.54}%
+\contentsline {subsection}{\numberline {4.1.3}Point Cloud}{15}{subsection.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud calculation}{14}{subsection.55}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud calculation}{15}{subsection.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Point Cloud Normalization}{15}{subsection.56}%
+\contentsline {subsection}{\numberline {4.1.5}Point Cloud Normalization}{15}{subsection.57}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Noise}{15}{subsection.59}%
+\contentsline {subsection}{\numberline {4.1.6}Noise}{16}{subsection.60}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.7}Fit to PyTorch}{16}{subsection.61}%
+\contentsline {subsection}{\numberline {4.1.7}Fit to PyTorch}{16}{subsection.62}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Real Dataset}{16}{section.63}%
+\contentsline {section}{\numberline {4.2}Real Dataset}{17}{section.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}Metrics for evaluation}{16}{section.64}%
+\contentsline {section}{\numberline {4.3}Metrics for evaluation}{17}{section.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{17}{chapter.65}%
+\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{17}{section.66}%
+\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{19}{section.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{18}{section.70}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}model comparison}{19}{section.72}%
+\contentsline {section}{\numberline {5.3}model comparison}{21}{section.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{21}{chapter.74}%
+\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{23}{appendix.75}%
+\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{23}{section.76}%
+\contentsline {section}{\numberline {A.1}Dataset}{25}{section.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{23}{section.80}%
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{27}{appendix*.81}%
+\contentsline {chapter}{Bibliography}{29}{appendix*.82}%

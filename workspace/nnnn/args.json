@@ -8,7 +8,7 @@
   "lr": 0.001,
   "lr_scheduler": "9999",
   "momentum": 0.9,
-  "loss": "angle_histo",
+  "loss": "angle",
   "penalty": 1.4,
   "albedo_penalty": 1e+6,
   "angle_loss_weight": 10,

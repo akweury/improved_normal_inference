@@ -9,13 +9,13 @@
 %----------------------------------------------------------------------------------------
 
 \section{Synthetic Dataset}
-To train a deep learning model with supervised learning scheme, a dataset should require two principles, truth-worthy ground-truth and comprehensive scenarios. The depth map captured by Kinect is not satisfied the first requirement since it is usually semi-dense with a number of missing pixels, as shown in Figure \ref{fig:kinect-depth}. Therefore, a more elaborate depth map is required for the training work. In this thesis, a dataset called ``synthetic50" is created for the training works.
+To train a deep learning model with supervised learning scheme, a dataset should require two principles, truth-worthy ground-truth and comprehensive scenarios. The depth map captured by Kinect is not satisfied the first requirement since it is usually semi-dense with a number of missing pixels, as shown in Figure \ref{fig:kinect-depth}. Therefore, a more elaborate depth map is required for the training work. In this thesis, a dataset called ``synthetic50-5" is created for the training works.
 
 
 \subsection{Resource}
 \cite{data1}, \cite{data2}, \cite{data3} and \cite{data4} published a set of point cloud dataset on the internet for computer vision task research. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. Each objects has been scanned for hundreds of times for an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds makes the normal inference task trivial since the neighbor based method performs good enough for these kind of task. Some of the point cloud even equipped with pre-computed normal map based on more advanced methods. They all provides the accurate ground-truth for the supervised learning method.
 
-In this thesis, 50 point clouds scanned on real objects have been used for training work and 5 point clouds have been used for test work. Figure \ref{fig:dataset-demo} illustrates some of the point clouds. Appendix \ref{AppendixA} gives a full version of dataset models.
+The ``synthetic50-5", is a datset with 50 point clouds as training set and 5 point clouds as test set. The dataset is created base on the work of this thesis and using for normal inference task. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
 
 \begin{figure}[!h]
 	\centering
@@ -59,7 +59,19 @@ In this thesis, 50 point clouds scanned on real objects have been used for train
 
 
 \subsection{Data Files}
-In order to fit the using scenario of Kinect as much as possible, a set of synthetic 3D scenes of each object is captured via Unity, which is a game engine using for 3D games creation. It can place the point cloud in a virtual   The main advantage using generated scene is the complete information of all the information in the synthetic world. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. To construct the dataset, 1000 different scenes have been saved. The model pose, camera position, light position are random changed in each scene.
+In order to fit the using scenario of Kinect as much as possible, the dataset consists of the generated synthetic 3D scenes via Unity, which is a game engine using for 3D games creation. 
+
+In the synthetic scenes from engine, the object is placed on a cylinder platform, which is lighted by a directional light nearby. A camera focus on the platform and captured the scene. The layout in the game engine is shown in Figure \ref{fig:unity-workplace}. In order to simulate more scenarios, the positions of the camera and directional light are randomly changed in each new scene. For 50 training objects, 1000 scenes are generated and each scene is saved in 3 kinds of resolutions $ 512\times512\times3 $, $ 256\times256\times3 $ and $ 128\times128\times3 $.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=.8\textwidth]{./Figures/unity-workplace.PNG}
+	\caption{The layout of synthetic scenes generation in Unity.}
+	\label{fig:unity-workplace}
+\end{figure}
+
+The main advantage using generated scene is the availability of complete information. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control.
+
 For each scene, following information is recorded
 \begin{itemize}
 	\item Depth range
@@ -69,21 +81,11 @@ For each scene, following information is recorded
 	\item Grayscale image
 	\item Normal Map	
 \end{itemize}
-
-
-
-\begin{itemize}
-	\item Grayscale Image
-\end{itemize}
-
-In Unity, the grayscale image in acquired via RGB texture by the following equation:
+where the grayscale image in acquired via RGB texture by the following equation:
 \[ gray: \frac{r+2g+b}{4}  \]
 
 
 
-%% What is surface normal
-\label{sec:surface-normal}
-In three dimension geometry, a surface normal at the point $ P $ is a vector $ n $ perpendicular to the tangent plane of the surface at point $ P $. The length of a normal is usually one, with a sign to represent the sides (interior or exterior).%% add a picture to illustrate
 
 
 \subsection{Point Cloud}
