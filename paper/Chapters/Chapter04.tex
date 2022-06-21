@@ -101,8 +101,18 @@ For each scene, following information is recorded
 
 A depth map $ D $ is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. The grayscale image can be used as guided normal inference task and also as a readable scene for human. The gray-color is converted from RGB color based on following equation 
 \[ gray: \frac{r+2g+b}{4}  \]
-The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal and its corresponding RGB color can be converted based on following equation:
-\[  \]
+The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on following equation:
+\begin{dgroup*}
+	\begin{dmath*}
+		n_x = \frac{R}{255} * 2 - 1
+	\end{dmath*}
+	\begin{dmath*}
+		n_y = \frac{G}{255}*2 - 1
+	\end{dmath*} 
+	\begin{dmath*}
+		n_z = 1-\frac{B}{255} * 2
+	\end{dmath*}
+\end{dgroup*}
 If consider the relation between Lambertian reflection and normal direction, the light source can be used to calculate the reflect direction of each point.
 The camera intrinsic and extrinsic matrix helps point cloud calculation.
 
@@ -110,19 +120,37 @@ It is necessary to point out again that ``synthetic50-5" aiming to rebuild the u
 
 
 
-
-
 \subsection{Convert to Point Cloud}
 \label{sec:depth-map-to-point-cloud}
 The depth map can be converted to 3D vertex point cloud as the input of the normal inference model. 
 
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture} 
+		% reference lines
+		\draw[thick,dashed]	(0,0) -- (10,0) ; % bottom
+		\draw[thick,dashed]	(0,3) -- (10,3) node[pos=0.9, above] {image plane}; % middle
+		\draw[thick,dashed]	(0,6) -- (10,6); % top
+		% camera 
+		\filldraw[black] (5,0) circle (2pt) node[anchor=south west]{Camera Position};
+		% world point 
+		\filldraw[black] (7,6) circle (2pt) node[anchor=north west]{Point};
+		% image point
+		\filldraw[black] (6,3) circle (2pt) node[anchor=north west]{Pixel};
+		% similiar triangles
+		\draw[thick] (5,0) -- (5,6); % AB
+		\draw[thick] (5,0) -- (7,6); % AC
+		\draw[thick] (5,6) -- (7,6) node[midway, below] {$ X $}; % BC
+		\draw[thick] (5,3) -- (6,3) node[midway, below] {$ u $};
+		% measure arrows
+		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
+		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
+	\end{tikzpicture}	
+	\caption{Convert depth to point in camera coordinate system}
+	\label{fig:depth-triangulation}
+\end{figure}
 
-
-
-\subsection{Point Cloud calculation}
-
-Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The $ x  $ and $ y $ axes perpendicular with each other. For a pixel $ (u,v) $ on depth map, its value $ D(u,v) $ is the $ Z $ component of the 3D point $P_C = (X,Y,Z) $ corresponding the camera origin. Based on the triangle similarity, we can get other two components $ X $ and $ Y $ as follows
-
+Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The $ x  $ and $ y $ axes perpendicular with each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ in camera coordinate system. The $ X $ and $ Y $ can be calculated based on the triangle similarity
 \begin{dgroup*}
 	
 	\begin{dmath*}
@@ -134,7 +162,7 @@ Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The 
 \end{dgroup*}
 
 where $ fk_u, fk_v $ is the focal length in pixels align $ u $ and $ v $ axes.
-It can be further converted to world coordinate system based on extrinsic matrix $ R $ and $ t $, that is
+Converted a point from camera coordinate system to world coordinate system, using extrinsic matrix $ R $ and $ t $
 \[P_W = P_CR+t \]
 
 \subsection{Point Cloud Normalization}
@@ -145,30 +173,29 @@ It can be further converted to world coordinate system based on extrinsic matrix
 
 The vertices have been normalized before feed them into the model. The depth range of each scene is shown in Figure \ref{fig:data-range}.
 The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus the normalization is required before feed training objects into the models. Figure \ref{fig:data-range} shows the fluctuation of extreme values and their ranges in 100 random training items. Table \ref{tab:data-range} gives the corresponding average values.
-%\begin{figure}[!h]
-%	\centering
-%	{\includegraphics[width=0.45\textwidth]{./pic/Data_Extreme.png}}
-%	{\includegraphics[width=0.45\textwidth]{./pic/Data_Range.png}}
-%	\label{fig:data_range}
-%	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
-%\end{figure}
-
-\begin{table}[!h]
+\begin{figure}[!h]
 	\centering
-	\begin{tabular}{|c|c|c|c|}
-		\hline
-		Axis & Range & Min & Max\\
-		\hline
-		X & 1.48 & -0.75 & 0.73\\
-		Y & 1.56 & -0.76 & 0.80\\
-		Z & 1.47 & 6.53 & 8.00\\
-		\hline
-	\end{tabular}
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
+	\label{fig:data_range}
+	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
+\end{figure}
+
+\begin{table}[h!]
 	\caption{The ranges and extreme values of each axis. The extreme min and max values of both X axis and Y axis are close to $ -0.75 $ and $ 0.75 $ separately. The case for Z axis is $ 6.5 $ and $ 8.0 $ separately. However, the range of three axes are relatively similar, around 1.5. 
 	}
 	\label{tab:data-range}
+	\centering
+	\begin{tabular}{c c c c}
+		\toprule
+		\tabhead{Axis} & \tabhead{Range} & \tabhead{Min} & \tabhead{Max}\\
+		\midrule
+		X & 1.48 & -0.75 & 0.73\\
+		Y & 1.56 & -0.76 & 0.80\\
+		Z & 1.47 & 6.53 & 8.00\\
+		\bottomrule\\
+	\end{tabular}
 \end{table}
-
 
 For the normalization, first we translate the point to the original point as much as possible, then choose the range value of one axis as a scale factor, normalize it to a unit object. 
 

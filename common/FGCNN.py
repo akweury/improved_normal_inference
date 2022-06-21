@@ -21,8 +21,8 @@ class FGCNN(nn.Module):
         # self.epsilon = 1e-20
         channel_size_1 = channel_num
         channel_size_2 = channel_num * 2
-        channel_size_3 = channel_num * 4
-        channel_size_4 = channel_num * 8
+        channel_size_3 = channel_num * 2
+        channel_size_4 = channel_num * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         # intro
