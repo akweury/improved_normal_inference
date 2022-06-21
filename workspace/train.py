@@ -892,15 +892,15 @@ def main(args, exp_dir, network, train_dataset):
 
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
-    if nn_model.args.exp == "fugrc":
-        loss_network = torchvision.models.__dict__[nn_model.args.vgg_flag](pretrained=True).features.to(nn_model.device)
+    # if nn_model.args.exp == "fugrc":
+    #     loss_network = torchvision.models.__dict__[nn_model.args.vgg_flag](pretrained=True).features.to(nn_model.device)
     ############ TRAINING LOOP ############
     for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
         # Train one epoch
-        if nn_model.args.exp == "fugrc":
-            is_best = train_fugrc(nn_model, epoch, loss_network)
-        else:
-            is_best = train_epoch(nn_model, epoch)
+        # if nn_model.args.exp == "fugrc":
+        #     is_best = train_fugrc(nn_model, epoch, loss_network)
+        # else:
+        is_best = train_epoch(nn_model, epoch)
         # Learning rate scheduler
         nn_model.lr_decayer.step()
 
