@@ -20,9 +20,9 @@ class FGCNN(nn.Module):
 
         # self.epsilon = 1e-20
         channel_size_1 = channel_num
-        channel_size_2 = channel_num * 2
-        channel_size_3 = channel_num * 2
-        channel_size_4 = channel_num * 2
+        channel_size_2 = channel_num * 1
+        channel_size_3 = channel_num * 1
+        channel_size_4 = channel_num * 1
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         # intro
@@ -64,13 +64,13 @@ class FGCNN(nn.Module):
         self.u3l3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
 
         # outro
-        self.out1 = Conv(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
-        self.out2 = Conv(out_ch, out_ch, (1, 1), (1, 1), (0, 0), active_function="")
+        self.out1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.out2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, xin):
         x1 = self.init1(xin)
-        x1 = self.init2(x1)
-        x1 = self.init3(x1)
+        x1 = self.d1l2(x1)
+        x1 = self.d1l3(x1)
 
         # Downsample 1
         x2 = self.d1l1(x1)
@@ -79,31 +79,31 @@ class FGCNN(nn.Module):
         # x2 = self.d1l4(x2)
 
         # Downsample 2
-        x3 = self.d2l1(x2)
-        x3 = self.d2l2(x3)
-        x3 = self.d2l3(x3)
+        x3 = self.d1l1(x2)
+        x3 = self.d1l2(x3)
+        x3 = self.d1l3(x3)
         # x3 = self.d2l4(x3)
 
         # Downsample 3
-        x4 = self.d3l1(x3)
-        x4 = self.d3l2(x4)
-        x4 = self.d3l3(x4)
+        x4 = self.d1l1(x3)
+        x4 = self.d1l2(x4)
+        x4 = self.d1l3(x4)
         # x4 = self.d3l4(x4)
 
         # Upsample 1
         x3 = self.u1l1(x4)
         x3 = self.u1l2(x3)
-        x3 = self.u1l3(x3)
+        # x3 = self.u1l3(x3)
 
         # Upsample 2
         x2 = self.u2l1(x3)
         x2 = self.u2l2(x2)
-        x2 = self.u2l3(x2)
+        # x2 = self.u2l3(x2)
 
         # # Upsample 3
         x1 = self.u3l1(x2)
         x1 = self.u3l2(x1)
-        x1 = self.u3l3(x1)
+        # x1 = self.u3l3(x1)
 
         xout = self.out1(x1)  # 512, 512
         xout = self.out2(xout)

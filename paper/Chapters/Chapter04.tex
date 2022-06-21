@@ -166,51 +166,12 @@ Converted a point from camera coordinate system to world coordinate system, usin
 \[P_W = P_CR+t \]
 
 \subsection{Point Cloud Normalization}
-
-
 \label{sec:dataset-normalization}
 %% How to represent input tensor, to make it fast converse
+The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus the normalization is required before feed training objects into the models.
+The range of each axis is shown in Figure \ref{fig:data-range}.  Table \ref{tab:data-range} gives a quantitative measurement of corresponding average values. 
 
-The vertices have been normalized before feed them into the model. The depth range of each scene is shown in Figure \ref{fig:data-range}.
-The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus the normalization is required before feed training objects into the models. Figure \ref{fig:data-range} shows the fluctuation of extreme values and their ranges in 100 random training items. Table \ref{tab:data-range} gives the corresponding average values.
-\begin{figure}[!h]
-	\centering
-	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
-	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
-	\label{fig:data_range}
-	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
-\end{figure}
-
-\begin{table}[h!]
-	\caption{The ranges and extreme values of each axis. The extreme min and max values of both X axis and Y axis are close to $ -0.75 $ and $ 0.75 $ separately. The case for Z axis is $ 6.5 $ and $ 8.0 $ separately. However, the range of three axes are relatively similar, around 1.5. 
-	}
-	\label{tab:data-range}
-	\centering
-	\begin{tabular}{c c c c}
-		\toprule
-		\tabhead{Axis} & \tabhead{Range} & \tabhead{Min} & \tabhead{Max}\\
-		\midrule
-		X & 1.48 & -0.75 & 0.73\\
-		Y & 1.56 & -0.76 & 0.80\\
-		Z & 1.47 & 6.53 & 8.00\\
-		\bottomrule\\
-	\end{tabular}
-\end{table}
-
-For the normalization, first we translate the point to the original point as much as possible, then choose the range value of one axis as a scale factor, normalize it to a unit object. 
-
-\begin{equation}\label{eq:normalization}
-	U^a = (V^a - V^a_{min}) / s  \quad  \text{for } a \text{ in }  X,Y,Z \text{ axis}
-\end{equation}
-where $ V^a_{min} $ denote the minimum value appeared in axis $ a $, $ s $ is the range of an axis, which can be any one of X, Y, or Z axis. 
-
-In this thesis, the range of X is chosen as scale factor for each scene.
-
-
-
-As discussed in \ref{sec:dataset-normalization}, the 3D vertex point cloud should be moved to origin point and normalize in range $ [0,1] $ to acquire a scale invariant feature.
-
-
+The normalization has been performed as follows. First translate the points to the original point as close as possible, then choose the range value of one axis as a scale factor, normalize the points to unit vectors. The equation is shown as follows
 \begin{dgroup*}
 	
 	\begin{dmath*}
@@ -223,8 +184,6 @@ As discussed in \ref{sec:dataset-normalization}, the 3D vertex point cloud shoul
 	\begin{dmath*}
 		Z_n = \frac{Z-\min(Z)}{s}
 	\end{dmath*}
-	
-	
 \end{dgroup*}
 
 where $ s $ is a scale factor, 
@@ -234,21 +193,44 @@ where $ s $ is a scale factor,
 \end{dmath*}
 It is calculated as the range in $ X $ axis, but theoretically can be used by $ Y $ or $ Z $ axes as well.
 
+\begin{figure}[!h]
+	\centering
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
+	\label{fig:data_range}
+	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
+\end{figure}
+
+\begin{table}[h!]
+	\caption{ The fluctuation of extreme values and their ranges in 100 random training items. 
+	}
+	\label{tab:data-range}
+	\centering
+	\begin{tabular}{c c c c}
+		\toprule
+		\tabhead{Axis} & \tabhead{Scale} & \tabhead{Min} & \tabhead{Max}\\
+		\midrule
+		X & 1.48 & -0.75 & 0.73\\
+		Y & 1.56 & -0.76 & 0.80\\
+		Z & 1.47 & 6.53 & 8.00\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
 
 
 
 \subsection{Noise}
 \label{sec:noise}
-The raw depth maps captured by Kinect usually have missing pixels. As shown in Figure \ref{fig:depth_map_kinect}.
-Observing the depth map, the missing pixels distributed all around the scene. Therefore an uniformly distributed pixel-delete noise is used for noise simulation. 
-It is reasonable that the noise intensities in different scenes are various. Some scenes have more missing pixels and some have less. It enables the model to not only learn scenarios with noise, but also with small minority noise or even without noise. In the noised dataset, the noise intensity is a x-percent pixel dropoff operation. For example, noise-intensity-10 means removes 10\% pixels.
-Figure \ref{fig:noise-intensity} shows the visualization of depth map after adding noise.
+The raw depth maps captured by Kinect usually have missing pixels. Therefore, the ``synthetic50-5" dataset adds a similar properties.
+As shown in Figure \ref{fig:depth_map_kinect}. the depth map has missing pixels distributed all around the scene.  Correspondingly, an uniformly distributed pixel-delete noise is used for noise simulation. 
+Furthermore, a parameter $ \mu $ is used to control the intensity of noise, it denotes the $ \mu $-percent pixel dropoff. For example, $ \mu-10 $ means removes 10\% pixels randomly. For each scene, the noising operation based on a random $ \mu $ in a range $ \left[0, 50\right] $, therefore some scenes have more missing pixels and some have less. The random noise intensity also enables the model to learn scenarios not only with noise, but also with minor noise or even without noise.
+Figure \ref{fig:noise-intensity} shows the noise effect on different $ \mu $.
 %% add noise image
 \begin{figure}[!h]
 	\centering
 	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
 	\decoRule	
-	\caption{Noise-intensity on 0, 10, 20, 30, 40, 50. Object Name: elephant-zun-lid.}
+	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
 	\label{fig:noise-intensity}
 \end{figure}
 
@@ -261,18 +243,17 @@ In order to saving the training time, the dataset is compressed in PyTorch forma
 	\centering
 	\begin{tabular}{l l}
 		\toprule
-		\tabhead{Name} & \tabhead{Description} \\
+		\tabhead{Name} & \tabhead{Content} \\
 		\midrule
 		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
 		\hline
-		\multirow{4}{*}{output-tensor}  & GT-Normal  \\ & GT-Normal * GT-Light-Direction \\ & Image \\ & GT-Light-Direction \\
+		\multirow{3}{*}{output-tensor}  & GT-Normal \\ & Image \\ & GT-Light-Direction \\
 		\hline
 		Light position & light position \\
 		\hline 
-		\multirow{3}{*}{Camera Matrix}  & K \\  & R \\  & t \\
+		Camera Matrix  & K,R,t\\
 		\hline 
-		\multirow{2}{*}{Depth Range}  & minDepth \\  & maxDepth \\
-		\hline
+		Depth Range  & minDepth, maxDepth\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
@@ -283,8 +264,4 @@ In order to saving the training time, the dataset is compressed in PyTorch forma
 \section{Real Dataset}
 
 The real dataset is the depth map and rgb image captured via Kinect...
-
-
-\section{Metrics for evaluation}
-Angle Loss
 
