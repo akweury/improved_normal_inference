@@ -149,7 +149,7 @@ class Transp(_ConvNd):
                                      stride, padding, dilation, False, (0, 0),
                                      groups, bias, padding_mode='zeros')
 
-        self.main = nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding)
+        self.main = nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding, output_padding=(1, 1))
         self.active = nn.LeakyReLU(0.01)
         self.bn1 = nn.BatchNorm2d(out_channels)
 
