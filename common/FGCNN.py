@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from common.Layers import GRB, TRB, GConv, GTransp, Transp, ResidualBlock, Conv
 
@@ -23,6 +25,7 @@ class FGCNN(nn.Module):
         channel_size_2 = channel_num * 1
         channel_size_3 = channel_num * 1
         channel_size_4 = channel_num * 1
+        channel_size_9 = channel_num * 2
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
         # intro
@@ -48,20 +51,24 @@ class FGCNN(nn.Module):
         self.d3l3 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
         self.d3l4 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
 
-        # upsampling 1
-        self.u1l1 = Transp(channel_size_4, channel_size_3, kernel_up, stride_2, padding_up)
-        self.u1l2 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
-        self.u1l3 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
+        self.uconv1 = GConv(channel_size_9, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv2 = GConv(channel_size_9, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv3 = GConv(channel_size_9, channel_size_1, kernel_up, stride, padding_up)
 
-        # upsampling 2
-        self.u2l1 = Transp(channel_size_3, channel_size_2, kernel_up, stride_2, padding_up)
-        self.u2l2 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
-        self.u2l3 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
-
-        # upsampling 3
-        self.u3l1 = Transp(channel_size_2, channel_size_1, kernel_up, stride_2, padding_up)
-        self.u3l2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
-        self.u3l3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+        # # upsampling 1
+        # self.u1l1 = Transp(channel_size_4, channel_size_3, kernel_up, stride_2, padding_up)
+        # self.u1l2 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
+        # self.u1l3 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
+        #
+        # # upsampling 2
+        # self.u2l1 = Transp(channel_size_3, channel_size_2, kernel_up, stride_2, padding_up)
+        # self.u2l2 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
+        # self.u2l3 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
+        #
+        # # upsampling 3
+        # self.u3l1 = Transp(channel_size_2, channel_size_1, kernel_up, stride_2, padding_up)
+        # self.u3l2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+        # self.u3l3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
 
         # outro
         self.out1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
@@ -91,19 +98,31 @@ class FGCNN(nn.Module):
         # x4 = self.d3l4(x4)
 
         # Upsample 1
-        x3 = self.u1l1(x4)
-        x3 = self.u1l2(x3)
-        # x3 = self.u1l3(x3)
+        x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
+        x3 = self.uconv1(torch.cat((x3, x3_us), 1))
 
         # Upsample 2
-        x2 = self.u2l1(x3)
-        x2 = self.u2l2(x2)
-        # x2 = self.u2l3(x2)
+        x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
+        x2 = self.uconv2(torch.cat((x2, x2_us), 1))
 
         # # Upsample 3
-        x1 = self.u3l1(x2)
-        x1 = self.u3l2(x1)
-        # x1 = self.u3l3(x1)
+        x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
+        x1 = self.uconv3(torch.cat((x1, x1_us), 1))
+
+        # # Upsample 1
+        # x3 = self.u1l1(x4)
+        # x3 = self.u1l2(x3)
+        # # x3 = self.u1l3(x3)
+        #
+        # # Upsample 2
+        # x2 = self.u2l1(x3)
+        # x2 = self.u2l2(x2)
+        # # x2 = self.u2l3(x2)
+        #
+        # # # Upsample 3
+        # x1 = self.u3l1(x2)
+        # x1 = self.u3l2(x1)
+        # # x1 = self.u3l3(x1)
 
         xout = self.out1(x1)  # 512, 512
         xout = self.out2(xout)
