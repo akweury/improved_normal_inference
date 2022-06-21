@@ -34,7 +34,7 @@ class Conv(_ConvNd):
         elif self.active_name == "Tanh":
             return self.active_Tanh(x)
         elif self.active_name == "":
-            return self.conv(x)
+            return x
         else:
             raise ValueError
 

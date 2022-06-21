@@ -58,7 +58,7 @@ The ``synthetic50-5", is a datset with 50 point clouds as training set and 5 poi
 \end{figure}
 
 
-\subsection{Data Files}
+\subsection{Synthesize Scenes using Unity}
 In order to fit the using scenario of Kinect as much as possible, the dataset consists of the generated synthetic 3D scenes via Unity, which is a game engine using for 3D games creation. 
 
 In the synthetic scenes from engine, the object is placed on a cylinder platform, which is lighted by a directional light nearby. A camera focus on the platform and captured the scene. The layout in the game engine is shown in Figure \ref{fig:unity-workplace}. In order to simulate more scenarios, the positions of the camera and directional light are randomly changed in each new scene. For 50 training objects, 1000 scenes are generated and each scene is saved in 3 kinds of resolutions $ 512\times512\times3 $, $ 256\times256\times3 $ and $ 128\times128\times3 $.
@@ -73,25 +73,50 @@ In the synthetic scenes from engine, the object is placed on a cylinder platform
 The main advantage using generated scene is the availability of complete information. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control.
 
 For each scene, following information is recorded
-\begin{itemize}
-	\item Depth range
-	\item Light position
-	\item Camera intrinsic and extrinsic matrix
-	\item Depth map
-	\item Grayscale image
-	\item Normal Map	
-\end{itemize}
-where the grayscale image in acquired via RGB texture by the following equation:
+\begin{table}
+	\caption{The information saved for each scene in ``synthetic50-5".}
+	\label{tab:data-files}
+	\centering
+	\begin{tabular}{l l}
+		\toprule
+		\tabhead{Data} & \tabhead{Size} \\
+		\midrule
+		Depth map & $ 512\times512\times3 $ \\
+		\hline 
+		Depth range  & $ 2\times1 $ \\  
+		\hline
+		Grayscale Image	& $ 512\times512\times1 $ \\  
+		\hline 
+		Normal Map &  $ 512\times512\times3 $  \\
+		\hline 
+		Light Position &  $ 3\times1 $  \\
+		\hline
+		Camera Intrinsic Matrix &  $ 3\times 3 $  \\
+		\hline 
+		Camera Extrinsic Matrix &  $ 3\times 4 $  \\
+		\hline 
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+A depth map $ D $ is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. The grayscale image can be used as guided normal inference task and also as a readable scene for human. The gray-color is converted from RGB color based on following equation 
 \[ gray: \frac{r+2g+b}{4}  \]
+The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal and its corresponding RGB color can be converted based on following equation:
+\[  \]
+If consider the relation between Lambertian reflection and normal direction, the light source can be used to calculate the reflect direction of each point.
+The camera intrinsic and extrinsic matrix helps point cloud calculation.
+
+It is necessary to point out again that ``synthetic50-5" aiming to rebuild the using scenarios of Kinect, where all types of the generated data files shown in Table \ref{tab:data-files} are also the same format of the Kinect data.
 
 
 
 
 
-\subsection{Point Cloud}
+\subsection{Convert to Point Cloud}
 \label{sec:depth-map-to-point-cloud}
+The depth map can be converted to 3D vertex point cloud as the input of the normal inference model. 
 
-A depth map $ D $ is captured by a depth camera like Kinect, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. The range of distance depends on the performance of depth camera. It can be saved as a 16-bit image, i.e. each pixel in range $0 \tilde 65535$. A depth map with knowing calibration can be further converted to a structured point cloud. 
+
 
 
 \subsection{Point Cloud calculation}
