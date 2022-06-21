@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from common.Layers import GRB, TRB, GConv, GTransp, ResidualBlock, Conv
+from common.Layers import GRB, TRB, GConv, GTransp, Transp, ResidualBlock, Conv
 
 
 class FGCNN(nn.Module):
@@ -49,17 +49,17 @@ class FGCNN(nn.Module):
         self.d3l4 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
 
         # upsampling 1
-        self.u1l1 = GTransp(channel_size_4, channel_size_3, kernel_up, stride_2, padding_up)
+        self.u1l1 = Transp(channel_size_4, channel_size_3, kernel_up, stride_2, padding_up)
         self.u1l2 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
         self.u1l3 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
 
         # upsampling 2
-        self.u2l1 = GTransp(channel_size_3, channel_size_2, kernel_up, stride_2, padding_up)
+        self.u2l1 = Transp(channel_size_3, channel_size_2, kernel_up, stride_2, padding_up)
         self.u2l2 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
         self.u2l3 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
 
         # upsampling 3
-        self.u3l1 = GTransp(channel_size_2, channel_size_1, kernel_up, stride_2, padding_up)
+        self.u3l1 = Transp(channel_size_2, channel_size_1, kernel_up, stride_2, padding_up)
         self.u3l2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
         self.u3l3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
 
@@ -76,19 +76,19 @@ class FGCNN(nn.Module):
         x2 = self.d1l1(x1)
         x2 = self.d1l2(x2)
         x2 = self.d1l3(x2)
-        x2 = self.d1l4(x2)
+        # x2 = self.d1l4(x2)
 
         # Downsample 2
         x3 = self.d2l1(x2)
         x3 = self.d2l2(x3)
         x3 = self.d2l3(x3)
-        x3 = self.d2l4(x3)
+        # x3 = self.d2l4(x3)
 
         # Downsample 3
         x4 = self.d3l1(x3)
         x4 = self.d3l2(x4)
         x4 = self.d3l3(x4)
-        x4 = self.d3l4(x4)
+        # x4 = self.d3l4(x4)
 
         # Upsample 1
         x3 = self.u1l1(x4)
