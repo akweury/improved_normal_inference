@@ -23,16 +23,16 @@ class Conv(_ConvNd):
 
     def forward(self, x):
 
-        x = self.bn1(x)
+        x = self.bn1(self.conv(x))
 
         if self.active_name == "LeakyReLU":
-            return self.active_LeakyReLU(self.conv(x))
+            return self.active_LeakyReLU(x)
         elif self.active_name == "Sigmoid":
-            return self.active_Sigmoid(self.conv(x))
+            return self.active_Sigmoid(x)
         elif self.active_name == "ReLU":
-            return self.active_ReLU(self.conv(x))
+            return self.active_ReLU(x)
         elif self.active_name == "Tanh":
-            return self.active_Tanh(self.conv(x))
+            return self.active_Tanh(x)
         elif self.active_name == "":
             return self.conv(x)
         else:
@@ -53,7 +53,6 @@ class GConv(_ConvNd):
 
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
-        self.bn1 = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         # Normalized Convolution

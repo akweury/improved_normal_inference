@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from common.Layers import GRB, TRB, ResidualBlock, Conv
+from common.Layers import GRB, TRB, GConv, GTransp, ResidualBlock, Conv
 
 
 class FGCNN(nn.Module):
@@ -25,38 +25,46 @@ class FGCNN(nn.Module):
         channel_size_4 = channel_num * 8
         # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
 
-        self.init1 = GRB(in_ch, channel_size_1, kernel_down, True, stride, padding_down)
-        self.init2 = GRB(channel_size_1, channel_size_1, kernel_down, False, stride, padding_down)
-        self.init3 = GRB(channel_size_1, channel_size_1, kernel_down, False, stride, padding_down)
+        # intro
+        self.init1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
+        self.init2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.init3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
 
-        self.d1l1 = GRB(channel_size_1, channel_size_2, kernel_down, True, stride_2, padding_down)
-        self.d1l2 = GRB(channel_size_2, channel_size_2, kernel_down, False, stride, padding_down)
-        self.d1l3 = GRB(channel_size_2, channel_size_2, kernel_down, False, stride, padding_down)
-        self.d1l4 = GRB(channel_size_2, channel_size_2, kernel_down, False, stride, padding_down)
+        # downsampling 1
+        self.d1l1 = GConv(channel_size_1, channel_size_2, kernel_down, stride_2, padding_down)
+        self.d1l2 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
+        self.d1l3 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
+        self.d1l4 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
 
-        self.d2l1 = GRB(channel_size_2, channel_size_3, kernel_down, True, stride_2, padding_down)
-        self.d2l2 = GRB(channel_size_3, channel_size_3, kernel_down, False, stride, padding_down)
-        self.d2l3 = GRB(channel_size_3, channel_size_3, kernel_down, False, stride, padding_down)
-        self.d2l4 = GRB(channel_size_3, channel_size_3, kernel_down, False, stride, padding_down)
+        # downsampling 2
+        self.d2l1 = GConv(channel_size_2, channel_size_3, kernel_down, stride_2, padding_down)
+        self.d2l2 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
+        self.d2l3 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
+        self.d2l4 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
 
-        self.d3l1 = GRB(channel_size_3, channel_size_4, kernel_down, True, stride_2, padding_down)
-        self.d3l2 = GRB(channel_size_4, channel_size_4, kernel_down, False, stride, padding_down)
-        self.d3l3 = GRB(channel_size_4, channel_size_4, kernel_down, False, stride, padding_down)
-        self.d3l4 = GRB(channel_size_4, channel_size_4, kernel_down, False, stride, padding_down)
+        # downsampling 3
+        self.d3l1 = GConv(channel_size_3, channel_size_4, kernel_down, stride_2, padding_down)
+        self.d3l2 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
+        self.d3l3 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
+        self.d3l4 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
 
-        self.u1l1 = TRB(channel_size_4, channel_size_3, kernel_up, True, stride_2, padding_up)
-        self.u1l2 = GRB(channel_size_3, channel_size_3, kernel_up, False, stride, padding_up)
-        self.u1l3 = GRB(channel_size_3, channel_size_3, kernel_up, False, stride, padding_up)
+        # upsampling 1
+        self.u1l1 = GTransp(channel_size_4, channel_size_3, kernel_up, stride_2, padding_up)
+        self.u1l2 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
+        self.u1l3 = GConv(channel_size_3, channel_size_3, kernel_up, stride, padding_up)
 
-        self.u2l1 = TRB(channel_size_3, channel_size_2, kernel_up, True, stride_2, padding_up)
-        self.u2l2 = GRB(channel_size_2, channel_size_2, kernel_up, False, stride, padding_up)
-        self.u2l3 = GRB(channel_size_2, channel_size_2, kernel_up, False, stride, padding_up)
+        # upsampling 2
+        self.u2l1 = GTransp(channel_size_3, channel_size_2, kernel_up, stride_2, padding_up)
+        self.u2l2 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
+        self.u2l3 = GConv(channel_size_2, channel_size_2, kernel_up, stride, padding_up)
 
-        self.u3l1 = TRB(channel_size_2, channel_size_1, kernel_up, True, stride_2, padding_up)
-        self.u3l2 = GRB(channel_size_1, channel_size_1, kernel_up, False, stride, padding_up)
-        self.u3l3 = GRB(channel_size_1, channel_size_1, kernel_up, False, stride, padding_up)
+        # upsampling 3
+        self.u3l1 = GTransp(channel_size_2, channel_size_1, kernel_up, stride_2, padding_up)
+        self.u3l2 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
+        self.u3l3 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
 
-        self.out1 = ResidualBlock(channel_size_1, out_ch, (1, 1), False, (1, 1), (0, 0))
+        # outro
+        self.out1 = Conv(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.out2 = Conv(out_ch, out_ch, (1, 1), (1, 1), (0, 0), active_function="")
 
     def forward(self, xin):
