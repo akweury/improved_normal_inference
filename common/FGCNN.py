@@ -30,26 +30,26 @@ class FGCNN(nn.Module):
 
         # intro
         self.init1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
-        self.init2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
-        self.init3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        # self.init2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        # self.init3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
 
         # downsampling 1
         self.d1l1 = GConv(channel_size_1, channel_size_2, kernel_down, stride_2, padding_down)
         self.d1l2 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
         self.d1l3 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
-        self.d1l4 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
-
-        # downsampling 2
-        self.d2l1 = GConv(channel_size_2, channel_size_3, kernel_down, stride_2, padding_down)
-        self.d2l2 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
-        self.d2l3 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
-        self.d2l4 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
-
-        # downsampling 3
-        self.d3l1 = GConv(channel_size_3, channel_size_4, kernel_down, stride_2, padding_down)
-        self.d3l2 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
-        self.d3l3 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
-        self.d3l4 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
+        # self.d1l4 = GConv(channel_size_2, channel_size_2, kernel_down, stride, padding_down)
+        #
+        # # downsampling 2
+        # self.d2l1 = GConv(channel_size_2, channel_size_3, kernel_down, stride_2, padding_down)
+        # self.d2l2 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
+        # self.d2l3 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
+        # self.d2l4 = GConv(channel_size_3, channel_size_3, kernel_down, stride, padding_down)
+        #
+        # # downsampling 3
+        # self.d3l1 = GConv(channel_size_3, channel_size_4, kernel_down, stride_2, padding_down)
+        # self.d3l2 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
+        # self.d3l3 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
+        # self.d3l4 = GConv(channel_size_4, channel_size_4, kernel_down, stride, padding_down)
 
         self.uconv1 = GConv(channel_size_9, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_9, channel_size_1, kernel_up, stride, padding_up)

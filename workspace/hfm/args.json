@@ -1,0 +1,29 @@
+{
+  "output_type": "normal_noise",
+  "exp": "hfm",
+  "resume": null,
+  "epochs": 100001,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "lr_scheduler": "9999",
+  "momentum": 0.9,
+  "loss": "angle",
+  "vgg_flag": "vgg16",
+  "penalty": 1.4,
+  "lr_decay_step": 1,
+  "lr_decay_factor": 0.1,
+  "content_layers": [
+    15
+  ],
+  "style_layers": [
+    3,
+    8,
+    15,
+    22
+  ],
+  "content_weight": 1.0,
+  "style_weight": 1.0,
+  "tv_weight": 1.0,
+  "fast_train": true
+}
+

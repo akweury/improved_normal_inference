@@ -66,13 +66,6 @@ def convert2training_tensor(path, k, output_type='normal'):
         mask = depth.sum(axis=2) == 0
         mask_gt = depth_gt.sum(axis=2) == 0
 
-        if k == 2:
-            # depth_filtered = mu.median_filter(depth)
-            depth_filtered_vectorize = mu.median_filter_vectorize(depth)
-            file_io.save_scaled16bitImage(depth_filtered_vectorize,
-                                          str(config.ws_path / "test.png"),
-                                          data['minDepth'], data['maxDepth'])
-
         img = file_io.load_16bitImage(img_files[item])
         img[mask_gt] = 0
         data['R'], data['t'] = np.identity(3), np.zeros(3)
@@ -117,23 +110,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         ]
 
         # case of resng, ng
-        if k == 0:
-            vertex[mask] = 0
-            vectors = np.c_[vertex, np.expand_dims(img, axis=2), light_direction]
-        elif k == 1:
-            vectors = vertex
-        elif k == 2:
-            # calculate delta x, y, z of between each point and its neighbors
-            vectors = neighbor_vectors_k(vertex, k)
-        # detail enhanced
-        elif k == 5:
-            hp_mask = mu.hpf(depth_files[item], visual=True) == 0
-            hp_vertex = vertex.copy()
-            hp_vertex[hp_mask] = 0
-
-            vectors = np.c_[vertex, np.expand_dims(img, axis=2), hp_vertex]
-        else:
-            raise ValueError
+        vertex[mask] = 0
+        vectors = np.c_[vertex, np.expand_dims(img, axis=2), light_direction]
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)

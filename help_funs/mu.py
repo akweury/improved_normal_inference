@@ -1058,8 +1058,8 @@ def visual_vertex(vertex, name):
     return vertex_8bit
 
 
-def visual_img(img, name, upper_right=None):
-    addText(img, f"{name}", font_size=0.8)
+def visual_img(img, name, upper_right=None, font_scale=0.8):
+    addText(img, f"{name}", font_size=font_scale)
     if upper_right is not None:
         addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
     return img

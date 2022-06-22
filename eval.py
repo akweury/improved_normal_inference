@@ -56,9 +56,9 @@ def main(models, test_folder, args):
         times.append(time_list[5:])
         sizes.append(size_list)
 
-    chart.line_chart(np.array(losses), folder_path, "Loss Evaluation", y_label="Radius", labels=list(models.keys()),
+    chart.line_chart(np.array(losses), folder_path, list(models.keys()), title="Loss Evaluation", y_label="Radius",
                      cla_leg=True)
-    chart.line_chart(np.array(times), folder_path, "Time Evaluation", y_label="Milliseconds",
+    chart.line_chart(np.array(times), folder_path, title="Time Evaluation", y_label="Milliseconds",
                      labels=list(models.keys()), cla_leg=True)
     chart.scatter_chart(np.array(sizes), np.array(losses), folder_path, "Loss Evaluation", y_label="Angles",
                         x_label="Point Num", labels=list(models.keys()))
@@ -71,8 +71,8 @@ def main(models, test_folder, args):
                   'test_folder': test_folder,
                   }
 
-    with open(str(folder_path / "evaluation.txt"), 'w') as f:
-        f.write(json.dumps(saved_json))
+    # with open(str(folder_path / "evaluation.txt"), 'w') as f:
+    #     f.write(json.dumps(saved_json))
 
 
 if __name__ == '__main__':
@@ -87,12 +87,13 @@ if __name__ == '__main__':
     models = {
 
         # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
-        "GCNN": config.ws_path / "nnnn" / "trained_model" / "checkpoint.pth.tar",
+        "GCNN32": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "GCNN64": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "SVD": None,
         # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
-    test_folder = config.synthetic_data
+    test_folder = config.synthetic_data_noise_local / "synthetic128"
 
     main(models, test_folder, args)

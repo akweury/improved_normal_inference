@@ -91,12 +91,7 @@ def print_args(args):
     pprint(f'==> Experiment Args:  {args} ')
 
 
-def main():
-    args = paser()
-
-    # config experiments
-    exp_path = config.ws_path / args.exp
-
+def get_model(args):
     if args.exp == "sconv":
         import workspace.sconv.network as nnn
 
@@ -130,16 +125,30 @@ def main():
         import workspace.ag.network as ag
 
         model = ag.CNN(args.num_channels)
+    elif args.exp == "hfm":
+        import workspace.hfm.network as hfm
+        model = hfm.CNN()
     else:
         raise ValueError("Unknown exp path")
+    return model
 
+
+def get_dataset_path(args):
     if args.machine == "local":
         dataset_path = config.synthetic_data_noise_local / args.dataset
     elif args.machine == "remote":
         dataset_path = config.synthetic_data_noise_dfki / args.dataset
     else:
         raise ValueError
+    return dataset_path
 
+
+def main():
+    args = paser()
+    # config experiments
+    exp_path = config.ws_path / args.exp
+    model = get_model(args)
+    dataset_path = get_dataset_path(args)
     # start the training
     train.main(args, exp_path, model, dataset_path)
 

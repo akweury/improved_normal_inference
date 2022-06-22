@@ -28,7 +28,7 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     # SVD model
     if model_path is None:
         # load dataset
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="val")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="test")
         data_loader = DataLoader(dataset, shuffle=False, batch_size=1, num_workers=1)
         loss_list, time_list, size_list = svd.eval(data_loader, 2)
         return loss_list, time_list, size_list
@@ -48,7 +48,7 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     if dataset_path == config.real_data:
         dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname=None)
     else:
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="val")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="test")
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,
