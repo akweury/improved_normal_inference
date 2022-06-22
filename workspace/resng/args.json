@@ -1,26 +1,21 @@
 {
   "output_type": "normal_noise",
   "neighbor": 0,
-  "cout": true,
-  "args": "json",
   "exp": "resng",
-  "workspace": "",
   "resume": null,
-  "gpu": 2,
-  "dataset": "synthetic",
-  "dataset_path": "synthetic_data_noise",
-  "workers": 1,
   "epochs": 100001,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "99999",
+  "lr_scheduler": "9999",
   "momentum": 0.9,
   "loss": "angle",
   "penalty": 1.4,
+  "albedo_penalty": 1e+6,
   "angle_loss_weight": 10,
   "angle_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
   "lr_decay_factor": 0.1,
-  "weight_decay": 0
+  "fast_train": true
 }
+

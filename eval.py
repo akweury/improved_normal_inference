@@ -88,7 +88,7 @@ if __name__ == '__main__':
     models = {
         "GCNN128": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
         # loss 13, on training
-        "SVD": None,
+        # "SVD": None,
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # fast, loss 14
         "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
         # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",

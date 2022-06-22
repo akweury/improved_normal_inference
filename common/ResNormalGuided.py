@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.conv import _ConvNd
 
-from common.ResNet import ResNet
 from common.ResNet import Bottleneck
+from common.ResNet import ResNet
 
 
 # Normalized Convolution Layer
@@ -35,23 +35,11 @@ class NormalGuided(nn.Module):
         super().__init__()
         self.__name__ = 'resng'
         kernel_down = (3, 3)
-        kernel_down_2 = (5, 5)
         kernel_up = (3, 3)
-        kernel_up_2 = (5, 5)
         padding_down = (1, 1)
-        padding_down_2 = (2, 2)
-        padding_down_3 = (4, 4)
-        padding_down_4 = (8, 8)
-        padding_down_5 = (16, 16)
         padding_up = (1, 1)
-        padding_up_2 = (2, 2)
         stride = (1, 1)
         stride_2 = (2, 2)
-
-        dilate1 = (2, 2)
-        dilate2 = (4, 4)
-        dilate3 = (8, 8)
-        dilate4 = (16, 16)
 
         self.active_f = nn.LeakyReLU(0.01)
         self.active_g = nn.Sigmoid()
@@ -70,11 +58,6 @@ class NormalGuided(nn.Module):
         self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        self.dilated1 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_2, dilate1)
-        self.dilated2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_3, dilate2)
-        self.dilated3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_4, dilate3)
-        self.dilated4 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down_5, dilate4)
-
         self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
@@ -83,51 +66,25 @@ class NormalGuided(nn.Module):
         self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
         self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
-
-    def forward(self, x1, x_img_1, cin):
-
+    def forward(self, x1, x_img_1):
         x1 = self.dconv1(x1)
         x1 = self.dconv2(x1)
         x1 = self.dconv3(x1)
 
         x_img = self.resnet50(x_img_1)
 
-        # x_img_1 = self.active_img(self.img_conv1(x_img_1))
-        # x_img_1 = self.active_img(self.img_conv2(x_img_1))
-        # x_img_1 = self.active_img(self.img_conv3(x_img_1))
-        #
         # Downsample 1
         x2 = self.dconv4(x1)
         x2 = self.dconv2(x2)
         x2 = self.dconv3(x2)
-
-        # x_img_2 = self.active_img(self.img_conv4(x_img_1))
-        # x_img_2 = self.active_img(self.img_conv2(x_img_2))
-        # x_img_2 = self.active_img(self.img_conv3(x_img_2))
 
         # Downsample 2
         x3 = self.dconv4(x2)
         x3 = self.dconv2(x3)
         x3 = self.dconv3(x3)
 
-        # x_img_3 = self.active_img(self.img_conv4(x_img_2))
-        # x_img_3 = self.active_img(self.img_conv2(x_img_3))
-        # x_img_3 = self.active_img(self.img_conv3(x_img_3))
-
         # Downsample 3
         x4 = self.dconv4(x3)
-        x4 = self.dconv2(x4)
-        x4 = self.dconv3(x4)
-
-        # x_img_4 = self.active_img(self.img_conv4(x_img_3))
-        # x_img_4 = self.active_img(self.img_conv2(x_img_4))
-        # x_img_4 = self.active_img(self.img_conv3(x_img_4))
-
-        # dilated conv
-        x4 = self.dilated1(x4)
-        x4 = self.dilated2(x4)
-        x4 = self.dilated3(x4)
-        x4 = self.dilated4(x4)
         x4 = self.dconv2(x4)
         x4 = self.dconv3(x4)
 
@@ -150,4 +107,4 @@ class NormalGuided(nn.Module):
         xout = self.conv1(x1)  # 512, 512
         xout = self.conv2(xout)
 
-        return xout, cin
+        return xout

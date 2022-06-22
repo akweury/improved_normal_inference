@@ -17,7 +17,7 @@ CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --data synthetic128 --machine r
 #### resume a training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --print-freq 100 --num-channels 32 --batch_size 4 --train-on 500 --resume /home/sha/improved_normal_inference/workspace/nnnn/trained_model/checkpoint.pth.tar
+CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp hfm --dataset synthetic128 --print-freq 100 --num-channels 32 --batch_size 4 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/trained_model/checkpoint.pth.tar
 ```
 
 #### start a new training work
