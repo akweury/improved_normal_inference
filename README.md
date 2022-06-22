@@ -29,7 +29,7 @@ CUDA_VISIBLE_DEVICES=1 python3 main.py --machine remote --exp hfm --dataset synt
 #### evaluate the test dataset (no visualisation)
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 eval.py --machine remote --data synthetic --noise true --gpu 1
+CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_noise_dfki --datasize synthetic128
 ```
 
 #### Copy the trained model from remote

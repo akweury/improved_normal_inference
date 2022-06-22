@@ -299,7 +299,7 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
-        "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "model_best.pth.tar",  # image guided
+        "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
