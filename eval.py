@@ -90,6 +90,7 @@ if __name__ == '__main__':
         # loss 13, on training
         "SVD": None,
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # fast, loss 14
+        "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
         # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
