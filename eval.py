@@ -95,6 +95,6 @@ if __name__ == '__main__':
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
     }
-    test_folder = config.synthetic_data_noise_local / "synthetic128"
+    test_folder = config.synthetic_data_noise_dfki / "synthetic128"
 
     main(models, test_folder, args)
