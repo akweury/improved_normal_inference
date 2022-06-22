@@ -24,6 +24,6 @@
   "content_weight": 1.0,
   "style_weight": 1.0,
   "tv_weight": 1.0,
-  "fast_train": true
+  "fast_train": false
 }
 

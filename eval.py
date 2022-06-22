@@ -63,16 +63,17 @@ def main(models, test_folder, args):
     chart.scatter_chart(np.array(sizes), np.array(losses), folder_path, "Loss Evaluation", y_label="Angles",
                         x_label="Point Num", labels=list(models.keys()))
     # save the evaluation
-    saved_json = {'loss_avg': loss_avg,
-                  'time_avg': time_avg,
-                  'losses': losses,
-                  'sizes': sizes,
-                  'times': times,
-                  'test_folder': test_folder,
+    saved_json = {"sequences": list(loss_avg.keys()),
+                  'loss_avg': list(loss_avg.values()),
+                  'time_avg': list(time_avg.values()),
+                  # 'losses': losses,
+                  # 'sizes': sizes,
+                  # 'times': times,
+                  'test_folder': str(test_folder),
                   }
 
-    # with open(str(folder_path / "evaluation.txt"), 'w') as f:
-    #     f.write(json.dumps(saved_json))
+    with open(str(folder_path / "evaluation.txt"), 'w') as f:
+        f.write(json.dumps(saved_json))
 
 
 if __name__ == '__main__':
@@ -85,11 +86,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     models = {
-
-        # "DeGaRes": config.ws_path / "degares" / "trained_model" / "checkpoint.pth.tar",
-        "GCNN32": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "GCNN64": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "SVD": None,
+        "GCNN128": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
+        # loss 13, on training
+        "SVD": None,
+        "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # fast, loss 14
         # "NG+2": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "checkpoint.pth.tar",
         # "ResNG": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",

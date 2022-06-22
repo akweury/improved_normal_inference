@@ -44,6 +44,8 @@ def preprocessing(models):
     # load data file names
     if args.data == "synthetic_noise":
         path = config.synthetic_data_noise_local / args.datasize / "test" / "tensor"
+    elif args.data == "synthetic_noise_dfki":
+        path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
         path = config.synthetic_data / "test" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
@@ -231,7 +233,7 @@ def start2(models_path_dict):
                 # load model
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
-                if args.exp == "ng":
+                if args.exp in ["ng", "hfm"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif args.exp in ["nnnn", "fugrc"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
@@ -297,11 +299,11 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
         "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
+        "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "model_best.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
         # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
         # "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "checkpoint-6693.pth.tar",
-        "FUGRC128": config.ws_path / "fugrc" / "trained_model" / "128" / "model_best128.pth.tar",
-        "FUGRC128-2000": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-391.pth.tar",
+        "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
     start2(models)
