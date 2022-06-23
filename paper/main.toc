@@ -69,20 +69,30 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Gated Convolution Neural Network for Normal Inference}{19}{section.67}%
+\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{19}{section.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.71}%
+\contentsline {subsection}{\numberline {5.1.1}Compared Approaches}{19}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.73}%
+\contentsline {subsection}{\numberline {5.1.2}Training Details}{19}{subsection.69}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}model comparison}{22}{section.75}%
+\contentsline {subsection}{\numberline {5.1.3}Qualitative Evaluation}{19}{subsection.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.77}%
+\contentsline {subsection}{\numberline {5.1.4}Quantitative Evaluation }{19}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.78}%
+\contentsline {subsection}{\numberline {5.1.5}Speed}{20}{subsection.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{25}{section.79}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.83}%
+\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{21}{section.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{29}{appendix*.84}%
+\contentsline {section}{\numberline {5.4}model comparison}{22}{section.80}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.82}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.83}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}Dataset}{25}{section.84}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.88}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{29}{appendix*.89}%

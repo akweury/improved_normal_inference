@@ -108,11 +108,9 @@ def get_model(args):
         model = ng.CNN(args.num_channels)
     elif args.exp == "resng":
         import workspace.resng.network as resng
-
-        model = resng.CNN()
+        model = resng.CNN(args.num_channels)
     elif args.exp == "degares":
         import workspace.degares.network as degares
-
         model = degares.CNN()
     elif args.exp == "fugrc":
         import workspace.fugrc.network as fugrc

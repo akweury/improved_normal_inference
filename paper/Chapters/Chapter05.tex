@@ -2,33 +2,31 @@
 \chapter{Experiments} % Main chapter title
 
 \label{ch:05} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-
+The experiments are performed on two normal inference tasks: normal inference based on depth image and guided normal inference based on RGB-D image. Prior works for normal estimation using very deep networks. For a single object surface normal detection as stated in this thesis, the given methods has a similar performance but only with $ 1/10 $ size.
 
 The model is trained with PyTorch 1.10.2, CUDA 10.2.89, GPU with single NVIDIA GEFORCE GTX 1080Ti.
 
 
 %% nnnn exp
-\section{Gated Convolution Neural Network for Normal Inference}
+\section{Surface Normal Inference based on Depth Map}
+The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) is trained and is compared with similar approaches.
 
-The first neural network that worked well for normal prediction in this master thesis is introduced in this section. It is named Gated Convolution Neural Network, or GCNN. The GCNN model is nothing but a UNet with gated convolution layers. it can predict normal map based on a point cloud. The error is around 10 degrees.
-
-The model uses a 512x512x3 3D vertex matrix as input and the output is a 512x512x3 normal map. The architecture is based on description in \ref{sec:architecture}. The channel size is up to 32 through the whole network. For the training parameters, learning rate is 0.001, penalty is 1.4, optimizer is Adam optimizer, the loss function is penalty-l2 loss as described in \ref{sec:loss}.
-
+\subsection{Compared Approaches}
 
 
+\subsection{Training Details}
+The network (see \ref{gcnn}) is trained on stated dataset in Chapter \ref{ch:04}. It has two versions, the L-size $ 512\times512\times3 $ and the  S-size $ 128\times128\times3 $. For the L-size model, it uses batch size 8 for 3500 iterations. For the S-size model, it uses batch size 32 for 6000 iterations. Both sizes use Adam optimizer \cite{adam} with a learning rate of $ 1\times10^{-3} $, penalty-l2 loss(see \ref{sec:loss}). The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape.
 
-The evaluation result on test scenes is shown in Figure \ref{fig:scatter-gcnn}.
-The GCNN based method has angle error between 5 to 15 degrees in both type of inputs. The error trends to higher with point number decrease. It is because the less points in the point cloud, the more detail is hided due to the insufficient of resolution. Therefore the recorded surface based on the point cloud is more coarse, which also increase the difficulty of the normal inference.
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-no-noise.png}
-	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-noised.png}
-	\caption{Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf{Left} one using point cloud without noise, the \textbf{right} one has noise.}
-	\label{fig:scatter-gcnn}
-\end{figure}
+\subsection{Qualitative Evaluation}
 
-The evaluation visualization on synthetic dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. The error concentrate mainly on severe changed surface region, like the teeth, paw and horn of the dragon.
+The evaluation visualization on dataset ``synthetic50-5" (see \ref{ch:04}) dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. It compares the results with method xxx, for both smooth and highly detailed cases. In all the cases, the angle errors are very close. The test-cases are based on test point cloud in ``synthetic50-5". 
+
+The model is supposed to used on any image size since it has no fully-connected layers (dense layers). Two size of models are based on exactly the same architecture. 
+
+%% a detailed analyis of this figure
+It is 
+
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[b]{0.24\linewidth}
@@ -75,6 +73,29 @@ The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-ev
 	\label{fig:gcnn-eval-real}
 \end{figure}
 
+
+
+\subsection{Quantitative Evaluation }
+
+
+
+
+
+The evaluation result on test scenes is shown in Figure \ref{fig:scatter-gcnn}.
+The GCNN based method has angle error between 5 to 15 degrees in both type of inputs. The error trends to higher with point number decrease. It is because the less points in the point cloud, the more detail is hided due to the insufficient of resolution. Therefore the recorded surface based on the point cloud is more coarse, which also increase the difficulty of the normal inference.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-no-noise.png}
+	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-noised.png}
+	\caption{Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf{Left} one using point cloud without noise, the \textbf{right} one has noise.}
+	\label{fig:scatter-gcnn}
+\end{figure}
+
+
+
+
+\subsection{Speed}
 
 
 %% resng
