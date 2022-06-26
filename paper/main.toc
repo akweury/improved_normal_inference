@@ -9,90 +9,86 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.14}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.1}From 3D to 2D}{1}{section.15}%
+\contentsline {section}{\numberline {1.1}Challenges of Normal Inference}{2}{section.16}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.2}Kinect and Surface Normal}{1}{section.16}%
+\contentsline {section}{\numberline {1.2}Main Works of this thesis}{2}{section.20}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.3}Standard Methods}{1}{section.17}%
+\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.21}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.4}Deep Learning based Method}{1}{section.18}%
+\contentsline {section}{\numberline {2.1}Standard Methods}{5}{section.22}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.5}Challenges of Normal Inference}{2}{section.19}%
+\contentsline {section}{\numberline {2.2}Deep Learning based Method}{5}{section.23}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.6}Main Works of this thesis}{2}{section.22}%
+\contentsline {section}{\numberline {2.3}Sparse Input processing}{5}{section.24}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.23}%
+\contentsline {section}{\numberline {2.4}Normal Inference}{6}{section.25}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.1}Sparse Input processing}{5}{section.24}%
+\contentsline {chapter}{\numberline {3}Approaches}{9}{chapter.26}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.2}Normal Inference}{6}{section.25}%
+\contentsline {section}{\numberline {3.1}Neighbor based surface normal estimation}{9}{section.27}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Approaches}{7}{chapter.26}%
+\contentsline {section}{\numberline {3.2}Gated Convolution neural network for surface normal estimation}{10}{section.33}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Neighbor based surface normal estimation}{7}{section.27}%
+\contentsline {subsection}{\numberline {3.2.1}Gated Convolution}{10}{subsection.36}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Gated Convolution neural network for surface normal estimation}{8}{section.33}%
+\contentsline {subsection}{\numberline {3.2.2}Architecture}{11}{subsection.39}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Gated Convolution}{8}{subsection.36}%
+\contentsline {subsection}{\numberline {3.2.3}Loss Function}{11}{subsection.41}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.2}Architecture}{9}{subsection.39}%
+\contentsline {subsubsection}{Perceptual Loss}{11}{section*.42}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.3}Loss Function}{9}{subsection.41}%
+\contentsline {subsubsection}{L2 Loss}{11}{section*.43}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Perceptual Loss}{9}{section*.42}%
+\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{13}{section.45}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{L2 Loss}{9}{section*.43}%
+\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{13}{subsection.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{11}{section.45}%
+\contentsline {subsection}{\numberline {3.3.2}Add the light information}{13}{subsection.48}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{11}{subsection.46}%
+\contentsline {chapter}{\numberline {4}Dataset}{15}{chapter.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Add the light information}{11}{subsection.48}%
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{15}{section.50}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.49}%
+\contentsline {subsection}{\numberline {4.1.1}Resource}{15}{subsection.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.50}%
+\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{15}{subsection.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.51}%
+\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{17}{subsection.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{13}{subsection.53}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{18}{subsection.58}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{15}{subsection.56}%
+\contentsline {subsection}{\numberline {4.1.5}Noise}{19}{subsection.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{16}{subsection.58}%
+\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{19}{subsection.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Noise}{17}{subsection.61}%
+\contentsline {section}{\numberline {4.2}Real Dataset}{20}{section.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{17}{subsection.63}%
+\contentsline {chapter}{\numberline {5}Experiments}{21}{chapter.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Real Dataset}{18}{section.65}%
+\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{21}{section.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.66}%
+\contentsline {subsection}{\numberline {5.1.1}Compared Approaches}{21}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{19}{section.67}%
+\contentsline {subsection}{\numberline {5.1.2}Training Details}{21}{subsection.69}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.1}Compared Approaches}{19}{subsection.68}%
+\contentsline {subsection}{\numberline {5.1.3}Qualitative Evaluation}{21}{subsection.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.2}Training Details}{19}{subsection.69}%
+\contentsline {subsection}{\numberline {5.1.4}Quantitative Evaluation }{21}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.3}Qualitative Evaluation}{19}{subsection.70}%
+\contentsline {subsection}{\numberline {5.1.5}Speed}{22}{subsection.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.4}Quantitative Evaluation }{19}{subsection.73}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{22}{section.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.5}Speed}{20}{subsection.75}%
+\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{23}{section.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.76}%
+\contentsline {section}{\numberline {5.4}model comparison}{24}{section.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{21}{section.78}%
+\contentsline {chapter}{\numberline {6}Conclusion}{25}{chapter.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}model comparison}{22}{section.80}%
+\contentsline {chapter}{\numberline {A}Dataset}{27}{appendix.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.82}%
+\contentsline {section}{\numberline {A.1}Dataset}{27}{section.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.83}%
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{27}{section.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{25}{section.84}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.88}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{29}{appendix*.89}%
+\contentsline {chapter}{Bibliography}{31}{appendix*.89}%

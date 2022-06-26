@@ -3,79 +3,21 @@ from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
-import torch
 import torch.nn as nn
-from common.AlbedoGatedNNN import AlbedoGatedNNN
-from common.AlbedoGatedNNN import GConv
 
-
-class LightNet(nn.Module):
-    def __init__(self, in_ch, out_ch, channel_num):
-        super().__init__()
-        self.__name__ = 'lignet'
-        kernel_size = (3, 3)
-        padding_size = (1, 1)
-        stride = (1, 1)
-
-        channel_size_1 = channel_num
-        self.active_leaky_relu = nn.LeakyReLU(0.01)
-        self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting3 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting4 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting5 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting6 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting7 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting8 = nn.Conv2d(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
-        self.lsInpainting9 = nn.Conv2d(channel_size_1, out_ch, kernel_size, stride, padding_size)
-        self.merge = nn.Conv2d(out_ch * 2, 3, kernel_size, stride, padding_size)
-        self.prod1 = nn.Conv2d(3, 1, kernel_size, stride, padding_size)
-        self.prod2 = nn.Conv2d(1, 1, kernel_size, stride, padding_size)
-
-    def forward(self, lin, nin):
-        L = self.lsInpainting1(lin)
-        L = self.lsInpainting2(L)
-        L = self.lsInpainting3(L)
-        L = self.lsInpainting4(L)
-        L = self.lsInpainting5(L)
-        L = self.lsInpainting6(L)
-        L = self.lsInpainting7(L)
-        L = self.active_leaky_relu(self.lsInpainting8(L))
-        xout_light = self.lsInpainting9(L)
-
-        scaleProd = self.active_leaky_relu(self.merge(torch.cat((xout_light, nin), 1)))
-        scaleProd = self.active_leaky_relu(self.prod1(scaleProd))
-        scaleProd = self.prod2(scaleProd)
-        return scaleProd
+from common.ResNormalGuided import NormalGuided
 
 
 class CNN(nn.Module):
     def __init__(self, channel_num):
         super().__init__()
         self.__name__ = 'ag'
+        self.net3_3 = NormalGuided(3, 3, channel_num)
 
-        self.normal3_3 = AlbedoGatedNNN(3, 3, channel_num)
-        self.light3_3 = AlbedoGatedNNN(3, 3, channel_num)
-        self.active_leaky_relu = nn.LeakyReLU(0.01)
-        self.active_sigmoid = nn.Sigmoid()
-
-        self.nl_layer = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
-        self.rho_layer = GConv(2, 1, (3, 3), (1, 1), (1, 1))
-
-        self.scaleProd1 = nn.Conv2d(6, 1, (3, 3), (1, 1), (1, 1))
-        self.scaleProd2 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
-
-    def forward(self, xin):
+    def forward(self, x):
         # x0: vertex array
-        x0 = xin[:, :3, :, :]
-        x_normal_out = self.normal3_3(x0)
+        x_vertex = x[:, :3, :, :]
+        x_img = x[:, 3:4, :, :]
 
-        # light source inpainting
-        light_direction = xin[:, 4:7, :, :]
-        light_out = self.light3_3(light_direction)
-
-        scaleProd = self.active_leaky_relu(self.scaleProd1(torch.cat((x_normal_out, light_out), 1)))
-        scaleProd = self.scaleProd2(scaleProd)
-
-        out = torch.cat((x_normal_out, light_out, scaleProd), 1)
-        return out
+        xout = self.net3_3(x_vertex, x_img)
+        return xout

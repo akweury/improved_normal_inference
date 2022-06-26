@@ -36,52 +36,54 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: main-blx.bib
 Database file #2: example.bib
-Repeated entry---line 257 of file example.bib
+Warning--entry type for "advencing_front" isn't style-file defined
+--line 4 of file example.bib
+Repeated entry---line 274 of file example.bib
  : @inproceedings{nconv
  :                     ,
 I'm skipping whatever remains of this entry
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-You've used 30 entries,
+You've used 31 entries,
             6393 wiz_defined-function locations,
-            1382 strings with 15697 characters,
-and the built_in function-call counts, 199608 in all, are:
-= -- 14073
-> -- 3485
-< -- 990
-+ -- 5187
-- -- 1409
-* -- 15055
-:= -- 21893
+            1388 strings with 15861 characters,
+and the built_in function-call counts, 202011 in all, are:
+= -- 14179
+> -- 3501
+< -- 1018
++ -- 5203
+- -- 1411
+* -- 15192
+:= -- 21953
 add.period$ -- 0
-call.type$ -- 30
-change.case$ -- 479
+call.type$ -- 31
+change.case$ -- 502
 chr.to.int$ -- 65
-cite$ -- 58
-duplicate$ -- 21834
-empty$ -- 17912
-format.name$ -- 2201
-if$ -- 40376
+cite$ -- 60
+duplicate$ -- 22137
+empty$ -- 18251
+format.name$ -- 2202
+if$ -- 40947
 int.to.chr$ -- 0
-int.to.str$ -- 76
+int.to.str$ -- 78
 missing$ -- 0
-newline$ -- 1200
-num.names$ -- 1345
-pop$ -- 10710
+newline$ -- 1220
+num.names$ -- 1363
+pop$ -- 11023
 preamble$ -- 1
-purify$ -- 680
+purify$ -- 702
 quote$ -- 0
-skip$ -- 5517
+skip$ -- 5632
 stack$ -- 0
-substring$ -- 23763
-swap$ -- 5053
-text.length$ -- 880
-text.prefix$ -- 29
+substring$ -- 23870
+swap$ -- 5183
+text.length$ -- 892
+text.prefix$ -- 30
 top$ -- 1
-type$ -- 1008
+type$ -- 1041
 warning$ -- 0
-while$ -- 3127
+while$ -- 3133
 width$ -- 0
-write$ -- 1171
+write$ -- 1190
 (There was 1 error message)

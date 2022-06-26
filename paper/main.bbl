@@ -762,6 +762,27 @@
     \warn{\item Invalid format of field 'month'}
   \endentry
 
+  \entry{advencing_front}{misc}{}
+    \list{publisher}{1}{%
+      {Springer-Verlag}%
+    }
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1997}
+    \field{labeldatesource}{}
+    \field{sortinit}{N}
+    \field{sortinithash}{N}
+    \verb{doi}
+    \verb 10.1007/S007910050004
+    \endverb
+    \field{number}{1}
+    \field{pages}{41\bibrangedash 52}
+    \field{title}{NETGEN An advancing front 2D/3D-mesh generator based on
+  abstract rules}
+    \field{volume}{1}
+    \field{journaltitle}{Computing and Visualization in Science}
+    \field{year}{1997}
+  \endentry
+
   \entry{gated_activation}{misc}{}
     \name{author}{6}{}{%
       {{hash=OAvd}{%

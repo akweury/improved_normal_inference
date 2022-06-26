@@ -35,5 +35,5 @@ CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_
 #### Copy the trained model from remote
 
 ```
-scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/nnnn/output.zip D:\TUK\improved_normal_inference\workspace\nnnn
+scp sha@pc-2103:/home/sha/improved_normal_inference/workspace/resng/output.zip D:\TUK\improved_normal_inference\workspace\resng
 ```

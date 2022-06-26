@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
-import torchvision
 from torch import nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
@@ -96,7 +95,7 @@ class WeightedL2Loss(nn.Module):
         return F.mse_loss(outputs, target)
 
 
-class AngleLoss(nn.Module):
+class NormalL2Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
@@ -120,6 +119,18 @@ class AngleLoss(nn.Module):
         # print(f"\t axis: {axis}\t axis_loss: {loss:.5f}")
 
         return loss  # +  F.mse_loss(outputs, target)  # + angle_loss.mul(args.angle_loss_weight)
+
+
+class GL2Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, args):
+        mask = torch.abs(target) > 0
+        G_diff = (outputs - target)[mask]
+        loss = torch.sum(G_diff ** 2) / G_diff.size(0)
+
+        return loss
 
 
 class AngleHistoLoss(nn.Module):
@@ -171,14 +182,15 @@ class AngleHistoLoss(nn.Module):
 class AngleLightLoss(nn.Module):
     def __init__(self):
         super().__init__()
+        self.normal_loss = NormalL2Loss()
+        self.g_loss = GL2Loss()
 
     def forward(self, outputs, target, args):
-        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+        normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
+        G = torch.sum(outputs[:, :3, :, :] * target[:, 5:8, :, :], dim=1)  # N * L
+        g_loss = self.g_loss(G, target[:, 3, :, :], args)
 
-        N_diff = (outputs[:, :3, :, :] - target[:, :3, :, :]).permute(0, 2, 3, 1)[mask]
-        l_diff = (outputs[:, 3:6, :, :] - target[:, 5:8, :, :]).permute(0, 2, 3, 1)[mask]
-        loss = torch.sum(N_diff ** 2) / N_diff.size(0)
-        loss += torch.sum(l_diff ** 2) / l_diff.size(0)
+        loss = normal_loss + g_loss
 
         return loss
 
@@ -296,7 +308,7 @@ loss_dict = {
     'masked_l1': MaskedL1Loss(),
     'masked_l2': MaskedL2Loss(),
     'weighted_l2': WeightedL2Loss(),
-    'angle': AngleLoss(),
+    'angle': NormalL2Loss(),
     'angle_detail': AngleDetailLoss(),
     'angleAlbedo': AngleAlbedoLoss(),
     'angleLight': AngleLightLoss(),

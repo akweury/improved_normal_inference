@@ -7,6 +7,31 @@
 %----------------------------------------------------------------------------------------
 %	SECTION 1
 %----------------------------------------------------------------------------------------
+%-----------------------------------
+%	SUBSECTION 1
+%-----------------------------------
+\section{Standard Methods}
+
+%%%%%%%%%%%%%%%%%%% talk about the reason of this thesis %%%%%%%%%%%%%%%%%%
+
+%% standard method for normal inference is insufficient, input is sparse, not robust enough
+Standard methods compute normals from the point cloud using neighboring information in image space or from a single grayscale image using use Shape from Shading \cite{SFS}. The first method assumes that the neighbors of the points locate on the same plane. This method performs well with a well-chosen window size. However, the drawbacks are that the algorithm is highly noise sensitive. It is weak in handling missing pixels, which is a common issue in the input data. The second method depends on the correct information about the light source. Errors may occur in regions with inter-reflections in the 3D measurement. 
+
+%-----------------------------------
+%	SUBSECTION 2
+%-----------------------------------
+
+\section{Deep Learning based Method}
+%% CNN based methods
+Recently, deep learning based method \cite{yolov3}, \cite{efficientDet} achieved a great succeed for image processing. 
+These network architectures use a batch of RGB/Grayscale images as input and usually employ for classification problems. Usually, the images are convoluted with a convolutional layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}.  
+
+However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
 
 From PCA for estimation to recently deep learning based methods, the task of surface normal inference is also been well studied in last several decades. 
 
