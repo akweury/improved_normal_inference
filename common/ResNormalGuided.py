@@ -91,21 +91,30 @@ class NormalGuided(nn.Module):
         x5 = self.dconv2(x5)
         x5 = self.dconv3(x5)
 
+        # Downsample 5
+        x6 = self.dconv4(x5)
+        x6 = self.dconv2(x6)
+        x6 = self.dconv3(x6)
+
         # merge image feature and vertex feature
 
         # Upsample 1
+        x5_us = F.interpolate(x6, x5.size()[2:], mode='nearest')  # 128,128
+        x5 = self.uconv1(torch.cat((x5, x5_us), 1))
+
+        # Upsample 2
         x4_us = F.interpolate(x5, x4.size()[2:], mode='nearest')  # 128,128
         x4 = self.uconv2(torch.cat((x4, x4_us), 1))
 
-        # Upsample 2
+        # Upsample 3
         x3_us = F.interpolate(x4, x3.size()[2:], mode='nearest')  # 128,128
         x3 = self.uconv3(torch.cat((x3, x3_us), 1))
 
-        # Upsample 3
+        # Upsample 4
         x2_us = F.interpolate(x3, x2.size()[2:], mode='nearest')
         x2 = self.uconv4(torch.cat((x2, x2_us), 1))
 
-        # # Upsample 4
+        # Upsample 5
         x1_us = F.interpolate(x2, x1.size()[2:], mode='nearest')  # 512, 512
         x1 = self.uconv5(torch.cat((x1, x1_us), 1))
 

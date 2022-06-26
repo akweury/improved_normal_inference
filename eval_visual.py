@@ -233,19 +233,12 @@ def start2(models_path_dict):
                 # load model
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
-                if args.exp in ["ng", "hfm", "resng"]:
+                if args.exp in ["ng", "hfm", "resng", "ag"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif args.exp in ["nnnn", "fugrc"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                     normal_no_mask_img = cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR)
                     normal[mask] = 0
-                    # cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal.png"),
-                    #            cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
-                elif args.exp == "ag":
-                    normal = evaluate_epoch(args, model, test_0_tensor, device)[:, :, :3]
-                    normal[mask] = 0
-                    # cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_ag.png"),
-                    #            cv.cvtColor(mu.visual_normal(normal, name, histogram=False), cv.COLOR_RGB2BGR))
                 else:
                     raise ValueError
 
@@ -298,11 +291,9 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
-        # "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
-        # "AG": config.ws_path / "ag" / "trained_model" / "checkpoint-365.pth.tar",  # with light direction
-        # "NG+": config.ws_path / "resng" / "trained_model" / "checkpoint.pth.tar",
-        "NNNN+ResNet": config.ws_path / "resng" / "trained_model" / "128" / "model_best.pth.tar",
+        "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
+        "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
+        "ResNG": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
         "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
