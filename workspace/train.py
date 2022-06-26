@@ -776,9 +776,9 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
     target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
     target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
     xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
-    if exp_name == "ag":
-        xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
-        xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
+    # if exp_name == "ag":
+    #     xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
+    #     xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
 
     # if xout.size() != (512, 512, 3):
     # if cout is not None:
