@@ -838,42 +838,6 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
 
-    elif exp_name in ["ag"]:
-        # pred base normal
-        xout_normal[mask] = 0
-        xout_scaleProd[mask] = 0
-        xout_light[mask] = 0
-        if exp_name == "ncnn":
-            xout_normal = xout_normal * 2 - 1
-            xout_scaleProd = xout_scaleProd * 2 - 1
-        normal_cnn_8bit = mu.visual_output(xout_normal, mask)
-
-        mu.addText(normal_cnn_8bit, "Output")
-        xout_base_ranges = mu.addHist(normal_cnn_8bit)
-        mu.addText(normal_cnn_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_8bit)
-
-        # light output visualization
-        xout_light_img = mu.normalize2_32bit(xout_light)
-        xout_light_img = mu.image_resize(xout_light_img, width=512, height=512)
-        mu.addText(xout_light_img, "Light_Output")
-        mu.addText(xout_light_img, str(train_idx[0]), pos='lower_left', font_size=0.3)
-        output_list.append(xout_light_img)
-
-        # light ground truth visualization
-        target_light_img = mu.normalize2_32bit(target_light)
-        target_light_img = mu.image_resize(target_light_img, width=512, height=512)
-        mu.addText(target_light_img, "Light_GT")
-        mu.addText(target_light_img, str(train_idx[0]), pos='lower_left', font_size=0.3)
-        output_list.append(target_light_img)
-
-        # light error visualization
-        diff_light_img, diff_light_angle = mu.eval_img_angle(xout_light, target_light)
-        diff_light = np.sum(np.abs(diff_light_angle)) / np.count_nonzero(diff_light_angle)
-        mu.addText(diff_light_img, "Light_Error")
-        mu.addText(diff_light_img, f"angle error: {int(diff_light)}", pos="upper_right", font_size=0.65)
-        output_list.append(diff_light_img)
-
     else:
         # pred normal
         pred_normal = xout_normal[:, :, :3]
