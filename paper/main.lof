@@ -3,56 +3,50 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {1.1}{\ignorespaces The point cloud representation of a dragon model. The right image shows the zoom in detail of the same model.\relax }}{1}{figure.caption.15}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {1.2}{\ignorespaces A captured depth map via infrared sensors. Pixels that far away represent by light colors, otherwise by dark colors. The black dots are the depths that failed to be detected.\relax }}{3}{figure.caption.17}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {1.3}{\ignorespaces Semi-dense Normal Map calculated from depth map using a standard method\relax }}{3}{figure.caption.18}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {1.4}{\ignorespaces The surface normal stored in an RGB image where X, Y, and Z axes are mapping to R,G,B channels.\relax }}{4}{figure.caption.19}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Left: A part of the point cloud of the dragon model. Right: The zoom in of the left point cloud.\relax }}{1}{figure.caption.15}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication.\relax }}{11}{figure.caption.38}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication.\relax }}{9}{figure.caption.33}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }}{12}{figure.caption.40}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }}{10}{figure.caption.35}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }}{14}{figure.caption.47}%
-\defcounter {refsection}{0}\relax 
-\addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{16}{figure.caption.52}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{16}{figure.caption.54}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{17}{figure.caption.57}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{18}{figure.caption.59}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{19}{figure.caption.62}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }}{12}{figure.caption.42}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces GCNN Normal Inference on Synthetic Dataset (object: dragon)\relax }}{22}{figure.caption.71}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{14}{figure.caption.47}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Evaluation on Real Dataset\relax }}{22}{figure.caption.72}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{14}{figure.caption.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }}{22}{figure.caption.74}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{15}{figure.caption.52}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.4}{\ignorespaces guided-GCNN Normal Inference on Synthetic Dataset (object: dragon). GCNN result is shown on (d) and (e) as comparison.\relax }}{23}{figure.caption.77}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{16}{figure.caption.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.5}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{23}{figure.caption.79}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{17}{figure.caption.57}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Normal Inference on different models with errors. (object: dragon)\relax }}{24}{figure.caption.81}%
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.1}{\ignorespaces GCNN Normal Inference on Synthetic Dataset (object: dragon)\relax }}{20}{figure.caption.66}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Evaluation on Real Dataset\relax }}{20}{figure.caption.67}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }}{20}{figure.caption.69}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.4}{\ignorespaces guided-GCNN Normal Inference on Synthetic Dataset (object: dragon). GCNN result is shown on (d) and (e) as comparison.\relax }}{21}{figure.caption.72}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.5}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{21}{figure.caption.74}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Normal Inference on different models with errors. (object: dragon)\relax }}{22}{figure.caption.76}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{28}{figure.caption.85}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{26}{figure.caption.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{29}{figure.caption.86}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{27}{figure.caption.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{30}{figure.caption.87}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{28}{figure.caption.82}%
