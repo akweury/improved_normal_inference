@@ -36,54 +36,53 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: main-blx.bib
 Database file #2: example.bib
-Warning--entry type for "advencing_front" isn't style-file defined
---line 4 of file example.bib
-Repeated entry---line 274 of file example.bib
- : @inproceedings{nconv
- :                     ,
+Repeated entry---line 388 of file example.bib
+ : @article{nconv
+ :               ,
 I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "guided"
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-You've used 31 entries,
+You've used 28 entries,
             6393 wiz_defined-function locations,
-            1388 strings with 15861 characters,
-and the built_in function-call counts, 202011 in all, are:
-= -- 14179
-> -- 3501
-< -- 1018
-+ -- 5203
-- -- 1411
-* -- 15192
-:= -- 21953
+            1365 strings with 15091 characters,
+and the built_in function-call counts, 185354 in all, are:
+= -- 13067
+> -- 3227
+< -- 909
++ -- 4785
+- -- 1318
+* -- 14023
+:= -- 20354
 add.period$ -- 0
-call.type$ -- 31
-change.case$ -- 502
-chr.to.int$ -- 65
-cite$ -- 60
-duplicate$ -- 22137
-empty$ -- 18251
-format.name$ -- 2202
-if$ -- 40947
+call.type$ -- 28
+change.case$ -- 430
+chr.to.int$ -- 59
+cite$ -- 54
+duplicate$ -- 20152
+empty$ -- 16674
+format.name$ -- 2041
+if$ -- 37520
 int.to.chr$ -- 0
-int.to.str$ -- 78
+int.to.str$ -- 70
 missing$ -- 0
-newline$ -- 1220
-num.names$ -- 1363
-pop$ -- 11023
+newline$ -- 1109
+num.names$ -- 1231
+pop$ -- 9979
 preamble$ -- 1
-purify$ -- 702
+purify$ -- 616
 quote$ -- 0
-skip$ -- 5632
+skip$ -- 5089
 stack$ -- 0
-substring$ -- 23870
-swap$ -- 5183
-text.length$ -- 892
-text.prefix$ -- 30
+substring$ -- 22212
+swap$ -- 4644
+text.length$ -- 822
+text.prefix$ -- 27
 top$ -- 1
-type$ -- 1041
+type$ -- 940
 warning$ -- 0
-while$ -- 3133
+while$ -- 2890
 width$ -- 0
-write$ -- 1190
+write$ -- 1082
 (There was 1 error message)

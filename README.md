@@ -5,7 +5,7 @@
 #### copy dataset from local to remote
 
 ```
-scp D:\TUK\improved_normal_inference\dataset\synthetic128.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic128
+scp D:\TUK\improved_normal_inference\dataset\synthetic256.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic256
 ```
 
 #### Create dataset

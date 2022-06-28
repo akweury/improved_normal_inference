@@ -4,13 +4,18 @@
 
 \label{ch:02} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
+\section{Deep Learning based Method}
+%% CNN based methods
+
+Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
+
+From PCA for estimation to recently deep learning based methods, the task of surface normal inference is also been well studied in last several decades. 
 
 
 
-Guided method \cite{guided} requires addition information like RGB image for the inference.
 
 
-
+\section{Noise Handling}
 %% denoising
 The depth map captured by depth sensors are usually with full of missing pixels and holes.
 \cite{depth-inpainting-distribution} proposed a depth hole filling method using the depth distributions of neighboring regions. 
@@ -21,19 +26,28 @@ The depth map captured by depth sensors are usually with full of missing pixels 
 \cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
 
 
-%% method for structured point cloud
 
 
-%% CNN based methods
-
-
-estimate the surface normal based on improve the performance of image processing to a brand new stage. 
-In 2014, Eigen et al.\cite{Eigen} proposed a method predicting depth map directly from RGB image using CNN. In this case, no depth map is required. In 2016, Laina et al. \cite{img2depth} proposed a deeper network based on ResNet \cite{resnet} with a well designed upsamling part. 
-%% guided scene completion
-
+%% normal estimation method introduction
+\section{Surface normal inference}
+\textbf{RGB based}  
+\cite{Eigen} predicted depth map directly from RGB image. 
 \cite{geometry_based_solution} proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
+\cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}.
 
-\cite{GeoNet} uses ResNet proposed by \cite{resnet} to infer the surface normal from RGB image, and further refine it with the help of depth map based on the methods proposed by \cite{geometry_based_solution}  further refine the a  GeoNet to infer depth and surface normal in one unified system,  method proposed by \cite{img2depth}. 
+
+\textbf{Point Cloud Based} 
+\cite{Holzer.S} proposed method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix. They also smooth the depth data in order to handle the noise of depth image. The drawbacks are, as mentioned in the paper, the normals error go up when point depths change severely. 
+
+\textbf{RGB-D based}
+Guided method \cite{guided} requires addition information like RGB image for the inference.
+
+
+
+
+%% method for structured point cloud
+%% image based 
+ 
 
 %% upsampling 
 It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
@@ -52,27 +66,5 @@ For the unstructured point cloud, the neighbor information of each point is usua
 \section{Standard Methods}
 
 Standard methods compute normals from the point cloud using neighboring information in image space or from a single grayscale image using use Shape from Shading \cite{SFS}. The first method assumes that the neighbors of the points locate on the same plane. This method performs well with a well-chosen window size. However, the drawbacks are that the algorithm is highly noise sensitive. It is weak in handling missing pixels, which is a common issue in the input data. The second method depends on the correct information about the light source. Errors may occur in regions with inter-reflections in the 3D measurement. 
-
-%-----------------------------------
-%	SUBSECTION 2
-%-----------------------------------
-
-\section{Deep Learning based Method}
-%% CNN based methods
-
-Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
-
-From PCA for estimation to recently deep learning based methods, the task of surface normal inference is also been well studied in last several decades. 
-
-
-\section{Normal Inference}
-
-%% normal estimation method introduction
-Usually, we based on point cloud, depth map or RGB/Grayscale image of the objects or scenes to inference the normals. 
-
-Traditional methods evaluate normals based on neighbor information of point cloud or depth map.
-In 2012, Holzer et al. \cite{Holzer.S} proposed method to calculate normal from covariance matrices. 
-This method use integral image as input, which is able to run algorithm in a high frame speed. They smooth the depth data in order to handle the noise of depth image. The drawbacks are, as mentioned in the paper, the normals error go up when point depths change severely. In 2013, Fouhey et al. \cite{geometry_based_solution} proposed a method constructing a over-determined function systems to predict normals and solving it 
-by algebra methods. Similarly, this approach gives a quick but coarse normal inference. 
 
 
