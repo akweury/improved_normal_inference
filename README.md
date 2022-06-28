@@ -11,7 +11,7 @@ scp D:\TUK\improved_normal_inference\dataset\synthetic256.zip sha@pc-2103:/datas
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --data synthetic128 --machine remote --max_k 0 --clear true
+CUDA_VISIBLE_DEVICES=1 python3 create_dataset.py --data synthetic256 --machine remote --max_k 0 --clear true
 ```
 
 #### resume a training work
@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp hfm --dataset synt
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp resng --dataset synthetic128 --batch_size 32 --train-on 1000 --num-channels 128
+CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp resng --dataset synthetic256 --batch_size 32 --train-on 1000 --num-channels 128
 ```
 
 #### evaluate the test dataset (no visualisation)

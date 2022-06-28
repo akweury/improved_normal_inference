@@ -4,14 +4,11 @@
 
 \label{ch:02} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-\section{Deep Learning based Method}
-%% CNN based methods
+
+
+
 
 Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
-
-From PCA for estimation to recently deep learning based methods, the task of surface normal inference is also been well studied in last several decades. 
-
-
 
 
 
@@ -31,23 +28,23 @@ The depth map captured by depth sensors are usually with full of missing pixels 
 %% normal estimation method introduction
 \section{Surface normal inference}
 \textbf{RGB based}  
+
+or from a single grayscale image using use Shape from Shading \cite{SFS}.  The second method depends on the correct information about the light source. Errors may occur in regions with inter-reflections in the 3D measurement. 
+
+
 \cite{Eigen} predicted depth map directly from RGB image. 
 \cite{geometry_based_solution} proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
 \cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}.
 
 
 \textbf{Point Cloud Based} 
-\cite{Holzer.S} proposed method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix. They also smooth the depth data in order to handle the noise of depth image. The drawbacks are, as mentioned in the paper, the normals error go up when point depths change severely. 
+The relevant methods derive the surface normals based on spatial relationship, which utilizes the neighbor information for estimation. These methods performs well with a well-chosen window size. However, the drawbacks are that the algorithm is highly noise sensitive. It is weak in handling missing pixels, which is a common issue in the input data. The earlier methods usually use optimized methods. \cite{Holzer.S} proposed method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix. They also smooth the depth data in order to handle the noise of depth image. The drawbacks are, as mentioned in the paper, the normals error go up when point depths change severely.  \cite{optimized-methods} did a comparison among the optimization-based methods. 
+
+\textbf{Unstructured point cloud}
+For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. \cite{unstructed-pc-patch-stitching} presents a pipeline for calculating the normals of multiple points in parallel. 
 
 \textbf{RGB-D based}
-Guided method \cite{guided} requires addition information like RGB image for the inference.
 
-
-
-
-%% method for structured point cloud
-%% image based 
- 
 
 %% upsampling 
 It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
@@ -56,15 +53,5 @@ Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for
 
 
 
-
-
-%% unstructured point cloud
-For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. \cite{unstructed-pc-patch-stitching} presents a pipeline for calculating the normals of multiple points in parallel. 
-
-
-
-\section{Standard Methods}
-
-Standard methods compute normals from the point cloud using neighboring information in image space or from a single grayscale image using use Shape from Shading \cite{SFS}. The first method assumes that the neighbors of the points locate on the same plane. This method performs well with a well-chosen window size. However, the drawbacks are that the algorithm is highly noise sensitive. It is weak in handling missing pixels, which is a common issue in the input data. The second method depends on the correct information about the light source. Errors may occur in regions with inter-reflections in the 3D measurement. 
 
 
