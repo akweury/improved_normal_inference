@@ -93,7 +93,7 @@ if __name__ == '__main__':
         # "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # fast, loss 14
         # "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "ResNG": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "NG": config.ws_path / "ng" / "trained_model" / "128" / "checkpoint.pth.tar",
         "GCNN": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
     }
     test_folder = config.synthetic_data_noise_local / "synthetic128"
