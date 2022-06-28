@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp hfm --dataset synt
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ng --dataset synthetic128 --batch_size 32 --train-on 1000 --num-channels 128
+CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --dataset synthetic128 --batch_size 32 --train-on 1000 --num-channels 128
 ```
 
 #### evaluate the test dataset (no visualisation)
