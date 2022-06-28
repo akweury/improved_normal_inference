@@ -133,6 +133,18 @@ class GL2Loss(nn.Module):
         return loss
 
 
+class ImageL2Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, outputs, target, mask):
+        mask = mask.bool()
+        Image_diff = (outputs - target)[mask]
+        loss = torch.sum(Image_diff ** 2) / Image_diff.size(0)
+
+        return loss
+
+
 class AngleHistoLoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -184,13 +196,17 @@ class AngleLightLoss(nn.Module):
         super().__init__()
         self.normal_loss = NormalL2Loss()
         self.g_loss = GL2Loss()
+        self.img_loss = ImageL2Loss()
 
     def forward(self, outputs, target, args):
         normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
-        G = torch.sum(outputs[:, :3, :, :] * target[:, 5:8, :, :], dim=1)  # N * L
-        g_loss = self.g_loss(G, target[:, 3, :, :], args)
 
-        loss = normal_loss + g_loss
+        input_mask = outputs[:, 4, :, :]
+        G = torch.sum(outputs[:, :3, :, :] * target[:, 5:8, :, :], dim=1)  # N * L
+        out_img = outputs[:, 3, :, :] * G
+        img_loss = self.img_loss(out_img, target[:, 4, :, :], input_mask)
+
+        loss = normal_loss + img_loss * args.albedo_penalty
 
         return loss
 
