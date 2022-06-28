@@ -290,11 +290,11 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
+        "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
         "ResNG": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "ResNG2": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint2.pth.tar",
+        # "ResNG2": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint2.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

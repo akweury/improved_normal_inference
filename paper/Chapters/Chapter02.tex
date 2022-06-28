@@ -5,51 +5,39 @@
 \label{ch:02} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
 
+Due to the different of data structures, the point clouds can be grouped into types, structured point cloud based and unstructured point cloud based. The first case contains the neighbor information of each point together with a depth map or RGB image, the second case does not contain any neighbor information which has to be further calculated.
 
-
-
-Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
-
-
-
-\section{Noise Handling}
-%% denoising
-The depth map captured by depth sensors are usually with full of missing pixels and holes.
-\cite{depth-inpainting-distribution} proposed a depth hole filling method using the depth distributions of neighboring regions. 
-
-\cite{nconv} introduced normalized convolution dealing with missing or uncertain data for convolution operation. It uses a binary mask to distinguish missing data and integrate it into the convolution operation. \cite{ncnn} applied it and use normalized convolution layers in their networks, which aims to reconstruct the missing pixels from the sparse depth map sensed by cameras. \cite{pncnn} proposed an input confidence estimation network to estimate the confidence instead of using a binary mask. However, the relevant papers are only using 1 channel data as model input, which didn't discussed the case for the multiple-channel data as input.
-
-\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
-\cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
-
-
-
-
-%% normal estimation method introduction
-\section{Surface normal inference}
-\textbf{RGB based}  
-
-or from a single grayscale image using use Shape from Shading \cite{SFS}.  The second method depends on the correct information about the light source. Errors may occur in regions with inter-reflections in the 3D measurement. 
-
-
-\cite{Eigen} predicted depth map directly from RGB image. 
-\cite{geometry_based_solution} proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
-\cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}.
-
-
-\textbf{Point Cloud Based} 
+\paragraph{ Structured Point Cloud Based}
 The relevant methods derive the surface normals based on spatial relationship, which utilizes the neighbor information for estimation. These methods performs well with a well-chosen window size. However, the drawbacks are that the algorithm is highly noise sensitive. It is weak in handling missing pixels, which is a common issue in the input data. The earlier methods usually use optimized methods. \cite{Holzer.S} proposed method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix. They also smooth the depth data in order to handle the noise of depth image. The drawbacks are, as mentioned in the paper, the normals error go up when point depths change severely.  \cite{optimized-methods} did a comparison among the optimization-based methods. 
 
-\textbf{Unstructured point cloud}
-For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. \cite{unstructed-pc-patch-stitching} presents a pipeline for calculating the normals of multiple points in parallel. 
 
-\textbf{RGB-D based}
+\paragraph{Unstructured Point Cloud Based}
+For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor (KNN) is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. To ease this problem, \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. To calculate the normals of multiple points in parallel \cite{unstructed-pc-patch-stitching} processes a series of overlapping patches for normal estimation. 
 
 
-%% upsampling 
-It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
-%% talk about image upsampling, unet
-Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 3 times and upsampled 3 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
+
+Deep learning based methods take single RGB image or RGB-D image as the input for normal estimation. It has a strong relationship with the depth inference tasks, two benchmarks are highly used in these area. (\cite{nyu} and \cite{kitti-depth}) Based on the input of training model, the methods can be roughly divided as follows: 
+
+\paragraph{Depth Based}
+Depth map contains the spatial information of the object surface, which is very important for the normal inference task. However, the depth map captured by depth sensors are usually with missing pixels and holes on dark, shinny or transparent regions.(\cite{nyu}). To overcome the missing pixels,
+\cite{depth-inpainting-distribution} proposed a depth hole filling method using the depth distributions of neighboring regions.  \cite{nconv} introduced normalized convolution dealing with missing or uncertain data for convolution operation. It uses a binary mask to distinguish missing data and integrate it into the convolution operation. \cite{ncnn} applied it and use normalized convolution layers in their networks, which aims to reconstruct the missing pixels from the sparse depth map sensed by cameras. \cite{pncnn} proposed an input confidence estimation network to estimate the confidence instead of using a binary mask. However, the relevant papers are only using 1 channel data as model input, which didn't discussed the case for the multiple-channel data as input, such as RGB image, or structured point cloud.
+\cite{depth-enhance-guided} further integrated RGB image as the guidance to deal with the missing pixels in the depth map. 
+
+
+\paragraph{RGB based} RGB based methods predict the depth map diretly from single RGB image.
+\cite{Eigen} proposed a two staged network for depth map prediction based on RGB image, which consider the global features and the local features respectively. \cite{img2depth} employed Residual Network for the feature extraction and further designed a upsampling part which replace the fully-connected layer with the unpolling layers. 
+\cite{geometry_based_solution} proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
+\cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}. \cite{binsformer} proposed a method achieved state of art in NYUv2 Dataset (\cite{nyu}), which adaptively generate information to predict depth maps based on RGB image.
+
+\paragraph{RGB-D based}
+\cite{hfm} based on UNet architecture for normal estimation using RGB-D image as input. The RGB image and depth map are in the separate branches and imply a fusion module in four sections of the network to concatenate two branches. It also considers the confidence of the values in depth map.
+
+
+
+
+
+
+
 
 
 

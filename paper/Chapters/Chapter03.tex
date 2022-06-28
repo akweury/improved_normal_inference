@@ -13,7 +13,22 @@
 In three dimension geometry, a surface normal at the point $ P $ is a vector $ n $ perpendicular to the tangent plane of the surface at point $ P $. The length of a normal is usually one, with a sign to represent the sides (interior or exterior).%% add a picture to illustrate
 
 
-% ----------------------- neighbor based method -------------------------------------------
+\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
+\cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
+
+
+Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
+
+
+
+
+
+%% upsampling 
+It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
+%% talk about image upsampling, unet
+Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 3 times and upsampled 3 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
+
+
 \section{Neighbor based surface normal estimation}
 
 For a point $ P $ in a surface, its normal $ n $ is a vector of the tangent plane $ \Pi $ of the surface at this point $ P $. As long as find $ k $ vectors $ \textbf{v}_1, ..., \textbf{v}_k \in \mathbb{R}^3 $ on the tangent plane, the normal can be calculated immediately based on equation $ v \cdot \textbf{n} = 0 $

@@ -382,7 +382,8 @@ def compute_normal(vertex, cam_pos, mask, k):
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
                 neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)  # delete center vertex
                 # delete background vertex
-                neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
+                if neighbors.ndim == 2:
+                    neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
 
                 plane_vectors = neighbors - vertex[i, j]
 

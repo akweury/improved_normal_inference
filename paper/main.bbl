@@ -480,30 +480,43 @@
     \field{year}{2012}
   \endentry
 
-  \entry{SFS}{article}{}
-    \name{author}{1}{}{%
-      {{hash=HB}{%
-         family={Horn},
+  \entry{depth-enhance-guided}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=HJ}{%
+         family={Hua},
          familyi={H\bibinitperiod},
-         given={Berthold},
-         giveni={B\bibinitperiod},
+         given={Jiashen},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=GX}{%
+         family={Gong},
+         familyi={G\bibinitperiod},
+         given={Xiaojin},
+         giveni={X\bibinitperiod},
       }}%
     }
-    \strng{namehash}{HB1}
-    \strng{fullhash}{HB1}
+    \list{publisher}{1}{%
+      {AAAI Press}%
+    }
+    \strng{namehash}{HJGX1}
+    \strng{fullhash}{HJGX1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2004}
+    \field{labelyear}{2018}
     \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
-    \field{title}{Shape from Shading: A Method for Obtaining the Shape of a
-  Smooth Opaque Object from One View}
-    \verb{url}
-    \verb http://hdl.handle.net/1721.1/6885
-    \endverb
-    \field{month}{10}
-    \field{year}{2004}
+    \field{booktitle}{Proceedings of the 27th International Joint Conference on
+  Artificial Intelligence}
+    \field{isbn}{9780999241127}
+    \field{pages}{2283–2290}
+    \field{series}{IJCAI'18}
+    \field{title}{A Normalized Convolutional Neural Network for Guided Sparse
+  Depth Upsampling}
+    \list{location}{1}{%
+      {Stockholm, Sweden}%
+    }
+    \field{year}{2018}
   \endentry
 
   \entry{perceptual-loss}{misc}{}
@@ -588,6 +601,52 @@
     \verb https://arxiv.org/abs/1412.6980
     \endverb
     \field{year}{2014}
+  \endentry
+
+  \entry{optimized-methods}{inproceedings}{}
+    \name{author}{4}{}{%
+      {{hash=KK}{%
+         family={Klasing},
+         familyi={K\bibinitperiod},
+         given={Klaas},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=AD}{%
+         family={Althoff},
+         familyi={A\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=WD}{%
+         family={Wollherr},
+         familyi={W\bibinitperiod},
+         given={Dirk},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={Buss},
+         familyi={B\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KK+1}
+    \strng{fullhash}{KKADWDBM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2009}
+    \field{labeldatesource}{}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{booktitle}{2009 IEEE International Conference on Robotics and
+  Automation}
+    \verb{doi}
+    \verb 10.1109/ROBOT.2009.5152493
+    \endverb
+    \field{pages}{3206\bibrangedash 3211}
+    \field{title}{Comparison of surface normal estimation methods for range
+  sensing applications}
+    \field{year}{2009}
   \endentry
 
   \entry{nconv}{inproceedings}{}
@@ -678,6 +737,57 @@
     \verb https://arxiv.org/abs/1606.00373
     \endverb
     \field{year}{2016}
+  \endentry
+
+  \entry{binsformer}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=LZ}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Zhenyu},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=WX}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Xuyang},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=LX}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Xianming},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=JJ}{%
+         family={Jiang},
+         familyi={J\bibinitperiod},
+         given={Junjun},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{LZ+1}
+    \strng{fullhash}{LZWXLXJJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \verb{doi}
+    \verb 10.48550/ARXIV.2204.00987
+    \endverb
+    \field{title}{BinsFormer: Revisiting Adaptive Bins for Monocular Depth
+  Estimation}
+    \verb{url}
+    \verb https://arxiv.org/abs/2204.00987
+    \endverb
+    \field{year}{2022}
   \endentry
 
   \entry{data3}{online}{}
@@ -917,6 +1027,59 @@
     \field{year}{2015}
   \endentry
 
+  \entry{nyu}{inproceedings}{}
+    \name{author}{4}{}{%
+      {{hash=SN}{%
+         family={Silberman},
+         familyi={S\bibinitperiod},
+         given={Nathan},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=HD}{%
+         family={Hoiem},
+         familyi={H\bibinitperiod},
+         given={Derek},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=KP}{%
+         family={Kohli},
+         familyi={K\bibinitperiod},
+         given={Pushmeet},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=FR}{%
+         family={Fergus},
+         familyi={F\bibinitperiod},
+         given={Rob},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer-Verlag Berlin}%
+    }
+    \strng{namehash}{SN+1}
+    \strng{fullhash}{SNHDKPFR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2012}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{booktitle}{ECCV'12 Proceedings of the 12th European conference on
+  Computer Vision - Volume Part V}
+    \field{edition}{ECCV'12 Proceedings of the 12th European conference on
+  Computer Vision - Volume Part V}
+    \field{isbn}{978-3-642-33714-7}
+    \field{pages}{746\bibrangedash 760}
+    \field{title}{Indoor Segmentation and Support Inference from RGBD Images}
+    \verb{url}
+    \verb https://www.microsoft.com/en-us/research/publication/indoor-segmentat
+    \verb ion-support-inference-rgbd-images/
+    \endverb
+    \field{year}{2012}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
   \entry{data4}{online}{}
     \field{labeltitlesource}{title}
     \field{labeldatesource}{nodate}
@@ -984,6 +1147,58 @@
     \verb{url}
     \verb http://www.graphics.stanford.edu/data/3Dscanrep/
     \endverb
+  \endentry
+
+  \entry{kitti-depth}{inproceedings}{}
+    \name{author}{6}{}{%
+      {{hash=UJ}{%
+         family={Uhrig},
+         familyi={U\bibinitperiod},
+         given={Jonas},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Schneider},
+         familyi={S\bibinitperiod},
+         given={Nick},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SL}{%
+         family={Schneider},
+         familyi={S\bibinitperiod},
+         given={Lukas},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=FU}{%
+         family={Franke},
+         familyi={F\bibinitperiod},
+         given={Uwe},
+         giveni={U\bibinitperiod},
+      }}%
+      {{hash=BT}{%
+         family={Brox},
+         familyi={B\bibinitperiod},
+         given={Thomas},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Geiger},
+         familyi={G\bibinitperiod},
+         given={Andreas},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{UJ+1}
+    \strng{fullhash}{UJSNSLFUBTGA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{}
+    \field{sortinit}{U}
+    \field{sortinithash}{U}
+    \field{booktitle}{International Conference on 3D Vision (3DV)}
+    \field{title}{Sparsity Invariant CNNs}
+    \field{year}{2017}
   \endentry
 
   \entry{depth-inpainting-distribution}{inproceedings}{}
@@ -1089,6 +1304,70 @@
     \field{year}{2018}
   \endentry
 
+  \entry{hfm}{inproceedings}{}
+    \name{author}{7}{}{%
+      {{hash=ZJ}{%
+         family={Zeng},
+         familyi={Z\bibinitperiod},
+         given={Jin},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=TY}{%
+         family={Tong},
+         familyi={T\bibinitperiod},
+         given={Yanfeng},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=HY}{%
+         family={Huang},
+         familyi={H\bibinitperiod},
+         given={Yunmu},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=YQ}{%
+         family={Yan},
+         familyi={Y\bibinitperiod},
+         given={Qiong},
+         giveni={Q\bibinitperiod},
+      }}%
+      {{hash=SW}{%
+         family={Sun},
+         familyi={S\bibinitperiod},
+         given={Wenxiu},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=CJ}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Jing},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=WY}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Yongtian},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ZJ+1}
+    \strng{fullhash}{ZJTYHYYQSWCJWY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{}
+    \field{sortinit}{Z}
+    \field{sortinithash}{Z}
+    \field{booktitle}{2019 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)}
+    \verb{doi}
+    \verb 10.1109/CVPR.2019.00631
+    \endverb
+    \field{pages}{6146\bibrangedash 6155}
+    \field{title}{Deep Surface Normal Estimation With Hierarchical RGB-D
+  Fusion}
+    \field{year}{2019}
+  \endentry
+
   \entry{unstructed-pc-patch-stitching}{misc}{}
     \name{author}{6}{}{%
       {{hash=ZJ}{%
@@ -1128,7 +1407,7 @@
          giveni={Z\bibinitperiod},
       }}%
     }
-    \strng{namehash}{ZJ+1}
+    \strng{namehash}{ZJ+2}
     \strng{fullhash}{ZJJWWMLXLZLZ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}

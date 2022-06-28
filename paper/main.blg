@@ -40,49 +40,48 @@ Repeated entry---line 388 of file example.bib
  : @article{nconv
  :               ,
 I'm skipping whatever remains of this entry
-Warning--I didn't find a database entry for "guided"
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-You've used 28 entries,
+You've used 33 entries,
             6393 wiz_defined-function locations,
-            1365 strings with 15091 characters,
-and the built_in function-call counts, 185354 in all, are:
-= -- 13067
-> -- 3227
-< -- 909
-+ -- 4785
-- -- 1318
-* -- 14023
-:= -- 20354
+            1399 strings with 16497 characters,
+and the built_in function-call counts, 229788 in all, are:
+= -- 16496
+> -- 3862
+< -- 1084
++ -- 6168
+- -- 1565
+* -- 17259
+:= -- 25677
 add.period$ -- 0
-call.type$ -- 28
-change.case$ -- 430
-chr.to.int$ -- 59
-cite$ -- 54
-duplicate$ -- 20152
-empty$ -- 16674
-format.name$ -- 2041
-if$ -- 37520
+call.type$ -- 33
+change.case$ -- 537
+chr.to.int$ -- 54
+cite$ -- 64
+duplicate$ -- 25403
+empty$ -- 20399
+format.name$ -- 2523
+if$ -- 46133
 int.to.chr$ -- 0
-int.to.str$ -- 70
+int.to.str$ -- 85
 missing$ -- 0
-newline$ -- 1109
-num.names$ -- 1231
-pop$ -- 9979
+newline$ -- 1379
+num.names$ -- 1504
+pop$ -- 11980
 preamble$ -- 1
-purify$ -- 616
+purify$ -- 776
 quote$ -- 0
-skip$ -- 5089
+skip$ -- 6094
 stack$ -- 0
-substring$ -- 22212
-swap$ -- 4644
-text.length$ -- 822
-text.prefix$ -- 27
+substring$ -- 27843
+swap$ -- 5703
+text.length$ -- 966
+text.prefix$ -- 32
 top$ -- 1
-type$ -- 940
+type$ -- 1110
 warning$ -- 0
-while$ -- 2890
+while$ -- 3710
 width$ -- 0
-write$ -- 1082
+write$ -- 1347
 (There was 1 error message)
