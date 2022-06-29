@@ -918,7 +918,7 @@ def eval_img_angle(output, target):
     mask = target.sum(axis=2) == 0
     angle_matrix = np.zeros(target.shape[:2])
     angle_matrix[~mask] = angle_between(target[~mask], output[~mask])
-
+    # angle_matrix[angle_matrix > 10] = 0
     img = angle2rgb(angle_matrix)
     img[mask] = 0
     return img, angle_matrix

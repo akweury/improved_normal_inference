@@ -4,7 +4,7 @@ import shutil
 
 import numpy as np
 import torch
-
+import glob
 import config
 from help_funs import file_io
 
@@ -55,17 +55,21 @@ def noisy_a_folder(folder_path, output_path):
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    for idx in range(10000):
-        if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0_noise.png"))):
+
+    gt_files = np.array(sorted(glob.glob(str(folder_path / "*normal0*.png"), recursive=True)))
+    depth_files = np.array(sorted(glob.glob(str(folder_path / "*depth0*.png"), recursive=True)))
+    data_files = np.array(sorted(glob.glob(str(folder_path / "*data0*.json"), recursive=True)))
+    img_files = np.array(sorted(glob.glob(str(folder_path / "*image0*.png"), recursive=True)))
+    for idx in range(len(img_files)):
+        if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0.png"))):
             continue
-        image_file, ply_file, json_file, depth_gt_file, _, normal_file = file_io.get_file_name(idx, folder_path)
-        if os.path.exists(image_file):
-            f = open(json_file)
+        if os.path.exists(img_files[idx]):
+            f = open(data_files[idx])
             data = json.load(f)
-            depth = file_io.load_scaled16bitImage(depth_gt_file, data['minDepth'], data['maxDepth'])
+            depth = file_io.load_scaled16bitImage(depth_files[idx], data['minDepth'], data['maxDepth'])
 
             # get noise mask
-            img = np.expand_dims(file_io.load_16bitImage(image_file), axis=2)
+            img = np.expand_dims(file_io.load_16bitImage(img_files[idx]), axis=2)
             # img[img < 20] = 0
             depth, noise_factor = noisy_1channel(depth)
 
@@ -79,9 +83,9 @@ def noisy_a_folder(folder_path, output_path):
                 json.dump(data, f)
 
             # file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
-            shutil.copyfile(depth_gt_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
-            shutil.copyfile(image_file, str(output_path / (str(idx).zfill(5) + ".image0.png")))
-            shutil.copyfile(normal_file, str(output_path / (str(idx).zfill(5) + ".normal0.png")))
+            shutil.copyfile(depth_files[idx], str(output_path / (str(idx).zfill(5) + ".depth0.png")))
+            shutil.copyfile(img_files[idx], str(output_path / (str(idx).zfill(5) + ".image0.png")))
+            shutil.copyfile(gt_files[idx], str(output_path / (str(idx).zfill(5) + ".normal0.png")))
 
             print(f'File {idx} added noise.')
 

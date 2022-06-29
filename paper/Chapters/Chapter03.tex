@@ -8,8 +8,24 @@
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
-%% What is surface normal
-\label{sec:surface-normal}
+In this chapter, we first introduced an optimization based method using singular value decomposition (SVD) for surface normal estimation task. Then, we introduced the main work of this thesis, a deep learning based method which use gated convolution layers for normal inference. 
+
+All the methods have been introduced in this chapter use RGB-D image as input. For the guided methods, the light source position and camera matrix are assumed given. The output is directly the corresponding normal map.
+
+
+\section{Problem Statement}
+Given a RGB image $ I^{W\times H\times 3} $, the corresponding depth map $ Z^{W\times H \times 1} $, where $ W $ and $ H $ denote the width and the height of the image separately, the light source $ \textbf{l} = (l_x, l_y,l_z) $ and the camera matrix $ P^{3\times 4} $. 
+We would like to estimate the corresponding normal map  $ N^{W\times H \times 3} $. 
+
+The depth map can be converted to point cloud.
+
+
+Each normal $ \textbf{n}^{3 \times 1} $ at position $ (x, y) $ in the normal map is a unit vector, which perpendicular to the tangent plane of the surface at point $ P $
+
+
+
+
+
 In three dimension geometry, a surface normal at the point $ P $ is a vector $ n $ perpendicular to the tangent plane of the surface at point $ P $. The length of a normal is usually one, with a sign to represent the sides (interior or exterior).%% add a picture to illustrate
 
 

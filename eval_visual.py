@@ -27,7 +27,7 @@ def evaluate_epoch(args, model, input_tensor, device):
         # store the predicted normal
         output = output[0, :].permute(1, 2, 0)
         output = output.to('cpu').numpy()
-    return output
+    return output[:, :, :3]
 
 
 def preprocessing(models):
@@ -233,8 +233,10 @@ def start2(models_path_dict):
                 # load model
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
-                if args.exp in ["ng", "hfm", "resng", "ag"]:
+                if args.exp in ["ng", "hfm", "resng"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
+                elif args.exp in ["ag"]:
+                    normal = evaluate_epoch(args, model, test_0_tensor, device)
                 elif args.exp in ["nnnn", "fugrc"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                     normal_no_mask_img = cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR)
@@ -252,9 +254,9 @@ def start2(models_path_dict):
             diff_img, diff_angle = mu.eval_img_angle(normal, gt)
             diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
-            mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
-            if normal_no_mask_img is not None:
-                cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+            # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+            # if normal_no_mask_img is not None:
+            #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
             cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
                        cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
             cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
@@ -263,7 +265,7 @@ def start2(models_path_dict):
             eval_res[model_idx, i] = diff
 
         # save files
-        mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
+        # mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
 
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), img)
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
@@ -290,11 +292,11 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        "SVD": None,
+        # "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        "ResNG": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "NG": config.ws_path / "ng" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "GCNN128": config.ws_path / "resng" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "GCNN256": config.ws_path / "resng" / "trained_model" / "256" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

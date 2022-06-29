@@ -18,7 +18,7 @@ parser.add_argument('--machine', type=str, default="local", choices=['local', 'r
                     help="loading dataset from local or dfki machine")
 parser.add_argument('--data', type=str, default="synthetic",
                     help="choose dataset")
-parser.add_argument('--max_k', type=str, default="0,1",
+parser.add_argument('--max_k', type=str, default="0",
                     help="loading dataset from local or dfki machine")
 parser.add_argument('--noise', type=str, default="true",
                     help="add noise to the dataset")
