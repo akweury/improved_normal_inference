@@ -132,7 +132,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         print(f'File {item + 1}/{len(data_files)} converted to tensor. K = {k}')
 
 
-if args.data in ["synthetic128", "synthetic256", "synthetic512"]:
+if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
     for folder in ["train", "test", "val"]:
 
         if args.machine == "remote":

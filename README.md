@@ -5,13 +5,19 @@
 #### copy dataset from local to remote
 
 ```
-scp D:\TUK\improved_normal_inference\dataset\synthetic128.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic128
+scp D:\TUK\improved_normal_inference\dataset\synthetic512.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic512
 ```
 
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=1 python3 create_dataset.py --data synthetic128 --machine remote --max_k 0 --clear true
+CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --data synthetic64 --machine remote --max_k 0 --clear true
+```
+
+#### resize dataset
+
+```
+CUDA_VISIBLE_DEVICES=0 python3 resize_dataset.py --machine remote --new-size 64
 ```
 
 #### resume a training work
