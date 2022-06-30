@@ -473,24 +473,25 @@ class TrainingModel():
                 self.optimizer = Adam(self.parameters, lr=self.args.lr, weight_decay=0, amsgrad=True)
             else:
                 raise ValueError
-
-            if self.exp_name == "degares":
-                # load weight from pretrained resng model
-                print(f'load model {config.resng_model}')
-                pretrained_model = torch.load(config.resng_model)
-                resng = pretrained_model['model']
-                self.missing_keys = model.load_state_dict(resng.state_dict(), strict=False)
-
-                # load optimizer
-                # self.optimizer = pretrained_model['optimizer']
-
-                # Print model's state_dict
-                print("ResNg's state_dict:")
-                for param_tensor in resng.state_dict():
-                    print(param_tensor, "\t", resng.state_dict()[param_tensor].size())
-                print("DeGaRes's state_dict:")
-                for param_tensor in model.state_dict():
-                    print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+            if self.args.init_net != None:
+                model.init_net(self.args.init_net)
+            # if self.exp_name == "degares":
+            #     # load weight from pretrained resng model
+            #     print(f'load model {config.resng_model}')
+            #     pretrained_model = torch.load(config.resng_model)
+            #     resng = pretrained_model['model']
+            #     self.missing_keys = model.load_state_dict(resng.state_dict(), strict=False)
+            #
+            #     # load optimizer
+            #     # self.optimizer = pretrained_model['optimizer']
+            #
+            #     # Print model's state_dict
+            #     print("ResNg's state_dict:")
+            #     for param_tensor in resng.state_dict():
+            #         print(param_tensor, "\t", resng.state_dict()[param_tensor].size())
+            #     print("DeGaRes's state_dict:")
+            #     for param_tensor in model.state_dict():
+            #         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
 
             return model
 

@@ -2,6 +2,7 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "ag",
+  "init_net": null,
   "resume": null,
   "epochs": 100001,
   "optimizer": "adam",

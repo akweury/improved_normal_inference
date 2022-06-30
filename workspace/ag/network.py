@@ -6,15 +6,27 @@ import torch
 import torch.nn as nn
 from common.Layers import GConv
 from common.ResNormalGuided import NormalGuided
-
+import config
 
 class CNN(nn.Module):
     def __init__(self, channel_num):
         super().__init__()
         self.__name__ = 'ag'
+        self.channel_num = channel_num
         self.net3_3 = NormalGuided(3, 3, channel_num)
         self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
         self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
+
+    def init_net(self, model_name):
+        net_dict = self.net3_3.state_dict()
+        source_net = NormalGuided(3, 3, self.channel_num)
+        checkpoint = torch.load(model_name)
+
+        source_net.load_state_dict(checkpoint['model'])
+        source_net_dict = source_net.state_dict()
+        source_net_dict = {k: v for k, v in source_net_dict.items() if k in net_dict and v.size() == net_dict[k].size()}
+        net_dict.update(source_net_dict)
+        self.net3_3.load_state_dict(net_dict)
 
     def forward(self, x):
         # x0: vertex array
