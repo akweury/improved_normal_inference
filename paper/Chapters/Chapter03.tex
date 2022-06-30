@@ -4,29 +4,56 @@
 
 \label{ch:03} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
 
-In this chapter, we first introduced an optimization based method using singular value decomposition (SVD) for surface normal estimation task. Then, we introduced the main work of this thesis, a deep learning based method which use gated convolution layers for normal inference. 
+The normal inference task can be simply stated as follows:
 
-All the methods have been introduced in this chapter use RGB-D image as input. For the guided methods, the light source position and camera matrix are assumed given. The output is directly the corresponding normal map.
+Given a structured point cloud $ V^{W\times H\times 3} $,
+We would like to estimate the normal map  $ N^{W\times H \times 3} $, where each normal  $ \textbf{n}^{3\times 1} $ at point $ \textbf{p}^{3\times 1} $ is a unit vector with direction point outward and perpendicular to the tangent plane of the surface at point $ \textbf{p}^{3\times 1} $.
+
+In this chapter, we first introduced an optimization based method using singular value decomposition (SVD). Then, we introduced the main work of this thesis, a deep learning based method which use gated convolution layers for normal inference. 
+
+\section{Neighbor based surface normal estimation}
+
+For a point $ \textbf{p} $ in a surface, its normal $ \textbf{n} $ is a vector of the tangent plane $ \Pi $ of the surface at this point $ \textbf{p} $. As long as find $ k $ vectors $ \textbf{v}_1, ..., \textbf{v}_k \in \mathbb{R}^3 $ on the same tangent plane, the normal can be calculated immediately by solving equation system $ A \cdot \textbf{n} = 0 $, where $ A \in \mathbb{R}^{k\times 3} $ is the vector matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_k $.
+
+In order to find the vectors on the tangent plane, we can assume the $ k $ neighbor points of $ \textbf{p} $ are in the same plane, where $ k $ is a customized parameter. Then, 
+\begin{equation}
+	\textbf{v}_i = \textbf{p}_i - \textbf{p} \quad \text{for} \ 1 \le i \le k
+\end{equation}
+are $ k $ vectors on the tangent plane. Since they all perpendicular to the normal $ \textbf{n} $, we have 
+\begin{equation}{\label{eq:normal-overdetermined-equation}}
+	\textbf{v}_i \cdot \textbf{n} = 0 \quad \text{for} \ 1 \le i \le k
+\end{equation}
+The equation system can be further simplified as 
+\begin{equation}{\label{eq:normal-overdetermined-equation}}
+	A \cdot \textbf{n} = 0
+\end{equation}
+where $ A\in \mathbb{R}^{k\times 3} $ denotes the matrix constructed by $ \textbf{v}_i $.
+In order to avoid trivial solution, one more constraint should be added
+\[ \|  \bn_{3 \times 1} \|_2^2 = 1  \]
+which also let the normal to be a unit vector.
+
+To calculate a valid normal, at least 3 points are required, i.e. $ k>=3 $. For the sake of robust, more points can be used to reduce the measuring error. For the case $ k>3 $, the equation system is usually over-determined, then the equation system mentioned above can be converted to follow optimization problem
+\begin{equation}
+	\begin{array}{rrclcl}
+		\displaystyle \min & \multicolumn{3}{l}{\| A  \bn \|^2} \\
+		\\
+		\textrm{s.t.} & \| \bn \|^2 & = & 1 
+	\end{array}
+\end{equation}
+which can be solved by singular value decomposition(SVD). Let the decomposition of $ A=U\Sigma V^T $, The solution i.e. normal is the last column of $ V $.
 
 
-\section{Problem Statement}
-Given a RGB image $ I^{W\times H\times 3} $, the corresponding depth map $ Z^{W\times H \times 1} $, where $ W $ and $ H $ denote the width and the height of the image separately, the light source $ \textbf{l} = (l_x, l_y,l_z) $ and the camera matrix $ P^{3\times 4} $. 
-We would like to estimate the corresponding normal map  $ N^{W\times H \times 3} $. 
+At last, all the normals should point ot view point $ \textbf{s} $, thus the direction of a normal should be inverted if 
+\begin{equation}\label{eq:normal-invertion}
+	\textbf{n} \cdot (\textbf{p}  - \textbf{s}) > 0
+\end{equation}
 
-The depth map can be converted to point cloud.
+Repeat the procedure for all the points in the point cloud to get the entire normal map. 
 
-
-Each normal $ \textbf{n}^{3 \times 1} $ at position $ (x, y) $ in the normal map is a unit vector, which perpendicular to the tangent plane of the surface at point $ P $
-
-
-
-
-
-In three dimension geometry, a surface normal at the point $ P $ is a vector $ n $ perpendicular to the tangent plane of the surface at point $ P $. The length of a normal is usually one, with a sign to represent the sides (interior or exterior).%% add a picture to illustrate
+% ---------------------------- gated convolution neural network -------------------------------------------------
+\section{Gated Convolution neural network for surface normal estimation}
+\label{gcnn}
 
 
 \cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
@@ -45,47 +72,7 @@ It is worth to noticed that, the output of normal inference CNN model is not one
 Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 3 times and upsampled 3 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
 
 
-\section{Neighbor based surface normal estimation}
 
-For a point $ P $ in a surface, its normal $ n $ is a vector of the tangent plane $ \Pi $ of the surface at this point $ P $. As long as find $ k $ vectors $ \textbf{v}_1, ..., \textbf{v}_k \in \mathbb{R}^3 $ on the tangent plane, the normal can be calculated immediately based on equation $ v \cdot \textbf{n} = 0 $
-
-Let $ P_1, ..., P_k \in \mathbb{R}^3 $ are $ k $ neighbors of point $ P $ in the point cloud. In order to find the normal $ n $, we can assume the neighbor points and $ P $ are in the same tangent plane. Then 
-\begin{equation}
-	\textbf{v}_i = P_i - P \quad \text{for} \ 1 \le i \le k
-\end{equation}
-are $ k $ vectors on the tangent plane. Since they all perpendicular to the normal $ n $, we have 
-\begin{equation}{\label{eq:normal-overdetermined-equation}}
-	\textbf{v}_i \cdot \textbf{n} = 0 \quad \text{for} \ 1 \le i \le k
-\end{equation}
-The equation system can be further simplified as 
-\begin{equation}{\label{eq:normal-overdetermined-equation}}
-	M \cdot \textbf{n} = 0
-\end{equation}
-where $ M\in \mathbb{R}^{k\times 3} $ denotes the matrix constructed by $ \textbf{v}_i $.
-In order to avoid trivial solution, one more constraint should be added
-\[ \|  \bn_{3 \times 1} \|_2^2 = 1  \], which also let the normal to be a unit vector.
-
-In order to calculate a valid normal, 3 points are required at least. For the sake of robust, more points can be used to reduce the measuring error. In this case, the equation system is over-determined, then the equation system mentioned above can be converted to follow optimization problem
-\begin{equation}
-	\begin{array}{rrclcl}
-		\displaystyle \min & \multicolumn{3}{l}{\| M  \bn \|^2} \\
-		\\
-		\textrm{s.t.} & \| \bn \|^2 & = & 1 
-	\end{array}
-\end{equation}
-which can be solved by singular value decomposition(SVD). Let the decomposition of $ M=U\Sigma V^T $, The solution i.e. normal is the last column of $ V $.
-
-
-At last, all the normals should point ot view point $ S $, thus the direction of a normal should be inverted if 
-\begin{equation}\label{eq:normal-invertion}
-	\textbf{n}\cdot (P-S)>0
-\end{equation}
-
-
-\newpage
-% ---------------------------- gated convolution neural network -------------------------------------------------
-\section{Gated Convolution neural network for surface normal estimation}
-\label{gcnn}
 The standard convolution layer goes like this
 
 \begin{equation}

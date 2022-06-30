@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
-parser.add_argument('--new-size', type=int, default=128,
+parser.add_argument('--new-size', type=int, default=64,
                     help="the size of resized data")
 parser.add_argument('--clear', type=str, default="false",
                     help="flag that is used to clear old dataset")
@@ -53,7 +53,7 @@ for folder in ["train", "test", "val"]:
         # left most valid col
         saved_case = 0
         failed_counter = 0
-        while saved_case < 5 and failed_counter < 20:
+        while saved_case < 10 and failed_counter < 20:
             left = np.random.randint(min(int(w - new_size), int(np.argmax(np.sum(depth, axis=1) > 0))) - 1,
                                      int(w - new_size))
             right = left + new_size
