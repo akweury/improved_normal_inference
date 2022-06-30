@@ -45,6 +45,9 @@ for folder in ["train", "test", "val"]:
     img_files = np.array(sorted(glob.glob(str(original_folder / "*image0.png"), recursive=True)))
 
     for item in range(len(data_files)):
+        if os.path.exists(str(dataset_folder / (str(item).zfill(5) + f".depth0-9.png"))):
+            continue
+
         print(f"file {item}")
         depth = cv2.imread(depth_files[item], -1)
         img = cv2.imread(img_files[item], -1)

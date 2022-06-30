@@ -55,7 +55,7 @@ def avg_angle_between_tensor(v1, v2):
 
 
 def vertex2light_direction(vertex_map, light_sorce):
-    light_direction = light_sorce - vertex_map
+    light_direction = vertex_map - light_sorce
     light_direction_map = light_direction / np.linalg.norm(light_direction, ord=2, axis=2, keepdims=True)
 
     return light_direction_map

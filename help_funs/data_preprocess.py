@@ -1,10 +1,11 @@
+import glob
 import json
 import os
 import shutil
 
 import numpy as np
 import torch
-import glob
+
 import config
 from help_funs import file_io
 
@@ -140,11 +141,14 @@ def vectex_normalization(vertex, mask):
     zzz = np.argmax(np.array([x_range, y_range, z_range]))
     scale_factors = [x_range, y_range, z_range]
     shift_vector = np.array([vertex[:, :, 0][~mask].min(), vertex[:, :, 1][~mask].min(), vertex[:, :, 2][~mask].min()])
-    vertex[:, :, :1][~mask] = (vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()) / scale_factors[0]
-    vertex[:, :, 1:2][~mask] = (vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()) / scale_factors[0]
-    vertex[:, :, 2:3][~mask] = (vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()) / scale_factors[0]
+    vertex[:, :, :1][~mask] = vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()
+    vertex[:, :, 1:2][~mask] = vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()
+    vertex[:, :, 2:3][~mask] = vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()
 
-    return vertex, scale_factors, shift_vector
+    norms = (np.linalg.norm(vertex, ord=2, axis=2, keepdims=True) + 1e-20)
+    vertex = vertex / norms.max()
+
+    return vertex, norms.max(), shift_vector
 
 
 if __name__ == '__main__':

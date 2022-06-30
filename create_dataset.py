@@ -9,7 +9,7 @@ import torch
 
 import config
 from help_funs import file_io, mu
-from help_funs.data_preprocess import noisy_a_folder, vectex_normalization, neighbor_vectors_k
+from help_funs.data_preprocess import noisy_a_folder, vectex_normalization
 
 parser = argparse.ArgumentParser(description='Eval')
 
@@ -68,7 +68,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         img = file_io.load_16bitImage(img_files[item])
         img[mask_gt] = 0
-        data['R'], data['t'] = np.identity(3), np.zeros(3)
+        # data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
                                  torch.tensor(data['R']).float(),
@@ -78,7 +78,8 @@ def convert2training_tensor(path, k, output_type='normal'):
                                     torch.tensor(data['R']).float(),
                                     torch.tensor(data['t']).float())
 
-        vertex, scale_factors, shift_vector = vectex_normalization(vertex, mask)
+        vertex_norm, scale_factors, shift_vector = vectex_normalization(vertex, mask)
+
         vertex_gt, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
 
         # gt normal
@@ -87,9 +88,9 @@ def convert2training_tensor(path, k, output_type='normal'):
                 np.linalg.norm(gt_normal, ord=2, axis=2, keepdims=True) + 1e-20)  # normal normalization
 
         # light
-        light_pos = (data['lightPos'] - shift_vector) / scale_factors[0]
-        light_direction = mu.vertex2light_direction(vertex, light_pos)
-        light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos)
+        # light_pos = (data['lightPos'] - shift_vector) / scale_factors
+        light_direction = mu.vertex2light_direction(vertex, data['lightPos'])
+        light_direction_gt = mu.vertex2light_direction(vertex_gt, data['lightPos'])
         light_direction_gt[mask_gt] = 0
         light_direction[mask] = 0
 
@@ -98,9 +99,9 @@ def convert2training_tensor(path, k, output_type='normal'):
         G[mask_gt] = 0
         albedo_gt = img / (G + 1e-20)
 
-        # mu.show_images(np.uint8((albedo_gt* G)/(albedo_gt* G).max() * 255), "img")
-        # albedo_gt[~mask_gt] = (albedo_gt[~mask_gt] - albedo_gt.min()) / (albedo_gt.max() - albedo_gt.min()) * 255
-        # mu.show_images(albedo_gt, "a")
+        # mu.show_images(img, "img")
+        # albedo_img = np.uint8(albedo_gt)
+        # mu.show_images(albedo_img, "a")
 
         target = np.c_[
             gt_normal,  # 0,1,2
@@ -110,8 +111,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         ]
 
         # case of resng, ng
-        vertex[mask] = 0
-        vectors = np.c_[vertex, np.expand_dims(img, axis=2), light_direction]
+        vertex_norm[mask] = 0
+        vectors = np.c_[vertex_norm, np.expand_dims(img, axis=2), light_direction]
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)
