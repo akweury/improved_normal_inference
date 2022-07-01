@@ -1,7 +1,7 @@
 {
   "machine": "remote",
   "batch_size": 32,
-  "train_on": 1000,
+  "train_on": 3000,
   "num-channels": 128,
   "init_net": null,
   "output_type": "normal_noise",
