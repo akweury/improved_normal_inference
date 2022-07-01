@@ -3,6 +3,7 @@
   "neighbor": 0,
   "exp": "resng",
   "resume": null,
+  "init_net": null,
   "epochs": 100001,
   "optimizer": "adam",
   "lr": 0.001,

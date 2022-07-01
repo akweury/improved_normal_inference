@@ -19,8 +19,7 @@ class CNN(nn.Module):
         # x0: vertex array
         # c0: confidence of each element in x0
         x_vertex = x[:, :3, :, :]
-        x_img = x[:, 3:4, :, :]
 
-        xout = self.nconv3_3(x_vertex, x_img)
+        xout = self.nconv3_3(x_vertex)
 
         return xout
