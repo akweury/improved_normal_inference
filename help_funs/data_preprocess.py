@@ -64,7 +64,7 @@ def noisy_a_folder(folder_path, output_path):
     for idx in range(len(img_files)):
         if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0.png"))):
             continue
-        if os.path.exists(img_files[idx]):
+        if os.path.exists(data_files[idx]):
             f = open(data_files[idx])
             data = json.load(f)
             depth = file_io.load_scaled16bitImage(depth_files[idx], data['minDepth'], data['maxDepth'])
