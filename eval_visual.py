@@ -43,11 +43,11 @@ def preprocessing(models):
 
     # load data file names
     if args.data == "synthetic_noise":
-        path = config.synthetic_data_noise_local / args.datasize / "test" / "tensor"
+        path = config.synthetic_data_noise_local / args.datasize / "selval" / "tensor"
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
-        path = config.synthetic_data / args.datasize / "test" / "tensor"  # key tests 103, 166, 189,9
+        path = config.synthetic_data / args.datasize / "selval" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
         path = config.real_data / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
@@ -109,7 +109,7 @@ def start(models_path_dict):
             if name == "SVD":
                 print(f'- model {name} evaluation...')
                 camPos = torch.tensor(test_0['t'])
-                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=4)
 
             else:
                 checkpoint = torch.load(model)
@@ -225,7 +225,7 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=2)
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=1)
             else:
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
@@ -294,11 +294,11 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        "SVD": None,
+        # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
-        # "GCNN256": config.ws_path / "resng" / "trained_model" / "256" / "checkpoint.pth.tar",
+        "GCNN512": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

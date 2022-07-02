@@ -13,6 +13,8 @@ We would like to estimate the normal map  $ N^{W\times H \times 3} $, where each
 In this chapter, we first introduced an optimization based method using singular value decomposition (SVD). Then, we introduced the main work of this thesis, a deep learning based method which use gated convolution layers for normal inference. 
 
 \section{Neighbor based surface normal estimation}
+\subsection{Approach}
+
 The idea behind the neighbor based method is to fit a plane $ \Pi $ using the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, calculate the normal  $ \tilde{\textbf{n}} $ of the plane. Then the actual normal $ \textbf{n} \approx \tilde{\textbf{n}}  $.
 
 It is under the assumption that the point and its neighbors are located in the same plane. This is usually not hold for the most of the surface, but if $ k $ in a suitable scale and point cloud is dense enough, it is enough to get a good result. As shown in Figure \ref{fig:svd-normal}. 
@@ -46,38 +48,68 @@ At last, all the normals should point ot view point $ \textbf{s} $, thus the dir
 
 Repeat the procedure for all the points in the point cloud to get the entire normal map. 
 
-% ---------------------------- gated convolution neural network -------------------------------------------------
+\subsection{Evaluation}
+The neighbor based method can predict the normal map in a good way when the given point cloud is dense, as shown in Figure \ref{fig:svd-normal}. It can successfully predict the smooth surface of the dragon object, especially the flakes and the tails of the dragon. 
+
+However, it failed in the areas such as hindleg, horn and the mouth, which consists mainly by sharp edges. This is because the neighbors points in these area do not hold the assumption of coplanarity, the normals of these neighbors can be very different. 
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_groundtruth.png}
+	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_normal_SVD.png}
+	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_error_SVD.png}
+	
+	\label{fig:svd-normal}
+	\caption{Normal map of a dragon object predicted by neighbor based method. k=2, angle error=5 \textbf{Left}: ground-truth normal map \textbf{Middle}: predicted normal map, \textbf{Right}: Error map}
+\end{figure}
+The neighbor based method is depended on a well-chosen parameter $ k $. Figure \ref{fig:svd-k-eval} shows the evaluation on different $ k $ values. When $ k=1 $, the average error of the whole image is the lowest one, most of the normals are close to the ground-truth but the outline edges, which are the areas that surface normal changed extremely sever. For the case $ k=2 $, the sharp edges are more smooth and cause more error, like the eyes area of the dragon. Compare to the first case, the outline edge error goes better. Most of the edge errors are reduced when $ k=2 $, since more neighbor points join the evaluation and it reduces the effect of outliers. However, for the area of horn outline, hindleg outline, the error goes worse. In this case, most of the neighbors of these points are outliers and thus failed this approach.  $ k=3 $ and $ k=4 $ further increase the angle errors in $ k=2 $.
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k1.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k2.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k3.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k4.png}	
+	\label{fig:svd-k-eval}
+	\caption{Error map of neighbor based method with different $ k $ values. From left to right, $ k=1,2,3,4 $ separately.}
+\end{figure}
+
+The performance of neighbor based method is good enough for a well chosen $ k $, and it can be further improved by simply use different $ k $ for different area prediction. However, for the case of noised point cloud as input, the approach will broken, since the noise will failed the neighbor selection and also reduce the number of possible neighbors of each point for a fixed $ k $.
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_point_cloud_noise.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_groundtruth.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_normal_SVD.png}
+	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_error_SVD.png}	
+	\label{fig:svd-noise}
+	\caption{Evaluation of neighbor based method on a noised dragon model}
+\end{figure}
+
+
+
+
+
+
+% ---------------------- gated convolution neural network ------------------------
 \section{Gated Convolution neural network for surface normal estimation}
 \label{gcnn}
 
 
-\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
-\cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
-
-
-Recently, deep learning based method achieved a great succeed for image processing.  \cite{yolov3} proposed  \cite{efficientDet} These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class \cite{efficientDet}, or with a set of values to represent the position of bounding boxes.\cite{yolov3}. However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
-
-
-
-
+Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
 
 %% upsampling 
 It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
 %% talk about image upsampling, unet
-Recently, Ronneberger et al proposed an architecture called UNet \cite{unet} for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 3 times and upsampled 3 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
+Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 4 times and upsampled 4 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=.8\textwidth]{./Figures/u-net-illustration-correct-scale2.pdf}
+	\label{fig:u-net}
+	\caption{The structure of UNet. \cite{unet}}
+\end{figure}
 
 
-
-The standard convolution layer goes like this
-
-\begin{equation}
-	\begin{array}{rrclcl}
-		\displaystyle O = \Sigma\Sigma W\cdot I \\
-	\end{array}
-\end{equation}
-each filter is applied as a sliding window to walk through the whole matrix and calculates the output matrix. Every entry in the matrix counts in the operation. This is reasonable for image processing task with full-dense input, since no missing pixels exist. 
-However, the depth-map and point cloud is only semi-dense. The valid and invalid pixels will be treated equally if we still perform standard convolution layers. Since the aim of the network is not learning the pattern of noise, but the noise with eternally changing patterns will confuse the network, and it fails the normal inference, a mask is required to distinguish two kinds of pixels. 
-
+The UNet is based on standard convolution layers to construct the network. This is reasonable for image processing task with full-dense input, since no missing pixels exist. 
+However, for the input of noised point cloud, the valid and invalid pixels will be treated equally if we still perform standard convolution layers. Since the aim of the network is not learning the pattern of noise, but the noise with eternally changing patterns will confuse the network, and it fails the normal inference, a mask is required to distinguish two kinds of pixels. 
 
 % why we need a mask
 \cite{pncnn0} use binary mask to indicate valid pixels, and further use normalized convolution to predict the output. The normalized convolution is shown as follows
@@ -95,10 +127,13 @@ However, the depth-map and point cloud is only semi-dense. The valid and invalid
 where $ k $ is the kernel size, $ (x,y) $ is the position in input, $ (i,j) $ is the displacement in kenel, $ M $ is the corresponding mask. A binary mask uses 1 to indicate valid pixels and 0 otherwise. $ \odot $ denotes element-wise multiplication.
 
 Normalized convolution layer added the weight to the mask. However, a initialization for the mask is still required, and the propagation of the mask remain a tricky task. 
+
 \subsection{Gated Convolution}
 
 % introduce gconv
-\cite{gconv} proposed gated convolution using for image inpainting task. 
+\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
+\cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
+
 
 The structure is shown in Figure \ref{fig:gconvLayer}. Instead of using a mask as input to indicate valid pixels, it employs a standard convolution layers to learn this mask directly from data. The valid pixels are then activated by a Sigmoid function. Then it imply element-wise multiplication with the feature map. Formally, the gated convolution is described as follows, the layer with input size $ (N, C_{in}, H, W) $ and output size $ (N, C_{out}, H_{out}, W_{out}) $:
 \begin{equation}\label{gconv}
@@ -109,19 +144,19 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 
 
 % Gated Convolution Layer
-\begin{figure}[h!]
+\begin{figure}[th]
 	\centering
 	\begin{tikzpicture}
 		\tikzstyle{rect} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		\node (output) [rect] {Output};
-		\node (oplus) [below of=output, yshift=-.5cm] {$\Huge\oplus $};
-		\node (LeakyReLU) [rect,below of=oplus, yshift=-1cm] {Feature};
-		\node (sigmoid) [rect, below of=oplus, yshift=-1cm, xshift=-4cm] {Mask};
+		\node (oplus) [below of=output, yshift=-.2cm] {$\Huge\oplus $};
+		\node (LeakyReLU) [rect,below of=oplus, yshift=-0.4cm] {Feature};
+		\node (sigmoid) [rect, below of=oplus, yshift=-0.4cm, xshift=-4cm] {Mask};
 		
 		\node (conv1) [rect,below of=sigmoid, yshift=-1cm] {Mask};
 		\node (conv2) [rect,below of=LeakyReLU, yshift=-1cm] {Feature};
-		\node (input) [below of=oplus] at (0,-8) {\includegraphics[width=.25\textwidth]{./Figures/train-input.png}};
+		\node (input) [below of=oplus] at (0,-7) {\includegraphics[width=.25\textwidth]{./Figures/train-input.png}};
 		
 		\draw [arrow] (oplus) -- (output);
 		\draw [arrow] (sigmoid) |- (oplus);

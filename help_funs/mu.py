@@ -382,10 +382,16 @@ def compute_normal(vertex, cam_pos, mask, k):
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
                 neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)  # delete center vertex
                 # delete background vertex
-                if neighbors.ndim == 2:
+                if neighbors.ndim == 2 and neighbors.shape[0] > 2:
                     neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
 
-                plane_vectors = neighbors - vertex[i, j]
+                if neighbors.shape[0] > 1:
+                    neighbor_base = neighbors[0, :]
+                    neighbors = neighbors[1:, :]
+                else:
+                    neighbor_base = vertex[i, j]
+
+                plane_vectors = neighbors - neighbor_base
 
                 u, s, vh = np.linalg.svd(plane_vectors)
                 normal = vh.T[:, -1]

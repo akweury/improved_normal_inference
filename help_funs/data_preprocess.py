@@ -60,7 +60,7 @@ def noisy_a_folder(folder_path, output_path):
     gt_files = np.array(sorted(glob.glob(str(folder_path / "*normal0*.png"), recursive=True)))
     depth_files = np.array(sorted(glob.glob(str(folder_path / "*depth0*.png"), recursive=True)))
     data_files = np.array(sorted(glob.glob(str(folder_path / "*data0*.json"), recursive=True)))
-    img_files = np.array(sorted(glob.glob(str(folder_path / "*image0*.png"), recursive=True)))
+    img_files = np.array(sorted(glob.glob(str(folder_path / "*image0.png"), recursive=True)))
     for idx in range(len(data_files)):
         if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0.png"))):
             continue
