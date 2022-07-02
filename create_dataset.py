@@ -71,13 +71,14 @@ def convert2training_tensor(path, k, output_type='normal'):
         # data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
-                                 torch.tensor(data['R']).float(),
-                                 torch.tensor(data['t']).float())
+                                 torch.tensor(np.identity(3)).float(),
+                                 torch.tensor(np.zeros(3)).float())
         vertex_gt = mu.depth2vertex(torch.tensor(depth_gt).permute(2, 0, 1),
                                     torch.tensor(data['K']),
-                                    torch.tensor(data['R']).float(),
-                                    torch.tensor(data['t']).float())
-
+                                    torch.tensor(np.identity(3)).float(),
+                                    torch.tensor(np.zeros(3)).float())
+        vertex[mask] = 0
+        vertex_gt[mask_gt] = 0
         vertex_norm, scale_factors, shift_vector = vectex_normalization(vertex, mask)
 
         vertex_gt, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
@@ -89,6 +90,10 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
+        light_pos = np.array(data['lightPos']) + (
+                    (np.array(data['R']).transpose(0, 1)) @ (np.array(data['t'])).reshape(3, 1)).reshape(3)
+
+        lig_pos_norm = torch.from_numpy((light_pos - shift_vector) / scale_factors)
         light_direction = mu.vertex2light_direction(vertex, data['lightPos'])
         light_direction_gt = mu.vertex2light_direction(vertex_gt, data['lightPos'])
         light_direction_gt[mask_gt] = 0
@@ -122,7 +127,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         training_case = {'input_tensor': input_tensor,
                          'gt_tensor': gt_tensor,
                          'scale_factors': scale_factors,
-                         'light_source': data['lightPos'],
+                         'light_source': lig_pos_norm,
                          'K': data['K'],
                          'R': data['R'],
                          't': data['t'],
@@ -134,7 +139,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["train", "test", "val"]:
+    for folder in ["test"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder

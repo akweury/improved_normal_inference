@@ -141,9 +141,9 @@ def vectex_normalization(vertex, mask):
     zzz = np.argmax(np.array([x_range, y_range, z_range]))
     scale_factors = [x_range, y_range, z_range]
     shift_vector = np.array([vertex[:, :, 0][~mask].min(), vertex[:, :, 1][~mask].min(), vertex[:, :, 2][~mask].min()])
-    vertex[:, :, :1][~mask] = vertex[:, :, :1][~mask] - vertex[:, :, 0][~mask].min()
-    vertex[:, :, 1:2][~mask] = vertex[:, :, 1:2][~mask] - vertex[:, :, 1][~mask].min()
-    vertex[:, :, 2:3][~mask] = vertex[:, :, 2:3][~mask] - vertex[:, :, 2][~mask].min()
+    vertex[:, :, :1][~mask] = vertex[:, :, :1][~mask] - shift_vector[0]
+    vertex[:, :, 1:2][~mask] = vertex[:, :, 1:2][~mask] - shift_vector[1]
+    vertex[:, :, 2:3][~mask] = vertex[:, :, 2:3][~mask] - shift_vector[2]
 
     norms = (np.linalg.norm(vertex, ord=2, axis=2, keepdims=True) + 1e-20)
     vertex = vertex / norms.max()

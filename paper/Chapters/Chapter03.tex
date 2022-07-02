@@ -8,27 +8,20 @@
 The normal inference task can be simply stated as follows:
 
 Given a structured point cloud $ V^{W\times H\times 3} $,
-We would like to estimate the normal map  $ N^{W\times H \times 3} $, where each normal  $ \textbf{n}^{3\times 1} $ at point $ \textbf{p}^{3\times 1} $ is a unit vector with direction point outward and perpendicular to the tangent plane of the surface at point $ \textbf{p}^{3\times 1} $.
+We would like to estimate the normal map  $ N^{W\times H \times 3} $, where each normal  $ \textbf{n}^{3\times 1} $ at point $ \textbf{v}^{3\times 1} \in N $ is a unit vector with its direction point outward of the surface and perpendicular to the tangent plane of the surface at point $ \textbf{p}^{3\times 1} $.
 
 In this chapter, we first introduced an optimization based method using singular value decomposition (SVD). Then, we introduced the main work of this thesis, a deep learning based method which use gated convolution layers for normal inference. 
 
 \section{Neighbor based surface normal estimation}
+The idea behind the neighbor based method is to fit a plane $ \Pi $ using the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, calculate the normal  $ \tilde{\textbf{n}} $ of the plane. Then the actual normal $ \textbf{n} \approx \tilde{\textbf{n}}  $.
 
-For a point $ \textbf{p} $ in a surface, its normal $ \textbf{n} $ is a vector of the tangent plane $ \Pi $ of the surface at this point $ \textbf{p} $. As long as find $ k $ vectors $ \textbf{v}_1, ..., \textbf{v}_k \in \mathbb{R}^3 $ on the same tangent plane, the normal can be calculated immediately by solving equation system $ A \cdot \textbf{n} = 0 $, where $ A \in \mathbb{R}^{k\times 3} $ is the vector matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_k $.
+It is under the assumption that the point and its neighbors are located in the same plane. This is usually not hold for the most of the surface, but if $ k $ in a suitable scale and point cloud is dense enough, it is enough to get a good result. As shown in Figure \ref{fig:svd-normal}. 
 
-In order to find the vectors on the tangent plane, we can assume the $ k $ neighbor points of $ \textbf{p} $ are in the same plane, where $ k $ is a customized parameter. Then, 
-\begin{equation}
-	\textbf{v}_i = \textbf{p}_i - \textbf{p} \quad \text{for} \ 1 \le i \le k
-\end{equation}
-are $ k $ vectors on the tangent plane. Since they all perpendicular to the normal $ \textbf{n} $, we have 
-\begin{equation}{\label{eq:normal-overdetermined-equation}}
-	\textbf{v}_i \cdot \textbf{n} = 0 \quad \text{for} \ 1 \le i \le k
-\end{equation}
-The equation system can be further simplified as 
+Specifically, it is not necessary to find the exact plane equation to solve the normal. Instead, the normal can be derived based on an equation system (\ref{eq:normal-overdetermined-equation}). The normal $ \tilde{\textbf{n}} $ of plane $ \Pi $ is perpendicular to all the vector on the plane $ \Pi $, we can construct $ k $ vectors on plane $ \Pi $ use point $ \textbf{p} $ and its $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ , which are assumed on the same plane, therefore we can a set of vector $ \textbf{v}_1, ..., \textbf{v}_k \in \mathbb{R}^3 $ and each of them satisfied $ \textbf{v}_i \cdot \tilde{\textbf{n}} = 0$. Then, the equation system can be constructed as 
 \begin{equation}{\label{eq:normal-overdetermined-equation}}
 	A \cdot \textbf{n} = 0
 \end{equation}
-where $ A\in \mathbb{R}^{k\times 3} $ denotes the matrix constructed by $ \textbf{v}_i $.
+where $ A \in \mathbb{R}^{k\times 3} $ is the vector matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_k $.
 In order to avoid trivial solution, one more constraint should be added
 \[ \|  \bn_{3 \times 1} \|_2^2 = 1  \]
 which also let the normal to be a unit vector.
@@ -41,7 +34,9 @@ To calculate a valid normal, at least 3 points are required, i.e. $ k>=3 $. For 
 		\textrm{s.t.} & \| \bn \|^2 & = & 1 
 	\end{array}
 \end{equation}
-which can be solved by singular value decomposition(SVD). Let the decomposition of $ A=U\Sigma V^T $, The solution i.e. normal is the last column of $ V $.
+which can be solved by singular value decomposition(SVD). Let the decomposition of 
+\[ A=U\Sigma V^T \]
+The solution i.e. normal is the last column of $ V $.
 
 
 At last, all the normals should point ot view point $ \textbf{s} $, thus the direction of a normal should be inverted if 

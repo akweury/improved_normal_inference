@@ -47,7 +47,7 @@ def preprocessing(models):
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
-        path = config.synthetic_data / "test" / "tensor"  # key tests 103, 166, 189,9
+        path = config.synthetic_data / args.datasize / "test" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
         path = config.real_data / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
@@ -176,7 +176,9 @@ def start(models_path_dict):
 def start2(models_path_dict):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, datasize = preprocessing(
         models_path_dict)
-    if datasize == "synthetic128":
+    if datasize == "synthetic64":
+        font_scale = 0.8
+    elif datasize == "synthetic128":
         font_scale = 0.8
     elif datasize == "synthetic256":
         font_scale = 0.7
@@ -223,7 +225,7 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=2)
             else:
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
@@ -267,7 +269,7 @@ def start2(models_path_dict):
         # save files
         # mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
 
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), img)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), mu.visual_img(img, "", font_scale=font_scale))
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
                    cv.cvtColor(mu.visual_normal(gt, "", histogram=False), cv.COLOR_RGB2BGR), )
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_point_cloud_noise.png"),
@@ -292,10 +294,10 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
-        # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
+        "SVD": None,
+        # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
+        # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "GCNN256": config.ws_path / "resng" / "trained_model" / "256" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 

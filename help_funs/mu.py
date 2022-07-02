@@ -366,7 +366,7 @@ def normalize2_16bit(img):
 
 
 def normal_point2view_point(normal, point, view_point):
-    if np.dot(normal, (point - view_point.reshape(3))) > 0:
+    if np.dot(normal, (view_point.reshape(3) - point)) < 0:
         normal = -normal
     return normal
 
@@ -389,7 +389,7 @@ def compute_normal(vertex, cam_pos, mask, k):
 
                 u, s, vh = np.linalg.svd(plane_vectors)
                 normal = vh.T[:, -1]
-                normal = normal_point2view_point(normal, vertex[i][j], -cam_pos)
+                normal = normal_point2view_point(normal, vertex[i][j], cam_pos)
                 if np.linalg.norm(normal) != 1:
                     normal = normal / np.linalg.norm(normal)
                 normals[i, j] = normal
@@ -1043,6 +1043,7 @@ def visual_output(xout, mask):
 
 def visual_normal(normal, name, histogram=True):
     normal_img = normal2RGB(normal)
+    normal_img = image_resize(normal_img, width=512, height=512)
     addText(normal_img, name, font_size=0.8)
     # show histogram under the image, show range of RGB color on upper right corner.
     if histogram:
@@ -1060,6 +1061,7 @@ def visual_vertex(vertex, name):
 
 
 def visual_img(img, name, upper_right=None, font_scale=0.8):
+    img = image_resize(img, width=512, height=512)
     addText(img, f"{name}", font_size=font_scale)
     if upper_right is not None:
         addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
