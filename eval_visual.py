@@ -296,9 +296,9 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
-        # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
+        "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
-        "GCNN512": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
+        # "GCNN512": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
