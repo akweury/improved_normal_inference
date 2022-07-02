@@ -53,6 +53,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         f = open(data_files[item])
         data = json.load(f)
         f.close()
+        light_pos = np.array(data['lightPos']) + (
+                (np.array(data['R']).transpose(0, 1)) @ (np.array(data['t'])).reshape(3, 1)).reshape(3)
 
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
@@ -90,12 +92,10 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
-        light_pos = np.array(data['lightPos']) + (
-                    (np.array(data['R']).transpose(0, 1)) @ (np.array(data['t'])).reshape(3, 1)).reshape(3)
 
         lig_pos_norm = torch.from_numpy((light_pos - shift_vector) / scale_factors)
-        light_direction = mu.vertex2light_direction(vertex, data['lightPos'])
-        light_direction_gt = mu.vertex2light_direction(vertex_gt, data['lightPos'])
+        light_direction = mu.vertex2light_direction(vertex, light_pos)
+        light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos)
         light_direction_gt[mask_gt] = 0
         light_direction[mask] = 0
 
