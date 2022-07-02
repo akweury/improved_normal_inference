@@ -35,7 +35,7 @@ class CNN(nn.Module):
         x_light = x[:, 4:7, :, :]
         input_mask = torch.sum(torch.abs(x_vertex), dim=1) > 0
         input_mask = input_mask.unsqueeze(1)
-        x_normal_out = self.net3_3(x_vertex, x_img)
+        x_normal_out = self.net3_3(x_vertex)
 
         x_g = self.albedo1(torch.cat((x_normal_out, x_light), 1))
         x_albedo = self.albedo2(torch.cat((x_g, x_img), 1))
