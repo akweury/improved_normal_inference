@@ -22,8 +22,7 @@ class CNN(nn.Module):
         net_dict = self.net3_3.state_dict()
         source_net = NormalizedNNN(3, 3, self.channel_num)
         checkpoint = torch.load(eval(f"config.{model_name}"))
-
-        source_net.load_state_dict(checkpoint['model'].nconv3_3)
+        source_net.load_state_dict(checkpoint['model'].nconv3_3.state_dict())
         source_net_dict = source_net.state_dict()
         source_net_dict = {k: v for k, v in source_net_dict.items() if k in net_dict and v.size() == net_dict[k].size()}
         net_dict.update(source_net_dict)
