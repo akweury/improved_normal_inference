@@ -27,7 +27,7 @@ def evaluate_epoch(args, model, input_tensor, device):
         # store the predicted normal
         output = output[0, :].permute(1, 2, 0)
         output = output.to('cpu').numpy()
-    return output[:, :, :3]
+    return output[:, :, :]
 
 
 def preprocessing(models):
@@ -36,6 +36,7 @@ def preprocessing(models):
     # Mode selection
     parser.add_argument('--data', type=str, default='synthetic_noise', help="choose evaluate dataset")
     parser.add_argument('--datasize', type=str, default='synthetic128', help="choose evaluate dataset size")
+    parser.add_argument('--combine', type=str, default='true', help="combine the output images in one")
 
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
@@ -73,12 +74,15 @@ def preprocessing(models):
           f"Eval Time: {eval_time}\n"
           f"Eval Models: {models.keys()}\n")
 
-    return models, path, output_path, eval_res, eval_date, eval_time, all_names, args.datasize
+    return models, path, output_path, eval_res, eval_date, eval_time, all_names, args
 
 
 def start(models_path_dict):
-    models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, data_size = preprocessing(
+    models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, args = preprocessing(
         models_path_dict)
+
+    data_size = args.datasize
+
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
 
     # iterate evaluate images
@@ -108,8 +112,7 @@ def start(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                camPos = torch.tensor(test_0['t'])
-                normal = svd.eval_single(vertex_0, np.array([0, 0.8, 7.5]), farthest_neighbour=4)
+                normal = svd.eval_single(vertex_0, mask, np.array([0, 0, 7.5]), farthest_neighbour=2)
 
             else:
                 checkpoint = torch.load(model)
@@ -174,8 +177,9 @@ def start(models_path_dict):
 
 
 def start2(models_path_dict):
-    models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, datasize = preprocessing(
+    models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, args = preprocessing(
         models_path_dict)
+    datasize = args.datasize
     if datasize == "synthetic64":
         font_scale = 0.8
     elif datasize == "synthetic128":
@@ -212,9 +216,7 @@ def start2(models_path_dict):
         normal_no_mask_img = None
         # black_img = cv.normalize(np.uint8(np.zeros(shape=(512, 512, 3))), None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         # gt_img = cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR)
-        # input_list, output_list, error_list = [mu.visual_img(img, "Image"),
-        #                                        mu.visual_vertex(vertex_0, "Input(Vertex)"),
-        #                                        gt_img], [], []
+        input_list, output_list, error_list, albedo_list, albedo_diff_list = [], [], [], [], []
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_gt.png"), black_img)
 
         # evaluate CNN models
@@ -238,7 +240,27 @@ def start2(models_path_dict):
                 if args.exp in ["ng", "hfm", "resng"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
                 elif args.exp in ["ag"]:
-                    normal = evaluate_epoch(args, model, test_0_tensor, device)
+                    xout = evaluate_epoch(args, model, test_0_tensor, device)
+
+                    normal = xout[:, :, :3]
+                    xout_albedo = xout[:, :, 3]
+
+                    # visual albedo error
+                    rho_gt = mu.albedo(img_0, gt, light_gt)
+                    output_list.append(mu.visual_albedo(xout_albedo, name))
+                    output_list.append(mu.visual_albedo(rho_gt, "GT(albedo)"))
+
+                    diff_albedo = np.abs(np.uint8(xout_albedo) - np.uint8(rho_gt))
+                    diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
+                                                                    cv.NORM_MINMAX, dtype=cv.CV_8U),
+                                                       cv.COLORMAP_HOT)
+                    diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
+                    # mu.addText(diff_albedo_img, name)
+                    # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
+                    error_list.append(
+                        mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
+
+
                 elif args.exp in ["nnnn", "fugrc"]:
                     normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                     normal_no_mask_img = cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR)
@@ -259,6 +281,9 @@ def start2(models_path_dict):
             # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
             # if normal_no_mask_img is not None:
             #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+            output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+            error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+
             cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
                        cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
             cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
@@ -269,6 +294,8 @@ def start2(models_path_dict):
         # save files
         # mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
 
+        output_list.append(cv.cvtColor(mu.visual_normal(gt, "GT"), cv.COLOR_RGB2BGR))
+        output_list.append(mu.visual_vertex(vertex_0, "Input_Vertex"))
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_img.png"), mu.visual_img(img, "", font_scale=font_scale))
         cv.imwrite(str(folder_path / f"fancy_eval_{i}_groundtruth.png"),
                    cv.cvtColor(mu.visual_normal(gt, "", histogram=False), cv.COLOR_RGB2BGR), )
@@ -279,13 +306,13 @@ def start2(models_path_dict):
 
         # output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
         # left = mu.hconcat_resize(input_list)
-        # right_normal = mu.hconcat_resize([output])
-        # right_error = mu.hconcat_resize(error_list)
+        right_normal = mu.hconcat_resize([cv.hconcat(output_list)])
+        right_error = mu.hconcat_resize(error_list)
         # im_tile_resize = mu.hconcat_resize([left, right])
 
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
-        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
-        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
 
         print(f"{data_idx} has been evaluated.")
 
@@ -296,9 +323,10 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
+        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
         "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
-        # "GCNN512": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
