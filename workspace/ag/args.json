@@ -11,7 +11,7 @@
   "momentum": 0.9,
   "loss": "angleLight",
   "penalty": 1.4,
-  "albedo_penalty": 1e-2,
+  "albedo_penalty": 1e-3,
   "angle_loss_weight": 1e-3,
   "angle_loss": true,
   "loss_milestone": 15,
