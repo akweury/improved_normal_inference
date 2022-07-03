@@ -9,7 +9,7 @@
   "lr": 0.001,
   "lr_scheduler": "9999",
   "momentum": 0.9,
-  "loss": "angleLight",
+  "loss": "angleAlbedo",
   "penalty": 1.4,
   "albedo_penalty": 1e-5,
   "angle_loss_weight": 1e-3,
