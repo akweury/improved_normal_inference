@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from common.Layers import GConv
 from common.ResNormalGuided import NormalGuided
-from common.NormalizedNNN import NormalizedNNN
+# from common.NormalizedNNN import NormalizedNNN
 import config
 
 class CNN(nn.Module):
@@ -14,7 +14,7 @@ class CNN(nn.Module):
         super().__init__()
         self.__name__ = 'ag'
         self.channel_num = channel_num
-        self.net3_3 = NormalizedNNN(3, 3, channel_num)
+        self.net3_3 = NormalGuided(3, 3, channel_num)
         self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
         self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
 
