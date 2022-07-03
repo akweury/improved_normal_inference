@@ -177,9 +177,9 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 \label{sec:architecture}
 Based on the implementation mentioned above, the architecture roughly follows on UNet proposed by \cite{unet}, as shown in Figure \ref{fig:gcnn-archi}. 
 
-Instead of using pooling layers for down/up samplings, gated convolution layer with stride $ (2,2) $ is used. The gated convolution using Sigmoid function for gating layer and LeakyReLU function for feature layer. All the layers are gated convolution layer with the exception of last two layer, which instead uses standard convolution layer to scale the output in range $\left[-1, 1\right]$. Other than the last two layers which use $ 1\times 1 $ kernels, all the gated convolution layer use $ 3\times 3 $ kernels with $ 1\times1 $ padding. 
+Instead of using pooling layers for down/up samplings, gated convolution layer with stride $ (1,1) $ is used. The gated convolution using Sigmoid function for gating layer and LeakyReLU function for feature layer. All the layers are gated convolution layer with the exception of last two layers, which instead uses standard convolution layer to scale the output in range $\left[-1, 1\right]$. Other than the last two layers which use $ 1\times 1 $ kernels, all the gated convolution layer use $ 3\times 3 $ kernels with $ 1\times1 $ padding. 
 
-The input is 3D vertex with size $ 512\times512\times3 $, and output is $ 512\times512\times3 $ normal map, which has the same resolution. There are 3 times downsamplings, each scale with 3 gated convolution layers, the third layer has stride-2. The upsampling part interpolate the feature maps 3 times with 1 gated convolution layer in each scale. 
+The input is 3D vertex with size $ 512\times512\times3 $, and output is $ 512\times512\times3 $ normal map, which has the same resolution. There are 3 times downsamplings, each scale with 3 gated convolution layers, the third layer has stride 2. The upsampling part interpolate the feature maps 3 times with 1 gated convolution layer in each scale. 
 
 It keeps the skip connection in UNet to remain the fine detail features. 
  
@@ -567,22 +567,34 @@ It keeps the skip connection in UNet to remain the fine detail features.
 \end{figure}
 
 \subsection{Loss Function}
-
-\subsubsection{Perceptual Loss}
-
-\cite{perceptual-loss} proposed perceptual loss.
-
-\subsubsection{L2 Loss}
-The loss function is based on mean square error is described as follows: 
+The loss function applied in the training work is a customized L2 loss based on mean square error
 
 \begin{equation}\label{gcnn-loss}
 	\begin{array}{ll}
 		l(x,y)= L  &= \{l_1, ..., l_N\}^T\\ 
-		l_n &= mean(Mask_{ol}(x_n - y_n)^2\cdot p + (x_n - y_n)^2\cdot Mask_{nol})\\
+		l_{n\in N} &= mean(mask_{ol}(x_n - y_n)^2\cdot p + (x_n - y_n)^2\cdot mask_{nol})\\
 	\end{array}
 \end{equation}
 
-where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ Mask_{ol} $ is the mask for the outlier, $ p $ is the penalty of the outlier, it is set as 1.4.
+where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ mask_{ol} $ is the mask for the outliers, $ p $ is the penalty of the outliers, it is set as 1.4.
+
+\subsection{Evaluation}
+The goal of normal inference is to generate a normal map which each pixel corresponding the normal of input depth map/image. Figure \ref{fig:gcnn-eval-synthetic} is the evaluation of dragon object using trained GCNN model.
+
+
+
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_point_cloud_noise.png}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_groundtruth.png}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_normal_GCNN3-32-512.png}	
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_error_GCNN3-32-512.png}
+	\caption{GCNN Normal Inference on Synthetic Dataset (object: dragon) From left to right: Input vertex map, ground-truth, GCNN normal map, error map.}
+	\label{fig:gcnn-eval-synthetic}
+\end{figure}
+
+
 
 \newpage
 \section{Guided normal inference using GCNN}

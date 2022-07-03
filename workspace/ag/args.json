@@ -2,7 +2,6 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "ag",
-  "init_net": "gcnn_3_32",
   "resume": null,
   "epochs": 100001,
   "optimizer": "adam",

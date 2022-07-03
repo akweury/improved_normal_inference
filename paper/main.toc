@@ -37,60 +37,58 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.2.3}Loss Function}{10}{subsection.40}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Perceptual Loss}{10}{section*.41}%
+\contentsline {subsubsection}{Perceptual Loss}{10}{section*.42}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{L2 Loss}{10}{section*.42}%
+\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{11}{section.43}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{11}{section.44}%
+\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{11}{subsection.44}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{11}{subsection.45}%
+\contentsline {subsection}{\numberline {3.3.2}Add the light information}{11}{subsection.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Add the light information}{11}{subsection.47}%
+\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.47}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{13}{chapter.48}%
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.48}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{13}{section.49}%
+\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{13}{subsection.50}%
+\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{13}{subsection.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{13}{subsection.52}%
+\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{15}{subsection.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{15}{subsection.55}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{16}{subsection.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{16}{subsection.57}%
+\contentsline {subsection}{\numberline {4.1.5}Noise}{17}{subsection.59}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Noise}{17}{subsection.60}%
+\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{17}{subsection.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{17}{subsection.62}%
+\contentsline {section}{\numberline {4.2}Real Dataset}{18}{section.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Real Dataset}{18}{section.64}%
+\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{19}{chapter.65}%
+\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{19}{section.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{19}{section.66}%
+\contentsline {subsection}{\numberline {5.1.1}Compared Approaches}{19}{subsection.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.1}Compared Approaches}{19}{subsection.67}%
+\contentsline {subsection}{\numberline {5.1.2}Training Details}{19}{subsection.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.2}Training Details}{19}{subsection.68}%
+\contentsline {subsection}{\numberline {5.1.3}Qualitative Evaluation}{19}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.3}Qualitative Evaluation}{19}{subsection.69}%
+\contentsline {subsection}{\numberline {5.1.4}Quantitative Evaluation }{19}{subsection.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.4}Quantitative Evaluation }{19}{subsection.72}%
+\contentsline {subsection}{\numberline {5.1.5}Speed}{20}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.5}Speed}{20}{subsection.74}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.74}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{20}{section.75}%
+\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{21}{section.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{21}{section.77}%
+\contentsline {section}{\numberline {5.4}model comparison}{22}{section.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}model comparison}{22}{section.79}%
+\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{23}{chapter.81}%
+\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{25}{appendix.82}%
+\contentsline {section}{\numberline {A.1}Dataset}{25}{section.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{25}{section.83}%
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{25}{section.87}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{29}{appendix*.88}%
+\contentsline {chapter}{Bibliography}{29}{appendix*.87}%
