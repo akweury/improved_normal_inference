@@ -244,11 +244,16 @@ def start2(models_path_dict):
 
                     normal = xout[:, :, :3]
                     xout_albedo = xout[:, :, 3]
+                    g_out = np.sum(normal * light_gt, axis=-1)
+                    img_out = xout_albedo * g_out
+                    img_out[mask] = 0
+                    output_list.append(mu.visual_img(img_out, name))
 
                     # visual albedo error
                     rho_gt = mu.albedo(img_0, gt, light_gt)
-                    output_list.append(mu.visual_albedo(xout_albedo, name))
-                    output_list.append(mu.visual_albedo(rho_gt, "GT(albedo)"))
+                    g = np.sum(gt * light_gt, axis=-1)
+                    img_gt = rho_gt * g
+                    output_list.append(mu.visual_img(img_gt, "GT"))
 
                     diff_albedo = np.abs(np.uint8(xout_albedo) - np.uint8(rho_gt))
                     diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,

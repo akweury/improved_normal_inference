@@ -1068,6 +1068,10 @@ def visual_vertex(vertex, name):
 
 def visual_img(img, name, upper_right=None, font_scale=0.8):
     img = image_resize(img, width=512, height=512)
+    img = cv.normalize(img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    if img.ndim == 2:
+        img = cv.merge((img, img, img))
+
     addText(img, f"{name}", font_size=font_scale)
     if upper_right is not None:
         addText(img, f"angle error: {upper_right}", pos="upper_right", font_size=0.65)
