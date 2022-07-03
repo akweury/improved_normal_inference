@@ -21,7 +21,6 @@ from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
-import config
 from help_funs import mu
 
 date_now = datetime.datetime.today().date()
@@ -214,41 +213,23 @@ class AngleLightLoss(nn.Module):
 class AngleAlbedoLoss(nn.Module):
     def __init__(self):
         super().__init__()
+        self.normal_loss = NormalL2Loss()
+        self.g_loss = GL2Loss()
+        self.img_loss = ImageL2Loss()
 
     def forward(self, outputs, target, args):
         # normal l2 loss
-        mask_too_high = torch.gt(outputs, 1).bool().detach()
-        mask_too_low = torch.lt(outputs, -1).bool().detach()
-        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
-        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
-        axis = args.epoch % 3
-        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
 
-        axis_target = torch.cat((target[:, :3, :, :], target[:, 5:8, :, :]), 1)
-        axis_output = outputs[:, :6, :, :]
-        axis_diff_normal = (axis_output - axis_target)[:, axis, :, :][mask]
-        axis_diff_light = (axis_output - axis_target)[:, axis + 3, :, :][mask]
-        ScaleProd_diff = (outputs[:, 6, :, :] - target[:, 3, :, :])[mask]
+        normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
 
-        loss = torch.sum(axis_diff_normal ** 2) / axis_diff_normal.size(0)
-        loss += torch.sum(axis_diff_light ** 2) / axis_diff_light.size(0)
-        loss += torch.sum(ScaleProd_diff ** 2) / ScaleProd_diff.size(0)
+        input_mask = outputs[:, 4, :, :]
+        G = outputs[:, 5, :, :]  # N * L
+        out_img = outputs[:, 3, :, :] * G
+        img_loss = self.img_loss(out_img, target[:, 4, :, :], input_mask)
 
-        # light loss
-        # light_target = target[:, 5:8, :, :]
-        # light_output = outputs[:, 3:6, :, :]
-        # l_diff = (light_output - light_target).permute(0, 2, 3, 1)[mask]
-        # loss += torch.sum(l_diff ** 2) / (l_diff.size(0))
+        g_loss = self.g_loss(outputs[:, 5, :, :], target[:, 3, :, :], args)
 
-        # N*L loss
-        # G_target = target[:, 3, :, :]
-        # G_output = outputs[:, 3, :, :]
-
-        # add angle loss
-        # light_rad_loss = mu.eval_angle_tensor(outputs[:, 3:6, :, :], target[:, 5:8, :, :]) * args.angle_loss_weight
-        # normal_rad_loss = mu.eval_angle_tensor(outputs[:, :3, :, :], target[:, :3, :, :]) * args.angle_loss_weight
-        # loss += light_rad_loss
-        # loss += normal_rad_loss
+        loss = normal_loss + img_loss * args.albedo_penalty + g_loss
 
         return loss
 

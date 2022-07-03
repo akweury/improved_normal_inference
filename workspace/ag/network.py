@@ -4,7 +4,7 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
-from common.Layers import GConv
+from common.Layers import GConv, LightNet
 from common.ResNormalGuided import NormalGuided
 # from common.NormalizedNNN import NormalizedNNN
 import config
@@ -15,6 +15,7 @@ class CNN(nn.Module):
         self.__name__ = 'ag'
         self.channel_num = channel_num
         self.net3_3 = NormalGuided(3, 3, channel_num)
+        self.scaleProdInfer = LightNet(3, 3, channel_num)
         self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
         self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
 
@@ -37,7 +38,10 @@ class CNN(nn.Module):
         input_mask = input_mask.unsqueeze(1)
         x_normal_out = self.net3_3(x_vertex)
 
+        # light guided
+        scaleProd = self.scaleProdInfer(x_light, x_normal_out)
+
         x_g = self.albedo1(torch.cat((x_normal_out, x_light), 1))
         x_albedo = self.albedo2(torch.cat((x_g, x_img), 1))
-        xout = torch.cat((x_normal_out, x_albedo, input_mask), 1)
+        xout = torch.cat((x_normal_out, x_albedo, input_mask, scaleProd), 1)
         return xout
