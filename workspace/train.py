@@ -241,7 +241,7 @@ class AngleAlbedoLoss(nn.Module):
 
         g_loss = self.g_loss(out_G, target_g, args)
 
-        loss = normal_loss + albedo_loss * args.albedo_penalty + g_loss
+        loss = normal_loss + g_loss
 
         return loss
 
