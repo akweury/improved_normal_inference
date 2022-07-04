@@ -5,7 +5,7 @@
 #### copy dataset from local to remote
 
 ```
-scp D:\TUK\improved_normal_inference\dataset\synthetic512.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic512
+scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512\test.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic512
 ```
 
 #### Create dataset
@@ -29,7 +29,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp resng --dataset sy
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --dataset synthetic512 --batch_size 4 --train-on 1000 --num-channels 64
+CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp ag --dataset synthetic512 --batch_size 4 --train-on 1000 --num-channels 32 --loss angleLight --init-net gcnn_3_32
 ```
 
 #### evaluate the test dataset (no visualisation)
