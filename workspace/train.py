@@ -223,13 +223,19 @@ class AngleAlbedoLoss(nn.Module):
         normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
 
         input_mask = outputs[:, 4, :, :]
-        G = outputs[:, 5, :, :]  # N * L
-        out_img = outputs[:, 3, :, :] * G
-        img_loss = self.img_loss(out_img, target[:, 4, :, :], input_mask)
+        out_G = outputs[:, 5, :, :]  # N * L
+        out_albedo = outputs[:, 3, :, :]
+        target_img = target[:, 4, :, :]
+        target_g = target[:, 3, :, :]
 
-        g_loss = self.g_loss(outputs[:, 5, :, :], target[:, 3, :, :], args)
+        target_albedo = target_img / (target_g + 1e-20)
+        out_albedo = target_img / (out_G + 1e-20)
 
-        loss = normal_loss + img_loss * args.albedo_penalty + g_loss
+        albedo_loss = self.img_loss(out_albedo, target_albedo, input_mask)
+
+        g_loss = self.g_loss(out_G, target_g, args)
+
+        loss = normal_loss + albedo_loss * args.albedo_penalty + g_loss
 
         return loss
 
@@ -571,7 +577,9 @@ def train_epoch(nn_model, epoch):
                     with torch.no_grad():
                         # put input and target to device
                         input, target = input.to(nn_model.device), target.to(nn_model.device)
-
+                        input = input[1:2, :]
+                        target = target[1:2, :]
+                        test_idx = test_idx[1]
                         # Wait for all kernels to finish
                         torch.cuda.synchronize()
 

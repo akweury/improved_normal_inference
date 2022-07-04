@@ -44,7 +44,7 @@ def preprocessing(models):
 
     # load data file names
     if args.data == "synthetic_noise":
-        path = config.synthetic_data_noise_local / args.datasize / "val" / "tensor"
+        path = config.synthetic_data_noise_local / args.datasize / "selval" / "tensor"
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
