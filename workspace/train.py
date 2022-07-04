@@ -198,12 +198,18 @@ class AngleLightLoss(nn.Module):
         self.img_loss = ImageL2Loss()
 
     def forward(self, outputs, target, args):
-        normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
-
+        out_normal = outputs[:, :3, :, :]
+        out_albedo = outputs[:, 3, :, :]
+        target_normal = target[:, :3, :, :]
+        target_light = target[:, 5:8, :, :]
+        img = target[:, 4, :, :]
         input_mask = outputs[:, 4, :, :]
-        G = torch.sum(outputs[:, :3, :, :] * target[:, 5:8, :, :], dim=1)  # N * L
-        out_img = outputs[:, 3, :, :] * G
-        img_loss = self.img_loss(out_img, target[:, 4, :, :], input_mask)
+
+        normal_loss = self.normal_loss(out_normal, target_normal, args)
+
+        G = torch.sum(out_normal * target_light, dim=1)  # N * L
+        out_img = out_albedo * G
+        img_loss = self.img_loss(out_img, img, input_mask)
 
         loss = normal_loss + img_loss * args.albedo_penalty
 

@@ -6,8 +6,9 @@ import torch
 import torch.nn as nn
 from common.Layers import GConv, LightNet
 from common.ResNormalGuided import NormalGuided
+
+
 # from common.NormalizedNNN import NormalizedNNN
-import config
 
 class CNN(nn.Module):
     def __init__(self, channel_num):
@@ -18,6 +19,7 @@ class CNN(nn.Module):
         self.scaleProdInfer = LightNet(3, 3, channel_num)
         self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
         self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
+        self.albedo3 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
 
     def init_net(self, model_name):
         net_dict = self.net3_3.state_dict()
@@ -43,5 +45,6 @@ class CNN(nn.Module):
 
         x_g = self.albedo1(torch.cat((x_normal_out, x_light), 1))
         x_albedo = self.albedo2(torch.cat((x_g, x_img), 1))
+        x_albedo = self.albedo3(x_albedo)
         xout = torch.cat((x_normal_out, x_albedo, input_mask, scaleProd), 1)
         return xout
