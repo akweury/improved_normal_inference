@@ -44,7 +44,7 @@ def preprocessing(models):
 
     # load data file names
     if args.data == "synthetic_noise":
-        path = config.synthetic_data_noise_local / args.datasize / "selval" / "tensor"
+        path = config.synthetic_data_noise_local / args.datasize / "val" / "tensor"
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
@@ -337,7 +337,7 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
-        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
