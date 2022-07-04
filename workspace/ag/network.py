@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from common.Layers import GConv, LightNet
 from common.ResNormalGuided import NormalGuided
+import config
 
 
 # from common.NormalizedNNN import NormalizedNNN
