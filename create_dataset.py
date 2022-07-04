@@ -86,7 +86,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         vertex_gt[mask_gt] = 0
         vertex_norm, scale_factors, shift_vector = vectex_normalization(vertex, mask)
 
-        vertex_gt, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
+        vertex_gt_norm, scale_factors, shift_vector = vectex_normalization(vertex_gt, mask_gt)
 
         # gt normal
         gt_normal = file_io.load_24bitNormal(gt_files[item]).astype(np.float32)
@@ -103,15 +103,14 @@ def convert2training_tensor(path, k, output_type='normal'):
         light_direction[mask] = 0
 
         # albedo
-        G = np.sum(gt_normal * light_direction_gt, axis=-1)
-        G[mask_gt] = 0
-        albedo_gt = img / (G + 1e-20)
+        G = np.sum(gt_normal * light_direction, axis=-1)
+        G[mask] = 0
+        albedo = img / (G + 1e-20)
 
-        mu.show_images(img, "img")
-        albedo_img = np.uint8(albedo_gt)
+        # mu.show_images(img, "img")
+        # albedo_img = np.uint8(albedo)
         # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-
-        mu.show_images(albedo_img, "a")
+        # mu.show_images(albedo_img, "a")
 
         target = np.c_[
             gt_normal,  # 0,1,2
