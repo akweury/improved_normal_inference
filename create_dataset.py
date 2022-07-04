@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 
+import cv2 as cv
 import numpy as np
 import torch
 
@@ -53,9 +54,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         f = open(data_files[item])
         data = json.load(f)
         f.close()
-        light_pos = np.array(data['lightPos']) + (
-                (np.array(data['R']).transpose(0, 1)) @ (np.array(data['t'])).reshape(3, 1)).reshape(3)
+        light_pos = np.array(data['lightPos'])
+        light_pos = np.array(data['R']) @ light_pos.reshape(3, 1) - np.array(data['t']).reshape(3, 1)
+        # light_pos = np.array(data['R']) @ (light_pos.reshape(3, 1) + np.array(data['t']).reshape(3, 1))
 
+        light_pos = light_pos.reshape(3)
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
@@ -70,15 +73,15 @@ def convert2training_tensor(path, k, output_type='normal'):
 
         img = file_io.load_16bitImage(img_files[item])
         img[mask_gt] = 0
-        # data['R'], data['t'] = np.identity(3), np.zeros(3)
+        data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
-                                 torch.tensor(np.identity(3)).float(),
-                                 torch.tensor(np.zeros(3)).float())
+                                 torch.tensor(data['R']).float(),
+                                 torch.tensor(data['t']).float())
         vertex_gt = mu.depth2vertex(torch.tensor(depth_gt).permute(2, 0, 1),
                                     torch.tensor(data['K']),
-                                    torch.tensor(np.identity(3)).float(),
-                                    torch.tensor(np.zeros(3)).float())
+                                    torch.tensor(data['R']).float(),
+                                    torch.tensor(data['t']).float())
         vertex[mask] = 0
         vertex_gt[mask_gt] = 0
         vertex_norm, scale_factors, shift_vector = vectex_normalization(vertex, mask)
@@ -104,9 +107,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         G[mask_gt] = 0
         albedo_gt = img / (G + 1e-20)
 
-        # mu.show_images(img, "img")
-        # albedo_img = np.uint8(albedo_gt)
-        # mu.show_images(albedo_img, "a")
+        mu.show_images(img, "img")
+        albedo_img = np.uint8(albedo_gt)
+        # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+
+        mu.show_images(albedo_img, "a")
 
         target = np.c_[
             gt_normal,  # 0,1,2

@@ -95,11 +95,13 @@ def start(models_path_dict):
         right = int(w / 2 + 64)
         below = int(h / 2 - 64)
         top = int(h / 2 + 64)
-        gt = gt[left: right, below:top, :]
-        mask = gt.sum(axis=2) == 0
+        s_gt = gt[left: right, below:top, :]
+        s_input = test_0_tensor[:, :, left: right, below:top]
 
-        img_list = [mu.visual_normal(gt, "GT")]
-        diff_list = None
+        s_mask = s_gt.sum(axis=2) == 0
+        img_list = [mu.visual_normal(s_gt, "GT")]
+
+        # diff_list = []
 
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
@@ -112,35 +114,37 @@ def start(models_path_dict):
             print(f'- model {name} evaluation...')
 
             if name == "s-window":
-                input_tensor = test_0_tensor[:, :, left: right, below:top]
-                normal = evaluate_epoch(args, model, input_tensor[:, :4, :, :], device)
+                normal = evaluate_epoch(args, model, s_input[:, :3, :, :], device)
             else:
-                input_tensor = test_0_tensor
-                normal = evaluate_epoch(args, model, input_tensor[:, :4, :, :], device)
+                normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
                 normal = normal[left: right, below:top, :]
 
-            normal[mask] = 0
+            normal[s_mask] = 0
             img_list.append(mu.visual_normal(normal, name))
             # visual error
-            diff_img, diff_angle = mu.eval_img_angle(normal, gt)
-            diff = np.sum(diff_angle) / np.count_nonzero(diff_angle)
-            diff_angle = np.uint8(diff_angle)
-            if diff_list is None:
-                diff_list = diff_angle
-            else:
-                diff_list = np.c_[diff_list, diff_angle]
+            diff_img, diff_angle = mu.eval_img_angle(normal, s_gt)
+            diff = np.sum(diff_angle) / (np.count_nonzero(diff_angle) + 1e-20)
+
+            img_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=1))
+
+            # diff_angle = np.uint8(diff_angle)
+            # if diff_list is None:
+            #     diff_list = diff_angle
+            # else:
+            #     diff_list = np.c_[diff_list, diff_angle]
             eval_res[model_idx, i] = diff
 
         # save the results
         output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
-        diff_list = cv.normalize(diff_list, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        # diff_list = cv.normalize(diff_list, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
 
-        diff_img = cv.applyColorMap(diff_list, cv.COLORMAP_JET)
-        dmask = np.c_[mask, mask]
-        diff_img[dmask] = 0
+        # diff_img = cv.applyColorMap(diff_list, cv.COLORMAP_JET)
+
+        # dmask = np.c_[mask]
+        # diff_img[dmask] = 0
         # mu.show_images(diff_img,"ss")
         cv.imwrite(str(folder_path / f"eval_{i}_normal.png"), output)
-        cv.imwrite(str(folder_path / f"eval_{i}_error.png"), diff_img)
+        # cv.imwrite(str(folder_path / f"eval_{i}_error.png"),  mu.hconcat_resize(diff_list))
         print(f"{data_idx} has been evaluated.")
 
 
@@ -151,8 +155,8 @@ if __name__ == '__main__':
         # "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        "s-window": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "m-window": config.ws_path / "resng" / "trained_model" / "256" / "checkpoint.pth.tar",
+        "s-window": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",
+        "full-window": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

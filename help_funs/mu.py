@@ -56,7 +56,7 @@ def avg_angle_between_tensor(v1, v2):
 
 def vertex2light_direction(vertex_map, light_sorce):
     light_direction = vertex_map - light_sorce
-    light_direction_map = light_direction / np.linalg.norm(light_direction, ord=2, axis=2, keepdims=True)
+    light_direction_map = light_direction / np.sqrt(np.sum(light_direction ** 2, axis=-1, keepdims=True))
 
     return light_direction_map
 
@@ -927,6 +927,9 @@ def eval_img_angle(output, target):
     # angle_matrix[angle_matrix > 10] = 0
     img = angle2rgb(angle_matrix)
     img[mask] = 0
+
+    img = image_resize(img, width=512, height=512)
+
     return img, angle_matrix
 
 
