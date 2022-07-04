@@ -292,6 +292,8 @@ class LightNet(nn.Module):
         padding_size = (1, 1)
         stride = (1, 1)
         channel_size_1 = channel_num
+        self.tanh = nn.Tanh()
+        self.leakyReLU = nn.LeakyReLU(0.01)
         self.lsInpainting1 = GConv(in_ch, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting2 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting3 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
@@ -302,8 +304,8 @@ class LightNet(nn.Module):
         self.lsInpainting8 = GConv(channel_size_1, channel_size_1, kernel_size, stride, padding_size)
         self.lsInpainting9 = GConv(channel_size_1, out_ch, kernel_size, stride, padding_size)
         self.merge = GConv(out_ch * 2, 3, kernel_size, stride, padding_size)
-        self.prod1 = GConv(3, 1, kernel_size, stride, padding_size)
-        self.prod2 = GConv(1, 1, kernel_size, stride, padding_size)
+        self.prod1 = nn.Conv2d(3, 1, kernel_size, stride, padding_size)
+        self.prod2 = nn.Conv2d(1, 1, kernel_size, stride, padding_size)
 
     def forward(self, lin, nin):
         L = self.lsInpainting1(lin)
@@ -316,6 +318,6 @@ class LightNet(nn.Module):
         L = self.lsInpainting8(L)
         xout_light = self.lsInpainting9(L)
         scaleProd = self.merge(torch.cat((xout_light, nin), 1))
-        scaleProd = self.prod1(scaleProd)
-        scaleProd = self.prod2(scaleProd)
+        scaleProd = self.leakyReLU(self.prod1(scaleProd))
+        scaleProd = self.tanh(self.prod2(scaleProd))
         return scaleProd
