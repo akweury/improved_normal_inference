@@ -317,7 +317,7 @@ loss_dict = {
 class SyntheticDepthDataset(Dataset):
 
     def __init__(self, data_path, k=0, output_type="normal_noise", setname='train'):
-        if setname in ['train', 'val', 'test']:
+        if setname in ['train', 'selval', 'test']:
             self.training_case = np.array(
                 sorted(
                     glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
@@ -854,6 +854,18 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
 
         albedo_gt = np.uint8(target_img / (target_scaleProd + 1e-20))
         output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
+
+        # pred normal
+        pred_normal = xout_normal[:, :, :3]
+        pred_normal = mu.filter_noise(pred_normal, threshold=[-1, 1])
+        pred_img = mu.normal2RGB(pred_normal)
+        pred_img[mask] = 0
+        normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        mu.addText(normal_cnn_8bit, "output")
+        xout_ranges = mu.addHist(normal_cnn_8bit)
+        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+        output_list.append(normal_cnn_8bit)
+
     else:
         # pred normal
         pred_normal = xout_normal[:, :, :3]
