@@ -56,6 +56,8 @@ def paser():
     parser.add_argument('--init-net', type=str, default=None)
 
     parser.add_argument('--penalty', '-pena', default=1.2, help='penalty of output value which out of range [0-255]')
+    parser.add_argument('--albedo-penalty', type=float, default=1e-4,
+                        help='penalty of albedo loss')
     ########### Logging ###########
     parser.add_argument('--print-freq', default=100, type=int,
                         help='Printing evaluation criterion frequency (default: 10)')
