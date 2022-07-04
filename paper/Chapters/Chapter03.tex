@@ -262,7 +262,6 @@ It keeps the skip connection in UNet to remain the fine detail features.
 		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
 		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
 		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\node[text width=1cm] at (\vdist*\disttimes+0.1,\yschift-3.5) {32};
 		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
 		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
 		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
@@ -521,7 +520,6 @@ It keeps the skip connection in UNet to remain the fine detail features.
 		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
 		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 3
 		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\node[text width=1cm] at (\vdist*\disttimes+0.2,\yschift-3.3) {32};
 		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
 		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
 		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
@@ -579,7 +577,7 @@ The loss function applied in the training work is a customized L2 loss based on 
 where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ mask_{ol} $ is the mask for the outliers, $ p $ is the penalty of the outliers, it is set as 1.4.
 
 \subsection{Evaluation}
-The goal of normal inference is to generate a normal map which each pixel corresponding the normal of input depth map/image. Figure \ref{fig:gcnn-eval-synthetic} is the evaluation of the dragon object using trained GCNN model. Overall the predicted map is similar to the ground truth.
+The goal of normal inference is to generate a normal map which each pixel corresponding the normal of input depth map/image. Figure \ref{fig:gcnn-eval-synthetic} is the evaluation of the dragon object using trained GCNN model. Overall the predicted map is similar to the ground truth. A more detailed evaluation with comparison with other approaches is shown in Chapter \ref{ch:05}.
 
 
 \begin{figure}[th]
@@ -603,7 +601,7 @@ The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branc
 
 
 % architecture of NG
-\begin{figure}[!h]
+\begin{figure}[th]
 	\centering
 	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
 	\begin{tikzpicture}
@@ -1268,11 +1266,19 @@ where $ * $ denotes scalar product,
 the albedo rho can be computed by 
 \[\rho = \frac{I}{N*L}\]
 
-in NN, it is 
-\[\rho = conv2d(\frac{I}{N*L})\]
+Consider to predict the albedo, then the corresponding loss term is 
+\[\|\rho-\hat\rho \|_{F_2}\]
 
-The corresponding loss term is 
-\[\|I-\rho(N*L) \|_{F_2}\]
+In the practice, the loss can be further written as follows
+\begin{equation}
+	\begin{array}{rrclcl}
+		\displaystyle \[\|\rho-\hat\rho \|_{F_2}\]\\
+		\\
+		\Rightarrow &  \[\| \frac{I}{N\star L} - \frac{\hat I}{\hat N \star \hat L} \|\]\\
+		\Rightarrow &  \[\| N\star L - \hat N \star \hat L \|\]\\
+	\end{array}
+\end{equation}
+
 in this case, the normal is supposed to be more crispy than the previous implement.
 
 In a first step, we should compute initial albedos from the predicted

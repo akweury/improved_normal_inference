@@ -230,18 +230,18 @@ class AngleAlbedoLoss(nn.Module):
 
         input_mask = outputs[:, 4, :, :]
         out_G = outputs[:, 5, :, :]  # N * L
-        out_albedo = outputs[:, 3, :, :]
+        # out_albedo = outputs[:, 3, :, :]
         target_img = target[:, 4, :, :]
         target_g = target[:, 3, :, :]
 
         target_albedo = target_img / (target_g + 1e-20)
         out_albedo = target_img / (out_G + 1e-20)
 
-        albedo_loss = self.img_loss(out_albedo, target_albedo, input_mask)
+        # albedo_loss = self.img_loss(out_albedo, target_albedo, input_mask)
 
         g_loss = self.g_loss(out_G, target_g, args)
 
-        loss = normal_loss + g_loss
+        loss = normal_loss + g_loss * args.angle_loss_weight
 
         return loss
 
