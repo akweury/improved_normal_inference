@@ -416,7 +416,7 @@ class TrainingModel():
             training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
             train_dataset.training_case = train_dataset.training_case[training_idxs]
         print("test case number: " + str(test_dataset.training_case.shape))
-        # test_dataset.training_case = test_dataset.training_case[:3]
+        test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
                                        shuffle=True,
                                        batch_size=self.args.batch_size,
@@ -583,9 +583,9 @@ def train_epoch(nn_model, epoch):
                     with torch.no_grad():
                         # put input and target to device
                         input, target = input.to(nn_model.device), target.to(nn_model.device)
-                        input = input[1:2, :]
-                        target = target[1:2, :]
-                        test_idx = test_idx[2]
+                        input = input[4:5, :]
+                        target = target[4:5, :]
+                        test_idx = test_idx[0]
                         # Wait for all kernels to finish
                         torch.cuda.synchronize()
 
