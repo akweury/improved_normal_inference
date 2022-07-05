@@ -9,7 +9,7 @@
   "lr_scheduler": "9999",
   "momentum": 0.9,
   "penalty": 1.4,
-  "angle_loss_weight": 1.5,
+  "angle_loss_weight": 2,
   "angle_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
