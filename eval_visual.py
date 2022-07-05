@@ -245,26 +245,27 @@ def start2(models_path_dict):
                     normal = xout[:, :, :3]
                     xout_albedo = xout[:, :, 3]
                     xout_g = xout[:, :, 5]
-                    img_out = xout_albedo * xout_g
+
+                    # visual albedo error
+                    # rho_gt = mu.albedo(img_0, gt, light_gt)
+                    # xout_albedo = np.uint8(xout_albedo)
+                    # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
+
+                    xout_albedo2 = np.uint8(img_0 / (xout_g + 1e-20))
+                    output_list.append(mu.visual_img(xout_albedo2, "albedo_out"))
+
+                    g = np.sum(gt * light_gt, axis=-1)
+                    albedo_gt = np.uint8(img_0 / (g + 1e-20))
+                    output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
+
+                    img_out = xout_albedo2 * xout_g
                     img_out[mask] = 0
                     img_out = np.uint8(img_out)
                     img_out = mu.visual_img(img_out, "img_out")
                     output_list.append(img_out)
                     output_list.append(mu.visual_img(img_8bit, "img_gt"))
 
-                    # visual albedo error
-                    # rho_gt = mu.albedo(img_0, gt, light_gt)
-                    xout_albedo = np.uint8(xout_albedo)
-                    output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
-
-                    xout_albedo2 = np.uint8(img_0 / (xout_g + 1e-20))
-                    output_list.append(mu.visual_img(xout_albedo2, "albedo_out_2"))
-
-                    g = np.sum(gt * light_gt, axis=-1)
-                    albedo_gt = np.uint8(img_0 / (g + 1e-20))
-                    output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
-
-                    diff_albedo = np.abs(np.uint8(xout_albedo) - albedo_gt)
+                    diff_albedo = np.abs(xout_albedo2 - albedo_gt)
                     diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
                                                                     cv.NORM_MINMAX, dtype=cv.CV_8U),
                                                        cv.COLORMAP_HOT)
@@ -337,8 +338,8 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
-        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
-        # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
+        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
         "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
