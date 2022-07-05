@@ -585,7 +585,7 @@ def train_epoch(nn_model, epoch):
                         input, target = input.to(nn_model.device), target.to(nn_model.device)
                         input = input[1:2, :]
                         target = target[1:2, :]
-                        test_idx = test_idx[4]
+                        test_idx = test_idx[3]
                         # Wait for all kernels to finish
                         torch.cuda.synchronize()
 
