@@ -416,7 +416,7 @@ class TrainingModel():
             training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
             train_dataset.training_case = train_dataset.training_case[training_idxs]
         print("test case number: " + str(test_dataset.training_case.shape))
-        test_dataset.training_case = test_dataset.training_case[:3]
+        # test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
                                        shuffle=True,
                                        batch_size=self.args.batch_size,
