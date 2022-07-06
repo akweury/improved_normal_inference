@@ -120,7 +120,7 @@ class NormalLoss(nn.Module):
             loss = F.l1_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask])
         else:
             raise ValueError
-        return loss
+        return loss.float()
 
 
 class GLoss(nn.Module):

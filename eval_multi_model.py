@@ -42,7 +42,7 @@ def preprocessing(models):
 
     # load data file names
     if args.data == "synthetic_noise":
-        path = config.synthetic_data_noise_local / args.datasize / "test" / "tensor"
+        path = config.synthetic_data_noise_local / args.datasize / "selval" / "tensor"
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
@@ -75,7 +75,7 @@ def preprocessing(models):
     return models, path, output_path, eval_res, eval_date, eval_time, all_names, args.datasize
 
 
-def start(models_path_dict):
+def start(models_path_dict, s_window_length=32):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, data_size = preprocessing(
         models_path_dict)
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
@@ -91,10 +91,11 @@ def start(models_path_dict):
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         w, h = test_0_tensor.size(2), test_0_tensor.size(3)
-        left = int(w / 2 - 64)
-        right = int(w / 2 + 64)
-        below = int(h / 2 - 64)
-        top = int(h / 2 + 64)
+
+        left = int(w / 2 - s_window_length)
+        right = int(w / 2 + s_window_length)
+        below = int(h / 2 - s_window_length)
+        top = int(h / 2 + s_window_length)
         s_gt = gt[left: right, below:top, :]
         s_input = test_0_tensor[:, :, left: right, below:top]
 
