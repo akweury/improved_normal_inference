@@ -95,9 +95,8 @@ class WeightedL2Loss(nn.Module):
 
 
 class NormalLoss(nn.Module):
-    def __init__(self, type):
+    def __init__(self):
         super().__init__()
-        self.loss_type = type
 
     def forward(self, outputs, target, args):
         outputs = outputs[:, :3, :, :]
@@ -115,9 +114,9 @@ class NormalLoss(nn.Module):
 
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :][mask]
-        if self.loss_type == "l2":
+        if args.loss_type == "l2":
             loss = F.mse_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask])
-        elif self.loss_type == "l1":
+        elif args.loss_type == "l1":
             loss = F.l1_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask])
         else:
             raise ValueError
@@ -125,15 +124,14 @@ class NormalLoss(nn.Module):
 
 
 class GLoss(nn.Module):
-    def __init__(self, loss_type):
+    def __init__(self):
         super().__init__()
-        self.loss_type = loss_type
 
     def forward(self, outputs, target, args):
         mask = torch.abs(target) > 0
-        if self.loss_type == "l1":
+        if args.loss_type == "l1":
             loss = F.l1_loss(outputs[mask], target[mask])
-        elif self.loss_type == "l2":
+        elif args.loss_type == "l2":
             loss = F.mse_loss(outputs[mask], target[mask])
         else:
             raise ValueError
@@ -141,15 +139,14 @@ class GLoss(nn.Module):
 
 
 class ImageLoss(nn.Module):
-    def __init__(self, loss_type):
+    def __init__(self):
         super().__init__()
-        self.loss_type = loss_type
 
-    def forward(self, outputs, target, mask):
+    def forward(self, outputs, target, mask, args):
         mask = mask.bool()
-        if self.loss_type == "l1":
+        if args.loss_type == "l1":
             loss = F.l1_loss(outputs[mask], target[mask])
-        elif self.loss_type == "l2":
+        elif args.loss_type == "l2":
             loss = F.mse_loss(outputs[mask], target[mask])
         else:
             raise ValueError
@@ -206,9 +203,9 @@ class AngleHistoLoss(nn.Module):
 class AngleLightLoss(nn.Module):
     def __init__(self):
         super().__init__()
-        self.normal_loss = NormalLoss("l1")
-        self.g_loss = GLoss("l1")
-        self.img_loss = ImageLoss("l1")
+        self.normal_loss = NormalLoss()
+        self.g_loss = GLoss()
+        self.img_loss = ImageLoss()
 
     def forward(self, outputs, target, args):
         out_normal = outputs[:, :3, :, :]
@@ -222,7 +219,7 @@ class AngleLightLoss(nn.Module):
 
         G = torch.sum(out_normal * target_light, dim=1)  # N * L
         out_img = out_albedo * G
-        img_loss = self.img_loss(out_img, img, input_mask)
+        img_loss = self.img_loss(out_img, img, input_mask, args)
 
         loss = normal_loss + img_loss * args.albedo_penalty
 
@@ -232,9 +229,9 @@ class AngleLightLoss(nn.Module):
 class AngleAlbedoLoss(nn.Module):
     def __init__(self):
         super().__init__()
-        self.normal_loss = NormalLoss("l1")
-        self.g_loss = GLoss("l1")
-        self.img_loss = ImageLoss("l1")
+        self.normal_loss = NormalLoss()
+        self.g_loss = GLoss()
+        self.img_loss = ImageLoss()
 
     def forward(self, outputs, target, args):
         # normal l2 loss

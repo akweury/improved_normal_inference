@@ -53,6 +53,7 @@ def paser():
     parser.add_argument('--momentum', default=0.9, type=float, help='SGD momentum.')
 
     parser.add_argument('--loss', '-l', default='l1')
+    parser.add_argument('--loss-type', default='l2')
     parser.add_argument('--init-net', type=str, default=None)
 
     parser.add_argument('--penalty', '-pena', default=1.2, help='penalty of output value which out of range [0-255]')
