@@ -180,16 +180,17 @@ def start2(models_path_dict):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, args = preprocessing(
         models_path_dict)
     datasize = args.datasize
-    if datasize == "synthetic64":
-        font_scale = 0.8
-    elif datasize == "synthetic128":
-        font_scale = 0.8
-    elif datasize == "synthetic256":
-        font_scale = 0.7
-    elif datasize == "synthetic512":
-        font_scale = 1
-    else:
-        raise ValueError
+    # if datasize == "synthetic64":
+    #     font_scale = 0.8
+    # elif datasize == "synthetic128":
+    #     font_scale = 0.8
+    # elif datasize == "synthetic256":
+    #     font_scale = 0.7
+    # elif datasize == "synthetic512":
+    #     font_scale = 1
+    # else:
+    #     raise ValueError
+    font_scale = 1
 
     # read data
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
@@ -272,8 +273,8 @@ def start2(models_path_dict):
                     diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
                     # mu.addText(diff_albedo_img, name)
                     # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
-                    error_list.append(
-                        mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
+                    # error_list.append(
+                    #     mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
 
 
                 elif args.exp in ["nnnn", "fugrc"]:
@@ -339,7 +340,7 @@ if __name__ == '__main__':
         # "SVD": None,
         # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
         "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
-        "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
+        # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
         "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
