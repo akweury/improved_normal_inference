@@ -928,7 +928,7 @@ def eval_img_angle(output, target):
     img = angle2rgb(angle_matrix)
     img[mask] = 0
 
-    img = image_resize(img, width=512, height=512)
+    # img = image_resize(img, width=512, height=512)
 
     return img, angle_matrix
 
