@@ -115,9 +115,9 @@ class NormalLoss(nn.Module):
         axis = args.epoch % 3
         axis_diff = (outputs - target)[:, axis, :, :][mask]
         if args.loss_type == "l2":
-            loss = F.mse_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask])
+            loss = F.mse_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask]).float()
         elif args.loss_type == "l1":
-            loss = F.l1_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask])
+            loss = F.l1_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask]).float()
         else:
             raise ValueError
         return loss.float()
@@ -548,7 +548,7 @@ def train_epoch(nn_model, epoch):
     angle_loss_sharp_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
-        input, target = input.to(nn_model.device), target.to(nn_model.device)
+        input, target = input.float().to(nn_model.device), target.float().to(nn_model.device)
 
         # Wait for all kernels to finish
         torch.cuda.synchronize()
