@@ -5,7 +5,7 @@
   "num_channels ": 32,
   "resume": null,
   "epochs": 100001,
-  "init_net": null,
+  "init_net": "gcnn_3_32",
   "optimizer": "adam",
   "lr": 0.001,
   "lr_scheduler": "9999",

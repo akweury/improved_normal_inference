@@ -7,6 +7,7 @@ import torch.nn as nn
 from common.Layers import LightNet
 from common.ResNormalGuided import NormalGuided
 from common.AlbedoGatedNNN import AlbedoNet
+import config
 
 
 # from common.NormalizedNNN import NormalizedNNN
@@ -26,7 +27,8 @@ class CNN(nn.Module):
     def init_net(self, model_name):
         net_dict = self.net3_3.state_dict()
         source_net = NormalGuided(3, 3, self.channel_num)
-        checkpoint = torch.load(eval(f"config.{model_name}"))
+
+        checkpoint = torch.load(config.gcnn_3_32)
         source_net.load_state_dict(checkpoint['model'].nconv3_3.state_dict())
         source_net_dict = source_net.state_dict()
         source_net_dict = {k: v for k, v in source_net_dict.items() if k in net_dict and v.size() == net_dict[k].size()}
