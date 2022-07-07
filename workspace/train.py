@@ -15,13 +15,13 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torch.nn.functional as F
 from torch import nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 from help_funs import mu
+from workspace import loss_utils
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
@@ -72,275 +72,6 @@ def calc_TV_Loss(x):
 
 
 # -------------------------------------------------- loss function ---------------------------------------------------
-class L2Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, *args):
-        outputs = outputs[:, :3, :, :]
-        return F.mse_loss(outputs, target)
-
-
-class WeightedL2Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, args):
-        outputs = outputs[:, :3, :, :]
-        boarder_right = torch.gt(outputs, 255).bool().detach()
-        boarder_left = torch.lt(outputs, 0).bool().detach()
-        outputs[boarder_right] = outputs[boarder_right] * args.penalty
-        outputs[boarder_left] = outputs[boarder_left] * args.penalty
-        return F.mse_loss(outputs, target)
-
-
-class NormalLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, args):
-        outputs = outputs[:, :3, :, :]
-        target = target[:, :3, :, :]
-        mask_too_high = torch.gt(outputs, 1).bool().detach()
-        mask_too_low = torch.lt(outputs, -1).bool().detach()
-        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
-        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
-
-        # val_pixels = (~torch.prod(target == 0, 1).bool()).unsqueeze(1)
-        # angle_loss = mu.angle_between_2d_tensor(outputs, target, mask=val_pixels).sum() / val_pixels.sum()
-        # mask of non-zero positions
-        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
-        # mask = mask.unsqueeze(1).repeat(1, 3, 1, 1).float()
-
-        axis = args.epoch % 3
-        axis_diff = (outputs - target)[:, axis, :, :][mask]
-        if args.loss_type == "l2":
-            loss = F.mse_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask]).float()
-        elif args.loss_type == "l1":
-            loss = F.l1_loss(outputs[:, axis, :, :][mask], target[:, axis, :, :][mask]).float()
-        else:
-            raise ValueError
-        return loss.float()
-
-
-class GLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, args):
-        mask = torch.abs(target) > 0
-        if args.loss_type == "l1":
-            loss = F.l1_loss(outputs[mask], target[mask])
-        elif args.loss_type == "l2":
-            loss = F.mse_loss(outputs[mask], target[mask])
-        else:
-            raise ValueError
-        return loss
-
-
-class ImageLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, mask, args):
-        mask = mask.bool()
-        if args.loss_type == "l1":
-            loss = F.l1_loss(outputs[mask], target[mask])
-        elif args.loss_type == "l2":
-            loss = F.mse_loss(outputs[mask], target[mask])
-        else:
-            raise ValueError
-
-        return loss
-
-
-class AngleHistoLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, args):
-        outputs = outputs[:, :3, :, :]
-        target = target[:, :3, :, :]
-        mask_too_high = torch.gt(outputs, 1).bool().detach()
-        mask_too_low = torch.lt(outputs, -1).bool().detach()
-        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
-        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
-
-        mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
-
-        axis = args.epoch % 3
-        axis_diff = (outputs - target)[:, axis, :, :][mask]
-        loss = torch.sum(axis_diff ** 2) / (axis_diff.size(0))
-        # https://discuss.pytorch.org/t/differentiable-torch-histc/25865/3
-        min = -1.05
-        max = 1.05
-        bins = 100
-        delta = float(max - min) / float(bins)
-        centers = min + delta * (torch.arange(bins).float() + 0.5)
-        centers = centers.to(outputs.device)
-
-        sigma = 0.6
-        output_histo = outputs[:, axis, :, :][mask].unsqueeze(0) - centers.unsqueeze(1)
-        output_histo = torch.exp(-0.5 * (output_histo / sigma) ** 2) / (sigma * np.sqrt(np.pi * 2)) * delta
-        output_histo = output_histo.sum(dim=-1)
-        output_histo = output_histo / output_histo.sum(dim=-1)  # normalization
-
-        target_histo = target[:, axis, :, :][mask].unsqueeze(0) - centers.unsqueeze(1)
-        target_histo = torch.exp(-0.5 * (target_histo / sigma) ** 2) / (sigma * np.sqrt(np.pi * 2)) * delta
-        target_histo = target_histo.sum(dim=-1)
-        target_histo = target_histo / target_histo.sum(dim=-1)  # normalization
-
-        histo_loss = output_histo - target_histo
-        # for i in range(outputs.size(0)):
-        #     histo_mask = mask[i, :, :].to(outputs.device)
-        #     histo_output = torch.histc(outputs[i, axis, :, :][histo_mask], bins=256, min=-1.05, max=1.05)
-        #     histo_target = torch.histc(target[i, axis, :, :][histo_mask], bins=256, min=-1.05, max=1.05)
-        #     histo_loss += torch.sum(torch.abs(histo_output - histo_target)) * (1e-6)
-
-        return loss + histo_loss
-
-
-class AngleLightLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.normal_loss = NormalLoss()
-        self.g_loss = GLoss()
-        self.img_loss = ImageLoss()
-
-    def forward(self, outputs, target, args):
-        out_normal = outputs[:, :3, :, :]
-        out_albedo = outputs[:, 3, :, :]
-        target_normal = target[:, :3, :, :]
-        target_light = target[:, 5:8, :, :]
-        img = target[:, 4, :, :]
-        input_mask = outputs[:, 4, :, :]
-
-        normal_loss = self.normal_loss(out_normal, target_normal, args)
-
-        out_img = out_albedo * torch.sum(target_normal * target_light, dim=1)  # rho(N * L)
-        img_loss = self.img_loss(out_img, img, input_mask, args)
-
-        loss = normal_loss + img_loss * args.img_penalty
-
-        return loss
-
-
-def LambertError(normal, albedo, lighting, image):
-    """mean Lambert Reconstruction Error"""
-
-    mask = ~torch.prod(lighting == 0, dim=1).bool()
-    recon = albedo * torch.sum(normal * lighting, dim=1, keepdim=True)
-    error = torch.norm(image - recon, p=2, dim=1)
-
-    return error[mask].mean()
-
-
-class AngleAlbedoLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.normal_loss = NormalLoss()
-        self.g_loss = GLoss()
-        self.img_loss = ImageLoss()
-
-    def forward(self, outputs, target, args):
-        # normal l2 loss
-
-        normal_loss = self.normal_loss(outputs[:, :3, :, :], target[:, :3, :, :], args)
-
-        input_mask = outputs[:, 4, :, :]
-        out_G = outputs[:, 5, :, :]  # N * L
-        # out_albedo = outputs[:, 3, :, :]
-        target_img = target[:, 4, :, :]
-        target_g = target[:, 3, :, :]
-
-        target_albedo = target_img / (target_g + 1e-20)
-        out_albedo = target_img / (out_G + 1e-20)
-
-        # albedo_loss = self.img_loss(out_albedo, target_albedo, input_mask)
-
-        g_loss = self.g_loss(out_G, target_g, args)
-
-        loss = normal_loss + g_loss * args.angle_loss_weight
-
-        return loss
-
-
-class AngleDetailLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, args):
-        # add penalty to the extreme values, i.e. out of range [-1,1]
-        mask_too_high = torch.gt(outputs, 1).bool().detach()
-        mask_too_low = torch.lt(outputs, -1).bool().detach()
-        outputs[mask_too_high] = outputs[mask_too_high] * args.penalty
-        outputs[mask_too_low] = outputs[mask_too_low] * args.penalty
-
-        # smooth loss and sharp loss
-        axis = args.epoch % 3
-
-        # mask of normals
-        mask_smooth = (torch.abs(outputs[:, axis, :, :]) > 0)
-        mask_sharp = (torch.abs(outputs[:, axis + 3, :, :]) > 0)
-
-        target = target.permute(0, 2, 3, 1)
-        target_smooth = target[:, :, :, axis][mask_smooth]
-        output_smooth = outputs[:, axis, :, :]
-        output_smooth = output_smooth[mask_smooth]
-
-        target_sharp = target[:, :, :, axis][mask_sharp]
-        output_sharp = outputs[:, axis + 3, :, :]
-        output_sharp = output_sharp[mask_sharp]
-
-        axis_smooth_diff = output_smooth - target_smooth
-        axis_sharp_diff = output_sharp - target_sharp
-        loss = torch.sum(axis_smooth_diff ** 2) / (axis_smooth_diff.size(0)) + \
-               torch.sum(axis_sharp_diff ** 2) * args.sharp_penalty / ((axis_sharp_diff.size(0)) + 1e-20)
-
-        return loss
-
-
-class L1Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target):
-        return F.l1_loss(outputs, target)
-
-
-class MaskedL1Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, *args):
-        outputs = outputs[:, :3, :, :]
-        val_pixels = torch.ne(target, 0).float().detach()
-        return F.l1_loss(outputs * val_pixels, target * val_pixels)
-
-
-class MaskedL2Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, outputs, target, *args):
-        outputs = outputs[:, :3, :, :]
-        # val_pixels = torch.ne(target, 0).float().detach()
-        val_pixels = (~torch.prod(target == 0, 1).bool()).float().unsqueeze(1)
-        return F.mse_loss(outputs * val_pixels, target * val_pixels)
-
-
-loss_dict = {
-    'l1': L1Loss(),
-    'l2': L2Loss(),
-    'masked_l1': MaskedL1Loss(),
-    'masked_l2': MaskedL2Loss(),
-    'weighted_l2': WeightedL2Loss(),
-    'angle': NormalLoss(),
-    'angle_detail': AngleDetailLoss(),
-    'angleAlbedo': AngleAlbedoLoss(),
-    'angleLight': AngleLightLoss(),
-    'angle_histo': AngleHistoLoss(),
-}
 
 
 # ----------------------------------------- Dataset Loader -------------------------------------------------------------
@@ -371,31 +102,6 @@ class SyntheticDepthDataset(Dataset):
         return input_tensor, gt_tensor, item
 
 
-class NoiseDataset(Dataset):
-
-    def __init__(self, data_path, k, output_type, setname='train'):
-        if setname in ['train']:
-            self.input = np.array(
-                sorted(
-                    glob.glob(str(data_path / "tensor" / f"*_input_{k}_{output_type}.pt"), recursive=True)))
-            self.gt = np.array(
-                sorted(glob.glob(str(data_path / "tensor" / f"*_gt_{k}_{output_type}.pt"), recursive=True)))
-
-        assert (len(self.gt) == len(self.input))
-
-    def __len__(self):
-        return len(self.input)
-
-    def __getitem__(self, item):
-        if item < 0 or item >= self.__len__():
-            return None
-
-        input_tensor = torch.load(self.input[item])
-        gt_tensor = torch.load(self.gt[item])
-
-        return input_tensor, gt_tensor, item
-
-
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
     def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
@@ -415,7 +121,7 @@ class TrainingModel():
         self.model = self.init_network(network)
         self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
-        self.loss = loss_dict[args.loss].to(self.device)
+        self.img_loss = None
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -569,8 +275,18 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        loss = nn_model.loss(out, target, nn_model.args)
+        loss = loss_utils.weighted_normal_loss(out[:, :3, :, :],
+                                               target[:, :3, :, :],
+                                               nn_model.args.penalty,
+                                               epoch,
+                                               nn_model.args.loss_type)
 
+        if nn_model.args.img_loss:
+            nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
+                                                        albedo=out[:, 3:4, :, :],
+                                                        lighting=target[:, 5:7, :, :],
+                                                        image=target[:, 4:5, :, :], )
+            loss += nn_model.img_loss * nn_model.args.img_penalty
         # Backward pass
         loss.backward()
 
@@ -592,8 +308,12 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, train_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), train_idx.to('cpu')
-            loss_0th = loss / int(nn_model.args.batch_size)
-            print(f"\t loss: {loss_0th:.2e}\t axis: {epoch % 3}")
+            loss_0th_avg = loss / int(nn_model.args.batch_size)
+            print(f"\t normal loss: {loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
+            if nn_model.img_loss is not None:
+                img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
+                print(f"img loss: {img_loss_0th_avg:.2e}", "")
+            print("\n")
 
             # evaluation
             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
