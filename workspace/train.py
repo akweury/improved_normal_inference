@@ -114,7 +114,7 @@ class TrainingModel():
         self.output_folder = self.init_output_folder()
         self.optimizer = None
         self.parameters = None
-        self.losses = np.zeros((3, args.epochs))
+        self.losses = np.zeros((4, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
         self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
@@ -250,6 +250,21 @@ class TrainingModel():
             f.write(str(self.model))
 
 
+def plot_loss_per_axis(loss_total, nn_model, epoch):
+    loss_avg = loss_total / len(nn_model.train_loader.dataset)
+
+    nn_model.losses[epoch % 3, epoch] = loss_avg
+
+    # draw line chart
+    if epoch % 10 == 9:
+        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+                        log_y=True, label=0, epoch=epoch, start_epoch=0)
+        draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
+                        log_y=True, label=1, epoch=epoch, start_epoch=0)
+        draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
+                        log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title="Loss")
+
+
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
 def train_epoch(nn_model, epoch):
     nn_model.args.epoch = epoch
@@ -259,8 +274,8 @@ def train_epoch(nn_model, epoch):
     nn_model.model.train()
     loss_total = torch.tensor([0.0])
     angle_loss_avg = torch.tensor([0.0])
-    angle_loss_avg_light = torch.tensor([0.0])
-    angle_loss_sharp_total = torch.tensor([0.0])
+    img_loss_total = torch.tensor([0.0])
+
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target = input.float().to(nn_model.device), target.float().to(nn_model.device)
@@ -285,9 +300,9 @@ def train_epoch(nn_model, epoch):
             nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
                                                         albedo=out[:, 3:4, :, :],
                                                         lighting=target[:, 5:8, :, :],
-                                                        image=target[:, 4:5, :, :], )
-            loss += nn_model.img_loss * nn_model.args.img_penalty
-        # Backward pass
+                                                        image=target[:, 4:5, :, :], ) * nn_model.args.img_penalty
+            loss += nn_model.img_loss
+            # Backward pass
         loss.backward()
 
         # Update the parameters
@@ -295,6 +310,7 @@ def train_epoch(nn_model, epoch):
 
         # gpu_time = time.time() - start
         loss_total += loss.detach().to('cpu')
+        img_loss_total += nn_model.img_loss.detach().to('cpu')
 
         if not nn_model.args.fast_train:
             if nn_model.args.angle_loss:
@@ -312,7 +328,7 @@ def train_epoch(nn_model, epoch):
             print(f"\t normal loss: {loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
             if nn_model.img_loss is not None:
                 img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
-                print(f"img loss: {img_loss_0th_avg:.2e}", "")
+                print(f"\t img loss: {img_loss_0th_avg:.2e}", "")
             print("\n")
 
             # evaluation
@@ -340,42 +356,21 @@ def train_epoch(nn_model, epoch):
                                     train_idx=test_idx,
                                     prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
-    # save loss
-    loss_avg = loss_total / len(nn_model.train_loader.dataset)
-    nn_model.losses[epoch % 3, epoch] = loss_avg
-    if not nn_model.args.fast_train:
-        if nn_model.args.angle_loss:
-            angle_loss_avg = angle_loss_avg.to("cpu")
-            angle_loss_avg_light = angle_loss_avg_light.to("cpu")
-            nn_model.angle_losses[0, epoch] = angle_loss_avg
-            nn_model.angle_losses_light[0, epoch] = angle_loss_avg_light
+    # save loss and plot
+    plot_loss_per_axis(loss_total, nn_model, epoch)
 
-            if nn_model.args.exp == "degares":
-                angle_loss_sharp_avg = angle_loss_sharp_total / len(nn_model.train_loader.dataset)
-                nn_model.angle_sharp_losses[0, epoch] = angle_loss_sharp_avg
+    nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
+    draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
+                    log_y=True, label="image", epoch=epoch, start_epoch=0)
 
     # indicate for best model saving
-    if nn_model.best_loss > loss_avg:
-        nn_model.best_loss = loss_avg
-        print(f'best loss updated to {float(loss_avg):.8e}')
+    if nn_model.best_loss > loss_total:
+        nn_model.best_loss = loss_total
+        print(f'best loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
         is_best = True
     else:
         is_best = False
 
-    # draw line chart
-    if epoch % 10 == 9:
-        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-                        log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
-        draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
-                        log_y=True, label=1, epoch=epoch, start_epoch=nn_model.start_epoch)
-        draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
-                        log_y=True, label=2, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True, title="Loss")
-        if nn_model.args.angle_loss:
-            draw_line_chart(np.array([nn_model.angle_losses[0]]), nn_model.output_folder, log_y=True, label="normal",
-                            epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle")
-            draw_line_chart(np.array([nn_model.angle_losses_light[0]]), nn_model.output_folder, log_y=True,
-                            label="albedo",
-                            epoch=epoch, start_epoch=nn_model.start_epoch, loss_type="angle", cla_leg=True)
     return is_best
 
 
