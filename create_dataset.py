@@ -108,9 +108,9 @@ def convert2training_tensor(path, k, output_type='normal'):
         albedo = img / (G + 1e-20)
 
         # mu.show_images(img, "img")
-        # albedo_img = np.uint8(albedo)
-        # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        # mu.show_images(albedo_img, "a")
+        albedo_img = np.uint8(albedo)
+        albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+        mu.show_images(albedo_img, "a")
 
         target = np.c_[
             gt_normal,  # 0,1,2

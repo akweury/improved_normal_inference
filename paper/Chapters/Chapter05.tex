@@ -9,16 +9,26 @@ The model is trained with PyTorch 1.10.2, CUDA 10.2.89, GPU with single NVIDIA G
 
 %% nnnn exp
 \section{Surface Normal Inference based on Depth Map}
-The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) ( \ref{gcnn}) is trained and is compared with similar approaches. We evaluate the performance of the model in dataset ``synthetic50-5" introduced in  \ref{ch:04} including 5K depth maps with size  $ 512\times512\times3 $ for training. All the depth maps add simulated noise as introduced in \ref{sec:noise}. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, penalty-l2 loss(see \ref{sec:loss}). The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape. 
+The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) ( \ref{gcnn}) is trained and is compared with similar approaches. We evaluate the performance of the model in dataset ``synthetic50-5" introduced in  \ref{ch:04} including 5K depth maps with size  $ 512\times512\times3 $ for training. All the depth maps add simulated noise as introduced in \ref{sec:noise}. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, penalty-l2 loss. The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape. 
 
 \subsection{Qualitative Evaluation}
 
-The visual evaluation on model GCNN shown in Figure \ref{fig:gcnn-eval-synthetic-full}. 
+The evaluation visualization on test dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. As shown in the picture, GCNN model 
+Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_point_cloud_noise.png}
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_groundtruth.png}
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_normal_GCNN3-32-512.png}
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_normal_SVD.png}
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_error_GCNN3-32-512.png}
+	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_error_SVD.png}
+	\caption{GCNN Normal Inference on Synthetic Dataset (object: dragon) From left to right: Input vertex map, ground-truth, GCNN normal map, SVD normal map, GCNN error map, SVD error map}
+	\label{fig:gcnn-eval-synthetic}
+\end{figure}
 
-%% a detailed analyis of this figure
-It is 
 
-The evaluation visualization on test dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
+
 \begin{figure}[th]
 	\centering
 	\begin{subfigure}[b]{0.15\linewidth}

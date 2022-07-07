@@ -576,19 +576,7 @@ The loss function applied in the training work is a customized L2 loss based on 
 
 where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ mask_{ol} $ is the mask for the outliers, $ p $ is the penalty of the outliers, it is set as 1.4.
 
-\subsection{Evaluation}
-The goal of normal inference is to generate a normal map which each pixel corresponding the normal of input depth map/image. Figure \ref{fig:gcnn-eval-synthetic} is the evaluation of the dragon object using trained GCNN model. Overall the predicted map is similar to the ground truth. A more detailed evaluation with comparison with other approaches is shown in Chapter \ref{ch:05}.
 
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.2\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_point_cloud_noise.png}
-	\includegraphics[width=0.2\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_groundtruth.png}
-	\includegraphics[width=0.2\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_normal_GCNN3-32-512.png}
-	\includegraphics[width=0.2\linewidth]{./Figures/gcnn-synthetic/fancy_eval_2_error_GCNN3-32-512.png}
-	\caption{GCNN Normal Inference on Synthetic Dataset (object: dragon) From left to right: Input vertex map, ground-truth, GCNN normal map, error map.}
-	\label{fig:gcnn-eval-synthetic}
-\end{figure}
 
 
 

@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from common.Layers import GConv, LightNet
 from common.ResNormalGuided import NormalGuided
-import config
+from common.AlbedoGatedNNN import AlbedoNet
 
 
 # from common.NormalizedNNN import NormalizedNNN
@@ -17,10 +17,11 @@ class CNN(nn.Module):
         self.__name__ = 'ag'
         self.channel_num = channel_num
         self.net3_3 = NormalGuided(3, 3, channel_num)
+        self.albedo_net = AlbedoNet()
+
         self.scaleProdInfer = LightNet(3, 3, channel_num)
-        self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
-        self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
-        self.albedo3 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))
+
+        self.net11_3_refine = NormalGuided(11, 3, channel_num)
 
     def init_net(self, model_name):
         net_dict = self.net3_3.state_dict()
@@ -42,10 +43,9 @@ class CNN(nn.Module):
         x_normal_out = self.net3_3(x_vertex)
 
         # light guided
-        scaleProd = self.scaleProdInfer(x_light, x_normal_out)
+        # scaleProd = self.scaleProdInfer(x_light, x_normal_out)
+        x_albedo_out = self.albedo_net(x_normal_out, x_light, x_img)
+        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_albedo_out, x_img, x_light)))
 
-        x_g = self.albedo1(torch.cat((x_normal_out, x_light), 1))
-        x_albedo = self.albedo2(torch.cat((x_g, x_img), 1))
-        x_albedo = self.albedo3(x_albedo)
-        xout = torch.cat((x_normal_out, x_albedo, input_mask, scaleProd), 1)
+        xout = torch.cat((x_normal_out, x_albedo_out, input_mask), 1)
         return xout

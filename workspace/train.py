@@ -217,13 +217,22 @@ class AngleLightLoss(nn.Module):
 
         normal_loss = self.normal_loss(out_normal, target_normal, args)
 
-        G = torch.sum(out_normal * target_light, dim=1)  # N * L
-        out_img = out_albedo * G
+        out_img = out_albedo * torch.sum(target_normal * target_light, dim=1)  # rho(N * L)
         img_loss = self.img_loss(out_img, img, input_mask, args)
 
-        loss = normal_loss + img_loss * args.albedo_penalty
+        loss = normal_loss + img_loss * args.img_penalty
 
         return loss
+
+
+def LambertError(normal, albedo, lighting, image):
+    """mean Lambert Reconstruction Error"""
+
+    mask = ~torch.prod(lighting == 0, dim=1).bool()
+    recon = albedo * torch.sum(normal * lighting, dim=1, keepdim=True)
+    error = torch.norm(image - recon, p=2, dim=1)
+
+    return error[mask].mean()
 
 
 class AngleAlbedoLoss(nn.Module):
