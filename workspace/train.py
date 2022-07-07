@@ -390,7 +390,7 @@ def test_epoch(nn_model, epoch):
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
             if nn_model.exp_name == "light":
-                input = input[:1, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+                input = input[:1, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
                 out = out[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
                 target = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
             if nn_model.exp_name == "nnnn":
@@ -559,9 +559,9 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # target
     target_img = mu.unit_vector2RGB(target)
     mask = target.sum(axis=2) == 0
-    target_ranges = mu.addHist(target_img)
     target_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(target_gt_8bit, "GT")
+    target_ranges = mu.addHist(target_img)
     mu.addText(target_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(target_gt_8bit)
 

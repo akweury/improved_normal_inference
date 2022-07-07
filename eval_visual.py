@@ -205,6 +205,7 @@ def start2(models_path_dict):
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         light_gt = gt_tensor[:, 5:8, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        light_input = test_0_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         vertex_0 = test_0_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         img_0 = test_0_tensor[:, 3, :, :].permute(1, 2, 0).squeeze(-1).numpy()
 
@@ -238,74 +239,84 @@ def start2(models_path_dict):
                 # load model
                 device = torch.device("cuda:0")
                 model = checkpoint['model'].to(device)
-                if args.exp in ["ng", "hfm", "resng"]:
-                    normal = evaluate_epoch(args, model, test_0_tensor[:, :4, :, :], device)
-                elif args.exp in ["ag"]:
+
+                if args.exp in ["light"]:
+                    x_out_light = evaluate_epoch(args, model, test_0_tensor, device)
+                    light_no_mask_img = cv.cvtColor(mu.visual_normal(x_out_light, "", histogram=False),
+                                                    cv.COLOR_RGB2BGR)
+                    x_out_light[mask] = 0
+                    diff_img, diff_angle = mu.eval_img_angle(x_out_light, light_gt)
+                    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                    output_list.append(cv.cvtColor(mu.visual_normal(x_out_light, name), cv.COLOR_RGB2BGR))
+                    error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_input.png"),
+                               cv.cvtColor(mu.visual_normal(light_input, "", histogram=False), cv.COLOR_RGB2BGR))
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_gt.png"),
+                               cv.cvtColor(mu.visual_normal(light_gt, "", histogram=False), cv.COLOR_RGB2BGR))
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_{name}.png"),
+                               cv.cvtColor(mu.visual_normal(x_out_light, "", histogram=False), cv.COLOR_RGB2BGR))
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_error_{name}.png"),
+                               mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+
+                    eval_res[model_idx, i] = diff
+                else:
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
 
                     normal = xout[:, :, :3]
-                    xout_albedo = xout[:, :, 3]
-                    xout_g = xout[:, :, 5]
 
                     # visual albedo error
                     # rho_gt = mu.albedo(img_0, gt, light_gt)
                     # xout_albedo = np.uint8(xout_albedo)
                     # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
+                    if xout.shape[2] >= 6:
+                        xout_g = xout[:, :, 5]
+                        xout_albedo2 = np.uint8(img_0 / (xout_g + 1e-20))
+                        output_list.append(mu.visual_img(xout_albedo2, "albedo_out"))
 
-                    xout_albedo2 = np.uint8(img_0 / (xout_g + 1e-20))
-                    output_list.append(mu.visual_img(xout_albedo2, "albedo_out"))
+                        g = np.sum(gt * light_gt, axis=-1)
+                        albedo_gt = np.uint8(img_0 / (g + 1e-20))
+                        output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
 
-                    g = np.sum(gt * light_gt, axis=-1)
-                    albedo_gt = np.uint8(img_0 / (g + 1e-20))
-                    output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
+                        img_out = xout_albedo2 * xout_g
+                        img_out[mask] = 0
+                        img_out = np.uint8(img_out)
+                        img_out = mu.visual_img(img_out, "img_out")
+                        output_list.append(img_out)
+                        output_list.append(mu.visual_img(img_8bit, "img_gt"))
 
-                    img_out = xout_albedo2 * xout_g
-                    img_out[mask] = 0
-                    img_out = np.uint8(img_out)
-                    img_out = mu.visual_img(img_out, "img_out")
-                    output_list.append(img_out)
-                    output_list.append(mu.visual_img(img_8bit, "img_gt"))
-
-                    diff_albedo = np.abs(xout_albedo2 - albedo_gt)
-                    diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
-                                                                    cv.NORM_MINMAX, dtype=cv.CV_8U),
-                                                       cv.COLORMAP_HOT)
-                    diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
+                        diff_albedo = np.abs(xout_albedo2 - albedo_gt)
+                        diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
+                                                                        cv.NORM_MINMAX, dtype=cv.CV_8U),
+                                                           cv.COLORMAP_HOT)
+                        diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
                     # mu.addText(diff_albedo_img, name)
                     # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
                     # error_list.append(
                     #     mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
-
-
-                elif args.exp in ["nnnn", "fugrc"]:
-                    normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
-                    normal_no_mask_img = cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR)
                     normal[mask] = 0
-                else:
-                    raise ValueError
 
-            normal[mask] = 0
+                    diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+                    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                    # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+                    # if normal_no_mask_img is not None:
+                    #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+                    output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+                    error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                               cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
+                               mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+
+                    eval_res[model_idx, i] = diff
 
             # visual normal
             # output_list.append(mu.visual_normal(normal, name))
 
             # visual error
             # gt[mask_input] = 0
-            diff_img, diff_angle = mu.eval_img_angle(normal, gt)
-            diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-
-            # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
-            # if normal_no_mask_img is not None:
-            #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-            output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
-            error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
-
-            cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                       cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
-            cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
-                       mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
-
-            eval_res[model_idx, i] = diff
 
         # save files
         # mu.save_array(gt, str(folder_path / f"fancy_eval_{i}_normal_gt"))
@@ -338,12 +349,12 @@ if __name__ == '__main__':
 
     models = {
         "SVD": None,
-        # "GCNN-64": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",  # image guided
+        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
-        "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
+        # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
