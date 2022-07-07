@@ -7,6 +7,7 @@ import torch.nn as nn
 from common.Layers import GConv, LightNet
 from common.ResNormalGuided import NormalGuided
 from common.AlbedoGatedNNN import AlbedoNet
+import config
 
 
 # from common.NormalizedNNN import NormalizedNNN
