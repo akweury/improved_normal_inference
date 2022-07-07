@@ -11,7 +11,7 @@
   "lr_scheduler": "9999",
   "momentum": 0.9,
   "penalty": 1.4,
-  "img_penalty": 1,
+  "img_penalty": 1e-3,
   "img_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
