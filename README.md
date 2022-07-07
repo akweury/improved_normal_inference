@@ -29,7 +29,7 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp resng --dataset sy
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp sconv --dataset synthetic512 --batch_size 8 --train-on 1000 --num-channels 32 --loss angle 
+CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synthetic512 --batch_size 4 --train-on 50 
 ```
 
 #### evaluate the test dataset (no visualisation)
