@@ -284,7 +284,7 @@ def train_epoch(nn_model, epoch):
         if nn_model.args.img_loss:
             nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
                                                         albedo=out[:, 3:4, :, :],
-                                                        lighting=target[:, 5:7, :, :],
+                                                        lighting=target[:, 5:8, :, :],
                                                         image=target[:, 4:5, :, :], )
             loss += nn_model.img_loss * nn_model.args.img_penalty
         # Backward pass
