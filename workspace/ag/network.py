@@ -4,10 +4,9 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
-from common.Layers import GConv, LightNet
+from common.Layers import LightNet
 from common.ResNormalGuided import NormalGuided
 from common.AlbedoGatedNNN import AlbedoNet
-import config
 
 
 # from common.NormalizedNNN import NormalizedNNN
@@ -22,7 +21,7 @@ class CNN(nn.Module):
 
         self.scaleProdInfer = LightNet(3, 3, channel_num)
 
-        self.net11_3_refine = NormalGuided(11, 3, channel_num)
+        self.net11_3_refine = NormalGuided(8, 3, channel_num)
 
     def init_net(self, model_name):
         net_dict = self.net3_3.state_dict()
@@ -46,7 +45,7 @@ class CNN(nn.Module):
         # light guided
         # scaleProd = self.scaleProdInfer(x_light, x_normal_out)
         x_albedo_out = self.albedo_net(x_normal_out, x_light, x_img)
-        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_albedo_out, x_img, x_light)))
+        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_albedo_out, x_img, x_light), dim=1))
 
         xout = torch.cat((x_normal_out, x_albedo_out, input_mask), 1)
         return xout
