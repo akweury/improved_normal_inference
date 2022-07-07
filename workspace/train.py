@@ -336,17 +336,20 @@ def train_epoch(nn_model, epoch):
         # Update the parameters
         nn_model.optimizer.step()
 
-        # visualisation
         if i == 0:
             # print statistics
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
-            input, out, target, train_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), train_idx.to('cpu')
-            loss_0th_avg = nn_model.normal_loss / int(nn_model.args.batch_size)
-            print(f"\t normal loss: {loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
+
+            if nn_model.normal_loss is not None:
+                normal_loss_0th_avg = nn_model.normal_loss / int(nn_model.args.batch_size)
+                print(f"\t normal loss: {normal_loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
             if nn_model.img_loss is not None:
                 img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
                 print(f"\t img loss: {img_loss_0th_avg:.2e}", end="")
+            if nn_model.light_loss is not None:
+                light_loss_0th_avg = nn_model.light_loss / int(nn_model.args.batch_size)
+                print(f"\t light loss: {light_loss_0th_avg:.2e}", end="")
             print("\n")
 
     # save loss and plot

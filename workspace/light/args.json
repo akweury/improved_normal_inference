@@ -6,6 +6,7 @@
   "init_net": null,
   "epochs": 100001,
   "optimizer": "adam",
+  "num_channels": 32,
   "lr": 0.001,
   "img_loss": false,
   "normal_loss": false,
