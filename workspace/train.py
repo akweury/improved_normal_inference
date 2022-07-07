@@ -592,7 +592,7 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
         mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
         output_list.append(normal_cnn_8bit)
     elif exp_name == "ag":
-        xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 5].detach().numpy()
+        # xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 5].detach().numpy()
         xout_albedo = xout[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
 
         # img_out = xout_albedo * xout_scaleProd
@@ -604,8 +604,8 @@ def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefi
         # xout_albedo = np.uint8(xout_albedo)
         # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
 
-        xout_albedo2 = np.uint8(target_img / (xout_scaleProd + 1e-20))
-        output_list.append(mu.visual_img(xout_albedo2, "albedo_out_2"))
+        xout_albedo_img = np.uint8(xout_albedo)
+        output_list.append(mu.visual_img(xout_albedo_img, "albedo_out"))
 
         albedo_gt = np.uint8(target_img / (target_scaleProd + 1e-20))
         output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
