@@ -13,6 +13,7 @@ import torch
 
 import config
 from help_funs import mu
+from workspace.svd import eval as svd
 
 
 ############ EVALUATION FUNCTION ############
@@ -75,11 +76,10 @@ def preprocessing(models):
     return models, path, output_path, eval_res, eval_date, eval_time, all_names, args.datasize
 
 
-def start(models_path_dict, s_window_length=32):
+def start(models_path_dict, infos, s_window_length=32):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, data_size = preprocessing(
         models_path_dict)
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
-
     # iterate evaluate images
     for i, data_idx in enumerate(all_names):
         # read data
@@ -98,35 +98,69 @@ def start(models_path_dict, s_window_length=32):
         top = int(h / 2 + s_window_length)
         s_gt = gt[left: right, below:top, :]
         s_input = test_0_tensor[:, :, left: right, below:top]
+        s_input_numpy = s_input.clone()
+        s_input_numpy = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         s_mask = s_gt.sum(axis=2) == 0
-        img_list = [mu.visual_normal(s_gt, "GT")]
 
-        # diff_list = []
+        cv.imwrite(str(folder_path / f"eval_{i}_input.png"),
+                   cv.cvtColor(mu.visual_vertex(s_input_numpy,
+                                                ""),
+                               cv.COLOR_RGB2BGR))
+
+        cv.imwrite(str(folder_path / f"eval_{i}_normal_GT.png"),
+                   cv.cvtColor(mu.visual_normal(s_gt, "", histogram=False),
+                               cv.COLOR_RGB2BGR))
+
+        if infos["title"]:
+            img_list = [mu.visual_normal(s_gt, "GT", histogram=infos["histo"])]
+        else:
+            img_list = [mu.visual_normal(s_gt, "", histogram=infos["histo"])]
 
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
             # load model
-            checkpoint = torch.load(model)
-            args = checkpoint['args']
-            start_epoch = checkpoint['epoch']
-            device = torch.device("cuda:0")
-            model = checkpoint['model'].to(device)
-            print(f'- model {name} evaluation...')
-
-            if name == "s-window":
-                normal = evaluate_epoch(args, model, s_input[:, :3, :, :], device)
+            # diff_list = []
+            if name == "SVD":
+                print(f'- model {name} evaluation...')
+                normal, gpu_time = svd.eval_single(s_input_numpy, ~s_mask, np.array([0, 0, -7]), farthest_neighbour=2)
             else:
-                normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
-                normal = normal[left: right, below:top, :]
+                checkpoint = torch.load(model)
+                args = checkpoint['args']
+                start_epoch = checkpoint['epoch']
+                device = torch.device("cuda:0")
+                model = checkpoint['model'].to(device)
+                print(f'- model {name} evaluation...')
+
+                if name == "s-window":
+                    normal = evaluate_epoch(args, model, s_input[:, :3, :, :], device)
+                else:
+                    normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
+                    normal = normal[left: right, below:top, :]
 
             normal[s_mask] = 0
-            img_list.append(mu.visual_normal(normal, name))
+
+            cv.imwrite(str(folder_path / f"eval_{i}_normal_{name}.png"),
+                       cv.cvtColor(mu.visual_normal(normal, "", histogram=False),
+                                   cv.COLOR_RGB2BGR))
+
+            if infos["title"]:
+                img_list.append(mu.visual_normal(normal, name, histogram=infos["histo"]))
+            else:
+                img_list.append(mu.visual_normal(normal, "", histogram=infos["histo"]))
             # visual error
+
             diff_img, diff_angle = mu.eval_img_angle(normal, s_gt)
             diff = np.sum(diff_angle) / (np.count_nonzero(diff_angle) + 1e-20)
 
-            img_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=1))
+            cv.imwrite(str(folder_path / f"eval_{i}_error_{name}.png"),
+                       cv.cvtColor(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1),
+                                   cv.COLOR_RGB2BGR))
+
+            if infos["title"]:
+                img_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=1))
+            else:
+                img_list.append(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1))
 
             # diff_angle = np.uint8(diff_angle)
             # if diff_list is None:
@@ -153,13 +187,17 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
+        "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        "s-window": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",
-        "full-window": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "s-window": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",
+        "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
-
-    start(models)
+    infos = {
+        "title": False,
+        "histo": False,
+        "error": False
+    }
+    start(models, infos=infos)

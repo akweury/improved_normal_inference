@@ -9,29 +9,50 @@ The model is trained with PyTorch 1.10.2, CUDA 10.2.89, GPU with single NVIDIA G
 
 %% nnnn exp
 \section{Surface Normal Inference based on Depth Map}
-The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) is trained and is compared with similar approaches.
-
-\subsection{Compared Approaches}
-
-
-\subsection{Training Details}
-The network (see \ref{gcnn}) is trained on stated dataset in Chapter \ref{ch:04}. It has two versions, the L-size $ 512\times512\times3 $ and the  S-size $ 128\times128\times3 $. For the L-size model, it uses batch size 8 for 3500 iterations. For the S-size model, it uses batch size 32 for 6000 iterations. Both sizes use Adam optimizer \cite{adam} with a learning rate of $ 1\times10^{-3} $, penalty-l2 loss(see \ref{sec:loss}). The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape.
-
+The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) ( \ref{gcnn}) is trained and is compared with similar approaches. We evaluate the performance of the model in dataset ``synthetic50-5" introduced in  \ref{ch:04} including 5K depth maps with size  $ 512\times512\times3 $ for training. All the depth maps add simulated noise as introduced in \ref{sec:noise}. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, penalty-l2 loss(see \ref{sec:loss}). The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape. 
 
 \subsection{Qualitative Evaluation}
 
-The evaluation visualization on dataset ``synthetic50-5" (see \ref{ch:04}) dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. It compares the results with method xxx, for both smooth and highly detailed cases. In all the cases, the angle errors are very close. The test-cases are based on test point cloud in ``synthetic50-5". 
-
-The model is supposed to used on any image size since it has no fully-connected layers (dense layers). Two size of models are based on exactly the same architecture. 
+The visual evaluation on model GCNN shown in Figure \ref{fig:gcnn-eval-synthetic-full}. 
 
 %% a detailed analyis of this figure
 It is 
 
+The evaluation visualization on test dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
+\begin{figure}[th]
+	\centering
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_input.png}
+		\caption{Input}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_GT.png}
+		\caption{GT}
+	\end{subfigure}
+		\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_GCNN.png}
+		\caption{GCNN}
+	\end{subfigure}
+		\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_SVD.png}
+		\caption{SVD}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.15\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_error_GCNN.png}
+	\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_error_SVD.png}
+		\caption{}
+	\end{subfigure}
+	\caption{Zoom in of dragon object evaluation.}
+	\label{fig:gcnn-eval-synthetic-zoom-in}
+\end{figure}
 
 
 
 The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-eval-real}
-\begin{figure}[h!]
+\begin{figure}[th]
 	\centering
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/gcnn-real/fancy_eval_1_point_cloud_noise.png}

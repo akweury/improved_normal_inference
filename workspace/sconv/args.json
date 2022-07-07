@@ -3,7 +3,7 @@
   "neighbor": 0,
   "exp": "sconv",
   "resume": null,
-  "epochs": 100001,
+  "epochs": 1000,
   "optimizer": "adam",
   "lr": 0.001,
   "lr_scheduler": "99999",
