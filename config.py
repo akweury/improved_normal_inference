@@ -27,6 +27,9 @@ real_data = dataset / "data_real"
 real_data_dfki = Path("/datasets/sha/data_real")
 
 # pretrained model
+
+light_3_32 = ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar"
+
 gcnn_model_64 = ws_path / "nnnn" / "trained_model" / "64" / "checkpoint.pth.tar"
 gcnn_model_128 = ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar"
 gcnn_model_256 = ws_path / "nnnn" / "trained_model" / "256" / "checkpoint.pth.tar"

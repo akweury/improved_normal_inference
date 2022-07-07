@@ -18,22 +18,31 @@ class CNN(nn.Module):
         self.__name__ = 'ag'
         self.channel_num = channel_num
         self.normal_net = NormalGuided(3, 3, channel_num)
-        self.light_net = AlbedoNet()
+        self.light_net = NormalGuided(3, 3, channel_num)
 
-        self.scaleProdInfer = LightNet(3, 3, channel_num)
-
-        self.net11_3_refine = NormalGuided(8, 3, channel_num)
+        self.net11_3_refine = NormalGuided(7, 3, channel_num)
 
     def init_net(self, model_name):
-        net_dict = self.net3_3.state_dict()
-        source_net = NormalGuided(3, 3, self.channel_num)
+        normal_source_net = NormalGuided(3, 3, self.channel_num)
+        normal_checkpoint = torch.load(config.gcnn_3_32)
+        normal_source_net.load_state_dict(normal_checkpoint['model'].nconv3_3.state_dict())
+        normal_source_net_dict = normal_source_net.state_dict()
+        normal_net_dict = self.normal_net.state_dict()
+        normal_source_net_dict = {k: v for k, v in normal_source_net_dict.items() if
+                                  k in normal_net_dict and v.size() == normal_net_dict[k].size()}
+        normal_net_dict.update(normal_source_net_dict)
+        self.normal_net.load_state_dict(normal_net_dict)
 
-        checkpoint = torch.load(config.gcnn_3_32)
-        source_net.load_state_dict(checkpoint['model'].nconv3_3.state_dict())
-        source_net_dict = source_net.state_dict()
-        source_net_dict = {k: v for k, v in source_net_dict.items() if k in net_dict and v.size() == net_dict[k].size()}
-        net_dict.update(source_net_dict)
-        self.net3_3.load_state_dict(net_dict)
+        light_source_net = NormalGuided(3, 3, self.channel_num)
+        light_checkpoint = torch.load(config.light_3_32)
+
+        light_source_net.load_state_dict(light_checkpoint['model'].nconv3_3.state_dict())
+        light_source_net_dict = light_source_net.state_dict()
+        light_net_dict = self.light_net.state_dict()
+        light_source_net_dict = {k: v for k, v in light_source_net_dict.items() if
+                                 k in light_net_dict and v.size() == light_net_dict[k].size()}
+        light_net_dict.update(light_source_net_dict)
+        self.light_net.load_state_dict(light_net_dict)
 
     def forward(self, x):
         # x0: vertex array
@@ -42,12 +51,15 @@ class CNN(nn.Module):
         x_light = x[:, 4:7, :, :]
         input_mask = torch.sum(torch.abs(x_vertex), dim=1) > 0
         input_mask = input_mask.unsqueeze(1)
-        x_normal_out = self.net3_3(x_vertex)
 
-        # light guided
-        # scaleProd = self.scaleProdInfer(x_light, x_normal_out)
+        # normal predict
+        x_normal_out = self.normal_net(x_vertex)
+
+        # light inpaint
         x_light_out = self.light_net(x_light)
+
+        # refine normal
         x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_light_out, x_img), dim=1))
 
-        xout = torch.cat((x_normal_out, x_albedo_out, input_mask), 1)
+        xout = torch.cat((x_normal_out, x_light_out, input_mask), 1)
         return xout
