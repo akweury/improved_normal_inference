@@ -311,7 +311,7 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.step()
 
         # gpu_time = time.time() - start
-        loss_total += loss.detach().to('cpu')
+        loss_total += normal_loss.detach().to('cpu')
         img_loss_total += nn_model.img_loss.detach().to('cpu')
 
         if not nn_model.args.fast_train:
