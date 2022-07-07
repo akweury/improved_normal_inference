@@ -11,7 +11,7 @@ scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512\test.zi
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
+CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
 ```
 
 #### resize dataset
