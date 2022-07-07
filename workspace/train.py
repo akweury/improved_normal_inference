@@ -128,6 +128,7 @@ class TrainingModel():
         self.save_model()
         self.pretrained_weight = None
         self.best_loss = 1e+20
+        self.best_img_loss = 1e+20
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
@@ -368,10 +369,14 @@ def train_epoch(nn_model, epoch):
     # indicate for best model saving
     if nn_model.best_loss > loss_total:
         nn_model.best_loss = loss_total
-        print(f'best loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
+        print(f'best normal loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
         is_best = True
     else:
         is_best = False
+
+    if nn_model.best_img_loss > img_loss_total:
+        nn_model.best_img_loss = img_loss_total
+        print(f'best image loss updated to {float(img_loss_total / len(nn_model.train_loader.dataset)):.8e}')
 
     return is_best
 
