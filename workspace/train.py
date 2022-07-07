@@ -278,7 +278,8 @@ def train_epoch(nn_model, epoch):
 
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
-        input, target = input.float().to(nn_model.device), target.float().to(nn_model.device)
+        input, target, loss = input.float().to(nn_model.device), target.float().to(nn_model.device), torch.tensor(
+            [0.0]).to(nn_model.device)
 
         # Wait for all kernels to finish
         torch.cuda.synchronize()
@@ -290,11 +291,12 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        loss = loss_utils.weighted_normal_loss(out[:, :3, :, :],
-                                               target[:, :3, :, :],
-                                               nn_model.args.penalty,
-                                               epoch,
-                                               nn_model.args.loss_type)
+        normal_loss = loss_utils.weighted_normal_loss(out[:, :3, :, :],
+                                                      target[:, :3, :, :],
+                                                      nn_model.args.penalty,
+                                                      epoch,
+                                                      nn_model.args.loss_type)
+        loss += normal_loss
 
         if nn_model.args.img_loss:
             nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
@@ -324,11 +326,11 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, train_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), train_idx.to('cpu')
-            loss_0th_avg = loss / int(nn_model.args.batch_size)
+            loss_0th_avg = normal_loss / int(nn_model.args.batch_size)
             print(f"\t normal loss: {loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
             if nn_model.img_loss is not None:
                 img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
-                print(f"\t img loss: {img_loss_0th_avg:.2e}", "")
+                print(f"\t img loss: {img_loss_0th_avg:.2e}", end="")
             print("\n")
 
             # evaluation
