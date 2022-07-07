@@ -2,7 +2,7 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "ag",
-  "num_channels ": 32,
+  "num_channels": 32,
   "resume": null,
   "epochs": 100001,
   "init_net": "gcnn_3_32",
