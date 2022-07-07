@@ -442,7 +442,7 @@ def array2RGB(numpy_array, mask):
     return (numpy_array * 255).astype(np.uint8)
 
 
-def normal2RGB(normals):
+def unit_vector2RGB(normals):
     mask = np.sum(np.abs(normals), axis=2) != 0
     rgb = np.zeros(shape=normals.shape)
     # convert normal to RGB color
@@ -529,7 +529,7 @@ def vertex2normal(vertex, mask, cam_pos, k_idx):
     start = time.time()
     normals = compute_normal(vertex, cam_pos, mask, k_idx)
     gpu_time = time.time() - start
-    normals_rgb = normal2RGB(normals)
+    normals_rgb = unit_vector2RGB(normals)
     return normals, normals_rgb, gpu_time
 
 
@@ -1044,14 +1044,14 @@ def output_radians_loss(output, target):
 
 def visual_output(xout, mask):
     xout_std = filter_noise(xout, threshold=[-1, 1])
-    xout_img = normal2RGB(xout_std)
+    xout_img = unit_vector2RGB(xout_std)
     xout_img[mask] = 0
     xout_8bit = cv.normalize(xout_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return xout_8bit
 
 
 def visual_normal(normal, name, histogram=True):
-    normal_img = normal2RGB(normal)
+    normal_img = unit_vector2RGB(normal)
     normal_img = image_resize(normal_img, width=512, height=512)
     addText(normal_img, name, font_size=0.8)
     # show histogram under the image, show range of RGB color on upper right corner.

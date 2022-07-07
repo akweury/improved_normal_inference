@@ -44,7 +44,7 @@ def weighted_l2_loss(outputs, target, penalty):
     return F.mse_loss(outputs, target)
 
 
-def weighted_normal_loss(outputs, target, penalty, epoch, loss_type):
+def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type):
     # give penalty to outliers
     outputs = outputs[:, :3, :, :]
     target = target[:, :3, :, :]

@@ -17,8 +17,8 @@ class CNN(nn.Module):
         super().__init__()
         self.__name__ = 'ag'
         self.channel_num = channel_num
-        self.net3_3 = NormalGuided(3, 3, channel_num)
-        self.albedo_net = AlbedoNet()
+        self.normal_net = NormalGuided(3, 3, channel_num)
+        self.light_net = AlbedoNet()
 
         self.scaleProdInfer = LightNet(3, 3, channel_num)
 
@@ -46,8 +46,8 @@ class CNN(nn.Module):
 
         # light guided
         # scaleProd = self.scaleProdInfer(x_light, x_normal_out)
-        x_albedo_out = self.albedo_net(x_normal_out, x_light, x_img)
-        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_albedo_out, x_img, x_light), dim=1))
+        x_light_out = self.light_net(x_light)
+        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_light_out, x_img), dim=1))
 
         xout = torch.cat((x_normal_out, x_albedo_out, input_mask), 1)
         return xout

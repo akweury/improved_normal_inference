@@ -122,6 +122,8 @@ class TrainingModel():
         self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
         self.img_loss = None
+        self.normal_loss = None
+        self.light_loss = None
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -193,7 +195,7 @@ class TrainingModel():
                 raise ValueError
             if self.args.init_net != None:
                 model.init_net(self.args.init_net)
-            # if self.exp_name == "degares":
+            # if self.exp_name == "light":
             #     # load weight from pretrained resng model
             #     print(f'load model {config.resng_model}')
             #     pretrained_model = torch.load(config.resng_model)
@@ -273,10 +275,10 @@ def train_epoch(nn_model, epoch):
         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
+    normal_loss_total = torch.tensor([0.0])
     loss_total = torch.tensor([0.0])
-    angle_loss_avg = torch.tensor([0.0])
     img_loss_total = torch.tensor([0.0])
-
+    light_loss_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target, loss = input.float().to(nn_model.device), target.float().to(nn_model.device), torch.tensor(
@@ -292,34 +294,47 @@ def train_epoch(nn_model, epoch):
         out = nn_model.model(input)
 
         # Compute the loss
-        normal_loss = loss_utils.weighted_normal_loss(out[:, :3, :, :],
-                                                      target[:, :3, :, :],
-                                                      nn_model.args.penalty,
-                                                      epoch,
-                                                      nn_model.args.loss_type)
-        loss += normal_loss
+        if nn_model.args.normal_loss:
+            normal_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+                                                               target[:, :3, :, :],
+                                                               nn_model.args.penalty,
+                                                               epoch,
+                                                               nn_model.args.loss_type)
+
+            loss += normal_loss
+            # for plot purpose
+            normal_loss_total += nn_model.normal_loss.detach().to('cpu')
+            loss_total += normal_loss_total
 
         if nn_model.args.img_loss:
             nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
                                                         albedo=out[:, 3:4, :, :],
                                                         lighting=target[:, 5:8, :, :],
                                                         image=target[:, 4:5, :, :], ) * nn_model.args.img_penalty
+
             loss += nn_model.img_loss
+
+            # for plot purpose
+            img_loss_total += nn_model.img_loss.detach().to('cpu')
+            loss_total += img_loss_total
+
+        if nn_model.args.light_loss:
+            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+                                                                       target[:, 5:8, :, :],
+                                                                       nn_model.args.penalty,
+                                                                       epoch,
+                                                                       nn_model.args.loss_type)
+            loss += nn_model.light_loss
+
+            # for plot purpose
+            light_loss_total += nn_model.light_loss.detach().to('cpu')
+            loss_total += light_loss_total
+
             # Backward pass
         loss.backward()
 
         # Update the parameters
         nn_model.optimizer.step()
-
-        # gpu_time = time.time() - start
-        loss_total += normal_loss.detach().to('cpu')
-        img_loss_total += nn_model.img_loss.detach().to('cpu')
-
-        if not nn_model.args.fast_train:
-            if nn_model.args.angle_loss:
-                angle_loss_avg = mu.eval_angle_tensor(out[:, :3, :, :], target[:, :3, :, :])
-                # angle_loss_avg_light = mu.eval_albedo_tensor(out[:, 3, :, :], target[:, 3, :, :])
-                # angle_loss_total += mu.output_radians_loss(out[:, :3, :, :], target[:, :3, :, :]).to('cpu').detach().numpy()
 
         # visualisation
         if i == 0:
@@ -327,58 +342,66 @@ def train_epoch(nn_model, epoch):
             np.set_printoptions(precision=5)
             torch.set_printoptions(sci_mode=True, precision=3)
             input, out, target, train_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), train_idx.to('cpu')
-            loss_0th_avg = normal_loss / int(nn_model.args.batch_size)
+            loss_0th_avg = nn_model.normal_loss / int(nn_model.args.batch_size)
             print(f"\t normal loss: {loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
             if nn_model.img_loss is not None:
                 img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
                 print(f"\t img loss: {img_loss_0th_avg:.2e}", end="")
             print("\n")
 
-            # evaluation
-            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
-                    with torch.no_grad():
-                        # put input and target to device
-                        input, target = input.to(nn_model.device), target.to(nn_model.device)
-                        input = input[-1:, :]
-                        target = target[-1:, :]
-                        print(test_idx)
-                        test_idx = test_idx[-1]
-                        # Wait for all kernels to finish
-                        torch.cuda.synchronize()
-
-                        # Forward pass
-                        out = nn_model.model(input)
-                        input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
-                            'cpu')
-                        draw_output(nn_model.args.exp, input, out,
-                                    target=target,
-                                    exp_path=nn_model.output_folder,
-                                    epoch=epoch,
-                                    i=j,
-                                    train_idx=test_idx,
-                                    prefix=f"eval_epoch_{epoch}_{test_idx}_")
-
     # save loss and plot
-    plot_loss_per_axis(loss_total, nn_model, epoch)
-
-    nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
-    draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
-                    log_y=True, label="image", epoch=epoch, start_epoch=0)
+    if nn_model.args.normal_loss:
+        plot_loss_per_axis(normal_loss_total, nn_model, epoch)
+    if nn_model.args.light_loss:
+        plot_loss_per_axis(light_loss_total, nn_model, epoch)
+    if nn_model.args.img_loss:
+        nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
+        draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
+                        log_y=True, label="image", epoch=epoch, start_epoch=0)
 
     # indicate for best model saving
     if nn_model.best_loss > loss_total:
         nn_model.best_loss = loss_total
-        print(f'best normal loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
+        print(f'best loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
         is_best = True
     else:
         is_best = False
 
-    if nn_model.best_img_loss > img_loss_total:
-        nn_model.best_img_loss = img_loss_total
-        print(f'best image loss updated to {float(img_loss_total / len(nn_model.train_loader.dataset)):.8e}')
-
     return is_best
+
+
+def test_epoch(nn_model, epoch):
+    for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
+        with torch.no_grad():
+            # put input and target to device
+            input, target = input.to(nn_model.device), target.to(nn_model.device)
+            input = input[-1:, :]
+            target = target[-1:, :]
+            print(test_idx)
+            test_idx = test_idx[-1]
+            # Wait for all kernels to finish
+            torch.cuda.synchronize()
+
+            # Forward pass
+            out = nn_model.model(input)
+            input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
+                'cpu')
+            if nn_model.exp_name == "light":
+                input = input[:1, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+                out = out[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+                target = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
+            if nn_model.exp_name == "nnnn":
+                input = input[:1, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+                out = out[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+                target = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
+
+            draw_output(nn_model.args.exp, input, out,
+                        target=target,
+                        exp_path=nn_model.output_folder,
+                        epoch=epoch,
+                        i=j,
+                        train_idx=test_idx,
+                        prefix=f"eval_epoch_{epoch}_{test_idx}_")
 
 
 def train_fugrc(nn_model, epoch, loss_network):
@@ -521,120 +544,37 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, x0, xout, target, exp_path, epoch, i, train_idx, prefix):
-    target_normal = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
-    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
-
-    # xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
-    target_img = target[0, :].permute(1, 2, 0)[:, :, 4].detach().numpy()
-    target_light = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
-    target_scaleProd = target[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
-    xout_normal = xout[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
-    # if exp_name == "ag":
-    #     xout_light = xout[0, :].permute(1, 2, 0)[:, :, 3:6].detach().numpy()
-    #     xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 6].detach().numpy()
-
-    # if xout.size() != (512, 512, 3):
-    # if cout is not None:
-    #     cout = xout[0, :].permute(1, 2, 0)[:, :, 3:6]
-    #     x1 = xout[0, :].permute(1, 2, 0)[:, :, 6:9]
-    # else:
-    #     x1 = None
-
+def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix):
     output_list = []
 
-    # input normal
-    input = x0[:1, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+    # input
     x0_normalized_8bit = mu.normalize2_32bit(input)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
     mu.addText(x0_normalized_8bit, str(train_idx), pos='lower_left', font_size=0.3)
     output_list.append(x0_normalized_8bit)
 
-    # gt normal
-    normal_img = mu.normal2RGB(target_normal)
-    mask = target_normal.sum(axis=2) == 0
-    target_ranges = mu.addHist(normal_img)
-    normal_gt_8bit = cv.normalize(normal_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(normal_gt_8bit, "GT")
-    mu.addText(normal_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
-    output_list.append(normal_gt_8bit)
+    # target
+    target_img = mu.unit_vector2RGB(target)
+    mask = target.sum(axis=2) == 0
+    target_ranges = mu.addHist(target_img)
+    target_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    mu.addText(target_gt_8bit, "GT")
+    mu.addText(target_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
+    output_list.append(target_gt_8bit)
 
-    if exp_name == "degares":
-        # pred base normal
-        normal_cnn_base_8bit = mu.visual_output(xout[:, :, :3], mask)
+    # pred
 
-        # pred sharp normal
-        normal_cnn_sharp_8bit = mu.visual_output(xout[:, :, 3:6], mask)
-
-        # pred combined normal
-        pred_normal = xout[:, :, :3] + xout[:, :, 3:6]
-        normal_cnn_8bit = mu.visual_output(pred_normal, mask)
-
-        mu.addText(normal_cnn_base_8bit, "output_base")
-        xout_base_ranges = mu.addHist(normal_cnn_base_8bit)
-        mu.addText(normal_cnn_base_8bit, str(xout_base_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_base_8bit)
-
-        # sharp edge detection input
-
-        x1_normalized_8bit = mu.normalize2_32bit(xout[:, :, 6:9])
-        x1_normalized_8bit = mu.image_resize(x1_normalized_8bit, width=512, height=512)
-        mu.addText(x1_normalized_8bit, "Input(Sharp)")
-        output_list.append(x1_normalized_8bit)
-
-        mu.addText(normal_cnn_sharp_8bit, "output_sharp")
-        xout_sharp_ranges = mu.addHist(normal_cnn_sharp_8bit)
-        mu.addText(normal_cnn_sharp_8bit, str(xout_sharp_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_sharp_8bit)
-
-        mu.addText(normal_cnn_8bit, "Output")
-        xout_ranges = mu.addHist(normal_cnn_8bit)
-        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_8bit)
-    elif exp_name == "ag":
-        # xout_scaleProd = xout[0, :].permute(1, 2, 0)[:, :, 5].detach().numpy()
-        xout_albedo = xout[0, :].permute(1, 2, 0)[:, :, 3].detach().numpy()
-
-        # img_out = xout_albedo * xout_scaleProd
-        # img_out[mask] = 0
-        # img_out = np.uint8(img_out)
-        # img_out = mu.visual_img(img_out, "img_out")
-        # output_list.append(img_out)
-
-        # xout_albedo = np.uint8(xout_albedo)
-        # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
-
-        xout_albedo_img = np.uint8(xout_albedo)
-        output_list.append(mu.visual_img(xout_albedo_img, "albedo_out"))
-
-        albedo_gt = np.uint8(target_img / (target_scaleProd + 1e-20))
-        output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
-
-        # pred normal
-        pred_normal = xout_normal[:, :, :3]
-        pred_normal = mu.filter_noise(pred_normal, threshold=[-1, 1])
-        pred_img = mu.normal2RGB(pred_normal)
-        pred_img[mask] = 0
-        normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        mu.addText(normal_cnn_8bit, "output")
-        xout_ranges = mu.addHist(normal_cnn_8bit)
-        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_8bit)
-
-    else:
-        # pred normal
-        pred_normal = xout_normal[:, :, :3]
-        pred_normal = mu.filter_noise(pred_normal, threshold=[-1, 1])
-        pred_img = mu.normal2RGB(pred_normal)
-        pred_img[mask] = 0
-        normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        mu.addText(normal_cnn_8bit, "output")
-        xout_ranges = mu.addHist(normal_cnn_8bit)
-        mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-        output_list.append(normal_cnn_8bit)
+    xout = mu.filter_noise(xout, threshold=[-1, 1])
+    pred_img = mu.unit_vector2RGB(xout)
+    pred_img[mask] = 0
+    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    mu.addText(normal_cnn_8bit, "output")
+    xout_ranges = mu.addHist(normal_cnn_8bit)
+    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    output_list.append(normal_cnn_8bit)
 
     # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(xout_normal, target_normal)
+    diff_img, diff_angle = mu.eval_img_angle(xout, target)
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
@@ -665,6 +605,10 @@ def main(args, exp_dir, network, train_dataset):
 
         # Save checkpoint in case evaluation crashed
         nn_model.save_checkpoint(is_best, epoch)
+
+        # evaluation
+        if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+            test_epoch(nn_model, epoch)
 
 
 if __name__ == '__main__':
