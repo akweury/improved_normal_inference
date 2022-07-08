@@ -4,9 +4,7 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
-from common.Layers import LightNet
 from common.ResNormalGuided import NormalGuided
-from common.AlbedoGatedNNN import AlbedoNet
 import config
 
 
@@ -19,8 +17,15 @@ class CNN(nn.Module):
         self.channel_num = channel_num
         self.normal_net = NormalGuided(3, 3, channel_num)
         self.light_net = NormalGuided(3, 3, channel_num)
+        self.remove_grad()
 
         self.net11_3_refine = NormalGuided(7, 3, channel_num)
+
+    def remove_grad(self):
+        for param in self.normal_net.parameters():
+            param.requires_grad = False
+        for param in self.light_net.parameters():
+            param.requires_grad = False
 
     def init_net(self, model_name):
         normal_source_net = NormalGuided(3, 3, self.channel_num)

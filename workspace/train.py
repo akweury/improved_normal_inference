@@ -173,12 +173,11 @@ class TrainingModel():
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
-
+            print(f"parameters that require grads: {self.parameters}")
             self.losses[:, :checkpoint['epoch']] = checkpoint['losses']
             self.angle_losses[:, :checkpoint['epoch']] = checkpoint['angle_losses']
 
             print(f"- checkout {checkpoint['epoch']} was loaded successfully!")
-            return model
         else:
             print(f"------------ start a new training work -----------------")
 
@@ -193,27 +192,12 @@ class TrainingModel():
                 self.optimizer = Adam(self.parameters, lr=self.args.lr, weight_decay=0, amsgrad=True)
             else:
                 raise ValueError
+
+            # load pre-trained model
             if self.args.init_net != None:
                 model.init_net(self.args.init_net)
-            # if self.exp_name == "light":
-            #     # load weight from pretrained resng model
-            #     print(f'load model {config.resng_model}')
-            #     pretrained_model = torch.load(config.resng_model)
-            #     resng = pretrained_model['model']
-            #     self.missing_keys = model.load_state_dict(resng.state_dict(), strict=False)
-            #
-            #     # load optimizer
-            #     # self.optimizer = pretrained_model['optimizer']
-            #
-            #     # Print model's state_dict
-            #     print("ResNg's state_dict:")
-            #     for param_tensor in resng.state_dict():
-            #         print(param_tensor, "\t", resng.state_dict()[param_tensor].size())
-            #     print("DeGaRes's state_dict:")
-            #     for param_tensor in model.state_dict():
-            #         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
 
-            return model
+        return model
 
     def init_lr_decayer(self):
         milestones = [int(x) for x in self.args.lr_scheduler.split(",")]
