@@ -36,7 +36,7 @@ class CNN(nn.Module):
         light_source_net = NormalGuided(3, 3, self.channel_num)
         light_checkpoint = torch.load(config.light_3_32)
 
-        light_source_net.load_state_dict(light_checkpoint['model'].nconv3_3.state_dict())
+        light_source_net.load_state_dict(light_checkpoint['model'].light3_3.state_dict())
         light_source_net_dict = light_source_net.state_dict()
         light_net_dict = self.light_net.state_dict()
         light_source_net_dict = {k: v for k, v in light_source_net_dict.items() if
