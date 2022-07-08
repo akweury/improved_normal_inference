@@ -295,13 +295,13 @@ def train_epoch(nn_model, epoch):
 
         # Compute the loss
         if nn_model.args.normal_loss:
-            normal_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
-                                                               target[:, :3, :, :],
-                                                               nn_model.args.penalty,
-                                                               epoch,
-                                                               nn_model.args.loss_type)
+            nn_model.normal_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+                                                                        target[:, :3, :, :],
+                                                                        nn_model.args.penalty,
+                                                                        epoch,
+                                                                        nn_model.args.loss_type)
 
-            loss += normal_loss
+            loss += nn_model.normal_loss
             # for plot purpose
             normal_loss_total += nn_model.normal_loss.detach().to('cpu')
             loss_total += normal_loss_total
