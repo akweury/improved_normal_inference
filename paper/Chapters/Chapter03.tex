@@ -1260,7 +1260,7 @@ The incoming light direction can be calculated based on the position of light so
 where $ S $ is the light source position and $ V $ is the vertices, both $ S $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. 
 
 \paragraph{Inpainting}
-The light map is calculated
+Due to the exist noise in the vertex map, the getting light map is also semi-dense.
 
 stores for every pixel the direction of incoming light.
 find a mapping H, such that $ l_{in} = H(v, l_{s}) $ for pixel $ v $, $ l_s $ is the position of light source, $ l_{in} $ is direction of incoming light of pixel $ v $. Iterate all the pixels, we get the light direction map $ L $.
