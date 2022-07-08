@@ -551,14 +551,18 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_list = []
 
     # input
-    x0_normalized_8bit = mu.normalize2_32bit(input)
+    vertex_0 = input[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    gt = target[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    x_out_normal = xout[0, :].permute(1, 2, 0).to('cpu').numpy()
+
+    x0_normalized_8bit = mu.normalize2_32bit(vertex_0)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
     mu.addText(x0_normalized_8bit, str(train_idx), pos='lower_left', font_size=0.3)
     output_list.append(x0_normalized_8bit)
 
     # target
-    target_img = mu.normal2RGB(target)
-    mask = target.sum(axis=2) == 0
+    target_img = mu.normal2RGB(gt)
+    mask = gt.sum(axis=2) == 0
     target_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(target_gt_8bit, "GT")
     target_ranges = mu.addHist(target_img)
@@ -567,7 +571,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     # pred
 
-    xout = mu.filter_noise(xout, threshold=[-1, 1])
+    xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
     pred_img = mu.normal2RGB(xout)
     pred_img[mask] = 0
     normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
@@ -577,7 +581,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_list.append(normal_cnn_8bit)
 
     # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(xout, target)
+    diff_img, diff_angle = mu.eval_img_angle(xout, gt)
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
