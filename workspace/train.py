@@ -303,7 +303,7 @@ def train_epoch(nn_model, epoch):
             loss_total += img_loss_total
 
         if nn_model.args.light_loss:
-            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, 3:6, :, :],
                                                                        target[:, 5:8, :, :],
                                                                        nn_model.args.penalty,
                                                                        epoch,
