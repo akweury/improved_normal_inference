@@ -170,10 +170,10 @@ def draw_output(x0, xout, cout, c0, target, exp_path, loss, epoch, i, prefix):
     x0_normalized_8bit = mu.normalize2_32bit(mu.tenor2numpy(x0[:1, :, :, :]))
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
 
-    normal_gt_8bit = mu.unit_vector2RGB(mu.tenor2numpy(target[:1, :, :, :]))
+    normal_gt_8bit = mu.normal2RGB(mu.tenor2numpy(target[:1, :, :, :]))
     mu.addText(normal_gt_8bit, "gt")
 
-    normal_cnn_8bit_norm = mu.unit_vector2RGB(mu.tenor2numpy(xout[:1, :, :, :]))
+    normal_cnn_8bit_norm = mu.normal2RGB(mu.tenor2numpy(xout[:1, :, :, :]))
     mu.addText(normal_cnn_8bit_norm, "output_shifted")
 
     output = cv.hconcat([x0_normalized_8bit, normal_gt_8bit, normal_cnn_8bit_norm])

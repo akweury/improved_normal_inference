@@ -557,7 +557,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_list.append(x0_normalized_8bit)
 
     # target
-    target_img = mu.unit_vector2RGB(target)
+    target_img = mu.normal2RGB(target)
     mask = target.sum(axis=2) == 0
     target_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(target_gt_8bit, "GT")
@@ -568,7 +568,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # pred
 
     xout = mu.filter_noise(xout, threshold=[-1, 1])
-    pred_img = mu.unit_vector2RGB(xout)
+    pred_img = mu.normal2RGB(xout)
     pred_img[mask] = 0
     normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     mu.addText(normal_cnn_8bit, "output")

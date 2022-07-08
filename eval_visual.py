@@ -248,14 +248,14 @@ def start2(models_path_dict):
                     diff_img, diff_angle = mu.eval_img_angle(x_out_light, light_gt)
                     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
-                    output_list.append(cv.cvtColor(mu.visual_normal(x_out_light, name), cv.COLOR_RGB2BGR))
+                    output_list.append(cv.cvtColor(mu.visual_light(x_out_light, name), cv.COLOR_RGB2BGR))
                     error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_input.png"),
-                               cv.cvtColor(mu.visual_normal(light_input, "", histogram=False), cv.COLOR_RGB2BGR))
+                               cv.cvtColor(mu.visual_light(light_input, "", histogram=False), cv.COLOR_RGB2BGR))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_gt.png"),
-                               cv.cvtColor(mu.visual_normal(light_gt, "", histogram=False), cv.COLOR_RGB2BGR))
+                               cv.cvtColor(mu.visual_light(light_gt, "", histogram=False), cv.COLOR_RGB2BGR))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_{name}.png"),
-                               cv.cvtColor(mu.visual_normal(x_out_light, "", histogram=False), cv.COLOR_RGB2BGR))
+                               cv.cvtColor(mu.visual_light(x_out_light, "", histogram=False), cv.COLOR_RGB2BGR))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_error_{name}.png"),
                                mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
 
@@ -333,13 +333,13 @@ def start2(models_path_dict):
 
         # output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
         # left = mu.hconcat_resize(input_list)
-        right_normal = mu.hconcat_resize([cv.hconcat(output_list)])
-        right_error = mu.hconcat_resize(error_list)
+        # right_normal = mu.hconcat_resize([cv.hconcat(output_list)])
+        # right_error = mu.hconcat_resize(error_list)
         # im_tile_resize = mu.hconcat_resize([left, right])
 
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
-        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
+        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
 
         print(f"{data_idx} has been evaluated.")
 
@@ -350,7 +350,7 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        "light2": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-2.pth.tar",  # image guided
+        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
