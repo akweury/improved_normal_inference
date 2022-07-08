@@ -349,6 +349,7 @@ def normalize2_32bit(img_scaled, data=None):
     elif img_scaled.shape[2] == 3:
         normalized_img, mins, maxs = normalize3channel(img_scaled)
     else:
+        print("image scaled shape: " + str(img_scaled.shape))
         raise ValueError
 
     img_32bit = cv.normalize(normalized_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)

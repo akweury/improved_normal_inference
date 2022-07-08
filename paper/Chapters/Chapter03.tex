@@ -582,7 +582,7 @@ where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ mask_{ol} $ is
 
 \newpage
 \section{Guided normal inference using GCNN}
-
+The 
 \subsection{Image Guided normal inference}
 The normal inference can be guided by gray-scale image, since the image is captured by passive method, it is fully-dense comparing to depth map, hence provides a complete view of the scene. 
 The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branch is the similar with GCNN model but with 4 additional concatenate layers, furthermore, 1 gated convolution layer is added before concatenate with image branch. The image branch takes a single grayscale image as input, then 3 times downsamplins with 3 standard layers in each scale. In the upsampling part, the feature map upsampled 3 times and concatenate with the last layer in the downsampling part before interpolation.
@@ -1241,7 +1241,26 @@ The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branc
 	\label{fig:ng-archi}
 \end{figure}
 
-\subsection{Add the light information}
+
+\subsection{Lambertian Surface}
+
+
+\subsection{Light Map}
+The incoming light direction of each point can be represented as a matrix with same size as normal map or vertex map, where each pixel corresponding with each other.
+
+%% calc the light direction matrix
+\paragraph{Calculation}
+The incoming light direction can be calculated based on the position of light source and points. As shown in Figure \ref{fig:lambertian-surface-principle}, the incoming light direction of the surface point is a vector point from light source to the surface point, therefor it can be calculated as follows
+
+\begin{equation}\label{light-direction}
+	\begin{array}{ll}
+		L&= \frac{V-S}{\|V-S\|_2}\\ 
+	\end{array}
+\end{equation}
+where $ S $ is the light source position and $ V $ is the vertices, both $ S $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. 
+
+\paragraph{Inpainting}
+The light map is calculated
 
 stores for every pixel the direction of incoming light.
 find a mapping H, such that $ l_{in} = H(v, l_{s}) $ for pixel $ v $, $ l_s $ is the position of light source, $ l_{in} $ is direction of incoming light of pixel $ v $. Iterate all the pixels, we get the light direction map $ L $.
