@@ -360,7 +360,7 @@ def train_epoch(nn_model, epoch):
     if nn_model.args.img_loss:
         nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
         draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
-                        log_y=True, label="image", epoch=epoch, start_epoch=0, title="img_loss")
+                        log_y=True, label="image", epoch=epoch, start_epoch=0, title="img_loss", cla_leg=True)
 
     # indicate for best model saving
     if nn_model.best_loss > loss_total:
