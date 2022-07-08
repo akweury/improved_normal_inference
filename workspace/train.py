@@ -114,7 +114,7 @@ class TrainingModel():
         self.output_folder = self.init_output_folder()
         self.optimizer = None
         self.parameters = None
-        self.losses = np.zeros((4, args.epochs))
+        self.losses = np.zeros((7, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
         self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
@@ -237,18 +237,24 @@ class TrainingModel():
             f.write(str(self.model))
 
 
-def plot_loss_per_axis(loss_total, nn_model, epoch, title="loss"):
+def plot_loss_per_axis(loss_total, nn_model, epoch, title):
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
+    if title == "normal_loss":
+        shift = 0
+    elif title == "light_loss":
+        shift = 3
+    else:
+        raise ValueError
 
-    nn_model.losses[epoch % 3, epoch] = loss_avg
+    nn_model.losses[epoch % 3 + shift, epoch] = loss_avg
 
     # draw line chart
     if epoch % 10 == 9:
-        draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
+        draw_line_chart(np.array([nn_model.losses[0 + shift]]), nn_model.output_folder,
                         log_y=True, label=0, epoch=epoch, start_epoch=0, title=title)
-        draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
+        draw_line_chart(np.array([nn_model.losses[1 + shift]]), nn_model.output_folder,
                         log_y=True, label=1, epoch=epoch, start_epoch=0, title=title)
-        draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
+        draw_line_chart(np.array([nn_model.losses[2 + shift]]), nn_model.output_folder,
                         log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title=title)
 
 
@@ -342,8 +348,8 @@ def train_epoch(nn_model, epoch):
     if nn_model.args.light_loss:
         plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
     if nn_model.args.img_loss:
-        nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
-        draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
+        nn_model.losses[6, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
+        draw_line_chart(np.array([nn_model.losses[6]]), nn_model.output_folder,
                         log_y=True, label="image", epoch=epoch, start_epoch=0, title="img_loss", cla_leg=True)
 
     # indicate for best model saving
