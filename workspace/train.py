@@ -253,7 +253,7 @@ class TrainingModel():
             f.write(str(self.model))
 
 
-def plot_loss_per_axis(loss_total, nn_model, epoch):
+def plot_loss_per_axis(loss_total, nn_model, epoch, title="loss"):
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
 
     nn_model.losses[epoch % 3, epoch] = loss_avg
@@ -261,11 +261,11 @@ def plot_loss_per_axis(loss_total, nn_model, epoch):
     # draw line chart
     if epoch % 10 == 9:
         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-                        log_y=True, label=0, epoch=epoch, start_epoch=0)
+                        log_y=True, label=0, epoch=epoch, start_epoch=0, title=title)
         draw_line_chart(np.array([nn_model.losses[1]]), nn_model.output_folder,
-                        log_y=True, label=1, epoch=epoch, start_epoch=0)
+                        log_y=True, label=1, epoch=epoch, start_epoch=0, title=title)
         draw_line_chart(np.array([nn_model.losses[2]]), nn_model.output_folder,
-                        log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title="Loss")
+                        log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title=title)
 
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
@@ -354,13 +354,13 @@ def train_epoch(nn_model, epoch):
 
     # save loss and plot
     if nn_model.args.normal_loss:
-        plot_loss_per_axis(normal_loss_total, nn_model, epoch)
+        plot_loss_per_axis(normal_loss_total, nn_model, epoch, title="normal_loss")
     if nn_model.args.light_loss:
-        plot_loss_per_axis(light_loss_total, nn_model, epoch)
+        plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
     if nn_model.args.img_loss:
         nn_model.losses[3, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
         draw_line_chart(np.array([nn_model.losses[3]]), nn_model.output_folder,
-                        log_y=True, label="image", epoch=epoch, start_epoch=0)
+                        log_y=True, label="image", epoch=epoch, start_epoch=0, title="img_loss")
 
     # indicate for best model saving
     if nn_model.best_loss > loss_total:
