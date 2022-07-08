@@ -553,7 +553,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # input
     vertex_0 = input[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     gt = target[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-    x_out_normal = xout[0, :].permute(1, 2, 0).to('cpu').numpy()
+    x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
     print("x_out_normal shape: " + str(x_out_normal.shape))
     x0_normalized_8bit = mu.normalize2_32bit(vertex_0)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
