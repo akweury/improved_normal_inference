@@ -184,7 +184,7 @@ class TrainingModel():
             # init model
             model = network.to(self.device)
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
-
+            print(f"parameters that require grads: {self.parameters}")
             # init optimizer
             if self.args.optimizer.lower() == 'sgd':
                 self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
