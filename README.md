@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 resize_dataset.py --machine remote --new-size 64
 #### resume a training work
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 main.py --machine remote --exp resng --dataset synthetic128 --print-freq 100 --num-channels 128 --batch_size 32 --train-on 3000 --resume /home/sha/improved_normal_inference/workspace/nnnn/trained_model/checkpoint.pth.tar
+CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synthetic512 --print-freq 100 --batch_size 4 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/trained_model/checkpoint.pth.tar
 ```
 
 #### start a new training work
