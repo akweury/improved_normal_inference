@@ -299,9 +299,15 @@ def train_epoch(nn_model, epoch):
         if nn_model.args.albedo_loss:
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
 
-            albedo_target = target[:, 4:5, :, :] / (target[:, 3:4, :, :] + 1e-20)
+            albedo_target = (target[:, 4:5, :, :] / 255) / (target[:, 3:4, :, :] + 1e-20)
+            albedo_target[albedo_target > 1000] = 1000
+            albedo_target[albedo_target < -1000] = -1000
+            albedo_gt_aligned = (albedo_target + 1000) / 2000
+
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.masked_l2_loss(out[:, 3:4, :, :], albedo_target)
+            nn_model.albedo_loss = loss_utils.weighted_l2_loss(out[:, 3:4, :, :], albedo_gt_aligned,
+                                                               nn_model.args.penalty,
+                                                               0, 1)
 
             loss += nn_model.albedo_loss
 
@@ -576,6 +582,12 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     # albedo
     albedo_gt_norm = (img_gt / 255.0) / g_gt
+    # tranculation
+    albedo_gt_norm[albedo_gt_norm > 1000] = 1000
+    albedo_gt_norm[albedo_gt_norm < -1000] = -1000
+    # norm
+    albedo_gt_norm = (albedo_gt_norm + 1000) / 2000
+
     albedo_out_8bit = mu.visual_albedo(albedo_gt_norm, "gt")
     albedo_gt_8bit = mu.visual_albedo(x_out_albedo, "pred")
     output_list.append(albedo_out_8bit)

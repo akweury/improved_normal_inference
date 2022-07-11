@@ -35,10 +35,10 @@ def masked_l2_loss(outputs, target):
     return F.mse_loss(outputs * val_pixels, target * val_pixels)
 
 
-def weighted_l2_loss(outputs, target, penalty):
+def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     outputs = outputs[:, :3, :, :]
-    boarder_right = torch.gt(outputs, 255).bool().detach()
-    boarder_left = torch.lt(outputs, 0).bool().detach()
+    boarder_right = torch.gt(outputs, scaleMax).bool().detach()
+    boarder_left = torch.lt(outputs, scaleMin).bool().detach()
     outputs[boarder_right] = outputs[boarder_right] * penalty
     outputs[boarder_left] = outputs[boarder_left] * penalty
     return F.mse_loss(outputs, target)

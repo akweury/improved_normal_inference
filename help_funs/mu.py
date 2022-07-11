@@ -751,6 +751,7 @@ def show_images(array, title):
     cv.destroyAllWindows()
 
 
+
 def show_normal(normal, title="Normal"):
     show_images(cv.cvtColor(visual_normal(normal, ""), cv.COLOR_RGB2BGR), title)
 
@@ -952,8 +953,8 @@ def eval_albedo_diff(output, target):
     diff_8bit = cv.applyColorMap(diff_8bit, cv.COLORMAP_HOT)
 
     diff_8bit[mask] = 0
-
-    return diff_8bit
+    diff_avg = diff.sum() / np.count_nonzero(target)
+    return diff_8bit, diff_avg
 
 def eval_angle_tensor(output, target):
     output_perm = output.permute(0, 2, 3, 1)

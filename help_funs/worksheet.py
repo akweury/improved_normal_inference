@@ -4,7 +4,8 @@ import numpy as np
 import torch
 
 import config
-from help_funs import mu
+from help_funs import mu, file_io
+
 
 def gau_histo(gt_normal, sigma):
     gt_normal = torch.from_numpy(gt_normal)
@@ -22,7 +23,7 @@ def gau_histo(gt_normal, sigma):
     return output_histo
 
 
-def load_a_training_case():
+def load_a_training_tensor():
     test_0_data = np.array(
         sorted(glob.glob(str(config.synthetic_data_noise_local / "synthetic512" / "selval" / "tensor" /
                              f"*_0_*"), recursive=True)))
@@ -32,36 +33,64 @@ def load_a_training_case():
     return test_0_tensor, gt_tensor
 
 
+def load_a_training_case():
+    path = config.synthetic_data_noise_local / "synthetic512" / "selval"
+    image_file, ply_file, json_file, depth_gt_file, depth_noise_file, normal_file = file_io.get_file_name(0, path)
+
+    img = file_io.load_16bitImage(image_file)
+    return img
+
+
+def show_img(albedo_gt, g_gt, name):
+    img_recon = albedo_gt * g_gt * 255
+    img_8bit = np.uint8(img_recon)
+    mu.show_images(img_8bit, name)
+
+
+def visual_albedo_histo(albedo_gt):
+    albedo_gt_array = albedo_gt.reshape(512 * 512)
+    import matplotlib.pyplot as plt
+
+    plt.cla()
+    # histr, histr_x = np.histogram(albedo_gt_array,
+    #                               bins=np.arange(albedo_gt_array.min()-1, albedo_gt_array.max() + 1))
+
+    # deterministic random data
+
+    _ = plt.hist(albedo_gt_array, bins=10)  # arguments are passed to np.histogram
+    plt.title("Histogram with 'auto' bins")
+    # plt.xscale('log')
+    plt.yscale('log')
+    plt.show()
+
+
 if __name__ == '__main__':
-    training_tensor, gt_tensor = load_a_training_case()
+    training_tensor, gt_tensor = load_a_training_tensor()
     vertex = training_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
     normal_gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     img_gt = gt_tensor[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
     g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
 
-    albedo_gt = img_gt / (g_gt + 1e-20)
+    # img_gt_16bit = load_a_training_case()
+    img_gt_norm = img_gt / 255
+    albedo_gt = img_gt_norm / (g_gt + 1e-20)
 
-    # test_torch()
-    # print_cuda_info()
-    # folder_path = config.paper_pic
-    #
-    # gcnn_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.npy"))
-    # gt_normal = np.load(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_gt.npy"))
-    # shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_normal_GCNN.png"),
-    #                 str(folder_path / f"normal-histo-diff" / "gcnn.png"))
-    # shutil.copyfile(str(config.paper_pic / "comparison" / "fancy_eval_3_groundtruth.png"),
-    #                 str(folder_path / f"normal-histo-diff" / "gt.png"))
-    #
-    # histo_gcnn, hist_x = mu.normal_histo(gcnn_normal)
-    # histo_gt, _ = mu.normal_histo(gt_normal)
-    #
-    # tensor_histo = histo_gt[0, :]
-    # tensor_histo = (tensor_histo - tensor_histo.min()) / (tensor_histo.max() - tensor_histo.min())
-    #
-    # gaussian_histo = gau_histo(gt_normal[:, :, 0], 3 * 25).numpy()
-    #
-    # mu.save_array(histo_gcnn, str(folder_path / f"normal-histo-diff" / "gcnn-histo"))
-    #
-    # chart.line_chart(histo_gcnn, str(folder_path / f"normal-histo-diff"), ["x", "y", "z"], x=hist_x[1:])
-    # chart.line_chart(histo_gt, str(folder_path / f"normal-histo-diff"), ["x_gt", "y_gt", "z_gt"], x=hist_x[1:])
+    # tranculation
+    albedo_gt[albedo_gt > 1000] = 1000
+    albedo_gt[albedo_gt < -1000] = -1000
+    visual_albedo_histo(albedo_gt)
+    albedo_gt_aligned = (albedo_gt + 1000) / 2000
+
+    # convert back
+    albedo_gt_recon = albedo_gt_aligned * 2000 - 1000
+
+    show_img(albedo_gt_recon, g_gt, "aligned")
+    show_img(albedo_gt, g_gt, "gt")
+
+    # show diff
+    albedo_gt_recon = np.expand_dims(albedo_gt_recon, axis=2)
+    albedo_gt = np.expand_dims(albedo_gt, axis=2)
+    diff_img, diff_avg = mu.eval_albedo_diff(albedo_gt_recon, albedo_gt)
+
+    print("ssss")
