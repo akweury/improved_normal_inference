@@ -277,6 +277,11 @@ def train_epoch(nn_model, epoch):
         # Wait for all kernels to finish
         torch.cuda.synchronize()
 
+        albedo_target = (target[:, 4:5, :, :] / 255) / (target[:, 3:4, :, :] + 1e-20)
+        albedo_target[albedo_target > 1000] = 1000
+        albedo_target[albedo_target < -1000] = -1000
+        albedo_gt_aligned = (albedo_target * 0.0005 + 0.5)
+
         # Clear the gradients
         nn_model.optimizer.zero_grad()
 
@@ -298,11 +303,6 @@ def train_epoch(nn_model, epoch):
 
         if nn_model.args.albedo_loss:
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
-
-            albedo_target = (target[:, 4:5, :, :] / 255) / (target[:, 3:4, :, :] + 1e-20)
-            albedo_target[albedo_target > 1000] = 1000
-            albedo_target[albedo_target < -1000] = -1000
-            albedo_gt_aligned = (albedo_target + 1000) / 2000
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
             nn_model.albedo_loss = loss_utils.weighted_l2_loss(out[:, 3:4, :, :], albedo_gt_aligned,
