@@ -45,7 +45,7 @@ class CNN(nn.Module):
 
         # light inpaint
         x_light_out = self.light_net(x_light)
-
+        print("img_max: " + x_img.max())
         # albedo predict
         x_albedo_out = self.albedo_net(torch.cat((x_vertex, x_light_out, x_img), dim=1))
 
