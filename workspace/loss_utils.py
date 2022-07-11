@@ -36,12 +36,13 @@ def masked_l2_loss(outputs, target):
 
 
 def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
-    outputs = outputs[:, :3, :, :]
     boarder_right = torch.gt(outputs, scaleMax).bool().detach()
     boarder_left = torch.lt(outputs, scaleMin).bool().detach()
     outputs[boarder_right] = outputs[boarder_right] * penalty
     outputs[boarder_left] = outputs[boarder_left] * penalty
-    return F.mse_loss(outputs, target)
+    mask = ~torch.prod(target == 0, dim=1).bool()
+
+    return torch.sum((outputs - target) ** 2) / torch.sum(mask)
 
 
 def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type):
