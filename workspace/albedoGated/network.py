@@ -20,8 +20,6 @@ class CNN(nn.Module):
         self.remove_grad()
 
     def remove_grad(self):
-        for param in self.normal_net.parameters():
-            param.requires_grad = False
         for param in self.light_net.parameters():
             param.requires_grad = False
 
