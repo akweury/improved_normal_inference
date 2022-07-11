@@ -544,7 +544,10 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # input
     vertex_0 = input[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     gt = target[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    img_gt = target[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    g_gt = target[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
+    x_out_albedo = xout[0, 3:4, :, :].permute(1, 2, 0).to('cpu').numpy()
     print("x_out_normal shape: " + str(x_out_normal.shape))
     x0_normalized_8bit = mu.normalize2_32bit(vertex_0)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
@@ -562,14 +565,21 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     # pred
 
-    xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
-    pred_img = mu.normal2RGB(xout)
-    pred_img[mask] = 0
-    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(normal_cnn_8bit, "output")
-    xout_ranges = mu.addHist(normal_cnn_8bit)
-    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-    output_list.append(normal_cnn_8bit)
+    # xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
+    # pred_img = mu.normal2RGB(xout)
+    # pred_img[mask] = 0
+    # normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    # mu.addText(normal_cnn_8bit, "output")
+    # xout_ranges = mu.addHist(normal_cnn_8bit)
+    # mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    # output_list.append(normal_cnn_8bit)
+
+    # albedo
+    albedo_gt_norm = (img_gt / 255.0) / g_gt
+    albedo_out_8bit = mu.visual_albedo(albedo_gt_norm, "gt")
+    albedo_gt_8bit = mu.visual_albedo(x_out_albedo, "pred")
+    output_list.append(albedo_out_8bit)
+    output_list.append(albedo_gt_8bit)
 
     # err visualisation
     diff_img, diff_angle = mu.eval_img_angle(xout, gt)
