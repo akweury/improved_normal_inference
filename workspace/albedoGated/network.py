@@ -51,5 +51,5 @@ class CNN(nn.Module):
 
         # x_normal_out = (x_img / x_albedo_out) / x_light_out
 
-        xout = torch.cat((x_light_out, x_light_out, input_mask, x_albedo_out), 1)
+        xout = torch.cat((x_light_out, x_albedo_out), 1)
         return xout
