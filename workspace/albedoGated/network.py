@@ -49,7 +49,7 @@ class CNN(nn.Module):
         # albedo predict
         x_albedo_out = self.albedo_net(torch.cat((x_vertex, x_light_out, x_img), dim=1))
 
-        x_normal_out = (x_img / x_albedo_out) / x_light_out
+        # x_normal_out = (x_img / x_albedo_out) / x_light_out
 
-        xout = torch.cat((x_normal_out, x_light_out, input_mask, x_albedo_out), 1)
+        xout = torch.cat((x_light_out, x_light_out, input_mask, x_albedo_out), 1)
         return xout

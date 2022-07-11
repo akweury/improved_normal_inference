@@ -297,10 +297,8 @@ def train_epoch(nn_model, epoch):
             loss_total += normal_loss_total
 
         if nn_model.args.albedo_loss:
-            nn_model.albedo_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
-                                                           albedo=out[:, 7:8, :, :],
-                                                           lighting=target[:, 5:8, :, :],
-                                                           image=target[:, 4:5, :, :], ) * nn_model.args.albedo_penalty
+            albedo_target = target[:, 4:5, :, :] / target[:, 3:4, :, :]
+            nn_model.albedo_loss = loss_utils.masked_l2_loss(out[:, 7:8, :, :], albedo_target)
 
             loss += nn_model.albedo_loss
 
