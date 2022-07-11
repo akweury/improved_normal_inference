@@ -93,10 +93,10 @@ The performance of neighbor based method is good enough for a well chosen $ k $,
 \label{gcnn}
 
 
-Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB/Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
+Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
 
 %% upsampling 
-It is worth to noticed that, the output of normal inference CNN model is not one or severl labels but an entire image or normal map with same size. 
+It is worth to noticed that, the output of normal inference CNN model is not one or several labels but an entire image or normal map with same size. 
 %% talk about image upsampling, unet
 Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 4 times and upsampled 4 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
 
@@ -1243,7 +1243,31 @@ The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branc
 
 
 \subsection{Lambertian Surface}
-
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture} 
+		% reference lines
+		\draw[thick,dashed]	(0,0) -- (10,0) ; % bottom
+		\draw[thick,dashed]	(0,3) -- (10,3) node[pos=0.9, above] {image plane}; % middle
+		\draw[thick,dashed]	(0,6) -- (10,6); % top
+		% camera 
+		\filldraw[black] (5,0) circle (2pt) node[anchor=south west]{Camera Position};
+		% world point 
+		\filldraw[black] (7,6) circle (2pt) node[anchor=north west]{Point};
+		% image point
+		\filldraw[black] (6,3) circle (2pt) node[anchor=north west]{Pixel};
+		% similiar triangles
+		\draw[thick] (5,0) -- (5,6); % AB
+		\draw[thick] (5,0) -- (7,6); % AC
+		\draw[thick] (5,6) -- (7,6) node[midway, below] {$ X $}; % BC
+		\draw[thick] (5,3) -- (6,3) node[midway, below] {$ u $};
+		% measure arrows
+		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
+		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
+	\end{tikzpicture}	
+	\caption{Lambertian Surface}
+	\label{fig:lambertian-surface}
+\end{figure}
 
 \subsection{Light Map}
 The incoming light direction of each point can be represented as a matrix with same size as normal map or vertex map, where each pixel corresponding with each other.
