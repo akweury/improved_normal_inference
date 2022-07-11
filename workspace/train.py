@@ -298,6 +298,7 @@ def train_epoch(nn_model, epoch):
 
         if nn_model.args.albedo_loss:
             albedo_target = target[:, 4:5, :, :] / target[:, 3:4, :, :]
+            print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
             nn_model.albedo_loss = loss_utils.masked_l2_loss(out[:, 3:4, :, :], albedo_target)
 
             loss += nn_model.albedo_loss
