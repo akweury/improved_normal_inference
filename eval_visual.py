@@ -270,20 +270,13 @@ def start2(models_path_dict):
                     # xout_albedo = np.uint8(xout_albedo)
                     # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
                     if xout.shape[2] >= 6:
-                        xout_g = xout[:, :, 5]
-                        xout_albedo2 = np.uint8(img_0 / (xout_g + 1e-20))
+                        xout_light = xout[:, :, 3:6]
+                        xout_albedo2 = np.uint8(img_0 / (np.sum(xout_light * normal, axis=-1) + 1e-20))
                         output_list.append(mu.visual_img(xout_albedo2, "albedo_out"))
 
                         g = np.sum(gt * light_gt, axis=-1)
                         albedo_gt = np.uint8(img_0 / (g + 1e-20))
                         output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
-
-                        img_out = xout_albedo2 * xout_g
-                        img_out[mask] = 0
-                        img_out = np.uint8(img_out)
-                        img_out = mu.visual_img(img_out, "img_out")
-                        output_list.append(img_out)
-                        output_list.append(mu.visual_img(img_8bit, "img_gt"))
 
                         diff_albedo = np.abs(xout_albedo2 - albedo_gt)
                         diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
@@ -331,15 +324,15 @@ def start2(models_path_dict):
 
         # save the results
 
-        # output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
+        output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
         # left = mu.hconcat_resize(input_list)
-        # right_normal = mu.hconcat_resize([cv.hconcat(output_list)])
-        # right_error = mu.hconcat_resize(error_list)
+        right_normal = mu.hconcat_resize([cv.hconcat(output_list)])
+        right_error = mu.hconcat_resize(error_list)
         # im_tile_resize = mu.hconcat_resize([left, right])
 
         # cv.imwrite(str(folder_path / f"fancy_eval_{i}_input.png"), left)
-        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
-        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_normal.png"), right_normal)
+        cv.imwrite(str(folder_path / f"fancy_eval_{i}_output_error.png"), right_error)
 
         print(f"{data_idx} has been evaluated.")
 
@@ -350,12 +343,12 @@ if __name__ == '__main__':
     models = {
         # "SVD": None,
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
-        # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
+        "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
