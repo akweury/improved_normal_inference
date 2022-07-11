@@ -25,17 +25,7 @@ class CNN(nn.Module):
         for param in self.light_net.parameters():
             param.requires_grad = False
 
-    def init_net(self, model_name):
-        normal_source_net = NormalGuided(3, 3, self.channel_num)
-        normal_checkpoint = torch.load(config.gcnn_3_32)
-        normal_source_net.load_state_dict(normal_checkpoint['model'].nconv3_3.state_dict())
-        normal_source_net_dict = normal_source_net.state_dict()
-        normal_net_dict = self.normal_net.state_dict()
-        normal_source_net_dict = {k: v for k, v in normal_source_net_dict.items() if
-                                  k in normal_net_dict and v.size() == normal_net_dict[k].size()}
-        normal_net_dict.update(normal_source_net_dict)
-        self.normal_net.load_state_dict(normal_net_dict)
-
+    def init_net(self):
         light_source_net = NormalGuided(3, 3, self.channel_num)
         light_checkpoint = torch.load(config.light_3_32)
 

@@ -194,8 +194,8 @@ class TrainingModel():
                 raise ValueError
 
             # load pre-trained model
-            if self.args.init_net != None:
-                model.init_net(self.args.init_net)
+            if self.args.init_net is not None or self.args.init_light_net is not None:
+                model.init_net()
 
         return model
 

@@ -6,7 +6,7 @@
   "resume": null,
   "epochs": 10001,
   "init_net": null,
-  "init_light_net": null,
+  "init_light_net": "light_3_32",
   "optimizer": "adam",
   "lr": 0.001,
   "lr_scheduler": "9999",
