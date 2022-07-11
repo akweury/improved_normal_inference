@@ -945,6 +945,15 @@ def eval_img_angle(output, target):
 
     return img, angle_matrix
 
+def eval_img_diff(output, target):
+    mask = target.sum(axis=2) == 0
+    diff = np.abs(output - target)
+    diff_8bit = cv.normalize(diff, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    diff_8bit = cv.applyColorMap(diff_8bit, cv.COLORMAP_HOT)
+
+    diff_8bit[mask] = 0
+
+    return diff_8bit
 
 def eval_angle_tensor(output, target):
     output_perm = output.permute(0, 2, 3, 1)

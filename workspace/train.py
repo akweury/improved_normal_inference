@@ -581,12 +581,19 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_list.append(albedo_out_8bit)
     output_list.append(albedo_gt_8bit)
 
-    # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(xout, gt)
-    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+    # albedo err visualisation
+    diff_img = mu.eval_img_diff(albedo_gt_8bit, albedo_out_8bit)
+
     mu.addText(diff_img, "Error")
-    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+    # mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
+
+    # # err visualisation
+    # diff_img, diff_angle = mu.eval_img_angle(xout, gt)
+    # diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+    # mu.addText(diff_img, "Error")
+    # mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+    # output_list.append(diff_img)
 
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
 
