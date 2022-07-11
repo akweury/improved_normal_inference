@@ -130,7 +130,7 @@ class TrainingModel():
         self.save_model()
         self.pretrained_weight = None
         self.best_loss = 1e+20
-        self.best_img_loss = 1e+20
+        self.best_albedo_loss = 1e+20
 
     def create_dataloader(self, dataset_path):
         train_on = self.args.train_on
@@ -334,7 +334,7 @@ def train_epoch(nn_model, epoch):
             if nn_model.normal_loss is not None:
                 normal_loss_0th_avg = nn_model.normal_loss / int(nn_model.args.batch_size)
                 print(f"\t normal loss: {normal_loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
-            if nn_model.img_loss is not None:
+            if nn_model.albedo_loss is not None:
                 albedo_loss_0th_avg = nn_model.albedo_loss / int(nn_model.args.batch_size)
                 print(f"\t albedo loss: {albedo_loss_0th_avg:.2e}", end="")
             if nn_model.light_loss is not None:
@@ -347,7 +347,7 @@ def train_epoch(nn_model, epoch):
         plot_loss_per_axis(normal_loss_total, nn_model, epoch, title="normal_loss")
     if nn_model.args.light_loss:
         plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
-    if nn_model.args.img_loss:
+    if nn_model.args.albedo_loss:
         nn_model.losses[6, epoch] = albedo_loss_total / len(nn_model.train_loader.dataset)
         draw_line_chart(np.array([nn_model.losses[6]]), nn_model.output_folder,
                         log_y=True, label="albedo", epoch=epoch, start_epoch=0, title="albedo_loss", cla_leg=True)
