@@ -945,7 +945,7 @@ def eval_img_angle(output, target):
 
     return img, angle_matrix
 
-def eval_img_diff(output, target):
+def eval_albedo_diff(output, target):
     mask = target.sum(axis=2) == 0
     diff = np.abs(output - target)
     diff_8bit = cv.normalize(diff, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)

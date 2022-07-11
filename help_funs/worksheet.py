@@ -1,11 +1,10 @@
-import shutil
+import glob
 
 import numpy as np
 import torch
-import glob
-import config
-from help_funs import mu, chart
 
+import config
+from help_funs import mu
 
 def gau_histo(gt_normal, sigma):
     gt_normal = torch.from_numpy(gt_normal)
@@ -23,11 +22,25 @@ def gau_histo(gt_normal, sigma):
     return output_histo
 
 
-if __name__ == '__main__':
-    test_0_data = np.array(sorted(glob.glob(str(config.synthetic_data_noise_128_local / "train" / "tensor" /
-                                                f"*_0_*"), recursive=True)))
+def load_a_training_case():
+    test_0_data = np.array(
+        sorted(glob.glob(str(config.synthetic_data_noise_local / "synthetic512" / "selval" / "tensor" /
+                             f"*_0_*"), recursive=True)))
     test_0 = torch.load(test_0_data[0])
     test_0_tensor = test_0['input_tensor'].unsqueeze(0)
+    gt_tensor = test_0['gt_tensor'].unsqueeze(0)
+    return test_0_tensor, gt_tensor
+
+
+if __name__ == '__main__':
+    training_tensor, gt_tensor = load_a_training_case()
+    vertex = training_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+
+    normal_gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    img_gt = gt_tensor[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
+    g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
+
+    albedo_gt = img_gt / (g_gt + 1e-20)
 
     # test_torch()
     # print_cuda_info()
