@@ -121,7 +121,7 @@ class TrainingModel():
         self.model = self.init_network(network)
         self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
-        self.img_loss = None
+        self.albedo_loss = None
         self.normal_loss = None
         self.light_loss = None
         self.criterion = nn.CrossEntropyLoss()
@@ -267,7 +267,7 @@ def train_epoch(nn_model, epoch):
     nn_model.model.train()
     normal_loss_total = torch.tensor([0.0])
     loss_total = torch.tensor([0.0])
-    img_loss_total = torch.tensor([0.0])
+    albedo_loss_total = torch.tensor([0.0])
     light_loss_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -296,17 +296,17 @@ def train_epoch(nn_model, epoch):
             normal_loss_total += nn_model.normal_loss.detach().to('cpu')
             loss_total += normal_loss_total
 
-        if nn_model.args.img_loss:
-            nn_model.img_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
-                                                        albedo=out[:, 3:4, :, :],
-                                                        lighting=target[:, 5:8, :, :],
-                                                        image=target[:, 4:5, :, :], ) * nn_model.args.img_penalty
+        if nn_model.args.albedo_loss:
+            nn_model.albedo_loss = loss_utils.LambertError(normal=target[:, :3, :, :],
+                                                           albedo=out[:, 7:8, :, :],
+                                                           lighting=target[:, 5:8, :, :],
+                                                           image=target[:, 4:5, :, :], ) * nn_model.args.albedo_penalty
 
-            loss += nn_model.img_loss
+            loss += nn_model.albedo_loss
 
             # for plot purpose
-            img_loss_total += nn_model.img_loss.detach().to('cpu')
-            loss_total += img_loss_total
+            albedo_loss_total += nn_model.albedo_loss.detach().to('cpu')
+            loss_total += albedo_loss_total
 
         if nn_model.args.light_loss:
             nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, 3:6, :, :],
@@ -335,8 +335,8 @@ def train_epoch(nn_model, epoch):
                 normal_loss_0th_avg = nn_model.normal_loss / int(nn_model.args.batch_size)
                 print(f"\t normal loss: {normal_loss_0th_avg:.2e}\t axis: {epoch % 3}", end="")
             if nn_model.img_loss is not None:
-                img_loss_0th_avg = nn_model.img_loss / int(nn_model.args.batch_size)
-                print(f"\t img loss: {img_loss_0th_avg:.2e}", end="")
+                albedo_loss_0th_avg = nn_model.albedo_loss / int(nn_model.args.batch_size)
+                print(f"\t albedo loss: {albedo_loss_0th_avg:.2e}", end="")
             if nn_model.light_loss is not None:
                 light_loss_0th_avg = nn_model.light_loss / int(nn_model.args.batch_size)
                 print(f"\t light loss: {light_loss_0th_avg:.2e}", end="")
@@ -348,9 +348,9 @@ def train_epoch(nn_model, epoch):
     if nn_model.args.light_loss:
         plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
     if nn_model.args.img_loss:
-        nn_model.losses[6, epoch] = img_loss_total / len(nn_model.train_loader.dataset)
+        nn_model.losses[6, epoch] = albedo_loss_total / len(nn_model.train_loader.dataset)
         draw_line_chart(np.array([nn_model.losses[6]]), nn_model.output_folder,
-                        log_y=True, label="image", epoch=epoch, start_epoch=0, title="img_loss", cla_leg=True)
+                        log_y=True, label="albedo", epoch=epoch, start_epoch=0, title="albedo_loss", cla_leg=True)
 
     # indicate for best model saving
     if nn_model.best_loss > loss_total:

@@ -3,7 +3,7 @@ from help_funs.data_preprocess import convert2training_tensor_noise
 from workspace import train
 from pncnn.utils import args_parser
 
-import workspace.noise_net.network as noiseNet
+import workspace.albedoGated.network as noiseNet
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
 
     # config experiments
     exp_path = config.ws_path / args.exp
-    if args.exp == "noise_net":
+    if args.exp == "albedoGated":
         model = noiseNet.CNN()
     else:
         raise ValueError("Unknown exp path")
