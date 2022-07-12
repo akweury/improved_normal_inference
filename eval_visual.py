@@ -203,11 +203,13 @@ def start2(models_path_dict):
         # unpack model
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
+        g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         light_gt = gt_tensor[:, 5:8, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         light_input = test_0_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         vertex_0 = test_0_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-        img_0 = test_0_tensor[:, 3, :, :].permute(1, 2, 0).squeeze(-1).numpy()
+
+        img_0 = test_0_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         mask = gt.sum(axis=2) == 0
         # mask_input = vertex_0.sum(axis=2) == 0
@@ -264,48 +266,50 @@ def start2(models_path_dict):
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
                     if args.exp not in ["albedoGated"]:
                         normal = xout[:, :, :3]
+                        normal[mask] = 0
+                        diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+                        diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                        # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+                        # if normal_no_mask_img is not None:
+                        #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+                        output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+                        error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                                   cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
+                                   mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+
+                        eval_res[model_idx, i] = diff
+
                     else:
-                        pass
+                        albedo_out = xout[:, :, 3:4]
+                        albedo_out[mask] = 0
+                        albedo_gt = mu.albedo(img_0, mask, g_gt)
+                        albedo_gt[mask] = 0
+                        albedo_out_img = mu.visual_albedo(albedo_out, mask, name)
+                        albedo_gt_img = mu.visual_albedo(albedo_gt, mask, "gt")
 
-                    # visual albedo error
-                    # rho_gt = mu.albedo(img_0, gt, light_gt)
-                    # xout_albedo = np.uint8(xout_albedo)
-                    # output_list.append(mu.visual_img(xout_albedo, "albedo_out"))
-                    if xout.shape[2] >= 6:
-                        xout_light = xout[:, :, 3:6]
-                        xout_albedo2 = np.uint8(img_0 / (np.sum(xout_light * normal, axis=-1) + 1e-20))
-                        output_list.append(mu.visual_img(xout_albedo2, "albedo_out"))
+                        output_list.append(albedo_out_img)
+                        output_list.append(albedo_gt_img)
 
-                        g = np.sum(gt * light_gt, axis=-1)
-                        albedo_gt = np.uint8(img_0 / (g + 1e-20))
-                        output_list.append(mu.visual_img(albedo_gt, "albedo_gt"))
+                        # albedo err visualisation
+                        diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt)
 
-                        diff_albedo = np.abs(xout_albedo2 - albedo_gt)
-                        diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
-                                                                        cv.NORM_MINMAX, dtype=cv.CV_8U),
-                                                           cv.COLORMAP_HOT)
-                        diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
+                        mu.addText(diff_img, "Error")
+                        mu.addText(diff_img, f"angle error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
+                        output_list.append(diff_img)
+
+                        # diff_albedo = np.abs(albedo_out - albedo_gt)
+                        # diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
+                        #                                                 cv.NORM_MINMAX, dtype=cv.CV_8U),
+                        #                                    cv.COLORMAP_HOT)
+                        # diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
                     # mu.addText(diff_albedo_img, name)
                     # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
                     # error_list.append(
                     #     mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
-                    normal[mask] = 0
-
-                    diff_img, diff_angle = mu.eval_img_angle(normal, gt)
-                    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-
-                    # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
-                    # if normal_no_mask_img is not None:
-                    #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-                    output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
-                    error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
-
-                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                               cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
-                    cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
-                               mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
-
-                    eval_res[model_idx, i] = diff
 
             # visual normal
             # output_list.append(mu.visual_normal(normal, name))

@@ -41,7 +41,8 @@ def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     outputs[boarder_right] = outputs[boarder_right] * penalty
     outputs[boarder_left] = outputs[boarder_left] * penalty
     mask = ~torch.prod(target == 0, dim=1).bool()
-
+    outputs[~mask] = 0
+    target[~mask] = 0
     return torch.sum((outputs - target) ** 2) / torch.sum(mask)
 
 

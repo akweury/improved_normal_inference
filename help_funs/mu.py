@@ -73,9 +73,15 @@ def albedo_tensor(I, N, L):
     return rho
 
 
-def albedo(I, N, L):
-    rho = I.reshape(512, 512) / (np.sum(N * L, axis=-1) + 1e-20)
-    return rho
+def albedo(I, mask, G):
+    albedo_norm = (I / 255.0) / (G + 1e-20)
+    # tranculation
+    albedo_norm[albedo_norm > 1000] = 1000
+    albedo_norm[albedo_norm < -1000] = -1000
+    # norm
+    albedo_norm = (albedo_norm + 1000) / 2000
+    albedo_norm[mask] = 0
+    return albedo_norm
 
 
 def angle_between_2d(m1, m2):
@@ -751,7 +757,6 @@ def show_images(array, title):
     cv.destroyAllWindows()
 
 
-
 def show_normal(normal, title="Normal"):
     show_images(cv.cvtColor(visual_normal(normal, ""), cv.COLOR_RGB2BGR), title)
 
@@ -946,6 +951,7 @@ def eval_img_angle(output, target):
 
     return img, angle_matrix
 
+
 def eval_albedo_diff(output, target):
     mask = target.sum(axis=2) == 0
     diff = np.abs(output - target)
@@ -955,6 +961,7 @@ def eval_albedo_diff(output, target):
     diff_8bit[mask] = 0
     diff_avg = diff.sum() / np.count_nonzero(target)
     return diff_8bit, diff_avg
+
 
 def eval_angle_tensor(output, target):
     output_perm = output.permute(0, 2, 3, 1)
@@ -1116,7 +1123,9 @@ def visual_img(img, name, upper_right=None, font_scale=0.8):
     return img
 
 
-def visual_albedo(rho, name):
+def visual_albedo(rho, mask, name):
+    rho[~mask] = rho[~mask] * 2000 - 1000
+    rho[~mask] = rho[~mask] * 255
     img = visual_img(np.uint8(rho), name)
     img_ranges = addHist(img)
     addText(img, str(img_ranges), pos="upper_right", font_size=0.5)

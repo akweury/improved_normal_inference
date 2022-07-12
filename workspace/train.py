@@ -277,11 +277,6 @@ def train_epoch(nn_model, epoch):
         # Wait for all kernels to finish
         torch.cuda.synchronize()
 
-        albedo_target = (target[:, 4:5, :, :] / 255) / (target[:, 3:4, :, :] + 1e-20)
-        albedo_target[albedo_target > 1000] = 1000
-        albedo_target[albedo_target < -1000] = -1000
-        albedo_gt_aligned = (albedo_target * 0.0005 + 0.5)
-
         # Clear the gradients
         nn_model.optimizer.zero_grad()
         torch.autograd.set_detect_anomaly(True)
@@ -302,10 +297,13 @@ def train_epoch(nn_model, epoch):
             loss_total += normal_loss_total
 
         if nn_model.args.albedo_loss:
+            mask = torch.sum(target[:, 4:5, :, :], dim=1) == 0
+
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
+            albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :])
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.weighted_l2_loss(out[:, 3:4, :, :], albedo_gt_aligned,
+            nn_model.albedo_loss = loss_utils.weighted_l2_loss(out[:, 3:4, :, :], albedo_gt,
                                                                nn_model.args.penalty,
                                                                0, 1)
 
@@ -581,17 +579,16 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # output_list.append(normal_cnn_8bit)
 
     # albedo
-    albedo_gt_norm = (img_gt / 255.0) / (g_gt + 1e-20)
-    # tranculation
-    albedo_gt_norm[albedo_gt_norm > 1000] = 1000
-    albedo_gt_norm[albedo_gt_norm < -1000] = -1000
-    # norm
-    albedo_gt_norm = (albedo_gt_norm + 1000) / 2000
+    albedo_gt_norm = mu.albedo(img_gt, mask, g_gt)
 
-    albedo_out_8bit = mu.visual_albedo(albedo_gt_norm, "gt")
-    albedo_gt_8bit = mu.visual_albedo(x_out_albedo, "pred")
-    output_list.append(albedo_out_8bit)
-    output_list.append(albedo_gt_8bit)
+    albedo_out = xout[:, :, 3:4]
+    albedo_out[mask] = 0
+
+    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
+    albedo_gt_img = mu.visual_albedo(albedo_gt_norm, mask, "gt")
+    albedo_out_img[mask] = 0
+    output_list.append(albedo_out_img)
+    output_list.append(albedo_gt_img)
 
     # albedo err visualisation
     diff_img, diff_avg = mu.eval_albedo_diff(x_out_albedo, albedo_gt_norm)
