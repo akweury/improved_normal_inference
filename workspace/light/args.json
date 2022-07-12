@@ -15,6 +15,7 @@
   "albedo_penalty": 1,
   "albedo_loss": false,
   "g_loss": false,
+  "albedo_threshold": 255,
   "lr_scheduler": "9999",
   "momentum": 0.9,
   "penalty": 1.4,
