@@ -582,24 +582,51 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # input
     vertex_0 = input[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     gt = target[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-    img_gt = target[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     g_gt = target[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    img_gt = target[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    light_gt = target[:, 5:8, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+
     x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
+    x_out_light = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
     g_out = xout[0, 3:6, :, :].permute(1, 2, 0).to('cpu').numpy()
-    print("x_out_normal shape: " + str(x_out_normal.shape))
-    x0_normalized_8bit = mu.normalize2_32bit(vertex_0)
-    mu.addText(x0_normalized_8bit, "Input(Vertex)")
-    mu.addText(x0_normalized_8bit, str(train_idx), pos='lower_left', font_size=0.3)
-    output_list.append(x0_normalized_8bit)
+    mask = gt.sum(axis=2) == 0
+    # input
+    output_list.append(mu.visual_vertex(vertex_0, "input(vertex)"))
 
     # target
-    target_img = mu.normal2RGB(gt)
-    mask = gt.sum(axis=2) == 0
-    target_gt_8bit = cv.normalize(target_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(target_gt_8bit, "GT")
-    target_ranges = mu.addHist(target_img)
-    mu.addText(target_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
-    output_list.append(target_gt_8bit)
+    output_list.append(mu.visual_normal(gt, "gt"))
+
+    # exp output
+    if exp_name == "light":
+        output_list.append(mu.visual_light(x_out_light, "pred"))
+        output_list.append(mu.visual_light(light_gt, "gt"))
+        output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
+    elif exp_name == "albedoGated":
+        # g
+        g_out[mask] = 0
+        mask_tensor = torch.prod(target == 0, dim=1, keepdim=True).bool()
+        g_gt = mu.g(target[:, 4:5, :, :],
+                    target[:, 3:4, :, :],
+                    target[:, :3, :, :],
+                    tranculate_threshold,
+                    mask_tensor).permute(2, 3, 1, 0).squeeze(-1).numpy()
+
+        albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
+        albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
+
+        # albedo
+        output_list.append(mu.visual_albedo(albedo_out, mask, "pred"))
+        output_list.append(mu.visual_albedo(albedo_gt, mask, "gt"))
+        output_list.append(mu.visual_diff(albedo_gt, albedo_out, "pixel"))
+
+        # normal
+        x_out_normal = g_out / (albedo_out + 1e-20)
+        x_gt_normal = g_gt / (albedo_gt + 1e-20)
+        x_out_normal[mask] = 0
+
+        output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_normal(x_gt_normal, "gt_recon"))
+        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
 
     # # albedo
     # albedo_out_norm[mask] = 0
@@ -621,48 +648,9 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
     # output_list.append(diff_img)
 
-    # g
-    g_out[mask] = 0
-    mask_tensor = torch.prod(target == 0, dim=1, keepdim=True).bool()
-    g_gt = mu.g(target[:, 4:5, :, :],
-                target[:, 3:4, :, :],
-                target[:, :3, :, :],
-                tranculate_threshold,
-                mask_tensor).permute(2, 3, 1, 0).squeeze(-1).numpy()
 
-    albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
-    albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
 
-    x_out_normal = g_out / albedo_out
 
-    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
-    albedo_gt_img = mu.visual_albedo(albedo_gt, mask, "gt")
-    # albedo_out_img[mask] = 0
-    output_list.append(albedo_out_img)
-    output_list.append(albedo_gt_img)
-
-    # g err visualisation
-    diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt)
-
-    mu.addText(diff_img, "Error")
-    mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
-    output_list.append(diff_img)
-
-    # pred
-
-    x_out_normal = g_out / (albedo_out + 1e-20)
-    x_gt_normal = g_gt / (albedo_gt + 1e-20)
-
-    x_out_normal[mask] = 0
-    diff_img, diff_angle = mu.eval_img_angle(x_out_normal, gt)
-    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-
-    # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
-    # if normal_no_mask_img is not None:
-    #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-    output_list.append(mu.visual_normal(x_out_normal, "pred"))
-    output_list.append(mu.visual_normal(x_gt_normal, "gt_recon"))
-    output_list.append(mu.visual_img(diff_img, "error", upper_right=int(diff), font_scale=1))
 
     #### post processing
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)

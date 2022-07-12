@@ -1149,3 +1149,27 @@ def g(I, scaleProd, N, tranculate_threshold, mask):
     rho = albedo(I, mask, scaleProd, tranculate_threshold)
     g = rho * N
     return g
+
+
+def eval_img_pixel(gt, out):
+    mask = gt.sum(axis=2) == 0
+    diff = np.abs(gt - out)
+    diff_8bit = cv.normalize(diff, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    diff_8bit = cv.applyColorMap(diff_8bit, cv.COLORMAP_HOT)
+    diff_8bit[mask] = 0
+    diff_avg = diff.sum() / np.sum(~mask)
+    return diff_8bit, diff_avg
+
+
+def visual_diff(gt, out, eval_type):
+    if eval_type == "angle":
+        diff_img, diff_avg = eval_img_angle(gt, out)
+    elif eval_type == "pixel":
+        diff_img, diff_avg = eval_img_pixel(gt, out)
+    else:
+        raise ValueError
+
+    addText(diff_img, "Error")
+    addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
+
+    return diff_img
