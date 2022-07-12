@@ -303,7 +303,7 @@ def train_epoch(nn_model, epoch):
             albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :])
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.weighted_l2_loss(out[:, 3:4, :, :], albedo_gt,
+            nn_model.albedo_loss = loss_utils.weighted_l1_loss(out[:, 3:4, :, :], albedo_gt,
                                                                nn_model.args.penalty,
                                                                0, 1)
 
@@ -594,7 +594,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     diff_img, diff_avg = mu.eval_albedo_diff(x_out_albedo, albedo_gt_norm)
 
     mu.addText(diff_img, "Error")
-    mu.addText(diff_img, f"angle error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
+    mu.addText(diff_img, f"error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
 
     # # err visualisation
