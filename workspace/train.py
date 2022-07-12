@@ -581,7 +581,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # output_list.append(normal_cnn_8bit)
 
     # albedo
-    albedo_gt_norm = (img_gt / 255.0) / g_gt
+    albedo_gt_norm = (img_gt / 255.0) / (g_gt + 1e-20)
     # tranculation
     albedo_gt_norm[albedo_gt_norm > 1000] = 1000
     albedo_gt_norm[albedo_gt_norm < -1000] = -1000

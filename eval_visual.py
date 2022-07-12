@@ -262,8 +262,10 @@ def start2(models_path_dict):
                     eval_res[model_idx, i] = diff
                 else:
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
-
-                    normal = xout[:, :, :3]
+                    if args.exp not in ["albedoGated"]:
+                        normal = xout[:, :, :3]
+                    else:
+                        pass
 
                     # visual albedo error
                     # rho_gt = mu.albedo(img_0, gt, light_gt)
@@ -349,7 +351,7 @@ if __name__ == '__main__':
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
         "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
-        # "GCNN": config.ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar",
+        "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }
