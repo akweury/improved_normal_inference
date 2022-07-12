@@ -417,7 +417,7 @@ def test_epoch(nn_model, epoch):
             out = nn_model.model(input)
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
-            
+
             draw_output(nn_model.args.exp, input, out,
                         target=target,
                         exp_path=nn_model.output_folder,
@@ -590,6 +590,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     # exp output
     if exp_name == "light":
+        x_out_light[mask] = 0
         output_list.append(mu.visual_light(x_out_light, "pred"))
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
