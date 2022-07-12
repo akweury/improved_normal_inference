@@ -297,7 +297,7 @@ def train_epoch(nn_model, epoch):
             loss_total += normal_loss_total
 
         if nn_model.args.albedo_loss:
-            mask = torch.sum(target[:, 4:5, :, :], dim=1) == 0
+            mask = torch.prod(target == 0, dim=1).bool()
 
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
             albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :])
