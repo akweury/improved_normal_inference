@@ -1124,9 +1124,9 @@ def visual_img(img, name, upper_right=None, font_scale=0.8):
 
 
 def visual_albedo(rho, mask, name):
-    rho[~mask] = rho[~mask] * 2000 - 1000
-    rho[~mask] = rho[~mask] * 255
-    img = visual_img(np.uint8(rho), name)
+    albedo = (rho * 2000 - 1000) * 255
+    albedo[mask] = 0
+    img = visual_img(np.uint8(albedo), name)
     img_ranges = addHist(img)
     addText(img, str(img_ranges), pos="upper_right", font_size=0.5)
     addText(img, f"{name}(albedo)", font_size=0.8)
