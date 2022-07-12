@@ -581,12 +581,12 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # albedo
     albedo_gt_norm = mu.albedo(img_gt, mask, g_gt)
 
-    albedo_out = xout[:, :, 3:4]
+    albedo_out = x_out_albedo
     albedo_out[mask] = 0
 
     albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
     albedo_gt_img = mu.visual_albedo(albedo_gt_norm, mask, "gt")
-    albedo_out_img[mask] = 0
+    # albedo_out_img[mask] = 0
     output_list.append(albedo_out_img)
     output_list.append(albedo_gt_img)
 
