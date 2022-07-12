@@ -959,7 +959,7 @@ def eval_albedo_diff(output, target):
     diff_8bit = cv.applyColorMap(diff_8bit, cv.COLORMAP_HOT)
 
     diff_8bit[mask] = 0
-    diff_avg = diff.sum() / np.count_nonzero(target)
+    diff_avg = diff.sum() / np.sum(~mask)
     return diff_8bit, diff_avg
 
 
