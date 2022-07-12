@@ -650,21 +650,19 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     # pred
 
-    xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
-    pred_img = mu.normal2RGB(xout)
-    pred_img[mask] = 0
-    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    mu.addText(normal_cnn_8bit, "output")
-    xout_ranges = mu.addHist(normal_cnn_8bit)
-    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-    output_list.append(normal_cnn_8bit)
+    x_out_normal = g_out / (albedo_out + 1e-20)
+    x_gt_normal = g_gt / (albedo_gt + 1e-20)
 
-    # err visualisation
-    diff_img, diff_angle = mu.eval_img_angle(xout, gt)
+    x_out_normal[mask] = 0
+    diff_img, diff_angle = mu.eval_img_angle(x_out_normal, gt)
     diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-    mu.addText(diff_img, "Error")
-    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
-    output_list.append(diff_img)
+
+    # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+    # if normal_no_mask_img is not None:
+    #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+    output_list.append(cv.cvtColor(mu.visual_normal(x_out_normal, "pred"), cv.COLOR_RGB2BGR))
+    output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
+    output_list.append(mu.visual_img(diff_img, "error", upper_right=int(diff), font_scale=1))
 
     #### post processing
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
