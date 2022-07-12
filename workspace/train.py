@@ -300,7 +300,7 @@ def train_epoch(nn_model, epoch):
             mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
 
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
-            albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :])
+            albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :], nn_model.args.albedo_threshold)
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
             nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(out[:, 3:4, :, :], albedo_gt,
@@ -399,7 +399,8 @@ def test_epoch(nn_model, epoch):
                         epoch=epoch,
                         i=j,
                         train_idx=test_idx,
-                        prefix=f"eval_epoch_{epoch}_{test_idx}_")
+                        prefix=f"eval_epoch_{epoch}_{test_idx}_",
+                        tranculate_threshold=nn_model.args.albedo_threshold)
 
 
 def train_fugrc(nn_model, epoch, loss_network):
@@ -542,7 +543,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix):
+def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix, tranculate_threshold):
     output_list = []
 
     # input
@@ -579,13 +580,13 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # output_list.append(normal_cnn_8bit)
 
     # albedo
-    albedo_gt_norm = mu.albedo(img_gt, mask, g_gt)
+    albedo_gt_norm = mu.albedo(img_gt, mask, g_gt, tranculate_threshold)
 
     albedo_out = x_out_albedo
     albedo_out[mask] = 0
 
-    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
-    albedo_gt_img = mu.visual_albedo(albedo_gt_norm, mask, "gt")
+    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred", tranculate_threshold)
+    albedo_gt_img = mu.visual_albedo(albedo_gt_norm, mask, "gt", tranculate_threshold)
     # albedo_out_img[mask] = 0
     output_list.append(albedo_out_img)
     output_list.append(albedo_gt_img)

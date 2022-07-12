@@ -73,13 +73,13 @@ def albedo_tensor(I, N, L):
     return rho
 
 
-def albedo(I, mask, G):
+def albedo(I, mask, G, tranculate_threshold):
     albedo_norm = (I / 255.0) / (G + 1e-20)
     # tranculation
-    albedo_norm[albedo_norm > 1000] = 1000
-    albedo_norm[albedo_norm < -1000] = -1000
+    albedo_norm[albedo_norm > tranculate_threshold] = tranculate_threshold
+    albedo_norm[albedo_norm < -tranculate_threshold] = -tranculate_threshold
     # norm
-    albedo_norm = (albedo_norm + 1000) / 2000
+    albedo_norm = (albedo_norm + tranculate_threshold) / (tranculate_threshold * 2)
     albedo_norm[mask] = 0
     return albedo_norm
 
@@ -1123,8 +1123,8 @@ def visual_img(img, name, upper_right=None, font_scale=0.8):
     return img
 
 
-def visual_albedo(rho, mask, name):
-    albedo = (rho * 2000 - 1000) * 255
+def visual_albedo(rho, mask, name, tranculate_threshold):
+    albedo = (rho * (2 * tranculate_threshold) - tranculate_threshold) * 255
     albedo[mask] = 0
     img = visual_img(np.uint8(albedo), name)
     img_ranges = addHist(img)

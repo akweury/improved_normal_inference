@@ -77,13 +77,15 @@ if __name__ == '__main__':
     albedo_gt = img_gt_norm / (g_gt + 1e-20)
 
     # tranculation
-    albedo_gt[albedo_gt > 1000] = 1000
-    albedo_gt[albedo_gt < -1000] = -1000
+    tranculate_threshold = 1
+
+    albedo_gt[albedo_gt > tranculate_threshold] = tranculate_threshold
+    albedo_gt[albedo_gt < -tranculate_threshold] = -tranculate_threshold
     visual_albedo_histo(albedo_gt)
-    albedo_gt_aligned = (albedo_gt + 1000) / 2000
+    albedo_gt_aligned = (albedo_gt + tranculate_threshold) / (2 * tranculate_threshold)
 
     # convert back
-    albedo_gt_recon = albedo_gt_aligned * 2000 - 1000
+    albedo_gt_recon = albedo_gt_aligned * (2 * tranculate_threshold) - tranculate_threshold
 
     show_img(albedo_gt_recon, g_gt, "aligned")
     show_img(albedo_gt, g_gt, "gt")
