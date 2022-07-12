@@ -303,9 +303,9 @@ def train_epoch(nn_model, epoch):
             albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :])
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.weighted_l1_loss(out[:, 3:4, :, :], albedo_gt,
-                                                               nn_model.args.penalty,
-                                                               0, 1)
+            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(out[:, 3:4, :, :], albedo_gt,
+                                                                   nn_model.args.penalty,
+                                                                   0, 1)
 
             loss += nn_model.albedo_loss
 
