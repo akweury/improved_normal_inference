@@ -594,10 +594,10 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_list.append(albedo_gt_8bit)
 
     # albedo err visualisation
-    diff_img = mu.eval_albedo_diff(x_out_albedo, albedo_gt_norm)
+    diff_img, diff_avg = mu.eval_albedo_diff(x_out_albedo, albedo_gt_norm)
 
     mu.addText(diff_img, "Error")
-    # mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+    mu.addText(diff_img, f"angle error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
 
     # # err visualisation
