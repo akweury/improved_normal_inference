@@ -660,8 +660,8 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
     # if normal_no_mask_img is not None:
     #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-    output_list.append(cv.cvtColor(mu.visual_normal(x_out_normal, "pred"), cv.COLOR_RGB2BGR))
-    output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
+    output_list.append(mu.visual_normal(x_out_normal, "pred"))
+    output_list.append(mu.visual_normal(x_gt_normal, "gt_recon"))
     output_list.append(mu.visual_img(diff_img, "error", upper_right=int(diff), font_scale=1))
 
     #### post processing

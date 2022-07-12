@@ -29,7 +29,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 #### start a new training work
 
 ```
-CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synthetic512 --batch_size 4 --train-on 50 
+CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 ```
 
 #### evaluate the test dataset (no visualisation)
