@@ -949,7 +949,7 @@ def eval_img_angle(output, target):
 
     # img = image_resize(img, width=512, height=512)
 
-    return img, angle_matrix
+    return img, angle_matrix / np.sum(~mask)
 
 
 def eval_albedo_diff(output, target):
@@ -1164,6 +1164,7 @@ def eval_img_pixel(gt, out):
 def visual_diff(gt, out, eval_type):
     if eval_type == "angle":
         diff_img, diff_avg = eval_img_angle(gt, out)
+        
     elif eval_type == "pixel":
         diff_img, diff_avg = eval_img_pixel(gt, out)
     else:
