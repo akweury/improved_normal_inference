@@ -627,7 +627,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
                 target[:, 3:4, :, :],
                 target[:, :3, :, :],
                 tranculate_threshold,
-                mask).permute(2, 3, 1, 0).squeeze(-1).numpy()
+                mask.unsequeeze(0).unsequeeze(0)).permute(2, 3, 1, 0).squeeze(-1).numpy()
 
     albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
     albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
