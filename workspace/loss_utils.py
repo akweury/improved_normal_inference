@@ -43,7 +43,7 @@ def weighted_log_l1_loss(outputs, target, penalty, scaleMin, scaleMax):
     mask = ~torch.prod(target == 0, dim=1, keepdim=True).bool()
     outputs[~mask] = 0
     target[~mask] = 0
-    return torch.sum(torch.log(torch.abs(outputs - target))) / torch.sum(mask)
+    return torch.sum(torch.sqrt(torch.abs(outputs[mask] - target[mask]) + 1e-20)) / torch.sum(mask)
 
 
 def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):

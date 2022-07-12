@@ -594,7 +594,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt_norm)
 
     mu.addText(diff_img, "Error")
-    mu.addText(diff_img, f"error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
+    mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
 
     # # err visualisation
