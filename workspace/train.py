@@ -114,7 +114,7 @@ class TrainingModel():
         self.output_folder = self.init_output_folder()
         self.optimizer = None
         self.parameters = None
-        self.losses = np.zeros((7, args.epochs))
+        self.losses = np.zeros((10, args.epochs))
         self.angle_losses = np.zeros((1, args.epochs))
         self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
@@ -124,6 +124,7 @@ class TrainingModel():
         self.albedo_loss = None
         self.normal_loss = None
         self.light_loss = None
+        self.g_loss = None
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -243,6 +244,8 @@ def plot_loss_per_axis(loss_total, nn_model, epoch, title):
         shift = 0
     elif title == "light_loss":
         shift = 3
+    elif title == "g_loss":
+        shift = 6
     else:
         raise ValueError
 
@@ -268,6 +271,7 @@ def train_epoch(nn_model, epoch):
     normal_loss_total = torch.tensor([0.0])
     loss_total = torch.tensor([0.0])
     albedo_loss_total = torch.tensor([0.0])
+    g_loss_total = torch.tensor([0.0])
     light_loss_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
@@ -296,6 +300,30 @@ def train_epoch(nn_model, epoch):
             normal_loss_total += nn_model.normal_loss.detach().to('cpu')
             loss_total += normal_loss_total
 
+        if nn_model.args.g_loss:
+            mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
+
+            # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
+
+            # g = rho N
+            g_gt = mu.g(target[:, 4:5, :, :],
+                        target[:, 3:4, :, :],
+                        target[:, :3, :, :],
+                        nn_model.args.albedo_threshold,
+                        mask)
+
+            # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
+            nn_model.g_loss = loss_utils.weighted_unit_vector_loss(out[:, 3:6, :, :], g_gt,
+                                                                   nn_model.args.penalty,
+                                                                   epoch,
+                                                                   nn_model.args.loss_type,
+                                                                   scale_threshold=255)
+
+            loss += nn_model.g_loss
+
+            # for plot purpose
+            g_loss_total += nn_model.g_loss.detach().to('cpu')
+            loss_total += g_loss_total
         if nn_model.args.albedo_loss:
             mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
 
@@ -345,15 +373,20 @@ def train_epoch(nn_model, epoch):
             if nn_model.light_loss is not None:
                 light_loss_0th_avg = nn_model.light_loss / int(nn_model.args.batch_size)
                 print(f"\t light loss: {light_loss_0th_avg:.2e}", end="")
+            if nn_model.g_loss is not None:
+                g_loss_0th_avg = nn_model.g_loss / int(nn_model.args.batch_size)
+                print(f"\t g loss: {g_loss_0th_avg:.2e}", end="")
             print("\n")
 
     # save loss and plot
     if nn_model.args.normal_loss:
         plot_loss_per_axis(normal_loss_total, nn_model, epoch, title="normal_loss")
+    if nn_model.args.g_loss:
+        plot_loss_per_axis(g_loss_total, nn_model, epoch, title="g_loss")
     if nn_model.args.light_loss:
         plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
     if nn_model.args.albedo_loss:
-        nn_model.losses[6, epoch] = albedo_loss_total / len(nn_model.train_loader.dataset)
+        nn_model.losses[9, epoch] = albedo_loss_total / len(nn_model.train_loader.dataset)
         draw_line_chart(np.array([nn_model.losses[6]]), nn_model.output_folder,
                         log_y=True, label="albedo", epoch=epoch, start_epoch=0, title="albedo_loss", cla_leg=True)
 
@@ -552,7 +585,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     img_gt = target[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     g_gt = target[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
-    x_out_albedo = xout[0, 3:4, :, :].permute(1, 2, 0).to('cpu').numpy()
+    g_out = xout[0, 3:6, :, :].permute(1, 2, 0).to('cpu').numpy()
     print("x_out_normal shape: " + str(x_out_normal.shape))
     x0_normalized_8bit = mu.normalize2_32bit(vertex_0)
     mu.addText(x0_normalized_8bit, "Input(Vertex)")
@@ -568,43 +601,71 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     mu.addText(target_gt_8bit, str(target_ranges), pos="upper_right", font_size=0.5)
     output_list.append(target_gt_8bit)
 
-    # pred
+    # # albedo
+    # albedo_out_norm[mask] = 0
+    # albedo_gt_norm = mu.albedo(img_gt, mask, g_gt, tranculate_threshold)
+    #
+    # albedo_out_scaled = (albedo_out_norm * (2 * tranculate_threshold) - tranculate_threshold) * 255
+    # albedo_gt_scaled = (albedo_gt_norm * (2 * tranculate_threshold) - tranculate_threshold) * 255
+    #
+    # albedo_out_img = mu.visual_albedo(albedo_out_scaled, mask, "pred")
+    # albedo_gt_img = mu.visual_albedo(albedo_gt_scaled, mask, "gt")
+    # # albedo_out_img[mask] = 0
+    # output_list.append(albedo_out_img)
+    # output_list.append(albedo_gt_img)
+    #
+    # # albedo err visualisation
+    # diff_img, diff_avg = mu.eval_albedo_diff(albedo_out_norm, albedo_gt_norm)
+    #
+    # mu.addText(diff_img, "Error")
+    # mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
+    # output_list.append(diff_img)
 
-    # xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
-    # pred_img = mu.normal2RGB(xout)
-    # pred_img[mask] = 0
-    # normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-    # mu.addText(normal_cnn_8bit, "output")
-    # xout_ranges = mu.addHist(normal_cnn_8bit)
-    # mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
-    # output_list.append(normal_cnn_8bit)
+    # g
+    g_out[mask] = 0
+    g_gt = mu.g(target[:, 4:5, :, :],
+                target[:, 3:4, :, :],
+                target[:, :3, :, :],
+                tranculate_threshold,
+                mask).permute(2, 3, 1, 0).squeeze(-1).numpy()
 
-    # albedo
-    albedo_gt_norm = mu.albedo(img_gt, mask, g_gt, tranculate_threshold)
+    albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
+    albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
 
-    albedo_out = x_out_albedo
-    albedo_out[mask] = 0
+    x_out_normal = g_out / albedo_out
 
-    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred", tranculate_threshold)
-    albedo_gt_img = mu.visual_albedo(albedo_gt_norm, mask, "gt", tranculate_threshold)
+    albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
+    albedo_gt_img = mu.visual_albedo(albedo_gt, mask, "gt")
     # albedo_out_img[mask] = 0
     output_list.append(albedo_out_img)
     output_list.append(albedo_gt_img)
 
-    # albedo err visualisation
-    diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt_norm)
+    # g err visualisation
+    diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt)
 
     mu.addText(diff_img, "Error")
     mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
     output_list.append(diff_img)
 
-    # # err visualisation
-    # diff_img, diff_angle = mu.eval_img_angle(xout, gt)
-    # diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
-    # mu.addText(diff_img, "Error")
-    # mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
-    # output_list.append(diff_img)
+    # pred
 
+    xout = mu.filter_noise(x_out_normal, threshold=[-1, 1])
+    pred_img = mu.normal2RGB(xout)
+    pred_img[mask] = 0
+    normal_cnn_8bit = cv.normalize(pred_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+    mu.addText(normal_cnn_8bit, "output")
+    xout_ranges = mu.addHist(normal_cnn_8bit)
+    mu.addText(normal_cnn_8bit, str(xout_ranges), pos="upper_right", font_size=0.5)
+    output_list.append(normal_cnn_8bit)
+
+    # err visualisation
+    diff_img, diff_angle = mu.eval_img_angle(xout, gt)
+    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+    mu.addText(diff_img, "Error")
+    mu.addText(diff_img, f"angle error: {int(diff)}", pos="upper_right", font_size=0.65)
+    output_list.append(diff_img)
+
+    #### post processing
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
 
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}.png")

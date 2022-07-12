@@ -74,7 +74,7 @@ def albedo_tensor(I, N, L):
 
 
 def albedo(I, mask, G, tranculate_threshold):
-    albedo_norm = (I / 255.0) / (G + 1e-20)
+    albedo_norm = I / (G + 1e-20)
     # tranculation
     albedo_norm[albedo_norm > tranculate_threshold] = tranculate_threshold
     albedo_norm[albedo_norm < -tranculate_threshold] = -tranculate_threshold
@@ -1123,10 +1123,11 @@ def visual_img(img, name, upper_right=None, font_scale=0.8):
     return img
 
 
-def visual_albedo(rho, mask, name, tranculate_threshold):
-    albedo = (rho * (2 * tranculate_threshold) - tranculate_threshold) * 255
+def visual_albedo(rho, mask, name):
+    # albedo = (rho * (2 * tranculate_threshold) - tranculate_threshold) * 255
+    albedo = np.uint8(rho)
     albedo[mask] = 0
-    img = visual_img(np.uint8(albedo), name)
+    img = visual_img(albedo, name)
     img_ranges = addHist(img)
     addText(img, str(img_ranges), pos="upper_right", font_size=0.5)
     addText(img, f"{name}(albedo)", font_size=0.8)
@@ -1135,3 +1136,16 @@ def visual_albedo(rho, mask, name, tranculate_threshold):
 
 def save_array(arr, save_path):
     np.save(save_path, arr)
+
+
+def albedo2normal(albedo, img, light):
+    normal = (img / (albedo + 1e-20)) / (light + 1e-20)
+    normal = normal / (np.linalg.norm(normal, ord=2, axis=-1, keepdims=True) + 1e-20)
+
+    return normal
+
+
+def g(I, scaleProd, N, tranculate_threshold, mask):
+    rho = albedo(I, mask, scaleProd, tranculate_threshold)
+    g = rho * N
+    return g

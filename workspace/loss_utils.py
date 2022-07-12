@@ -57,12 +57,12 @@ def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     return torch.sum((outputs - target) ** 2) / torch.sum(mask)
 
 
-def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type):
+def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
     # give penalty to outliers
     outputs = outputs[:, :3, :, :]
     target = target[:, :3, :, :]
-    mask_too_high = torch.gt(outputs, 1).bool().detach()
-    mask_too_low = torch.lt(outputs, -1).bool().detach()
+    mask_too_high = torch.gt(outputs, scale_threshold).bool().detach()
+    mask_too_low = torch.lt(outputs, -scale_threshold).bool().detach()
     outputs[mask_too_high] = outputs[mask_too_high] * penalty
     outputs[mask_too_low] = outputs[mask_too_low] * penalty
 
