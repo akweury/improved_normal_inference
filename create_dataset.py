@@ -103,9 +103,10 @@ def convert2training_tensor(path, k, output_type='normal'):
         light_direction[mask] = 0
 
         # albedo
-        G = np.sum(gt_normal * light_direction, axis=-1)
-        G[mask] = 0
-        albedo = img / (G + 1e-20)
+        G = np.sum(gt_normal * light_direction_gt, axis=-1)
+        G[mask_gt] = 0
+        albedo = img / (G)
+        albedo[np.isnan(albedo)] = 0
 
         # mu.show_images(img, "img")
         # albedo_img = np.uint8(albedo)
@@ -143,7 +144,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["selval", "test", "train"]:
+    for folder in ["selval", "test"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder

@@ -55,7 +55,7 @@ def avg_angle_between_tensor(v1, v2):
 
 
 def vertex2light_direction(vertex_map, light_sorce):
-    light_direction = vertex_map - light_sorce
+    light_direction = -vertex_map + light_sorce
     light_direction_map = light_direction / np.sqrt(np.sum(light_direction ** 2, axis=-1, keepdims=True))
 
     return light_direction_map
@@ -76,10 +76,10 @@ def albedo_tensor(I, N, L):
 def albedo(I, mask, G, tranculate_threshold):
     albedo_norm = I / (G + 1e-20)
     # tranculation
-    albedo_norm[albedo_norm > tranculate_threshold] = tranculate_threshold
-    albedo_norm[albedo_norm < -tranculate_threshold] = -tranculate_threshold
+    albedo_norm[albedo_norm > 255] = 255
+    albedo_norm[albedo_norm < 1e-2] = 1e-2
     # norm
-    albedo_norm = (albedo_norm + tranculate_threshold) / (tranculate_threshold * 2)
+    # albedo_norm = (albedo_norm + tranculate_threshold) / (tranculate_threshold * 2)
     albedo_norm[mask] = 0
     return albedo_norm
 

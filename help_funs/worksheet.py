@@ -72,7 +72,6 @@ if __name__ == '__main__':
     img_gt = gt_tensor[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
     g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
 
-    # img_gt_16bit = load_a_training_case()
     img_gt_norm = img_gt / 255
     albedo_gt = img_gt_norm / (g_gt + 1e-20)
 

@@ -45,7 +45,7 @@ def writePLY(vertex, normal, image, mask, filename, cameraPoints=None, lightPoin
             if mask[i, j]:
                 ply_file.write(f"{' '.join(map(str, vertex[i, j, :]))} "
                                f"{' '.join(map(str, normal[i, j, :]))} "
-                               f"{' '.join(map(str, image[i, j, :].repeat(3).astype(np.int32)))}\n")
+                               f"{' '.join(map(str, image[i, j].repeat(3).astype(np.int32)))}\n")
     if cameraPoints is not None:
         for i in range(len(cameraPoints)):
             ply_file.write(f"{' '.join(map(str, cameraPoints[i]))} 0.0 0.0 0.0 255 0 0\n")

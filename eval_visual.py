@@ -203,7 +203,7 @@ def start2(models_path_dict):
         # unpack model
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
-        g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        scaleProd_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         light_gt = gt_tensor[:, 5:8, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         light_input = test_0_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
@@ -284,49 +284,47 @@ def start2(models_path_dict):
                         eval_res[model_idx, i] = diff
 
                     else:
-                        albedo_out_norm = xout[:, :, 3:4]
-                        light_out = xout[:, :, :3]
-                        albedo_out_norm[mask] = 0
-                        args.albedo_threshold = 255
-                        albedo_gt_norm = mu.albedo(img_0, mask, g_gt, args.albedo_threshold)
-                        albedo_gt_norm[mask] = 0
+                        g_out_norm = xout[:, :, 3:6]
+                        x_out_light = xout[:, :, :3]
+                        g_out_norm[mask] = 0
+                        mask_tensor = torch.prod(gt_tensor == 0, dim=1, keepdim=True).bool()
+                        g_gt = mu.g(gt_tensor[:, 4:5, :, :],
+                                    gt_tensor[:, 3:4, :, :],
+                                    gt_tensor[:, :3, :, :],
+                                    args.albedo_threshold,
+                                    mask_tensor).permute(2, 3, 1, 0).squeeze(-1).numpy()
 
-                        albedo_out_scaled = (albedo_out_norm * (
-                                2 * args.albedo_threshold) - args.albedo_threshold)
-                        albedo_gt_scaled = (albedo_gt_norm * (2 * args.albedo_threshold) - args.albedo_threshold)
-                        albedo_gt_scaled[mask] = 0
-                        albedo_out_scaled[mask] = 0
+                        albedo_out = np.linalg.norm(g_out_norm, axis=-1, ord=2, keepdims=True)
+                        albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
 
-                        albedo_out_img = mu.visual_albedo(albedo_out_scaled * 255, mask, name)
-                        g_recon = img_0 / (albedo_gt_scaled * 255 + 1e-20)
-                        albedo_gt_img = mu.visual_albedo(albedo_gt_scaled * 255, mask, "gt")
-
+                        albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
+                        albedo_gt_img = mu.visual_albedo(albedo_gt, mask, "gt")
                         output_list.append(albedo_out_img)
                         output_list.append(albedo_gt_img)
 
                         # albedo err visualisation
-                        diff_img, diff_avg = mu.eval_albedo_diff(albedo_out_scaled, albedo_gt_scaled)
+                        diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt)
 
                         mu.addText(diff_img, "Error")
                         mu.addText(diff_img, f"angle error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
                         output_list.append(diff_img)
 
-                        # reconstruct normal
-                        normal = mu.albedo2normal(albedo_out_scaled * 255, img_0, light_out)
-                        normal = mu.albedo2normal(albedo_gt_scaled * 255, img_0, light_gt)
+                        x_out_normal = g_out_norm / (albedo_out + 1e-20)
+                        x_gt_normal = g_gt / (albedo_gt + 1e-20)
 
-                        normal[mask] = 0
-                        diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+                        x_out_normal[mask] = 0
+                        diff_img, diff_angle = mu.eval_img_angle(x_out_normal, gt)
                         diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
                         # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
                         # if normal_no_mask_img is not None:
                         #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-                        output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+                        output_list.append(cv.cvtColor(mu.visual_normal(x_out_normal, name), cv.COLOR_RGB2BGR))
+                        output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
                         error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
 
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                                   cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                                   cv.cvtColor(mu.visual_normal(x_out_normal, "", histogram=False), cv.COLOR_RGB2BGR))
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
                                    mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
 
