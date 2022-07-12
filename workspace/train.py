@@ -418,11 +418,11 @@ def test_epoch(nn_model, epoch):
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
             if nn_model.exp_name == "light":
-                input = input[:1, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+                input = input[:1, 4:7, :, :].permute(2, 3, 1, 0).detach().numpy()
                 out = out[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
                 target = target[0, :].permute(1, 2, 0)[:, :, 5:8].detach().numpy()
             if nn_model.exp_name == "nnnn":
-                input = input[:1, :].permute(2, 3, 1, 0).squeeze(-1).detach().numpy()
+                input = input[:1, :].permute(2, 3, 1, 0).detach().numpy()
                 out = out[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
                 target = target[0, :].permute(1, 2, 0)[:, :, :3].detach().numpy()
 
