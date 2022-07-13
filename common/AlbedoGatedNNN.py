@@ -26,7 +26,7 @@ class AlbedoNet(nn.Module):
 class GNet(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
-        self.__name__ = 'gnet'
+        # self.__name__ = 'gnet'
         kernel_down = (3, 3)
         kernel_up = (3, 3)
         padding_down = (1, 1)

@@ -14,7 +14,7 @@ import config
 class CNN(nn.Module):
     def __init__(self, channel_num):
         super().__init__()
-        self.__name__ = 'albedoGated'
+        # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
         self.light_net = NormalGuided(3, 3, channel_num)
         self.g_net = GNet(3, 3, channel_num)
