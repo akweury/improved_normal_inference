@@ -108,7 +108,7 @@ class TrainingModel():
         self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device(device_name)
+        self.device = torch.device(0)
         self.exp_name = self.args.exp
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
