@@ -125,6 +125,7 @@ def get_model(args):
         model = ncnn.CNN(args.num_channels)
     elif args.exp == "ag":
         import workspace.ag.network as ag
+        model = ag.CNN(args.num_channels)
     elif args.exp == "albedoGated":
         import workspace.albedoGated.network as albedoGated
 

@@ -104,7 +104,7 @@ class SyntheticDepthDataset(Dataset):
 
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
-    def __init__(self, args, exp_dir, network, dataset_path, device_name, start_epoch=0):
+    def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
         self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
@@ -655,7 +655,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 def main(args, exp_dir, network, train_dataset):
     device_name = "cuda:0"
 
-    nn_model = TrainingModel(args, exp_dir, network, device_name, train_dataset)
+    nn_model = TrainingModel(args, exp_dir, network, train_dataset)
 
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")

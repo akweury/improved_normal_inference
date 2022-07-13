@@ -43,7 +43,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 srun \
   -p RTX3090 \
   --ntasks=1 --gpus-per-task=1 --cpus-per-gpu=6 \
-  --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
+  --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
   python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 32 --train-on 1000 
