@@ -5,6 +5,7 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.ResNormalGuided import NormalGuided
+from common.AlbedoGatedNNN import GNet
 import config
 
 
@@ -16,7 +17,7 @@ class CNN(nn.Module):
         self.__name__ = 'albedoGated'
         self.channel_num = channel_num
         self.light_net = NormalGuided(3, 3, channel_num)
-        self.g_net = NormalGuided(7, 3, channel_num)
+        self.g_net = GNet(3, 3, channel_num)
         self.remove_grad()
 
     def remove_grad(self):
@@ -47,7 +48,7 @@ class CNN(nn.Module):
         x_light_out = self.light_net(x_light)
 
         # albedo predict
-        x_g_out = self.g_net(torch.cat((x_vertex, x_light_out, x_img), dim=1))
+        x_g_out = self.g_net(x_vertex, x_light_out, x_img)
 
         # x_normal_out = (x_img / x_albedo_out) / x_light_out
 
