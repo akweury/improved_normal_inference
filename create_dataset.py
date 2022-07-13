@@ -6,6 +6,7 @@ import shutil
 
 import numpy as np
 import torch
+import cv2 as cv
 
 import config
 from help_funs import file_io, mu
@@ -54,8 +55,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         data = json.load(f)
         f.close()
         light_pos = np.array(data['lightPos'])
-        light_pos = np.array(data['R']) @ light_pos.reshape(3, 1) - np.array(data['t']).reshape(3, 1)
-        # light_pos = np.array(data['R']) @ (light_pos.reshape(3, 1) + np.array(data['t']).reshape(3, 1))
+        # light_pos = np.array(data['R']) @ light_pos.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
+        light_pos = np.array(data['R']) @ (light_pos.reshape(3, 1) + np.array(data['t']).reshape(3, 1))  # real
 
         light_pos = light_pos.reshape(3)
         depth = file_io.load_scaled16bitImage(depth_files[item],
@@ -153,6 +154,7 @@ if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
             dataset_folder = config.synthetic_data_noise_local / args.data / folder
         else:
             raise ValueError
+
         if args.noise == "true":
             noisy_a_folder(original_folder, dataset_folder)
             if not os.path.exists(str(dataset_folder / "tensor")):

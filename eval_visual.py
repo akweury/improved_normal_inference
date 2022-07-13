@@ -247,19 +247,18 @@ def start2(models_path_dict):
                     light_no_mask_img = cv.cvtColor(mu.visual_normal(x_out_light, "", histogram=False),
                                                     cv.COLOR_RGB2BGR)
                     x_out_light[mask] = 0
-                    diff_img, diff_angle = mu.eval_img_angle(x_out_light, light_gt)
-                    diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+                    diff_img, diff = mu.eval_img_angle(x_out_light, light_gt)
 
-                    output_list.append(cv.cvtColor(mu.visual_light(x_out_light, name), cv.COLOR_RGB2BGR))
-                    error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+                    output_list.append(mu.visual_light(x_out_light, name))
+                    error_list.append(mu.visual_diff(x_out_light, light_gt, "angle"))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_input.png"),
-                               cv.cvtColor(mu.visual_light(light_input, "", histogram=False), cv.COLOR_RGB2BGR))
+                               mu.visual_light(light_input, "", histogram=False))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_gt.png"),
-                               cv.cvtColor(mu.visual_light(light_gt, "", histogram=False), cv.COLOR_RGB2BGR))
+                               mu.visual_light(light_gt, "", histogram=False))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_{name}.png"),
-                               cv.cvtColor(mu.visual_light(x_out_light, "", histogram=False), cv.COLOR_RGB2BGR))
+                               mu.visual_light(x_out_light, "", histogram=False))
                     cv.imwrite(str(folder_path / f"fancy_eval_{i}_light_error_{name}.png"),
-                               mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+                               mu.visual_diff(x_out_light, light_gt, "angle"))
 
                     eval_res[model_idx, i] = diff
                 else:
@@ -377,14 +376,14 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
+        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
-        "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
-        "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
+        # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
+        # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

@@ -948,8 +948,9 @@ def eval_img_angle(output, target):
     img[mask] = 0
 
     # img = image_resize(img, width=512, height=512)
+    diff = np.sum(np.abs(angle_matrix)) / np.count_nonzero(angle_matrix)
 
-    return img, angle_matrix / np.sum(~mask)
+    return img, diff
 
 
 def eval_albedo_diff(output, target):
@@ -1100,7 +1101,7 @@ def visual_light(light, name, histogram=True):
     if histogram:
         out_ranges = addHist(light_img)
         addText(light_img, str(out_ranges), pos="upper_right", font_size=0.5)
-
+    light_img = cv.cvtColor(light_img, cv.COLOR_RGB2BGR)
     return light_img
 
 
