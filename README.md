@@ -13,6 +13,14 @@ scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512-5000.zi
 
 ```
 CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
+
+srun \
+  --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
+  --container-workdir="`pwd`" \
+  --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
+  python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
+  
+
 ```
 
 #### resize dataset
