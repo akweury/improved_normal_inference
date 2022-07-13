@@ -8,7 +8,7 @@
   "init_net": null,
   "init_light_net": "light_3_32",
   "optimizer": "adam",
-  "lr": 0.01,
+  "lr": 0.001,
   "lr_scheduler": "9999",
   "momentum": 0.9,
   "penalty": 1.4,
