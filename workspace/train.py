@@ -207,7 +207,7 @@ class TrainingModel():
 
     def print_info(self, args):
         print(f'\n------------------- Starting experiment {self.exp_name} ------------------ \n')
-        print(f'- Model "{self.model.__name__}" was loaded successfully!')
+        # print(f'- Model "{self.model.__name__}" was loaded successfully!')
 
     def save_checkpoint(self, is_best, epoch):
         checkpoint_filename = os.path.join(self.output_folder, 'checkpoint-' + str(epoch) + '.pth.tar')
