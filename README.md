@@ -39,6 +39,15 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 
 ```
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
+
+srun \
+  -p RTX3090
+  --ntasks=1 --gpus-per-task=1 --cpus-per-gpu=6
+  --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
+  --container-workdir="`pwd`" \
+  --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
+  python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 32 --train-on 1000 
+
 ```
 
 #### evaluate the test dataset (no visualisation)

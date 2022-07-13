@@ -104,11 +104,11 @@ class SyntheticDepthDataset(Dataset):
 
 # ----------------------------------------- Training model -------------------------------------------------------------
 class TrainingModel():
-    def __init__(self, args, exp_dir, network, dataset_path, start_epoch=0):
+    def __init__(self, args, exp_dir, network, dataset_path, device_name, start_epoch=0):
         self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device(f"cuda:0")
+        self.device = torch.device(device_name)
         self.exp_name = self.args.exp
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
@@ -653,7 +653,12 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
 
 def main(args, exp_dir, network, train_dataset):
-    nn_model = TrainingModel(args, exp_dir, network, train_dataset)
+    device_name = None
+    available_gpus = [torch.cuda.device(i) for i in range(torch.cuda.device_count())]
+    print(available_gpus)
+    device_name = available_gpus[0]
+
+    nn_model = TrainingModel(args, exp_dir, network, device_name, train_dataset)
 
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
