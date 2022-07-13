@@ -36,6 +36,16 @@ class CNN(nn.Module):
         light_net_dict.update(light_source_net_dict)
         self.light_net.load_state_dict(light_net_dict)
 
+        normal_source_net = NormalGuided(3, 3, self.channel_num)
+        normal_checkpoint = torch.load(config.gcnn_3_32)
+        normal_source_net.load_state_dict(normal_checkpoint['model'].nconv3_3.state_dict())
+        normal_source_net_dict = normal_source_net.state_dict()
+        normal_net_dict = self.g_net.state_dict()
+        normal_source_net_dict = {k: v for k, v in normal_source_net_dict.items() if
+                                  k in normal_net_dict and v.size() == normal_net_dict[k].size()}
+        normal_net_dict.update(normal_source_net_dict)
+        self.g_net.load_state_dict(normal_net_dict)
+
     def forward(self, x):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
