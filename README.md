@@ -12,13 +12,13 @@ scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512-5000.zi
 #### Create dataset
 
 ```
-CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
+CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear false
 
 srun \
   --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear true
+  python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear false
   
 
 ```
@@ -41,12 +41,15 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
 srun \
-  -p RTX3090 \
-  --ntasks=1 --gpus-per-task=1 --cpus-per-gpu=6 \
+  -p batch \
+  --ntasks=1 \
+  --gpus-per-task=1 \
+  --mem=24G \
+  --cpus-per-gpu=6 \
   --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 32 --train-on 1000 
+  python3 main.py --machine remote --exp light --dataset synthetic512 --batch_size 16 --train-on 3000 --resume /home/sha/improved_normal_inference/workspace/light/trained_model/512/checkpoint.pth.tar 
 
 ```
 

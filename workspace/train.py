@@ -108,7 +108,7 @@ class TrainingModel():
         self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device(0)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.exp_name = self.args.exp
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
@@ -169,7 +169,7 @@ class TrainingModel():
             assert os.path.isfile(self.args.resume), f"No checkpoint found at:{self.args.resume}"
             checkpoint = torch.load(self.args.resume)
             self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
-            model = checkpoint['model'].to(self.device)  # resume model
+            model = nn.DataParallel(checkpoint['model']).to(self.device)  # resume model
             self.optimizer = checkpoint['optimizer']  # resume optimizer
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
@@ -183,7 +183,7 @@ class TrainingModel():
             print(f"------------ start a new training work -----------------")
 
             # init model
-            model = network.to(self.device)
+            model = nn.DataParallel(network).to(self.device)
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
             print(f"parameters that require grads: {self.parameters}")
             # init optimizer
@@ -640,10 +640,6 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # mu.addText(diff_img, "Error")
     # mu.addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
     # output_list.append(diff_img)
-
-
-
-
 
     #### post processing
     output = cv.cvtColor(cv.hconcat(output_list), cv.COLOR_RGB2BGR)
