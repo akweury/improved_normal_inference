@@ -1,11 +1,12 @@
 # Improved Normal Inference
 
 ### Command for remote machine
-
+serv-3305.kl.dfki.de (kiew)
+serv-3306.kl.dfki.de (koeln)
 #### copy dataset from local to remote
 
 ```
-scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512\test.zip sha@pc-2103:/datasets/sha/data_synthetic/synthetic512
+scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512-5000.zip serv-3305.kl.dfki.de:/netscratch/sha/data_synthetic/synthetic512
 ```
 
 #### Create dataset
