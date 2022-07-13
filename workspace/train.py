@@ -653,10 +653,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
 
 def main(args, exp_dir, network, train_dataset):
-    device_name = None
-    available_gpus = [torch.cuda.device(i) for i in range(torch.cuda.device_count())]
-    print(available_gpus)
-    device_name = available_gpus[0]
+    device_name = "cuda:0"
 
     nn_model = TrainingModel(args, exp_dir, network, device_name, train_dataset)
 
