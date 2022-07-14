@@ -169,7 +169,7 @@ class TrainingModel():
             assert os.path.isfile(self.args.resume), f"No checkpoint found at:{self.args.resume}"
             checkpoint = torch.load(self.args.resume)
             self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
-            model = nn.DataParallel(checkpoint['model']).to(self.device)  # resume model
+            model = nn.DataParallel(checkpoint['model']).to(0)  # resume model
             self.optimizer = checkpoint['optimizer']  # resume optimizer
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
@@ -183,7 +183,7 @@ class TrainingModel():
             print(f"------------ start a new training work -----------------")
 
             # init model
-            model = nn.DataParallel(network).to(self.device)
+            model = nn.DataParallel(network).to(0)
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
             print(f"parameters that require grads: {self.parameters}")
             # init optimizer
