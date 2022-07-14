@@ -289,7 +289,7 @@ def train_epoch(nn_model, epoch):
 
         # Clear the gradients
         nn_model.optimizer.zero_grad()
-        torch.autograd.set_detect_anomaly(True)
+        # torch.autograd.set_detect_anomaly(True)
         # Forward pass
         out = nn_model.model(input)
 
