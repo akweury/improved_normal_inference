@@ -169,7 +169,13 @@ class TrainingModel():
             assert os.path.isfile(self.args.resume), f"No checkpoint found at:{self.args.resume}"
             checkpoint = torch.load(self.args.resume)
             self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
-            model = nn.DataParallel(checkpoint['model']).to(0)  # resume model
+            model = checkpoint['model']  # resume model
+            if torch.cuda.device_count() > 1:
+                print("Let's use", torch.cuda.device_count(), "GPUs!")
+                model = nn.DataParallel(model)
+
+            model.to(0)
+
             self.optimizer = checkpoint['optimizer']  # resume optimizer
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
@@ -183,7 +189,13 @@ class TrainingModel():
             print(f"------------ start a new training work -----------------")
 
             # init model
-            model = nn.DataParallel(network).to(0)
+            model = network
+            if torch.cuda.device_count() > 1:
+                print("Let's use", torch.cuda.device_count(), "GPUs!")
+                model = nn.DataParallel(model)
+
+            model.to(0)
+
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
             print(f"parameters that require grads: {self.parameters}")
             # init optimizer
@@ -273,9 +285,9 @@ def train_epoch(nn_model, epoch):
     albedo_loss_total = torch.tensor([0.0])
     g_loss_total = torch.tensor([0.0])
     light_loss_total = torch.tensor([0.0])
-    for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
+    for i, (input_tensor, target_tensor, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
-        input, target, loss = input.float().to(0), target.float().to(0), torch.tensor(
+        input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor(
             [0.0]).to(0)
 
         # Wait for all kernels to finish
@@ -402,10 +414,10 @@ def train_epoch(nn_model, epoch):
 
 
 def test_epoch(nn_model, epoch):
-    for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
+    for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
         with torch.no_grad():
             # put input and target to device
-            input, target = input.to(0), target.to(0)
+            input, target = input_tensor.to(0), target_tensor.to(0)
             input = input[-1:, :]
             target = target[-1:, :]
             print(test_idx)
