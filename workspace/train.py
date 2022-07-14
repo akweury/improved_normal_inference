@@ -168,9 +168,9 @@ class TrainingModel():
             checkpoint = torch.load(self.args.resume)
             self.start_epoch = checkpoint['epoch'] + 1  # resume epoch
             model = checkpoint['model'].to(0)  # resume model
-            if torch.cuda.device_count() > 1:
-                print("Let's use", torch.cuda.device_count(), "GPUs!")
-                model = nn.DataParallel(model)
+            # if torch.cuda.device_count() > 1:
+            #     print("Let's use", torch.cuda.device_count(), "GPUs!")
+            #     model = nn.DataParallel(model)
 
             self.optimizer = checkpoint['optimizer']  # resume optimizer
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
@@ -186,9 +186,9 @@ class TrainingModel():
 
             # init model
             model = network.to(0 if torch.cuda.is_available() else "cpu")
-            if torch.cuda.device_count() > 1:
-                print("Let's use", torch.cuda.device_count(), "GPUs!")
-                model = nn.DataParallel(model)
+            # if torch.cuda.device_count() > 1:
+            #     print("Let's use", torch.cuda.device_count(), "GPUs!")
+            #     model = nn.DataParallel(model)
 
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
             print(f"parameters that require grads: {self.parameters}")
