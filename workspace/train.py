@@ -108,7 +108,7 @@ class TrainingModel():
         self.missing_keys = None
         self.args = args
         self.start_epoch = start_epoch
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(0 if torch.cuda.is_available() else "cpu")
         self.exp_name = self.args.exp
         self.exp_dir = Path(exp_dir)
         self.output_folder = self.init_output_folder()
@@ -147,11 +147,9 @@ class TrainingModel():
         # test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
                                        shuffle=True,
-                                       batch_size=self.args.batch_size,
-                                       num_workers=4)
+                                       batch_size=self.args.batch_size)
         test_data_loader = DataLoader(test_dataset,
-                                      batch_size=self.args.batch_size,
-                                      num_workers=4)
+                                      batch_size=self.args.batch_size)
         print('\n- Found {} images in "{}" folder.'.format(train_data_loader.dataset.__len__(), 'train'))
         print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'selval'))
 
