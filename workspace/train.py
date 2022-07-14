@@ -275,8 +275,8 @@ def train_epoch(nn_model, epoch):
     light_loss_total = torch.tensor([0.0])
     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
-        input, target, loss = input.float().to(nn_model.device), target.float().to(nn_model.device), torch.tensor(
-            [0.0]).to(nn_model.device)
+        input, target, loss = input.float().to(0), target.float().to(0), torch.tensor(
+            [0.0]).to(0)
 
         # Wait for all kernels to finish
         torch.cuda.synchronize()
@@ -405,7 +405,7 @@ def test_epoch(nn_model, epoch):
     for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
         with torch.no_grad():
             # put input and target to device
-            input, target = input.to(nn_model.device), target.to(nn_model.device)
+            input, target = input.to(0), target.to(0)
             input = input[-1:, :]
             target = target[-1:, :]
             print(test_idx)
