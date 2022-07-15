@@ -1179,14 +1179,14 @@ def visual_diff(gt, out, eval_type):
     return diff_img
 
 
-def change_dict_name(old_net_dict, new_net_dict, prefix):
+def change_light_dict_name(old_net_dict, new_net_dict, prefix):
     for new_key, new_value in new_net_dict.items():
 
         old_key = new_key[2:]
 
-        if "uconv" in old_key:
-            old_key = old_key[:5] + str(int(old_key[5]) + 2) + old_key[6:]
-            print(f"old key: {old_key}")
+        # if "uconv" in old_key:
+        #     old_key = old_key[:5] + str(int(old_key[5]) + 2) + old_key[6:]
+        #     print(f"old key: {old_key}")
         if old_key in old_net_dict:
             old_net_dict[new_key] = old_net_dict[old_key]
             del old_net_dict[old_key]
