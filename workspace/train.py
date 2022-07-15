@@ -357,7 +357,7 @@ def train_epoch(nn_model, epoch):
             loss_total += albedo_loss_total
 
         if nn_model.args.light_loss:
-            if nn_model.args.exp == "light":
+            if nn_model.args.exp in ["light", "albedoGated"]:
                 g_l, g_r = 0, 3
             elif nn_model.args.exp == "ag":
                 g_l, g_r = 3, 6
