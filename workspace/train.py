@@ -176,7 +176,10 @@ class TrainingModel():
             # self.optimizer = SGD(self.parameters, lr=self.args.lr, momentum=self.args.momentum, weight_decay=0)
             # self.args = checkpoint['args']
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
-            print(f"parameters that require grads: {self.parameters}")
+
+            print("pretrained net state_dict: ")
+            print(checkpoint['model'].state_dict())
+            
             self.losses[:, :checkpoint['epoch']] = checkpoint['losses']
             self.angle_losses[:, :checkpoint['epoch']] = checkpoint['angle_losses']
 
