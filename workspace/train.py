@@ -178,8 +178,8 @@ class TrainingModel():
             self.parameters = filter(lambda p: p.requires_grad, model.parameters())
 
             print("pretrained net state_dict: ")
-            print(checkpoint['model'].state_dict())
-            
+            print(checkpoint['model'].state_dict().keys())
+
             self.losses[:, :checkpoint['epoch']] = checkpoint['losses']
             self.angle_losses[:, :checkpoint['epoch']] = checkpoint['angle_losses']
 

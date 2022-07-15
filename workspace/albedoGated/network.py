@@ -20,7 +20,7 @@ class CNN(nn.Module):
         self.g_net = GNet2(3, 3, channel_num)
         self.remove_grad()
         print("g_net_state_dict: ")
-        print(self.g_net.state_dict())
+        print(self.g_net.state_dict().keys())
 
     def remove_grad(self):
         for param in self.light_net.parameters():
