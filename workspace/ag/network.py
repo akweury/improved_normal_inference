@@ -29,7 +29,7 @@ class CNN(nn.Module):
         for param in self.light_net.parameters():
             param.requires_grad = False
 
-    def init_net(self, model_name):
+    def init_net(self):
         normal_source_net = NormalGuided(3, 3, self.channel_num)
         normal_checkpoint = torch.load(config.gcnn_3_32)
         normal_source_net.load_state_dict(normal_checkpoint['model'].nconv3_3.state_dict())
