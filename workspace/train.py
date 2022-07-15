@@ -337,7 +337,7 @@ def train_epoch(nn_model, epoch):
             albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :], nn_model.args.albedo_threshold)
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(out[:, 3:4, :, :], albedo_gt,
+            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(out[:, 6:7, :, :], albedo_gt,
                                                                    nn_model.args.penalty,
                                                                    0, 1)
 
@@ -393,7 +393,7 @@ def train_epoch(nn_model, epoch):
         plot_loss_per_axis(light_loss_total, nn_model, epoch, title="light_loss")
     if nn_model.args.albedo_loss:
         nn_model.losses[9, epoch] = albedo_loss_total / len(nn_model.train_loader.dataset)
-        draw_line_chart(np.array([nn_model.losses[6]]), nn_model.output_folder,
+        draw_line_chart(np.array([nn_model.losses[9]]), nn_model.output_folder,
                         log_y=True, label="albedo", epoch=epoch, start_epoch=0, title="albedo_loss", cla_leg=True)
 
     # indicate for best model saving
@@ -587,6 +587,8 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
     x_out_light = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
     g_out = xout[0, 3:6, :, :].permute(1, 2, 0).to('cpu').numpy()
+    rho_out = xout[0, 6:7, :, :].permute(1, 2, 0).to('cpu').numpy()
+
     mask = gt.sum(axis=2) == 0
     # input
     output_list.append(mu.visual_vertex(vertex_0, "input(vertex)"))
@@ -600,6 +602,21 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
+    elif exp_name == "ag":
+        x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
+        rho_out = xout[0, 6:7, :, :].permute(1, 2, 0).to('cpu').numpy()
+        albedo_gt = img_gt / (1e-20 + g_gt)
+
+        # albedo
+        output_list.append(mu.visual_albedo(rho_out, mask, "pred"))
+        output_list.append(mu.visual_albedo(albedo_gt, mask, "gt"))
+        output_list.append(mu.visual_diff(albedo_gt, rho_out, "pixel"))
+
+        # normal
+        x_out_normal[mask] = 0
+        output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
+
     elif exp_name == "albedoGated":
         # g
         g_out[mask] = 0

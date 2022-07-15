@@ -519,52 +519,6 @@
     \field{year}{2018}
   \endentry
 
-  \entry{perceptual-loss}{misc}{}
-    \name{author}{3}{}{%
-      {{hash=JJ}{%
-         family={Johnson},
-         familyi={J\bibinitperiod},
-         given={Justin},
-         giveni={J\bibinitperiod},
-      }}%
-      {{hash=AA}{%
-         family={Alahi},
-         familyi={A\bibinitperiod},
-         given={Alexandre},
-         giveni={A\bibinitperiod},
-      }}%
-      {{hash=FFL}{%
-         family={Fei-Fei},
-         familyi={F\bibinithyphendelim F\bibinitperiod},
-         given={Li},
-         giveni={L\bibinitperiod},
-      }}%
-    }
-    \list{publisher}{1}{%
-      {arXiv}%
-    }
-    \keyw{Computer Vision and Pattern Recognition (cs.CV), Machine Learning
-  (cs.LG), FOS: Computer and information sciences, FOS: Computer and
-  information sciences}
-    \strng{namehash}{JJAAFFL1}
-    \strng{fullhash}{JJAAFFL1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2016}
-    \field{labeldatesource}{}
-    \field{sortinit}{J}
-    \field{sortinithash}{J}
-    \verb{doi}
-    \verb 10.48550/ARXIV.1603.08155
-    \endverb
-    \field{title}{Perceptual Losses for Real-Time Style Transfer and
-  Super-Resolution}
-    \verb{url}
-    \verb https://arxiv.org/abs/1603.08155
-    \endverb
-    \field{year}{2016}
-  \endentry
-
   \entry{adam}{misc}{}
     \name{author}{2}{}{%
       {{hash=KDP}{%

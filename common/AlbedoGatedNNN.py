@@ -9,7 +9,7 @@ class AlbedoNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.__name__ = 'albedoNet'
-
+        self.sigmoid = nn.Sigmoid()
         self.albedo1 = GConv(6, 1, (3, 3), (1, 1), (1, 1))
         self.albedo2 = GConv(2, 1, (3, 3), (1, 1), (1, 1))
         self.albedo3 = nn.Conv2d(1, 1, (3, 3), (1, 1), (1, 1))

@@ -5,6 +5,7 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.ResNormalGuided import NormalGuided
+from common.AlbedoGatedNNN import AlbedoNet
 import config
 
 
@@ -17,7 +18,8 @@ class CNN(nn.Module):
         self.channel_num = channel_num
         self.normal_net = NormalGuided(3, 3, channel_num)
         self.light_net = NormalGuided(3, 3, channel_num)
-        self.remove_grad()
+        self.albedo_net = AlbedoNet()
+        # self.remove_grad()
 
         self.net11_3_refine = NormalGuided(7, 3, channel_num)
 
@@ -54,8 +56,6 @@ class CNN(nn.Module):
         x_vertex = x[:, :3, :, :]
         x_img = x[:, 3:4, :, :]
         x_light = x[:, 4:7, :, :]
-        input_mask = torch.sum(torch.abs(x_vertex), dim=1) > 0
-        input_mask = input_mask.unsqueeze(1)
 
         # normal predict
         x_normal_out = self.normal_net(x_vertex)
@@ -64,7 +64,7 @@ class CNN(nn.Module):
         x_light_out = self.light_net(x_light)
 
         # refine normal
-        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_light_out, x_img), dim=1))
+        x_albedo = self.albedo_net(x_normal_out, x_light_out, x_img)
 
-        xout = torch.cat((x_normal_out, x_light_out, input_mask), 1)
+        xout = torch.cat((x_normal_out, x_light_out, x_albedo), 1)
         return xout

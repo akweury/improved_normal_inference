@@ -949,7 +949,7 @@ def eval_img_angle(output, target):
 
     # img = image_resize(img, width=512, height=512)
     diff = np.sum(np.abs(angle_matrix)) / np.count_nonzero(angle_matrix)
-
+    img = image_resize(img, 512, 512)
     return img, diff
 
 
@@ -1157,15 +1157,17 @@ def eval_img_pixel(gt, out):
     diff = np.abs(gt - out)
     diff_8bit = cv.normalize(diff, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     diff_8bit = cv.applyColorMap(diff_8bit, cv.COLORMAP_HOT)
+
     diff_8bit[mask] = 0
     diff_avg = diff.sum() / np.sum(~mask)
+    diff_8bit = image_resize(diff_8bit, 512, 512)
     return diff_8bit, diff_avg
 
 
 def visual_diff(gt, out, eval_type):
     if eval_type == "angle":
         diff_img, diff_avg = eval_img_angle(gt, out)
-        
+
     elif eval_type == "pixel":
         diff_img, diff_avg = eval_img_pixel(gt, out)
     else:
