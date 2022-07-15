@@ -18,6 +18,7 @@ class CNN(nn.Module):
         self.channel_num = channel_num
         self.normal_net = NormalGuided(3, 3, channel_num)
         self.light_net = NormalGuided(3, 3, channel_num)
+
         self.albedo_net = AlbedoNet()
         # self.remove_grad()
 
@@ -59,12 +60,15 @@ class CNN(nn.Module):
 
         # normal predict
         x_normal_out = self.normal_net(x_vertex)
-
+        input_mask = torch.sum(torch.abs(x_vertex), dim=1) > 0
+        input_mask = input_mask.unsqueeze(1)
         # light inpaint
         x_light_out = self.light_net(x_light)
 
         # refine normal
-        x_albedo = self.albedo_net(x_normal_out, x_light_out, x_img)
+        # x_albedo = self.albedo_net(x_normal_out, x_light_out, x_img)
+        x_normal_out = self.net11_3_refine(torch.cat((x_normal_out, x_light_out, x_img), 1))
 
-        xout = torch.cat((x_normal_out, x_light_out, x_albedo), 1)
+        xout = torch.cat((x_normal_out, x_light_out, input_mask), 1)
+        # xout = torch.cat((x_normal_out, x_light_out, x_albedo), 1)
         return xout

@@ -263,26 +263,10 @@ def start2(models_path_dict):
                     eval_res[model_idx, i] = diff
                 else:
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
-                    if args.exp not in ["albedoGated"]:
-                        normal = xout[:, :, :3]
-                        normal[mask] = 0
-                        diff_img, diff_angle = mu.eval_img_angle(normal, gt)
-                        diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
-                        # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
-                        # if normal_no_mask_img is not None:
-                        #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
-                        output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
-                        error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
 
-                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
-                                   cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
-                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
-                                   mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
 
-                        eval_res[model_idx, i] = diff
-
-                    else:
+                    if args.exp == "albedoGated":
                         g_out_norm = xout[:, :, 3:6]
                         x_out_light = xout[:, :, :3]
                         g_out_norm[mask] = 0
@@ -319,7 +303,7 @@ def start2(models_path_dict):
                         # if normal_no_mask_img is not None:
                         #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
                         output_list.append(cv.cvtColor(mu.visual_normal(x_out_normal, name), cv.COLOR_RGB2BGR))
-                        output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
+                        # output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
                         error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
 
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
@@ -338,6 +322,38 @@ def start2(models_path_dict):
                     # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
                     # error_list.append(
                     #     mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
+
+                    else:
+                        normal = xout[:, :, :3]
+                        normal[mask] = 0
+                        diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+                        diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                        # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+                        # if normal_no_mask_img is not None:
+                        #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+
+                        output_list.append(cv.cvtColor(mu.visual_normal(normal, name), cv.COLOR_RGB2BGR))
+                        error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                                   cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
+                                   mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+
+                        eval_res[model_idx, i] = diff
+
+                        if args.exp == "ag":
+                            light_out = xout[:, :, 3:6]
+                            normal_out = xout[:, :, :3]
+                            g_out = np.sum(normal_out * light_out, axis=-1, keepdims=True)
+                            albedo_out = img_0 / (g_out + 1e-20)
+                            albedo_gt = img_0 / (1e-20 + scaleProd_gt)
+
+                            # albedo
+                            output_list.append(mu.visual_albedo(albedo_out, mask, "pred"))
+                            output_list.append(mu.visual_albedo(albedo_gt, mask, "gt"))
+                            output_list.append(mu.visual_diff(albedo_gt, albedo_out, "pixel"))
 
             # visual normal
             # output_list.append(mu.visual_normal(normal, name))
@@ -375,15 +391,15 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
-        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        "SVD": None,
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
+        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
         # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
-        # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

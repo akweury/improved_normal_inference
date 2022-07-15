@@ -319,7 +319,13 @@ def train_epoch(nn_model, epoch):
                         mask)
 
             # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.g_loss = loss_utils.weighted_unit_vector_loss(out[:, 3:6, :, :], g_gt,
+            if nn_model.args.exp == "an":
+                g_l, g_r = 0, 3
+            elif nn_model.args.exp == "albedoGated":
+                g_l, g_r = 3, 6
+            else:
+                raise ValueError
+            nn_model.g_loss = loss_utils.weighted_unit_vector_loss(out[:, g_l:g_r, :, :], g_gt,
                                                                    nn_model.args.penalty,
                                                                    epoch,
                                                                    nn_model.args.loss_type,
@@ -615,6 +621,33 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         # normal
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
+    elif exp_name == "an":
+        # g
+        g_out = xout[0, 0:3, :, :].permute(1, 2, 0).to('cpu').numpy()
+        g_out[mask] = 0
+        mask_tensor = torch.prod(target == 0, dim=1, keepdim=True).bool()
+        g_gt = mu.g(target[:, 4:5, :, :],
+                    target[:, 3:4, :, :],
+                    target[:, :3, :, :],
+                    tranculate_threshold,
+                    mask_tensor).permute(2, 3, 1, 0).squeeze(-1).numpy()
+
+        albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
+        albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
+
+        # albedo
+        output_list.append(mu.visual_albedo(albedo_out, mask, "pred"))
+        output_list.append(mu.visual_albedo(albedo_gt, mask, "gt"))
+        output_list.append(mu.visual_diff(albedo_gt, albedo_out, "pixel"))
+
+        # normal
+        x_out_normal = g_out / (albedo_out + 1e-20)
+        x_gt_normal = g_gt / (albedo_gt + 1e-20)
+        x_out_normal[mask] = 0
+
+        output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_normal(x_gt_normal, "gt_recon"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
 
     elif exp_name == "albedoGated":
