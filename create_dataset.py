@@ -113,6 +113,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
         # mu.show_images(albedo_img, "a")
 
+        ###################  target  ####################
         target = np.c_[
             gt_normal,  # 0,1,2
             np.sum(gt_normal * light_direction_gt, axis=-1, keepdims=True),  # 3
@@ -120,9 +121,11 @@ def convert2training_tensor(path, k, output_type='normal'):
             light_direction_gt  # 5,6,7
         ]
 
-        # case of resng, ng
+        ################### input #######################
         vertex_norm[mask] = 0
-        vectors = np.c_[vertex_norm, np.expand_dims(img, axis=2), light_direction]
+        vectors = np.c_[vertex_norm,  # 0,1,2
+                        np.expand_dims(img, axis=2),  # 3
+                        light_direction]  # 4,5,6
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)

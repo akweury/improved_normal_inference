@@ -43,50 +43,50 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.3.2}Lambertian Surface}{11}{subsection.45}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.3}Light Map}{11}{subsection.47}%
+\contentsline {subsection}{\numberline {3.3.3}Light Map}{11}{subsection.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Calculation}{11}{section*.48}%
+\contentsline {paragraph}{Calculation}{11}{section*.47}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Inpainting}{11}{section*.50}%
+\contentsline {paragraph}{Inpainting}{11}{section*.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{15}{chapter.52}%
+\contentsline {chapter}{\numberline {4}Dataset}{15}{chapter.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{15}{section.53}%
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{15}{section.52}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{15}{subsection.54}%
+\contentsline {subsection}{\numberline {4.1.1}Resource}{15}{subsection.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{15}{subsection.56}%
+\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{15}{subsection.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{17}{subsection.59}%
+\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{17}{subsection.58}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{18}{subsection.61}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{18}{subsection.60}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Noise}{19}{subsection.64}%
+\contentsline {subsection}{\numberline {4.1.5}Noise}{19}{subsection.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{19}{subsection.66}%
+\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{19}{subsection.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{21}{chapter.68}%
+\contentsline {chapter}{\numberline {5}Experiments}{21}{chapter.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{21}{section.69}%
+\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{21}{section.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.1}Qualitative Evaluation}{21}{subsection.70}%
+\contentsline {subsection}{\numberline {5.1.1}Qualitative Evaluation}{21}{subsection.69}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.2}Quantitative Evaluation }{21}{subsection.74}%
+\contentsline {subsection}{\numberline {5.1.2}Quantitative Evaluation }{21}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.3}Speed}{22}{subsection.76}%
+\contentsline {subsection}{\numberline {5.1.3}Speed}{22}{subsection.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{22}{section.77}%
+\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{22}{section.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{23}{section.78}%
+\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{23}{section.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}model comparison}{24}{section.80}%
+\contentsline {section}{\numberline {5.4}model comparison}{24}{section.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{25}{chapter.81}%
+\contentsline {chapter}{\numberline {6}Conclusion}{25}{chapter.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{27}{appendix.82}%
+\contentsline {chapter}{\numberline {A}Dataset}{27}{appendix.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{27}{section.83}%
+\contentsline {section}{\numberline {A.1}Dataset}{27}{section.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{27}{section.87}%
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{27}{section.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{31}{appendix*.88}%
+\contentsline {chapter}{Bibliography}{31}{appendix*.87}%

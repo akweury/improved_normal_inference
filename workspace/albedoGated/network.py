@@ -7,7 +7,7 @@ import torch.nn as nn
 from common.ResNormalGuided import NormalGuided
 from common.AlbedoGatedNNN import GNet
 import config
-
+from help_funs import mu
 
 # from common.NormalizedNNN import NormalizedNNN
 
@@ -31,6 +31,9 @@ class CNN(nn.Module):
         light_source_net.load_state_dict(light_checkpoint['model'].light3_3.state_dict())
         light_source_net_dict = light_source_net.state_dict()
         light_net_dict = self.light_net.state_dict()
+
+        light_source_net_dict = mu.change_light_dict_name(light_source_net_dict, light_net_dict, "l_")
+
         light_source_net_dict = {k: v for k, v in light_source_net_dict.items() if
                                  k in light_net_dict and v.size() == light_net_dict[k].size()}
         light_net_dict.update(light_source_net_dict)

@@ -1124,14 +1124,15 @@ def visual_img(img, name, upper_right=None, font_scale=0.8):
     return img
 
 
-def visual_albedo(rho, mask, name):
+def visual_albedo(rho, mask, name, histo=True):
     # albedo = (rho * (2 * tranculate_threshold) - tranculate_threshold) * 255
     albedo = np.uint8(rho)
     albedo[mask] = 0
     img = visual_img(albedo, name)
-    img_ranges = addHist(img)
-    addText(img, str(img_ranges), pos="upper_right", font_size=0.5)
-    addText(img, f"{name}(albedo)", font_size=0.8)
+    if histo:
+        img_ranges = addHist(img)
+        addText(img, str(img_ranges), pos="upper_right", font_size=0.5)
+    # addText(img, f"{name}(albedo)", font_size=0.8)
     return img
 
 
