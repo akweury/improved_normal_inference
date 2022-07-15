@@ -5,7 +5,7 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.ResNormalGuided import NormalGuided
-from common.AlbedoGatedNNN import GNet
+from common.AlbedoGatedNNN import GNet2
 import config
 from help_funs import mu
 
@@ -17,7 +17,7 @@ class CNN(nn.Module):
         # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
         self.light_net = NormalGuided(3, 3, channel_num)
-        self.g_net = GNet(3, 3, channel_num)
+        self.g_net = GNet2(3, 3, channel_num)
         self.remove_grad()
 
     def remove_grad(self):
@@ -32,7 +32,7 @@ class CNN(nn.Module):
         light_source_net_dict = light_source_net.state_dict()
         light_net_dict = self.light_net.state_dict()
 
-        light_source_net_dict = mu.change_light_dict_name(light_source_net_dict, light_net_dict, "l_")
+        # light_source_net_dict = mu.change_light_dict_name(light_source_net_dict, light_net_dict, "l_")
 
         light_source_net_dict = {k: v for k, v in light_source_net_dict.items() if
                                  k in light_net_dict and v.size() == light_net_dict[k].size()}
