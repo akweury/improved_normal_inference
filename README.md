@@ -60,7 +60,7 @@ srun \
  --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh  \
  --container-workdir="`pwd`" \
  --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
- python3 main.py --machine remote --exp light --dataset synthetic512 --batch_size 12 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-13_19_01_11/checkpoint-919.pth.tar
+ python3 main.py --machine remote --exp light --dataset synthetic512 --batch_size 12 --train-on 2000 --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-14_10_41_23/checkpoint-2074.pth.tar
 
 
 ```

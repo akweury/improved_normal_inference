@@ -354,7 +354,14 @@ def train_epoch(nn_model, epoch):
             loss_total += albedo_loss_total
 
         if nn_model.args.light_loss:
-            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+            if nn_model.args.exp == "light":
+                g_l, g_r = 0, 3
+            elif nn_model.args.exp == "ag":
+                g_l, g_r = 3, 6
+            else:
+                raise ValueError
+
+            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, g_l:g_r, :, :],
                                                                        target[:, 5:8, :, :],
                                                                        nn_model.args.penalty,
                                                                        epoch,
