@@ -313,15 +313,48 @@ def start2(models_path_dict):
 
                         eval_res[model_idx, i] = diff
 
-                        # diff_albedo = np.abs(albedo_out - albedo_gt)
-                        # diff_albedo_img = cv.applyColorMap(cv.normalize(diff_albedo, None, 0, 255,
-                        #                                                 cv.NORM_MINMAX, dtype=cv.CV_8U),
-                        #                                    cv.COLORMAP_HOT)
-                        # diff_albedo_avg = np.sum(diff_albedo) / np.count_nonzero(diff_albedo)
-                    # mu.addText(diff_albedo_img, name)
-                    # mu.addText(diff_albedo_img, f"error: {int(diff_albedo_avg)}", pos="upper_right", font_size=0.65)
-                    # error_list.append(
-                    #     mu.visual_img(diff_albedo_img, name, upper_right=int(diff_albedo_avg), font_scale=font_scale))
+                    elif args.exp == "an":
+                        g_out = xout[:, :, 0:3]
+                        g_out[mask] = 0
+                        mask_tensor = torch.prod(gt_tensor == 0, dim=1, keepdim=True).bool()
+                        g_gt = mu.g(gt_tensor[:, 4:5, :, :],
+                                    gt_tensor[:, 3:4, :, :],
+                                    gt_tensor[:, :3, :, :],
+                                    args.albedo_threshold,
+                                    mask_tensor).permute(2, 3, 1, 0).squeeze(-1).numpy()
+
+                        albedo_out = np.linalg.norm(g_out, axis=-1, ord=2, keepdims=True)
+                        albedo_gt = np.linalg.norm(g_gt, axis=-1, ord=2, keepdims=True)
+
+                        albedo_out_img = mu.visual_albedo(albedo_out, mask, "pred")
+                        albedo_gt_img = mu.visual_albedo(albedo_gt, mask, "gt")
+                        output_list.append(albedo_out_img)
+                        output_list.append(albedo_gt_img)
+
+                        # albedo err visualisation
+                        diff_img, diff_avg = mu.eval_albedo_diff(albedo_out, albedo_gt)
+
+                        mu.addText(diff_img, "Error")
+                        mu.addText(diff_img, f"angle error: {int(diff_avg)}", pos="upper_right", font_size=0.65)
+                        output_list.append(diff_img)
+
+                        x_out_normal = g_out / (albedo_out + 1e-20)
+                        diff_img, diff_angle = mu.eval_img_angle(x_out_normal, gt)
+                        diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                        # mu.save_array(normal, str(folder_path / f"fancy_eval_{i}_normal_{name}"))
+                        # if normal_no_mask_img is not None:
+                        #     cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}_no_mask.png"), normal_no_mask_img)
+                        output_list.append(cv.cvtColor(mu.visual_normal(x_out_normal, name), cv.COLOR_RGB2BGR))
+                        # output_list.append(cv.cvtColor(mu.visual_normal(x_gt_normal, "gt_recon"), cv.COLOR_RGB2BGR))
+                        error_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=font_scale))
+
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                                   cv.cvtColor(mu.visual_normal(x_out_normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
+                                   mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+
+                        eval_res[model_idx, i] = diff
 
                     else:
                         normal = xout[:, :, :3]
@@ -394,7 +427,8 @@ if __name__ == '__main__':
         "SVD": None,
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
-        "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
+        # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
+        "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
         "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
