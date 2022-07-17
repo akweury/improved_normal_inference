@@ -51,7 +51,7 @@ srun \
   --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 8 --train-on 50 --resume /home/sha/improved_normal_inference/workspace/albedoGated/output_2022-07-13_18_28_03/checkpoint-307.pth.tar
+  python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 12 --train-on 50 --resume /home/sha/improved_normal_inference/workspace/albedoGated/output_2022-07-13_18_28_03/checkpoint-307.pth.tar
 
 srun \
  -p batch \
