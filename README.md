@@ -41,7 +41,9 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
 srun \
-  -p RTXA6000 \
+  --job-name="INI-light-full" \
+  --time=2-00:00 \
+  -p batch \
   --ntasks=1 \
   --gpus-per-task=1 \
   --mem=64G \
@@ -49,7 +51,7 @@ srun \
   --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 main.py --machine remote --exp an --dataset synthetic512 --batch_size 20 --train-on 4000 --resume /home/sha/improved_normal_inference/workspace/albedoGated/output_2022-07-13_18_28_03/checkpoint-307.pth.tar
+  python3 main.py --machine remote --exp light --dataset synthetic512 --batch_size 10 --train-on 4000 --resume /home/sha/improved_normal_inference/workspace/albedoGated/output_2022-07-13_18_28_03/checkpoint-307.pth.tar
 
 srun \
  -p batch \

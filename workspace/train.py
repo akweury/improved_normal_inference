@@ -286,19 +286,27 @@ def train_epoch(nn_model, epoch):
         # put input and target to device
         input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor(
             [0.0]).to(0)
+        mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
 
         # Wait for all kernels to finish
         torch.cuda.synchronize()
 
         # Clear the gradients
         nn_model.optimizer.zero_grad()
-        # torch.autograd.set_detect_anomaly(True)
+        torch.autograd.set_detect_anomaly(True)
         # Forward pass
         out = nn_model.model(input)
 
         # Compute the loss
+
         if nn_model.args.normal_loss:
-            nn_model.normal_loss = loss_utils.weighted_unit_vector_loss(out[:, :3, :, :],
+            if nn_model.args.exp == "an":
+                a = out.detach().clone()
+                normal_out = a / (torch.linalg.norm(a, dim=1, keepdim=True, ord=2) + 1e-20)
+            else:
+                normal_out = out[:, :3, :, :]
+
+            nn_model.normal_loss = loss_utils.weighted_unit_vector_loss(normal_out,
                                                                         target[:, :3, :, :],
                                                                         nn_model.args.penalty,
                                                                         epoch,
@@ -310,7 +318,6 @@ def train_epoch(nn_model, epoch):
             loss_total += normal_loss_total
 
         if nn_model.args.g_loss:
-            mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
 
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
 
@@ -340,13 +347,11 @@ def train_epoch(nn_model, epoch):
             g_loss_total += nn_model.g_loss.detach().to('cpu')
             loss_total += g_loss_total
         if nn_model.args.albedo_loss:
-            mask = torch.prod(target == 0, dim=1, keepdim=True).bool()
-
             # print("target img minmax:" + str(target[:, 4:5, :, :].max()))
-            albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :], nn_model.args.albedo_threshold)
 
-            # print("albedo maxmin: " + str(albedo_target.max()) + str(albedo_target.min()))
-            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(out[:, 6:7, :, :], albedo_gt,
+            albedo_out = torch.linalg.norm(out.permute(0, 2, 3, 1), dim=-1, keepdim=True, ord=2).permute(0, 3, 1, 2)
+            albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :], nn_model.args.albedo_threshold)
+            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(albedo_out, albedo_gt,
                                                                    nn_model.args.penalty,
                                                                    0, 1)
 

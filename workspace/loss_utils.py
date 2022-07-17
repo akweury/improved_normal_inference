@@ -57,6 +57,29 @@ def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     return torch.sum((outputs - target) ** 2) / torch.sum(mask)
 
 
+def weighted_rho_n_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
+    # give penalty to outliers
+    outputs = outputs[:, :3, :, :].permute(0, 2, 3, 1)
+    normal_gt = target[:, :3, :, :].permute(0, 2, 3, 1)
+    mask_too_high = torch.gt(outputs, scale_threshold).bool().detach()
+    mask_too_low = torch.lt(outputs, -scale_threshold).bool().detach()
+    outputs[mask_too_high] = outputs[mask_too_high] * penalty
+    outputs[mask_too_low] = outputs[mask_too_low] * penalty
+
+    # calc the loss
+    mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+
+    outputs.permute(0, 2, 3, 1)
+    albedo_out = torch.linalg.norm(outputs.permute(0, 2, 3, 1), dim=-1, keepdim=True, ord=2)
+    normal_out = outputs.permute(0, 2, 3, 1) / (albedo_out + 1e-20)
+
+    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
+    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
+    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
+
+    return loss.float()
+
+
 def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
     # give penalty to outliers
     outputs = outputs[:, :3, :, :]

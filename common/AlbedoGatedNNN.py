@@ -23,7 +23,7 @@ class AlbedoNet(nn.Module):
 
 
 #
-class GNet(nn.Module):
+class GNet2(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         # self.__name__ = 'gnet'
@@ -168,7 +168,7 @@ class GNet(nn.Module):
         return xout
 
 
-class GNet2(nn.Module):
+class GNet(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         # self.__name__ = 'gnet'
