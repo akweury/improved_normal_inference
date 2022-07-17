@@ -23,7 +23,7 @@ class AlbedoNet(nn.Module):
 
 
 #
-class GNet2(nn.Module):
+class GNet(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         # self.__name__ = 'gnet'
@@ -131,10 +131,10 @@ class GNet2(nn.Module):
         v3 = self.uconv3(torch.cat((x3, v3), 1))
 
         l3_us = F.interpolate(l4, l3.size()[2:], mode='nearest')  # 128,128
-        l3 = self.l_uconv4(torch.cat((l3, l3_us), 1))
+        l3 = self.l_uconv3(torch.cat((l3, l3_us), 1))
 
         i3_us = F.interpolate(i4, i3.size()[2:], mode='nearest')  # 128,128
-        i3 = self.i_uconv4(torch.cat((i3, i3_us), 1))
+        i3 = self.i_uconv3(torch.cat((i3, i3_us), 1))
 
         # Upsample 2
         x3_cat = torch.cat((v3, l3, i3), 1)
@@ -168,7 +168,7 @@ class GNet2(nn.Module):
         return xout
 
 
-class GNet(nn.Module):
+class GNet2(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         # self.__name__ = 'gnet'
