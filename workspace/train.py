@@ -137,12 +137,14 @@ class TrainingModel():
         train_on = self.args.train_on
 
         train_dataset = SyntheticDepthDataset(dataset_path, setname='train')
-        test_dataset = SyntheticDepthDataset(dataset_path, setname='train')
+        # test_dataset = SyntheticDepthDataset(dataset_path, setname='selval')
+        test_dataset = train_dataset
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
             training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
             train_dataset.training_case = train_dataset.training_case[training_idxs]
+            test_dataset.training_case = test_dataset.training_case[5]
         print("test case number: " + str(test_dataset.training_case.shape))
         # test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
