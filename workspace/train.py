@@ -138,7 +138,7 @@ class TrainingModel():
 
         train_dataset = SyntheticDepthDataset(dataset_path, setname='train')
         # test_dataset = SyntheticDepthDataset(dataset_path, setname='selval')
-        test_dataset = train_dataset
+        test_dataset = SyntheticDepthDataset(dataset_path, setname='selval')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -313,6 +313,24 @@ def train_epoch(nn_model, epoch):
                                                                         nn_model.args.penalty,
                                                                         epoch,
                                                                         nn_model.args.loss_type)
+
+            loss += nn_model.normal_loss
+            # for plot purpose
+            normal_loss_total += nn_model.normal_loss.detach().to('cpu')
+            loss_total += normal_loss_total
+
+        if nn_model.args.normal_huber_loss:
+            if nn_model.args.exp == "an":
+                a = out.detach().clone()
+                normal_out = a / (torch.linalg.norm(a, dim=1, keepdim=True, ord=2) + 1e-20)
+            else:
+                normal_out = out[:, :3, :, :]
+
+            nn_model.normal_loss = loss_utils.weighted_unit_vector_huber_loss(normal_out,
+                                                                              target[:, :3, :, :],
+                                                                              nn_model.args.penalty,
+                                                                              epoch,
+                                                                              nn_model.args.loss_type)
 
             loss += nn_model.normal_loss
             # for plot purpose

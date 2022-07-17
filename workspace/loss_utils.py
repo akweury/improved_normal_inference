@@ -57,29 +57,6 @@ def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     return torch.sum((outputs - target) ** 2) / torch.sum(mask)
 
 
-def weighted_rho_n_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
-    # give penalty to outliers
-    outputs = outputs[:, :3, :, :].permute(0, 2, 3, 1)
-    normal_gt = target[:, :3, :, :].permute(0, 2, 3, 1)
-    mask_too_high = torch.gt(outputs, scale_threshold).bool().detach()
-    mask_too_low = torch.lt(outputs, -scale_threshold).bool().detach()
-    outputs[mask_too_high] = outputs[mask_too_high] * penalty
-    outputs[mask_too_low] = outputs[mask_too_low] * penalty
-
-    # calc the loss
-    mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
-
-    outputs.permute(0, 2, 3, 1)
-    albedo_out = torch.linalg.norm(outputs.permute(0, 2, 3, 1), dim=-1, keepdim=True, ord=2)
-    normal_out = outputs.permute(0, 2, 3, 1) / (albedo_out + 1e-20)
-
-    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
-    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
-    normal_loss = F.mse_loss(normal_gt[mask], normal_out[mask]).float()
-
-    return loss.float()
-
-
 def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
     # give penalty to outliers
     outputs = outputs[:, :3, :, :]
@@ -146,3 +123,21 @@ class AngleHistoLoss(nn.Module):
         #     histo_loss += torch.sum(torch.abs(histo_output - histo_target)) * (1e-6)
 
         return loss + histo_loss
+
+
+def weighted_unit_vector_huber_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
+    # give penalty to outliers
+    outputs = outputs[:, :3, :, :].permute(0, 2, 3, 1)
+    target = target[:, :3, :, :].permute(0, 2, 3, 1)
+    mask = torch.sum(torch.abs(target[:, :, :, :3]), dim=-1) > 0
+    mask = mask.unsqueeze(-1)
+    scale_threshold = 0.2 * torch.max(torch.abs(outputs - target))
+    mask_high = (torch.gt(torch.abs(outputs), scale_threshold).bool() * mask)
+    mask_low = (torch.lt(torch.abs(outputs), scale_threshold).bool() * mask)
+
+    loss = torch.abs(outputs[mask_low] - target[mask_low]).mean()
+
+    loss += ((torch.pow((outputs[mask_high] - target[mask_high]), 2) + scale_threshold ** 2) / (
+                2 * scale_threshold)).mean()
+
+    return loss.float()
