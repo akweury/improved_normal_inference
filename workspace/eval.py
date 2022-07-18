@@ -83,9 +83,15 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
             # calculate loss
             out = mu.filter_noise(out, threshold=[-1, 1])
 
-            normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-            normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-            diff = mu.avg_angle_between_tensor(normal[mask], normal_target[mask]).to("cpu").detach().numpy()
+            if "light" in name:
+                light_output = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+                light_gt = target[:, 5:8, :, :].permute(0, 2, 3, 1).squeeze(0)
+                diff = mu.avg_angle_between_tensor(light_output[mask], light_gt[mask]).to("cpu").detach().numpy()
+            else:
+
+                normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+                normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+                diff = mu.avg_angle_between_tensor(normal[mask], normal_target[mask]).to("cpu").detach().numpy()
 
             loss_list[i] = diff
             time_list[i] = gpu_time * 1000
