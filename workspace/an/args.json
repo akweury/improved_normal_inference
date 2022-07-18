@@ -15,6 +15,7 @@
   "albedo_threshold": 255,
   "albedo_penalty": 1,
   "albedo_loss": true,
+  "normal_huber_loss": false,
   "g_loss": true,
   "normal_loss": true,
   "light_loss": false,
