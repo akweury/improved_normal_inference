@@ -41,7 +41,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
 srun \
-  --job-name="INI-an2-50" \
+  --job-name="INI-an2-50-l2" \
   --time=1-00:00 \
   -p A100 \
   --ntasks=1 \

@@ -54,7 +54,7 @@ def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
     mask = ~torch.prod(target == 0, dim=1, keepdim=True).bool()
     outputs[~mask] = 0
     target[~mask] = 0
-    return torch.sum((outputs - target) ** 2) / torch.sum(mask)
+    return F.mse_loss(outputs, target)
 
 
 def weighted_unit_vector_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
@@ -138,6 +138,6 @@ def weighted_unit_vector_huber_loss(outputs, target, penalty, epoch, loss_type, 
     loss = torch.abs(outputs[mask_low] - target[mask_low]).mean()
 
     loss += ((torch.pow((outputs[mask_high] - target[mask_high]), 2) + scale_threshold ** 2) / (
-                2 * scale_threshold)).mean()
+            2 * scale_threshold)).mean()
 
     return loss.float()

@@ -565,16 +565,23 @@ It keeps the skip connection in UNet to remain the fine detail features.
 \end{figure}
 
 \subsection{Loss Function}
-The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value. The formula is shown as follows:
+
+\paragraph{L2 Loss}
+The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value 
+\[ L_2(\tilde y - y) = \|\tilde y - y \|_2^2 \]
+
+\paragraph{Masked L2 Loss with penalty for outliers}
+The background pixels of the input data are not considered in the normal inference task, they are saved as black pixels in the input data. These pixels should not considered in the loss function, i.e. invalid pixels. Therefore, a valid mask is required to distinguish the background and the main object. Specifically, using a matrix with the same width and height as the output, for each pixel, 0 is invalid, 1 is valid. 
+Furthermore, depends on the specific task, the output should be constraint in a range. For normal output, the range is $ [-1,1] $. Thus for the outliers out of this range, a outlier mask can be applied to give them a penalty.
 
 \begin{equation}\label{gcnn-loss}
 	\begin{array}{ll}
-		l(x,y)= L  &= \{l_1, ..., l_N\}^T\\ 
-		l_{n\in N} &= mean(mask_{ol}(x_n - y_n)^2\cdot p + (x_n - y_n)^2\cdot mask_{nol})\\
+		l(x,y)&= L  = \{l_1, ..., l_N\}^T\\ 
+		l_{n\in N} &= \| mask_{obj} \odot mask_{ol} \odot ( {\tilde y}_n - y_n) \|_2^2 + 	\| mask_{obj} \odot mask_{nol} \odot ( {\tilde y}_n - y_n) \|_2^2 \\
 	\end{array}
 \end{equation}
 
-where $ x $ is input, $ y $ is target, $ N $ is the batch size. $ mask_{ol} $ is the mask for the outliers, $ p $ is the penalty of the outliers, it is set as 1.4.
+where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is the mask of the object, i.e. 1 means it is an pixel on the object, 0 is an pixel on the background. $ mask_{ol} $ is the mask for the outliers, i.e. 1 means outliers, 0 means non outlier, $ mask_{nol} $ is exactly the inverse of $ mask_{ol} $. $ p $ is the penalty of the outliers, it is set as 1.4.
 
 
 

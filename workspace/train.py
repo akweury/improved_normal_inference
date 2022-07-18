@@ -355,11 +355,9 @@ def train_epoch(nn_model, epoch):
                 g_l, g_r = 3, 6
             else:
                 raise ValueError
-            nn_model.g_loss = loss_utils.weighted_unit_vector_loss(out[:, g_l:g_r, :, :], g_gt,
-                                                                   nn_model.args.penalty,
-                                                                   epoch,
-                                                                   nn_model.args.loss_type,
-                                                                   scale_threshold=255)
+            nn_model.g_loss = loss_utils.weighted_l2_loss(out[:, g_l:g_r, :, :], g_gt,
+                                                          nn_model.args.penalty,
+                                                          0, 255)
 
             loss += nn_model.g_loss
 
@@ -371,9 +369,9 @@ def train_epoch(nn_model, epoch):
 
             albedo_out = torch.linalg.norm(out.permute(0, 2, 3, 1), dim=-1, keepdim=True, ord=2).permute(0, 3, 1, 2)
             albedo_gt = mu.albedo(target[:, 4:5, :, :], mask, target[:, 3:4, :, :], nn_model.args.albedo_threshold)
-            nn_model.albedo_loss = loss_utils.weighted_log_l1_loss(albedo_out, albedo_gt,
-                                                                   nn_model.args.penalty,
-                                                                   0, 1)
+            nn_model.albedo_loss = loss_utils.weighted_l2_loss(albedo_out, albedo_gt,
+                                                               nn_model.args.penalty,
+                                                               0, 255)
 
             loss += nn_model.albedo_loss
 
