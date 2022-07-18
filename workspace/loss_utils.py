@@ -47,11 +47,13 @@ def weighted_log_l1_loss(outputs, target, penalty, scaleMin, scaleMax):
 
 
 def weighted_l2_loss(outputs, target, penalty, scaleMin, scaleMax):
+    outputs = outputs.permute(0, 2, 3, 1)
+    target = target.permute(0, 2, 3, 1)
     boarder_right = torch.gt(outputs, scaleMax).bool().detach()
     boarder_left = torch.lt(outputs, scaleMin).bool().detach()
     outputs[boarder_right] = outputs[boarder_right] * penalty
     outputs[boarder_left] = outputs[boarder_left] * penalty
-    mask = ~torch.prod(target == 0, dim=1, keepdim=True).bool()
+    mask = ~torch.prod(target == 0, dim=-1).bool()
     outputs[~mask] = 0
     target[~mask] = 0
     return F.mse_loss(outputs, target)
