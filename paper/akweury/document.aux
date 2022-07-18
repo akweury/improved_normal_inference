@@ -6,28 +6,17 @@
 \bibdata{document-blx,example}
 \citation{biblatex-control}
 \abx@aux@refcontext{nyt/global//global/global}
-\citation{intrinsic-image}
-\abx@aux@cite{intrinsic-image}
-\abx@aux@segm{0}{0}{intrinsic-image}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {1}Guided normal inference using GCNN}{1}{}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Intrinsic image decomposition}{1}{}\protected@file@percent }
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image\relax }}{1}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {1}Guided Gated Convolution Neural Network for Normal Inference }{1}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Light Net Evaluation}{1}{}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Qualitative evaluation of light net. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.\relax }}{1}{}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:intrinsic-image}{{1}{1}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }}{1}{}\protected@file@percent }
-\newlabel{fig:lambertian-surface}{{2}{1}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Light Map}{2}{}\protected@file@percent }
-\newlabel{sec:lightmap}{{1.2}{2}}
-\newlabel{light-direction}{{1}{2}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The light map calculated from vertex map and the light source\relax }}{3}{}\protected@file@percent }
-\newlabel{fig:light-input}{{3}{3}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Light Net for light inpainting based on GCNN architecture.\relax }}{3}{}\protected@file@percent }
-\newlabel{fig:light-net-archi}{{4}{3}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Light and image guided normal inference using GCNN}{3}{}\protected@file@percent }
+\newlabel{fig:eval-light}{{1}{1}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The evaluation on 100 test cases of Light Net.\relax }}{1}{}\protected@file@percent }
+\newlabel{fig:scatter-light}{{2}{1}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}comparison}{1}{}\protected@file@percent }
 \abx@aux@read@bbl@mdfivesum{9304A158905EF5DF34C85A4707D38A5C}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Loss Function}{4}{}\protected@file@percent }
-\newlabel{gcnn-loss}{{2}{4}}
-\newlabel{RF1}{5}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The architecture of TriGNet\relax }}{5}{}\protected@file@percent }
-\newlabel{fig:albedo-gated-archi}{{5}{5}}
-\gdef \@abspage@last{5}
+\@writefile{lot}{\defcounter {refsection}{0}\relax }\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond.\relax }}{2}{}\protected@file@percent }
+\newlabel{tab:model-error}{{1}{2}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{3}{}\protected@file@percent }
+\newlabel{fig:normal-histo-diff}{{3}{3}}
+\gdef \@abspage@last{3}

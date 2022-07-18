@@ -42,7 +42,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 srun \
   --job-name="INI-an2-50-l2" \
-  --time=1-00:00 \
+  --time=3-00:00 \
   -p A100 \
   --ntasks=1 \
   --gpus-per-task=1 \

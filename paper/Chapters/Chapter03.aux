@@ -28,18 +28,33 @@
 \@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }}{10}{figure.caption.39}\protected@file@percent }
 \newlabel{fig:gcnn-archi}{{3.6}{10}{Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }{figure.caption.39}{}}
 \@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Loss Function}{10}{subsection.40}\protected@file@percent }
-\newlabel{gcnn-loss}{{3.6}{10}{Loss Function}{equation.41}{}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{11}{section.42}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Image Guided normal inference}{11}{subsection.43}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Lambertian Surface}{11}{subsection.45}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.3}Light Map}{11}{subsection.46}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Calculation}{11}{section*.47}\protected@file@percent }
-\newlabel{light-direction}{{3.7}{11}{Calculation}{equation.48}{}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Inpainting}{11}{section*.49}\protected@file@percent }
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }}{13}{figure.caption.44}\protected@file@percent }
-\newlabel{fig:ng-archi}{{3.7}{13}{Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.\relax }{figure.caption.44}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L1 Loss}{10}{section*.41}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L2 Loss}{10}{section*.42}\protected@file@percent }
+\newlabel{par:maskl2}{{3.2.3}{10}{Masked L2 Loss with penalty for outliers(mask-l2)}{section*.43}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{10}{section*.43}\protected@file@percent }
+\newlabel{gcnn-loss}{{3.6}{11}{Masked L2 Loss with penalty for outliers(mask-l2)}{equation.44}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Reversed Huber Loss}{11}{section*.45}\protected@file@percent }
+\newlabel{berhu-loss}{{3.7}{11}{Reversed Huber Loss}{equation.46}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{12}{section.47}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Intrinsic image decomposition}{12}{subsection.48}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image\relax }}{12}{figure.caption.49}\protected@file@percent }
+\newlabel{fig:intrinsic-image}{{3.7}{12}{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image\relax }{figure.caption.49}{}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }}{12}{figure.caption.50}\protected@file@percent }
+\newlabel{fig:lambertian-surface}{{3.8}{12}{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }{figure.caption.50}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Light Map}{13}{subsection.51}\protected@file@percent }
+\newlabel{sec:lightmap}{{3.3.2}{13}{Light Map}{subsection.51}{}}
+\newlabel{light-direction}{{3.8}{13}{Light Map}{equation.52}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.3}Light and image guided normal inference using GCNN}{13}{subsection.55}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.9}{\ignorespaces The light map calculated from vertex map and the light source\relax }}{14}{figure.caption.53}\protected@file@percent }
+\newlabel{fig:light-input}{{3.9}{14}{The light map calculated from vertex map and the light source\relax }{figure.caption.53}{}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.10}{\ignorespaces Light Net for light inpainting based on GCNN architecture.\relax }}{14}{figure.caption.54}\protected@file@percent }
+\newlabel{fig:light-net-archi}{{3.10}{14}{Light Net for light inpainting based on GCNN architecture.\relax }{figure.caption.54}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.4}Loss Function}{14}{subsection.57}\protected@file@percent }
+\newlabel{RF1}{15}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3.11}{\ignorespaces The architecture of TriGNet\relax }}{15}{figure.caption.56}\protected@file@percent }
+\newlabel{fig:albedo-gated-archi}{{3.11}{15}{The architecture of TriGNet\relax }{figure.caption.56}{}}
 \@setckpt{Chapters/Chapter03}{
-\setcounter{page}{14}
+\setcounter{page}{16}
 \setcounter{equation}{8}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -50,11 +65,11 @@
 \setcounter{part}{0}
 \setcounter{chapter}{3}
 \setcounter{section}{3}
-\setcounter{subsection}{3}
+\setcounter{subsection}{4}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{7}
+\setcounter{figure}{11}
 \setcounter{table}{0}
 \setcounter{LT@tables}{3}
 \setcounter{LT@chunks}{1}
@@ -69,7 +84,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{35}
+\setcounter{instcount}{37}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}
@@ -183,8 +198,9 @@
 \setcounter{subfigure}{0}
 \setcounter{subtable}{0}
 \setcounter{AM@survey}{0}
+\setcounter{r@tfl@t}{1}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{17}
-\setcounter{section@level}{4}
+\setcounter{bookmark@seq@number}{18}
+\setcounter{section@level}{2}
 }

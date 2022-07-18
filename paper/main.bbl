@@ -17,6 +17,36 @@
 \endgroup
 
 \datalist[entry]{nyt/global//global/global}
+  \entry{intrinsic-image}{article}{}
+    \name{author}{2}{}{%
+      {{hash=BH}{%
+         family={Barrow},
+         familyi={B\bibinitperiod},
+         given={Harry},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=TJ}{%
+         family={Tenenbaum},
+         familyi={T\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BHTJ1}
+    \strng{fullhash}{BHTJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1978}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Recovering Intrinsic Scene Characteristics from Images}
+    \field{journaltitle}{Recovering Intrinsic Scene Characteristics from
+  Images}
+    \field{month}{01}
+    \field{year}{1978}
+  \endentry
+
   \entry{unstructed-pc}{inproceedings}{}
     \name{author}{3}{}{%
       {{hash=BSY}{%
@@ -853,6 +883,34 @@
     \verb https://arxiv.org/abs/1606.05328
     \endverb
     \field{year}{2016}
+  \endentry
+
+  \entry{berhu-loss}{article}{}
+    \name{author}{1}{}{%
+      {{hash=OA}{%
+         family={Owen},
+         familyi={O\bibinitperiod},
+         given={Art},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{OA1}
+    \strng{fullhash}{OA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2007}
+    \field{labeldatesource}{}
+    \field{sortinit}{O}
+    \field{sortinithash}{O}
+    \verb{doi}
+    \verb 10.1090/conm/443/08555
+    \endverb
+    \field{isbn}{9780821841952}
+    \field{title}{A robust hybrid of lasso and ridge regression}
+    \field{volume}{443}
+    \field{journaltitle}{Contemp. Math.}
+    \field{month}{01}
+    \field{year}{2007}
   \endentry
 
   \entry{GeoNet}{inproceedings}{}

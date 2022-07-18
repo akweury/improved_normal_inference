@@ -566,11 +566,18 @@ It keeps the skip connection in UNet to remain the fine detail features.
 
 \subsection{Loss Function}
 
+\paragraph{L1 Loss}
+L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the median of the observations.
+
+\[ L_1(\tilde y - y) = |\tilde y - y | \]
+
 \paragraph{L2 Loss}
-The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value 
+The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value. It leads to the mean of the observations. 
 \[ L_2(\tilde y - y) = \|\tilde y - y \|_2^2 \]
 
-\paragraph{Masked L2 Loss with penalty for outliers}
+
+\paragraph{Masked L2 Loss with penalty for outliers(mask-l2)}
+\label{par:maskl2}
 The background pixels of the input data are not considered in the normal inference task, they are saved as black pixels in the input data. These pixels should not considered in the loss function, i.e. invalid pixels. Therefore, a valid mask is required to distinguish the background and the main object. Specifically, using a matrix with the same width and height as the output, for each pixel, 0 is invalid, 1 is valid. 
 Furthermore, depends on the specific task, the output should be constraint in a range. For normal output, the range is $ [-1,1] $. Thus for the outliers out of this range, a outlier mask can be applied to give them a penalty.
 
@@ -584,18 +591,120 @@ Furthermore, depends on the specific task, the output should be constraint in a 
 where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is the mask of the object, i.e. 1 means it is an pixel on the object, 0 is an pixel on the background. $ mask_{ol} $ is the mask for the outliers, i.e. 1 means outliers, 0 means non outlier, $ mask_{nol} $ is exactly the inverse of $ mask_{ol} $. $ p $ is the penalty of the outliers, it is set as 1.4.
 
 
+\paragraph{Reversed Huber Loss}
+
+\cite{berhu-loss} proposed Reversed Huber loss to combine both L1 and L2 loss. L1 loss is for small values whereas L2 for large values
+\begin{equation}\label{berhu-loss}
+	\begin{array}{ll}
+		\mathcal{B}(y)= \begin{cases}
+			|y| & |y| \le c \\
+			\dfrac{y^2 + c^2}{2d} & |x| > c\\
+		\end{cases}
+	\end{array}
+\end{equation}
+where $ c=0.2\max (|\tilde y - y|) $.
+
 
 
 
 \newpage
+	
 \section{Guided normal inference using GCNN}
-The 
-\subsection{Image Guided normal inference}
-The normal inference can be guided by gray-scale image, since the image is captured by passive method, it is fully-dense comparing to depth map, hence provides a complete view of the scene. 
-The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branch is the similar with GCNN model but with 4 additional concatenate layers, furthermore, 1 gated convolution layer is added before concatenate with image branch. The image branch takes a single grayscale image as input, then 3 times downsamplins with 3 standard layers in each scale. In the upsampling part, the feature map upsampled 3 times and concatenate with the last layer in the downsampling part before interpolation.
+
+\subsection{Intrinsic image decomposition}
+Intrinsic image model was introduced by \cite{intrinsic-image}. It interprets that an image $ I $ can be decomposed as the element-wise product between the reflectance $ R $ of the object and the shading $ S $ produced by the interaction between light and objects.
+\[ I =R  \odot S\]
+It interprets the observed image into reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
+%% insert a image for decompositions
+\begin{figure}[th]
+	\centering
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_reflectance.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_shading.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_light.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_normal.png}}
+	\caption{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image}
+	\label{fig:intrinsic-image}
+\end{figure}
+
+The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ N $ and the light source direction $ L $.
+\[ I = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
+note that the surface normal $ N $ and light direction $ L $ are unit vectors thus they have only two degrees of freedom. 
+
+\begin{figure}[th]
+	\centering
+	\begin{tikzpicture} 
+		% reference lines
+		\coordinate (light) at (-1,3);
+		\coordinate (p) at (2,0);
+		\coordinate (normal) at (2,3);
+		\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
+		\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
+		\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
+		\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
+		\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
+		\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
+		\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
+	\end{tikzpicture}
+	\caption{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
+	\label{fig:lambertian-surface}
+\end{figure}
+
+The equation can be further rearranged as follows
+\[ I = \textbf{g} \cdot \textbf{L} =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
+The shape from shading method employed the equation mentioned above to predict the both surface albedo $ \rho $ and the normal $ \textbf{N} $ with knowning light source direction $ \textbf{L} $. More specifically, a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in the image, an equation system can be set up 
+
+\[ 
+\begin{pmatrix}
+	L_1^T \\
+	L_2^T \\
+	\cdots \\
+	L_k^T
+\end{pmatrix} g(x,y) = 
+\begin{pmatrix}
+	I_1(x,y) \\
+	I_2(x,y) \\
+	\cdots \\
+	I_3(x,y)
+\end{pmatrix}
+\]
+for the simplicity, $ L_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ 
+The equation can be solved based on least square methods. 
+Since normal $ N(x,y) $ is unit vector, thus we have 
+
+\[ \|g(x,y)\|_2 = \|L_0\rho(x,y)N(x,y)\|_2 = L_0\rho(x,y) \]
+
+Then the normal can be obtained as follow
+
+\[  N(x,y) = \frac{g(x,y)}{L_0\rho(x,y)}\]
+
+In another word, the surface normal including the albedo can be obtained directly based on images and light directions. 
 
 
-% architecture of NG
+\subsection{Light Map}
+\label{sec:lightmap}
+The light map $ L $ can be derived from vertex map and the light source position. As shown in Figure \ref{fig:lambertian-surface}, the incoming light direction is a vector point from light source to the surface point, therefor it can be calculated as follows
+\begin{equation}\label{light-direction}
+	\begin{array}{ll}
+		L(x,y)&= \dfrac{V(x,y)-(s_x,s_y)}{\|V(x,y)-(s_x,s_y)\|_2}\\ 
+	\end{array}
+\end{equation}
+where $ (s_x,s_y) $ is the light source position and $ V $ is the vertices, both $  (s_x,s_y) $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. 
+The light map is a matrix corresponding the light direction of whole image where each pixel corresponding with each other, thus it has the same size as the vertex map.
+
+
+It is important to note that due to the exist noise in the vertex map, the getting light map is only semi-dense, as shown in Figure \ref{fig:light-input}. 
+
+\begin{figure}[th]
+	\centering
+	{\includegraphics[width=.4\textwidth]{./Figures/intrinsic_image_vertex_input.png}}
+	{\includegraphics[width=.4\textwidth]{./Figures/intrinsic_image_light_input.png}}
+	\caption{The light map calculated from vertex map and the light source}
+	\label{fig:light-input}
+\end{figure}
+
+In order to ease this issue, a light inpainting model has been trained based on the GCNN network with the identity architecture but the input and output, which takes the semi-dense light map as input and predict the fully dense light map as output. 
+
 \begin{figure}[th]
 	\centering
 	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
@@ -603,706 +712,61 @@ The proposed architecture is shown in Figure \ref{fig:ng-archi}. The upper branc
 		%% -------------------------------------- parameters ------------------------------------------------
 		\pgfmathsetmacro{\vdist}{0.4}
 		
-		\pgfmathsetmacro{\boxsizea}{3}	%% width 512
-		\pgfmathsetmacro{\boxsizeb}{1.5}	%% width 256
-		\pgfmathsetmacro{\boxsizec}{1}	%% width 128
-		\pgfmathsetmacro{\boxsized}{0.7}	%% width 64
-		
-		
-		\pgfmathsetmacro{\boxwidthd}{0.05}	%% width 1
-		\pgfmathsetmacro{\boxwidtha}{0.1}	%% width 3
-		\pgfmathsetmacro{\boxwidthb}{\boxwidtha*2}	%% width 32
-		\pgfmathsetmacro{\boxwidthc}{\boxwidtha*3}		%% width 64
-		
-		\pgfmathsetmacro{\preprocessingshift}{13}
-		\pgfmathsetmacro{\labelshift}{10.5}
-		\pgfmathsetmacro{\gconvwshift}{9}
-		\pgfmathsetmacro{\imgshift}{3.5}
-		\pgfmathsetmacro{\convwshift}{0}
-		
-		\pgfmathsetmacro{\secrowshift}{-6}
-		
-		\pgfmathsetmacro{\convrowstart}{4}
-		\pgfmathsetmacro{\secondrowstart}{4}
+		\pgfmathsetmacro{\boxsizea}{2}	%% width 512
+		\pgfmathsetmacro{\boxwidtha}{2}	%% width 3
 		
 		%% https://www.tug.org/pracjourn/2007-4/walden/color.pdf
-		\definecolor{gconvcolor}{rgb}{0.5,0.8,0.8}
-		\definecolor{convcolor}{rgb}{0.9,0.5,0.2}
-		\definecolor{interpolatecolor}{rgb}{0.3,0.9,0.5}
-		\definecolor{catcolor}{rgb}{0.9,0.3,0.9}
+		\definecolor{netcolor}{rgb}{0.5,0.7,0.7}
 		
-		%% ---------------------------------- preprocessing --------------------------------------------
-		%%  img_in 1x512x512
-		\pgfmathsetmacro{\disttimes}{3.5}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-input.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1.5) {3D Vertex};
-		
-		\draw [-stealth](1.45,\yschift-1.8) -- (1.45,\yschift-2.6);
-		
-		\draw [-stealth]  (\vdist*\disttimes+1.6,\yschift) -- (\vdist*\disttimes+1.1,\yschift);
-		
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-depth-noise.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1.5) {Add Noise};
-		
-		\draw [-stealth] (\vdist*\disttimes+1.6,\yschift) -- (\vdist*\disttimes+1.1,\yschift);
-		
-		\pgfmathsetmacro{\disttimes}{16.5}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-depth.png}};
-		\node[text width=2cm] at (\vdist*\disttimes+0.2,\yschift-1.5) {Depth Map};
-		
-		%% ------------------------------------ img preprocessing -------------------------------------
-		\pgfmathsetmacro{\disttimes}{3.5}
-		\pgfmathsetmacro{\yschift}{\imgshift}
-		\node[inner sep=0pt] (image) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-image.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1.5) {Image};
-		
-		\draw [-stealth](1.45,\yschift-1.8) -- (1.45,\yschift-2.2);
-		
-		
-		
-		%% ----------------------------------- output normal map -------------------------------------
-		\pgfmathsetmacro{\disttimes}{32.5}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-normal-gt.png}};
-		\node[text width=2.5cm] at (\vdist*\disttimes,\yschift-1.5) {Normal Map};
-		
-		\draw [-stealth] (\vdist*\disttimes+0.2,\yschift-2.7) -- (\vdist*\disttimes+0.2,\yschift-1.8);
-		
-		
-		%% ------------------------------------------- vertex input ----------------------------------------------
 		%% 	d_in							3x512x512
 		%%	dconv1: 	d_in-->x1 			32x512x512
 		\pgfmathsetmacro{\disttimes}{1}	%% width 32
+		\pgfmathsetmacro{\yshift}{1}	%% width 32
 		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\node[text width=1cm] at (\vdist*\disttimes+0.1,\yschift-3.5) {32};
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
+		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 32
+		\pgfmathsetmacro{\yschift}{-1}
 		
-		%%	dconv2:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{2}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
 		
-		%%	dconv3:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{3}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
+		\node[inner sep=0pt] (input) at (\vdist*\disttimes-6,\yschift-0.8)
+		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light_input.png}};
+		\node[text width=3.5cm] at (\vdist*\disttimes-6,\yschift-2.4) {Semi-dense Light Map};
 		
-		\draw (\vdist*\disttimes-0.1,\yschift-3) -- (\vdist*\disttimes-0.1,\yschift-3.7);
-		\draw (\vdist*\disttimes-0.1,\yschift-3.7) -- (\vdist*\disttimes+9.2,\yschift-3.7);
-		\draw [-stealth] (\vdist*\disttimes+9.2,\yschift-3.7) -- (\vdist*\disttimes+9.2,\yschift-3);
+		\node[inner sep=0pt] (output) at (\vdist*\disttimes+3,\yschift-0.8)
+		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light.png}};
+		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {Semi-dense Light Map};
 		
-		%% downsample 1
-		%%	dconv4:		x1-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{4}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{5}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{6}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
+		\draw [-stealth] (\vdist*\disttimes-4.5,\yschift-1) -- (\vdist*\disttimes-3.5,\yschift-1);
+		\draw [-stealth] (\vdist*\disttimes,\yschift-1) -- (\vdist*\disttimes+1,\yschift-1);
 		
-		\draw (\vdist*\disttimes-0.1,\yschift-1.6) -- (\vdist*\disttimes-0.1,\yschift-2.7);
-		\draw (\vdist*\disttimes-0.1,\yschift-2.7) -- (\vdist*\disttimes+6,\yschift-2.7);
-		\draw [-stealth] (\vdist*\disttimes+6,\yschift-2.7) -- (\vdist*\disttimes+6,\yschift-1.7);
 		
+		\pgfmathsetmacro{\disttimes}{-2}	%% width 32		
+		\pgfmathsetmacro{\yschift}{-1}
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
 		
-		%% downsample 2
-		%%	dconv4:		x2-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{7}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{8}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{9}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-1.2) -- (\vdist*\disttimes-0.1,\yschift-1.8);
-		\draw (\vdist*\disttimes-0.1,\yschift-1.8) -- (\vdist*\disttimes+2.8,\yschift-1.8);
-		\draw [-stealth] (\vdist*\disttimes+2.8,\yschift-1.8) -- (\vdist*\disttimes+2.8,\yschift-1.2);
-		
-		
-		%% downsample 3
-		%%	dconv4:		x3-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{11}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{12}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% concatenated x4 and x_img_4
-		\pgfmathsetmacro{\disttimes}{13}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% ----------------------------------- upsampling -------------------------------------
-		
-		%% upsample 1
-		%% interpolate	x3_us-->x3_mus			64x128x128
-		\pgfmathsetmacro{\disttimes}{14}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		% uconv 1
-		\pgfmathsetmacro{\disttimes}{15}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% concatenated x1 and x1_us
-		\pgfmathsetmacro{\disttimes}{15.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv2		x3_us-->x3			32x128x128
-		\pgfmathsetmacro{\disttimes}{17}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% upsample 2
-		%% cat x3, x_img_3-->x3			64x256x256
-		\pgfmathsetmacro{\disttimes}{18}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		´%% interpolate x2_us 64x256x256
-		\pgfmathsetmacro{\disttimes}{18.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;		
-		
-		%% uconv3 x2_us -->x2_mus
-		\pgfmathsetmacro{\disttimes}{19}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		% cat x2, x2_mus -->x2
-		\pgfmathsetmacro{\disttimes}{20}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv4 		x2,x2_us-->x2		32x256x256
-		\pgfmathsetmacro{\disttimes}{21.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% upsample 3
-		%% cat x2, x_img_2-->x2			64x256x256
-		\pgfmathsetmacro{\disttimes}{22.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% interpolate	x2-->x1_us			32x512x512
-		\pgfmathsetmacro{\disttimes}{23.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv5 x1_us-->x1_mus
-		\pgfmathsetmacro{\disttimes}{24}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% cat		x1,x1_mus-->x1		32x512x512
-		\pgfmathsetmacro{\disttimes}{26}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv6		x1			32x512x512
-		\pgfmathsetmacro{\disttimes}{27}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 3
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% cat		x1,x1_mus-->x1		32x512x512
-		\pgfmathsetmacro{\disttimes}{28}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% conv1		xout			3x512x512
-		\pgfmathsetmacro{\disttimes}{29}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 3
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%% conv2		xout			3x512x512
-		\pgfmathsetmacro{\disttimes}{30}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 3
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\node[text width=1cm] at (\vdist*\disttimes+0.3,\yschift-3.3) {3};
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		% -------------------------- image branch ----------------------------------------------
-		
-		%% ------------------------------------------- image input ----------------------------------------------
-		%% 	d_in							3x512x512
-		%%	dconv1: 	d_in-->x1 			32x512x512
-		\pgfmathsetmacro{\disttimes}{1}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}
-		\node[text width=1cm] at (\vdist*\disttimes+0.1,\yschift-3.5) {32};
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%%	dconv2:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{2}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%%	dconv3:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{3}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-3) -- (\vdist*\disttimes-0.1,\yschift-3.8);
-		\draw (\vdist*\disttimes-0.1,\yschift-3.8) -- (\vdist*\disttimes+6.8,\yschift-3.8);
-		\draw [-stealth] (\vdist*\disttimes+6.8,\yschift-3.8) -- (\vdist*\disttimes+6.8,\yschift-3);
-		
-		
-		%% downsample 1
-		%% dconv4:		x1-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{4}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.5}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{5}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.5}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{6}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.5}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-1.5) -- (\vdist*\disttimes-0.1,\yschift-2.3);
-		\draw (\vdist*\disttimes-0.1,\yschift-2.3) -- (\vdist*\disttimes+4.3,\yschift-2.3);
-		\draw [-stealth] (\vdist*\disttimes+4.3,\yschift-2.3) -- (\vdist*\disttimes+4.3,\yschift-1.6);
-		
-		%% downsample 2
-		%%	dconv4:		x2-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{7}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.8}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{8}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.8}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{9}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.8}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-1) -- (\vdist*\disttimes-0.1,\yschift-1.5);
-		\draw (\vdist*\disttimes-0.1,\yschift-1.5) -- (\vdist*\disttimes+1.8,\yschift-1.5);
-		\draw [-stealth] (\vdist*\disttimes+1.8,\yschift-1.5) -- (\vdist*\disttimes+1.8,\yschift-1.1);
-		
-		
-		%% downsample 3
-		%%	dconv4:		x3-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-1}
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{11}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-1}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{12}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-1}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		
-		\draw [-stealth] (\vdist*\disttimes+0.1,\yschift+0.3) -- (\vdist*\disttimes+0.1,\yschift+8);
-		%% ----------------------------------- upsampling -------------------------------------
-		
-		%% upsample 1
-		%% interpolate	x3_us-->x3_mus			64x128x128
-		\pgfmathsetmacro{\disttimes}{13}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.9}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% concatenate	x_img_3, x3_img_us			64x128x128
-		\pgfmathsetmacro{\disttimes}{14}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.9}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		% img_uconv 1
-		\pgfmathsetmacro{\disttimes}{15}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.9}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes+0.2,\yschift+0.3) -- (\vdist*\disttimes+0.2,\yschift+5.7);
-		\draw (\vdist*\disttimes+0.2,\yschift+5.7) -- (\vdist*\disttimes+0.9,\yschift+5.7);
-		\draw [-stealth] (\vdist*\disttimes+0.9,\yschift+5.7) -- (\vdist*\disttimes+0.9,\yschift+8);
-		
-		
-		%% upsample 2
-		´%% interpolate x_img_3-->x2_img_us 64x256x256
-		\pgfmathsetmacro{\disttimes}{15.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.6}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;		
-		
-		%% img_uconv2 x_img_2, x2_img_us -->x_img_2
-		\pgfmathsetmacro{\disttimes}{16}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.6}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		% img_uconv 2
-		\pgfmathsetmacro{\disttimes}{17.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift-0.6}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		
-		\draw (\vdist*\disttimes+0.2,\yschift+0.3) -- (\vdist*\disttimes+0.2,\yschift+5.3);
-		\draw (\vdist*\disttimes+0.2,\yschift+5.3) -- (\vdist*\disttimes+1.6,\yschift+5.3);
-		\draw [-stealth] (\vdist*\disttimes+1.6,\yschift+5.3) -- (\vdist*\disttimes+1.6,\yschift+7.3);
-		
-		
-		%% upsample 3
-		%% interpolate	x_img_1-->x1_img_us			32x512x512
-		\pgfmathsetmacro{\disttimes}{19}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}	%% width 32
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% concatenate	x_img_1, x1_img_us			32x512x512
-		\pgfmathsetmacro{\disttimes}{20}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}	%% width 32
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% img_uconv3 x1_us-->x1_mus
-		\pgfmathsetmacro{\disttimes}{20.5}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\convwshift}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes+1.3,\yschift+1.2) --  (\vdist*\disttimes+1.3,\yschift+4.7);
-		\draw (\vdist*\disttimes+1.3,\yschift+4.7) -- (\vdist*\disttimes+2.6,\yschift+4.7);
-		\draw [-stealth] (\vdist*\disttimes+2.6,\yschift+4.7) -- (\vdist*\disttimes+2.6,\yschift+6);
-		
-		%% ------------------------------------- label ----------------------------------------------		
-		\pgfmathsetmacro{\disttimes}{9}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Conv2d};
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\pgfmathsetmacro{\disttimes}{13}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Gated};
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		\pgfmathsetmacro{\disttimes}{17}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Interp.};
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=interpolatecolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;		
-		
-		
-		\pgfmathsetmacro{\disttimes}{21}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Concat.};
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=catcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;		
-		
+		\node[text width=3.5cm] at (\vdist*\disttimes,\yschift-1) {Light Net};
 	\end{tikzpicture}
-	
-	\caption{Guided Gated Convolution Neural Network for normal estimation. The normal branch shows on the upper side taking point cloud as input. The image branch shows on the lower side taking image as input. There are total 4 times fusions between the two branches. The output is a corresponding normal map.}
-	\label{fig:ng-archi}
+	\caption{Light Net for light inpainting based on GCNN architecture.}
+	\label{fig:light-net-archi}
 \end{figure}
 
 
-\subsection{Lambertian Surface}
+\subsection{Light and image guided normal inference using GCNN}
+Based on above implementations, we propose a Three branches Gated Convolutional Neural Network (TriGNet) to perform guided normal inference. The structure is shown in Figure \ref{fig:albedo-gated-archi}. As mentioned in the name, the network utilizes the GCNN architecture three times to accomplish the task. The first branch (shown above) takes a light map introduced in \ref{sec:lightmap} as the input, the structure is the same as GCNN architecture except that the last two standard convolution layers, the skip connections are kept to connect the 3 down/up samplings. 
+The second branch (shown below) takes image as the input, the structure is the same as the first branch other than the input image is 1 channel but not 3 channels. 
+The third branch takes the 3D vertex map as the input. The structure is based on GCNN architecture. However, in order to merge the other two branches, the vertex branch equips 4 times fusions in the up sampling part. Specifically, the first fusion locates immediately after the last gconv layer of the last down sampling, the second fusion after the second gconv layer of first up sampling, the third fusion after the second gconv layer of second up sampling, the fourth fusion after the second gconv layer of the third up sampling. Each fusion follows by an interpolation layer, a gconv layer to reduce the channel back to 32, a skip connection concatenate layer and another gconv layer to reduce the channel back to 32. After the fourth fusion, a gconv layer used for channel reduction, 2 standard conv layer for output prediction.
+
+\begin{sidewaysfigure}[th]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
+	\caption{The architecture of TriGNet}
+	\label{fig:albedo-gated-archi}
+\end{sidewaysfigure}
 
 
-\subsection{Light Map}
-The incoming light direction of each point can be represented as a matrix with same size as normal map or vertex map, where each pixel corresponding with each other.
-
-%% calc the light direction matrix
-\paragraph{Calculation}
-The incoming light direction can be calculated based on the position of light source and points. As shown in Figure \ref{fig:lambertian-surface-principle}, the incoming light direction of the surface point is a vector point from light source to the surface point, therefor it can be calculated as follows
-
-\begin{equation}\label{light-direction}
-	\begin{array}{ll}
-		L&= \frac{V-S}{\|V-S\|_2}\\ 
-	\end{array}
-\end{equation}
-where $ S $ is the light source position and $ V $ is the vertices, both $ S $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. 
-
-\paragraph{Inpainting}
-Due to the exist noise in the vertex map, the getting light map is also semi-dense.
-
-stores for every pixel the direction of incoming light.
-find a mapping H, such that $ l_{in} = H(v, l_{s}) $ for pixel $ v $, $ l_s $ is the position of light source, $ l_{in} $ is direction of incoming light of pixel $ v $. Iterate all the pixels, we get the light direction map $ L $.
-
-Let $ I $ denotes image, $ N $ denotes normal map, $ L $ denotes light direction map.
-
-lambertian reflection
-\[I = \rho N*L\]
-where $ * $ denotes scalar product,
-the albedo rho can be computed by 
-\[\rho = \frac{I}{N*L}\]
-
-Consider to predict the albedo, then the corresponding loss term is 
-\[\|\rho-\hat\rho \|_{F_2}\]
-
-In the practice, the loss can be further written as follows
-\begin{equation}
-	\begin{array}{cc}
-		&\|\rho-\hat\rho \|_{F_2}\\
-		\\
-		\Rightarrow &  \| \frac{I}{N\star L} - \frac{\hat I}{\hat N \star \hat L} \|\\
-		\\
-		\Rightarrow &  \| N\star L - \hat N \star \hat L \|\\
-	\end{array}
-\end{equation}
-
-in this case, the normal is supposed to be more crispy than the previous implement.
-
-In a first step, we should compute initial albedos from the predicted
-normals and check if everything is correct. (Normals need to be in
-spatial space again, not in tangent space, and we need to use cameras
-extrinsics R and t from the data file to triangulate the vertex maps
-correctly)...
-
-\[\rho = \frac{I}{N*L}\]
+\subsection{Loss Function}
+For the case of normal output, the loss function is the same as Mask-L2 loss as introduced in \ref{par:maskl2}. For the case of the product of albedo and normal, the loss function utilized a scaled Mask-L2 loss, which gives the range of inliers between $ [0,255] $. 
 
 
 

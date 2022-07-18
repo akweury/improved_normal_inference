@@ -97,7 +97,7 @@ if __name__ == '__main__':
         # "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "light1": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-1.pth.tar",
         # "light2": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-2.pth.tar",
-        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-3.pth.tar",
+        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",
     }
     test_folder = config.synthetic_data_noise_local / "synthetic512"
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
-
+from numpy.polynomial.polynomial import polyfit
 from help_funs import mu
 
 date_now = datetime.datetime.today().date()
@@ -56,7 +56,10 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
     if data_x.shape[1] <= 1:
         return
     for i, row in enumerate(data_x):
+        model = np.poly1d(polyfit(data_x[i], data_y[i], 2))
+        polyline = data_x[i]
         plt.scatter(data_x[i], data_y[i], label=labels[i])
+        plt.plot(polyline, model(polyline), color="r")
 
     if title is not None:
         plt.title(title)
