@@ -109,38 +109,38 @@ class VIL10Net(nn.Module):
         # Upsample 1
         x4_cat = torch.cat((v4, i4, l4), 1)
         x3_cat = F.interpolate(x4_cat, v3.size()[2:], mode='nearest')  # 128,128
-        x3 = self.uconv3_1(x3_cat)
-        v3 = self.uconv3(torch.cat((x3, v3), 1))
+        x3 = self.uconv1_1(x3_cat)
+        v3 = self.uconv1(torch.cat((x3, v3), 1))
 
         l3_us = F.interpolate(l4, l3.size()[2:], mode='nearest')  # 128,128
-        l3 = self.l_uconv3(torch.cat((l3, l3_us), 1))
+        l3 = self.l_uconv1(torch.cat((l3, l3_us), 1))
 
         i3_us = F.interpolate(i4, i3.size()[2:], mode='nearest')  # 128,128
-        i3 = self.i_uconv3(torch.cat((i3, i3_us), 1))
+        i3 = self.i_uconv1(torch.cat((i3, i3_us), 1))
 
         # Upsample 2
         x3_cat = torch.cat((v3, i3, l3), 1)
         x2_cat = F.interpolate(x3_cat, v2.size()[2:], mode='nearest')  # 128,128
-        x2 = self.uconv4_1(x2_cat)
-        v2 = self.uconv4(torch.cat((x2, v2), 1))
+        x2 = self.uconv2_1(x2_cat)
+        v2 = self.uconv2(torch.cat((x2, v2), 1))
 
         l2_us = F.interpolate(l3, l2.size()[2:], mode='nearest')  # 128,128
-        l2 = self.l_uconv4(torch.cat((l2, l2_us), 1))
+        l2 = self.l_uconv2(torch.cat((l2, l2_us), 1))
 
         i2_us = F.interpolate(i3, i2.size()[2:], mode='nearest')  # 128,128
-        i2 = self.i_uconv4(torch.cat((i2, i2_us), 1))
+        i2 = self.i_uconv2(torch.cat((i2, i2_us), 1))
 
         # Upsample 3
         x2_cat = torch.cat((v2, i2, l2), 1)
         x1_cat = F.interpolate(x2_cat, v1.size()[2:], mode='nearest')  # 128,128
-        x1 = self.uconv5_1(x1_cat)
-        v1 = self.uconv5(torch.cat((x1, v1), 1))
+        x1 = self.uconv3_1(x1_cat)
+        v1 = self.uconv3(torch.cat((x1, v1), 1))
 
         l1_us = F.interpolate(l2, l1.size()[2:], mode='nearest')  # 128,128
-        l1 = self.l_uconv5(torch.cat((l1, l1_us), 1))
+        l1 = self.l_uconv3(torch.cat((l1, l1_us), 1))
 
         i1_us = F.interpolate(i2, i1.size()[2:], mode='nearest')  # 128,128
-        i1 = self.i_uconv5(torch.cat((i1, i1_us), 1))
+        i1 = self.i_uconv3(torch.cat((i1, i1_us), 1))
 
         x0_cat = torch.cat((v1, i1, l1), 1)
         x0 = self.v_conv1(x0_cat)  # 512, 512

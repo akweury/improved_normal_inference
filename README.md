@@ -69,9 +69,9 @@ srun \
 
 
     srun \
-      --job-name="INI-resng-128-huber-full" \
+      --job-name="INI-gcnn-128-huber-full" \
       --time=7-00:00 \
-      -p batch \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=64G \
@@ -79,7 +79,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp resng --dataset synthetic128 --batch_size 64 --resume /home/sha/improved_normal_inference/workspace/i5/output_2022-07-19_13_53_08/checkpoint-90.pth.tar
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 128 --resume /home/sha/improved_normal_inference/workspace/i5/output_2022-07-19_13_53_08/checkpoint-90.pth.tar
 ```
 
 #### evaluate the test dataset (no visualisation)
