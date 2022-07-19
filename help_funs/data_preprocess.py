@@ -62,7 +62,7 @@ def noisy_a_folder(folder_path, output_path):
     # data_files = np.array(sorted(glob.glob(str(folder_path / "*data0*.json"), recursive=True)))
     # img_files = np.array(sorted(glob.glob(str(folder_path / "*image*.png"), recursive=True)))
     for idx in range(10000):
-        if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0.png"))):
+        if os.path.exists(str(output_path / (str(idx).zfill(5) + ".image9.png"))):
             continue
 
         data_file = str(folder_path / (str(idx).zfill(5) + ".data0.json"))
@@ -90,7 +90,7 @@ def noisy_a_folder(folder_path, output_path):
             # file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
             shutil.copyfile(depth_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
             shutil.copyfile(gt_file, str(output_path / (str(idx).zfill(5) + ".normal0.png")))
-            for i in range(5):
+            for i in range(10):
                 img_name = (str(idx).zfill(5) + f".image{str(i)}.png")
 
                 source_img_name = str(folder_path / (str(idx).zfill(5) + f".image{str(i)}.png"))
