@@ -264,8 +264,6 @@ def start2(models_path_dict):
                 else:
                     xout = evaluate_epoch(args, model, test_0_tensor, device)
 
-
-
                     if args.exp == "albedoGated":
                         g_out_norm = xout[:, :, 3:6]
                         x_out_light = xout[:, :, :3]
@@ -358,6 +356,8 @@ def start2(models_path_dict):
 
                     else:
                         normal = xout[:, :, :3]
+                        normal[normal > 1] = 1
+                        normal[normal < -1] = -1
                         normal[mask] = 0
                         diff_img, diff_angle = mu.eval_img_angle(normal, gt)
                         diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
@@ -425,12 +425,13 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
-        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
+        "an2-984": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-984.pth.tar",
         # "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",
-        # "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
-        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
+        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 

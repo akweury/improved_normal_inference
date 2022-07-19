@@ -94,10 +94,11 @@ if __name__ == '__main__':
         # "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "NG": config.ws_path / "ng" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        "an2-984": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-984.pth.tar",
+        "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "light1": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-1.pth.tar",
         # "light2": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-2.pth.tar",
-        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",
+        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",
     }
     test_folder = config.synthetic_data_noise_local / "synthetic512"
 

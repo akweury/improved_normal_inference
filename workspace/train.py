@@ -145,7 +145,7 @@ class TrainingModel():
             import random
             training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
             train_dataset.training_case = train_dataset.training_case[training_idxs]
-            test_dataset.training_case = test_dataset.training_case[np.array([0, 1, 2])]
+            test_dataset.training_case = test_dataset.training_case[np.array([0, 1, 2, 3])]
         print("test case number: " + str(test_dataset.training_case.shape))
         # test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
@@ -653,7 +653,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
-    elif exp_name == "vi5":
+    elif exp_name in ["vi5", "resng"]:
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))
