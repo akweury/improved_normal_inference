@@ -29,6 +29,7 @@ args = parser.parse_args()
 
 
 def convert2training_tensor(path, k, output_type='normal'):
+    width = 128
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -56,7 +57,10 @@ def convert2training_tensor(path, k, output_type='normal'):
         light_pos_list = []
         for i in range(5):
             light_posi = np.array(data[f'lightPos{str(i)}'])
-            light_posi = np.array(data['R']) @ light_posi.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
+            # light_posi = np.array(data[f'lightPos'])
+            # light_posi = np.array(data['R']) @ light_posi.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
+            light_posi = light_posi.reshape(3, 1) + np.array(data['t']).reshape(3, 1)
+
             light_pos_list.append(light_posi)
             # light_pos = light_pos - (np.array(data['R']).T @ (- np.array(data['t']).reshape(3, 1))).reshape(3)  # real
         light_pos_array = np.array(light_pos_list)
@@ -97,11 +101,11 @@ def convert2training_tensor(path, k, output_type='normal'):
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
 
-        light_direction_gt_array = np.zeros((128, 128, 15))
-        light_direction_array = np.zeros((128, 128, 15))
-        img_array = np.zeros((128, 128, 5))
+        light_direction_gt_array = np.zeros((width, width, 15))
+        light_direction_array = np.zeros((width, width, 15))
+        img_array = np.zeros((width, width, 5))
         img_file_prefix = data_files[item].split(".")[0] + ".image"
-        for i in range(5):
+        for i in range(1):
             img_file = img_file_prefix + str(i) + ".png"
             img = file_io.load_16bitImage(img_file)
             img[mask_gt] = 0
@@ -121,27 +125,29 @@ def convert2training_tensor(path, k, output_type='normal'):
             albedo = img / (G + 1e-20)
             albedo[np.isnan(albedo)] = 0
 
+            # img = mu.image_resize(img, 512, 512)
+            # mu.show_images(img, "img")
+            # albedo_img = np.uint8(albedo)
+            # import cv2 as cv
+            # albedo_img = mu.image_resize(albedo_img, 512, 512)
+            # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+            # mu.show_images(albedo_img, "a")
+
         light_gt_array = np.array(light_direction_gt_array)
         light_array = np.array(light_direction_array)
-
-        # mu.show_images(img, "img")
-        # albedo_img = np.uint8(albedo)
-        # import cv2 as cv
-        # albedo_img = cv.normalize(albedo_img, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-        # mu.show_images(albedo_img, "a")
 
         ###################  target  ####################
         target = np.c_[
             gt_normal,  # 0,1,2
             img_array,  # 3,4,5,6,7
-            light_gt_array  # 8,9,10,11,12
+            light_gt_array  # 8...22
         ]
 
         ################### input #######################
         vertex_norm[mask] = 0
         vectors = np.c_[vertex_norm,  # 0,1,2
                         img_array,  # 3,4,5,6,7
-                        light_array  # 8,9,10,11,12
+                        light_array  # 8...22
         ]
 
         # convert to tensor
@@ -163,7 +169,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["selval", "test", "train"]:
+    for folder in ["train", "test", "selval"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
