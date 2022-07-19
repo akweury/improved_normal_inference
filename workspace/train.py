@@ -125,6 +125,7 @@ class TrainingModel():
         self.normal_loss = None
         self.light_loss = None
         self.g_loss = None
+        self.normal_huber_loss = None
         self.criterion = nn.CrossEntropyLoss()
         self.init_lr_decayer()
         self.print_info(args)
@@ -251,7 +252,7 @@ class TrainingModel():
 
 def plot_loss_per_axis(loss_total, nn_model, epoch, title):
     loss_avg = loss_total / len(nn_model.train_loader.dataset)
-    if title == "normal_loss":
+    if title in ["normal_loss", "normal_huber_loss"]:
         shift = 0
     elif title == "light_loss":
         shift = 3
@@ -284,6 +285,7 @@ def train_epoch(nn_model, epoch):
     albedo_loss_total = torch.tensor([0.0])
     g_loss_total = torch.tensor([0.0])
     light_loss_total = torch.tensor([0.0])
+    normal_huber_loss_total = torch.tensor([0.0])
     for i, (input_tensor, target_tensor, train_idx) in enumerate(nn_model.train_loader):
         # put input and target to device
         input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor(
@@ -415,6 +417,9 @@ def train_epoch(nn_model, epoch):
             if nn_model.albedo_loss is not None:
                 albedo_loss_0th_avg = nn_model.albedo_loss / int(nn_model.args.batch_size)
                 print(f"\t albedo loss: {albedo_loss_0th_avg:.2e}", end="")
+            if nn_model.normal_huber_loss is not None:
+                normal_huber_loss_0th_avg = nn_model.normal_huber_loss / int(nn_model.args.batch_size)
+                print(f"\t normal huber loss: {normal_huber_loss_0th_avg:.2e}", end="")
             if nn_model.light_loss is not None:
                 light_loss_0th_avg = nn_model.light_loss / int(nn_model.args.batch_size)
                 print(f"\t light loss: {light_loss_0th_avg:.2e}", end="")
@@ -426,6 +431,8 @@ def train_epoch(nn_model, epoch):
     # save loss and plot
     if nn_model.args.normal_loss:
         plot_loss_per_axis(normal_loss_total, nn_model, epoch, title="normal_loss")
+    if nn_model.args.normal_huber_loss:
+        plot_loss_per_axis(normal_loss_total, nn_model, epoch, title="normal_huber_loss")
     if nn_model.args.g_loss:
         plot_loss_per_axis(g_loss_total, nn_model, epoch, title="g_loss")
     if nn_model.args.light_loss:
@@ -642,6 +649,11 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
     elif exp_name == "an2":
+        x_out_normal[mask] = 0
+        output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_normal(gt, "gt"))
+        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
+    elif exp_name == "vi5":
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))

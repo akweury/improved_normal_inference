@@ -15,10 +15,13 @@ scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512-5000.zi
 CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear false
 
 srun \
+  --ntasks=1 \
+  --cpus-per-task=10 \
+  --mem=64G \
   --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 create_dataset.py --data synthetic512 --machine remote --max_k 0 --clear false
+  python3 create_dataset_multi_lights.py --data synthetic128 --machine remote --max_k 0 --clear false
   
 
 ```
