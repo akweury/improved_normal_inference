@@ -30,7 +30,7 @@ class VIL10Net(nn.Module):
         self.l_dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.l_dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
 
-        self.i_dconv1 = GConv(5, channel_size_1, kernel_down, stride, padding_down)
+        self.i_dconv1 = GConv(10, channel_size_1, kernel_down, stride, padding_down)
         self.i_dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.i_dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
         self.i_dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
