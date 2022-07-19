@@ -65,7 +65,7 @@ def convert2training_tensor(path, k, output_type='normal'):
             light_pos_list.append(light_posi)
             # light_pos = light_pos - (np.array(data['R']).T @ (- np.array(data['t']).reshape(3, 1))).reshape(3)  # real
         light_pos_array = np.array(light_pos_list)
-        light_pos_array = light_pos_array.reshape(5, 3)
+        light_pos_array = light_pos_array.reshape(light_num * 3, 3)
         # light_pos = light_pos.reshape(3)
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
