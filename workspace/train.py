@@ -658,6 +658,11 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
+    elif exp_name == "i5":
+        x_out_normal[mask] = 0
+        output_list.append(mu.visual_normal(x_out_normal, "pred"))
+        output_list.append(mu.visual_normal(gt, "gt"))
+        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
     elif exp_name == "ag":
         x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
         rho_out = xout[0, 6:7, :, :].permute(1, 2, 0).to('cpu').numpy()

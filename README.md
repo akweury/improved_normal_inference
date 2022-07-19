@@ -69,9 +69,9 @@ srun \
 
 
     srun \
-      --job-name="INI-vi5-huber-full" \
+      --job-name="INI-i5-huber-1000" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTX2080Ti \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=64G \
@@ -79,9 +79,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp vi5 --dataset synthetic128 --batch_size 80 
-
-
+      python3 main.py --machine remote --exp i5 --dataset synthetic128 --batch_size 64 --train-on 1000
 ```
 
 #### evaluate the test dataset (no visualisation)

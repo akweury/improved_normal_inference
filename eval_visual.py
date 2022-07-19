@@ -425,12 +425,12 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
-        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
         # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
-        "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",
-        "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
-        "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",
+        # "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
+        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "GCNN3-32-512-2": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32-2.pth.tar",
         # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
