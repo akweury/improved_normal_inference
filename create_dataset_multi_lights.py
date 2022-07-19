@@ -30,6 +30,7 @@ args = parser.parse_args()
 
 def convert2training_tensor(path, k, output_type='normal'):
     width = 128
+    light_num = 10
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -55,7 +56,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         data = json.load(f)
         f.close()
         light_pos_list = []
-        for i in range(5):
+        for i in range(light_num):
             light_posi = np.array(data[f'lightPos{str(i)}'])
             # light_posi = np.array(data[f'lightPos'])
             # light_posi = np.array(data['R']) @ light_posi.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
@@ -105,7 +106,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         light_direction_array = np.zeros((width, width, 15))
         img_array = np.zeros((width, width, 5))
         img_file_prefix = data_files[item].split(".")[0] + ".image"
-        for i in range(1):
+        for i in range(light_num):
             img_file = img_file_prefix + str(i) + ".png"
             img = file_io.load_16bitImage(img_file)
             img[mask_gt] = 0
