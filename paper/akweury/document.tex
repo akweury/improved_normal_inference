@@ -40,8 +40,10 @@
 
 \subsection{Light Net Evaluation}
 
-We evaluate the light net on the test dataset for light inpainting task.
-A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. The average angular error are lower than $ 0.3 $ degree on all of test cases. In this case, to distinguish the output and the ground truth is already not easily only use naked eyes. Figure \ref{fig:scatter-light} uses a scatter plot to show the average angular error on 100 different test cases. The loss is mainly below
+We evaluate the GCNN architecture based light net on the test dataset. The light net parameters are further used as the initial parameter of light branch of the Trignet.
+
+A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. The average angular error are lower than $ 0.3 $ degree on all of test cases. In this case, to distinguish the output and the ground truth is already not easily only use naked eyes. 
+
 
 \begin{figure}[th]
 	\centering
@@ -67,8 +69,7 @@ A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. T
 	\label{fig:eval-light}
 \end{figure}
 
-
-
+Figure \ref{fig:scatter-light} uses a scatter plot to show the average angular error on 100 different test cases. The average pixel-wise angular error is 0.17 degree as shown in Table \ref{tab:model-error}. An regression line has been added in the plot to analysis the tendency of the errors. The angular error slightly goes up when valid point number in the scene increase. It is make sense since the valid pixels are usually connected and concentrate in a single patch, the less of the area of the patch, which corresponding the number of the valid points, the less variation of the light direction among the pixels, thus better the evaluation.
 
 
 \begin{figure}[th]
@@ -79,12 +80,66 @@ A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. T
 \end{figure}
 
 
-\begin{table}[th]
 
+\subsection{Trignet Net Evaluation}
+
+
+The qualitative evaluation of Trignet uses the model trained based on masked L2 loss.
+
+\subsubsection{title}
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_img.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_input.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_light.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_gt.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_output_error.png}
+	
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_img.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_input.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_light.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_gt.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_output_error.png}
+	
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_img.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_input.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_light.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_gt.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_output_error.png}
+	
+	\caption{Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.}
+	\label{fig:eval-trignet}
+\end{figure}
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=0.5\linewidth]{./Figures/scatter-light-noised.png}
+	\caption{The evaluation on 100 test cases of Trignet.}
+	\label{fig:scatter-trignet}
+\end{figure}
+
+
+
+
+\subsection{comparison}
+From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quite well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
+
+It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=\linewidth]{./Figures/normal-histo-diff.png}
+	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
+	\label{fig:normal-histo-diff}
+\end{figure}
+	
+
+\begin{table}[th]
+	
 	\centering
 	\begin{tabular}{l l l}
 		\toprule
-		\tabhead{Model} & \tabhead{Angle Error /degree} & \tabhead{Time /ms}\\
+		\tabhead{Model} & \tabhead{L2} & \tabhead{Time /ms}\\
 		\midrule
 		LightNet  & 0.17  & 4.72 \\ 
 		\hline
@@ -98,19 +153,5 @@ A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. T
 	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond.}
 	\label{tab:model-error}
 \end{table}
-
-
-\subsection{comparison}
-From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quit well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
-
-It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=\linewidth]{./Figures/normal-histo-diff.png}
-	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
-	\label{fig:normal-histo-diff}
-\end{figure}
-	
-
 
 \end{document}

@@ -43,7 +43,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
     gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
     data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
-    img_files = np.array(sorted(glob.glob(str(path / "*image0.png"), recursive=True)))
+    img_files = np.array(sorted(glob.glob(str(path / "*image*.png"), recursive=True)))
 
     for item in range(len(data_files)):
         if os.path.exists(str(path / "tensor" / f"{str(item).zfill(5)}_{k}_{output_type}.pth.tar")):
@@ -53,11 +53,15 @@ def convert2training_tensor(path, k, output_type='normal'):
         f = open(data_files[item])
         data = json.load(f)
         f.close()
-        light_pos = np.array(data['lightPos'])
-        light_pos = np.array(data['R']) @ light_pos.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
-        # light_pos = light_pos - (np.array(data['R']).T @ (- np.array(data['t']).reshape(3, 1))).reshape(3)  # real
-
-        light_pos = light_pos.reshape(3)
+        light_pos_list = []
+        for i in range(5):
+            light_posi = np.array(data[f'lightPos{str(i)}'])
+            light_posi = np.array(data['R']) @ light_posi.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
+            light_pos_list.append(light_posi)
+            # light_pos = light_pos - (np.array(data['R']).T @ (- np.array(data['t']).reshape(3, 1))).reshape(3)  # real
+        light_pos_array = np.array(light_pos_list)
+        light_pos_array = light_pos_array.reshape(5, 3)
+        # light_pos = light_pos.reshape(3)
         depth = file_io.load_scaled16bitImage(depth_files[item],
                                               data['minDepth'],
                                               data['maxDepth'])
@@ -70,8 +74,6 @@ def convert2training_tensor(path, k, output_type='normal'):
         mask = depth.sum(axis=2) == 0
         mask_gt = depth_gt.sum(axis=2) == 0
 
-        img = file_io.load_16bitImage(img_files[item])
-        img[mask_gt] = 0
         data['R'], data['t'] = np.identity(3), np.zeros(3)
         vertex = mu.depth2vertex(torch.tensor(depth).permute(2, 0, 1),
                                  torch.tensor(data['K']),
@@ -95,17 +97,32 @@ def convert2training_tensor(path, k, output_type='normal'):
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
 
-        lig_pos_norm = torch.from_numpy((light_pos - shift_vector) / scale_factors)
-        light_direction = mu.vertex2light_direction(vertex, light_pos)
-        light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos)
-        light_direction_gt[mask_gt] = 0
-        light_direction[mask] = 0
+        light_direction_gt_array = np.zeros((128, 128, 15))
+        light_direction_array = np.zeros((128, 128, 15))
+        img_array = np.zeros((128, 128, 5))
+        img_file_prefix = data_files[item].split(".")[0] + ".image"
+        for i in range(5):
+            img_file = img_file_prefix + str(i) + ".png"
+            img = file_io.load_16bitImage(img_file)
+            img[mask_gt] = 0
+            img_array[:, :, i] = img
 
-        # albedo
-        G = np.sum(gt_normal * light_direction_gt, axis=-1)
-        G[mask_gt] = 0
-        albedo = img / (G + 1e-20)
-        albedo[np.isnan(albedo)] = 0
+            lig_pos_norm = torch.from_numpy((light_pos_array[i] - shift_vector) / scale_factors)
+            light_direction = mu.vertex2light_direction(vertex, light_pos_array[i])
+            light_direction_gt = mu.vertex2light_direction(vertex_gt, light_pos_array[i])
+            light_direction_gt[mask_gt] = 0
+            light_direction[mask] = 0
+
+            light_direction_gt_array[:, :, 3 * i:3 * i + 3] = light_direction_gt
+            light_direction_array[:, :, 3 * i:3 * i + 3] = light_direction
+            # albedo
+            G = np.sum(gt_normal * light_direction_gt, axis=-1)
+            G[mask_gt] = 0
+            albedo = img / (G + 1e-20)
+            albedo[np.isnan(albedo)] = 0
+
+        light_gt_array = np.array(light_direction_gt_array)
+        light_array = np.array(light_direction_array)
 
         # mu.show_images(img, "img")
         # albedo_img = np.uint8(albedo)
@@ -116,16 +133,16 @@ def convert2training_tensor(path, k, output_type='normal'):
         ###################  target  ####################
         target = np.c_[
             gt_normal,  # 0,1,2
-            np.sum(gt_normal * light_direction_gt, axis=-1, keepdims=True),  # 3
-            np.expand_dims(img, axis=2),  # 4
-            light_direction_gt  # 5,6,7
+            img_array,  # 3,4,5,6,7
+            light_gt_array  # 8,9,10,11,12
         ]
 
         ################### input #######################
         vertex_norm[mask] = 0
         vectors = np.c_[vertex_norm,  # 0,1,2
-                        np.expand_dims(img, axis=2),  # 3
-                        light_direction]  # 4,5,6
+                        img_array,  # 3,4,5,6,7
+                        light_array  # 8,9,10,11,12
+        ]
 
         # convert to tensor
         input_tensor = torch.from_numpy(vectors.astype(np.float32)).permute(2, 0, 1)
@@ -135,7 +152,6 @@ def convert2training_tensor(path, k, output_type='normal'):
         training_case = {'input_tensor': input_tensor,
                          'gt_tensor': gt_tensor,
                          'scale_factors': scale_factors,
-                         'light_source': lig_pos_norm,
                          'K': data['K'],
                          'R': data['R'],
                          't': data['t'],

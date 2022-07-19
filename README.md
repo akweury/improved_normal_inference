@@ -40,18 +40,18 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 ```
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
-srun \
-  --job-name="INI-an2-50-l2" \
-  --time=3-00:00 \
-  -p A100 \
-  --ntasks=1 \
-  --gpus-per-task=1 \
-  --mem=64G \
-  --cpus-per-gpu=10 \
-  --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
-  --container-workdir="`pwd`" \
-  --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 12 --train-on 50 --resume /home/sha/improved_normal_inference/workspace/albedoGated/output_2022-07-13_18_28_03/checkpoint-307.pth.tar
+    srun \
+      --job-name="INI-an2-l2" \
+      --time=7-00:00 \
+      -p RTX3090 \
+      --ntasks=1 \
+      --gpus-per-task=1 \
+      --mem=64G \
+      --cpus-per-gpu=6 \
+      --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
+      --container-workdir="`pwd`" \
+      --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
+      python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 5 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
 
 srun \
  -p batch \

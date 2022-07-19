@@ -57,20 +57,24 @@ def noisy_a_folder(folder_path, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    gt_files = np.array(sorted(glob.glob(str(folder_path / "*normal0*.png"), recursive=True)))
-    depth_files = np.array(sorted(glob.glob(str(folder_path / "*depth0*.png"), recursive=True)))
-    data_files = np.array(sorted(glob.glob(str(folder_path / "*data0*.json"), recursive=True)))
-    img_files = np.array(sorted(glob.glob(str(folder_path / "*image0.png"), recursive=True)))
-    for idx in range(len(data_files)):
+    # gt_files = np.array(sorted(glob.glob(str(folder_path / "*normal0*.png"), recursive=True)))
+    # depth_files = np.array(sorted(glob.glob(str(folder_path / "*depth0*.png"), recursive=True)))
+    # data_files = np.array(sorted(glob.glob(str(folder_path / "*data0*.json"), recursive=True)))
+    # img_files = np.array(sorted(glob.glob(str(folder_path / "*image*.png"), recursive=True)))
+    for idx in range(10000):
         if os.path.exists(str(output_path / (str(idx).zfill(5) + ".depth0.png"))):
             continue
-        if os.path.exists(data_files[idx]):
-            f = open(data_files[idx])
+
+        data_file = str(folder_path / (str(idx).zfill(5) + ".data0.json"))
+        depth_file = str(folder_path / (str(idx).zfill(5) + ".depth0.png"))
+        gt_file = str(folder_path / (str(idx).zfill(5) + ".normal0.png"))
+        if os.path.exists(data_file):
+            f = open(data_file)
             data = json.load(f)
-            depth = file_io.load_scaled16bitImage(depth_files[idx], data['minDepth'], data['maxDepth'])
+            depth = file_io.load_scaled16bitImage(depth_file, data['minDepth'], data['maxDepth'])
 
             # get noise mask
-            img = np.expand_dims(file_io.load_16bitImage(img_files[idx]), axis=2)
+            # img = np.expand_dims(file_io.load_16bitImage(img_files[idx]), axis=2)
             # img[img < 20] = 0
             depth, noise_factor = noisy_1channel(depth)
 
@@ -84,9 +88,14 @@ def noisy_a_folder(folder_path, output_path):
                 json.dump(data, f)
 
             # file_io.save_16bitImage(img_noise, str(output_path / (str(idx).zfill(5) + ".image0_noise.png")))
-            shutil.copyfile(depth_files[idx], str(output_path / (str(idx).zfill(5) + ".depth0.png")))
-            shutil.copyfile(img_files[idx], str(output_path / (str(idx).zfill(5) + ".image0.png")))
-            shutil.copyfile(gt_files[idx], str(output_path / (str(idx).zfill(5) + ".normal0.png")))
+            shutil.copyfile(depth_file, str(output_path / (str(idx).zfill(5) + ".depth0.png")))
+            shutil.copyfile(gt_file, str(output_path / (str(idx).zfill(5) + ".normal0.png")))
+            for i in range(5):
+                img_name = (str(idx).zfill(5) + f".image{str(i)}.png")
+
+                source_img_name = str(folder_path / (str(idx).zfill(5) + f".image{str(i)}.png"))
+                if os.path.exists(source_img_name):
+                    shutil.copyfile(source_img_name, str(output_path / img_name))
 
             print(f'File {idx} added noise.')
 

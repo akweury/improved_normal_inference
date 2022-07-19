@@ -52,16 +52,16 @@
       </requires>
       <requires type="static">
           <file>blx-dm.def</file>
-      <file>blx-compat.def</file>
-      <file>blx-bibtex.def</file>
-      <file>biblatex.def</file>
-      <file>blx-natbib.def</file>
-      <file>standard.bbx</file>
-      <file>authoryear.bbx</file>
-      <file>authoryear.cbx</file>
-      <file>biblatex.cfg</file>
-      <file>english.lbx</file>
-    </requires>
+          <file>blx-compat.def</file>
+          <file>blx-bibtex.def</file>
+          <file>biblatex.def</file>
+          <file>blx-natbib.def</file>
+          <file>standard.bbx</file>
+          <file>authoryear.bbx</file>
+          <file>authoryear.cbx</file>
+          <file>biblatex.cfg</file>
+          <file>english.lbx</file>
+      </requires>
   </internal>
     <external package="biblatex" priority="5" active="0">
         <generic>bibtex</generic>
@@ -74,16 +74,16 @@
             <file>document.aux</file>
         </input>
         <output>
-      <file>document.bbl</file>
-    </output>
-    <provides type="dynamic">
-      <file>document.bbl</file>
-    </provides>
-    <requires type="dynamic">
-      <file>document.aux</file>
-      <file>document-blx.bib</file>
-    </requires>
-    <requires type="editable">
+            <file>document.bbl</file>
+        </output>
+        <provides type="dynamic">
+            <file>document.bbl</file>
+        </provides>
+        <requires type="dynamic">
+            <file>document.aux</file>
+            <file>document-blx.bib</file>
+        </requires>
+        <requires type="editable">
       <file>example.bib</file>
     </requires>
     <requires type="static">

@@ -56,10 +56,10 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
     if data_x.shape[1] <= 1:
         return
     for i, row in enumerate(data_x):
-        model = np.poly1d(polyfit(data_x[i], data_y[i], 2))
-        polyline = data_x[i]
+        b, a = np.polyfit(data_x[i], data_y[i], deg=1)
         plt.scatter(data_x[i], data_y[i], label=labels[i])
-        plt.plot(polyline, model(polyline), color="r")
+        xseq = np.linspace(0, 100000, num=100000)
+        plt.plot(xseq, a + b * xseq, lw=2.5)
 
     if title is not None:
         plt.title(title)
