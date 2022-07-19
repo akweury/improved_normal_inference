@@ -102,9 +102,9 @@ def convert2training_tensor(path, k, output_type='normal'):
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
 
-        light_direction_gt_array = np.zeros((width, width, 15))
-        light_direction_array = np.zeros((width, width, 15))
-        img_array = np.zeros((width, width, 5))
+        light_direction_gt_array = np.zeros((width, width, 30))
+        light_direction_array = np.zeros((width, width, 30))
+        img_array = np.zeros((width, width, 10))
         img_file_prefix = data_files[item].split(".")[0] + ".image"
         for i in range(light_num):
             img_file = img_file_prefix + str(i) + ".png"
