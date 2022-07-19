@@ -30,7 +30,7 @@ class CNN(nn.Module):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
         x_img = x[:, 3:8, :, :]
-        x_light = x[:, 8:23, :, :]
+        x_light = x[:, 8:, :, :]
         # albedo predict
         x_normal_out = self.normal_net(x_vertex, x_img, x_light)
         return x_normal_out
