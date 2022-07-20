@@ -18,6 +18,6 @@ class CNN(nn.Module):
 
     def forward(self, x):
         # general surface training
-        x_light = x[:, 3:4, :, :]
+        x_light = x[:, 3 + self.light_num:6 + self.light_num, :, :]
         xout_light = self.light3_3(x_light)
         return xout_light
