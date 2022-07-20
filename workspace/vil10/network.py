@@ -36,7 +36,7 @@ class CNN(nn.Module):
             img = x[:, 3 + i:4 + i, :, :]
             light = x[:, 3 + light_num + 3 * i:6 + light_num + 3 * i, :, :]
             x_light_out = self.illusion_encoder(torch.cat((img, light), 1))
-            x_light_feature[:, 32 * i, 32 * (i + 1), :, :] = x_light_out
+            x_light_feature[:, 32 * i:32 * (i + 1), :, :] = x_light_out
         # max pooling layer
         x_light_feature = self.max_pool(x_light_feature)
 

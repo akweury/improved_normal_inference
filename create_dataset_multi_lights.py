@@ -170,7 +170,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["train", "test", "selval"]:
+    for folder in ["test", "selval", "train"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
