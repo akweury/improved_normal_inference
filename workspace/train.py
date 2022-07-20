@@ -299,11 +299,8 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
         # torch.autograd.set_detect_anomaly(True)
         # Forward pass
-        if nn_model.args.exp == "vil10":
 
-            out = nn_model.model(input, nn_model.args.lightNum)
-        else:
-            out = nn_model.model(input)
+        out = nn_model.model(input)
 
         # Compute the loss
 
