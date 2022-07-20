@@ -28,6 +28,8 @@ class CNN(nn.Module):
             param.requires_grad = False
 
     def forward(self, x):
+
+        # extractor
         total_channel = self.light_num * self.channel_num
         x_light_feature_cat = torch.zeros(size=(x.size(0), total_channel, x.size(2) // 8, x.size(3) // 8)).to(x.device)
         for i in range(self.light_num):
@@ -35,9 +37,11 @@ class CNN(nn.Module):
             light = x[:, 3 + self.light_num + 3 * i:6 + self.light_num + 3 * i, :, :]
             x_light_out = self.illusion_encoder(torch.cat((img, light), 1))
             x_light_feature_cat[:, self.channel_num * i:self.channel_num * (i + 1), :, :] = x_light_out
+
         # max pooling layer
         x_light_feature = self.max_pool(x_light_feature_cat)
 
+        # normal estimation
         x_vertex = x[:, :3, :, :]
         x_normal = self.normal_net(x_vertex, x_light_feature)
 

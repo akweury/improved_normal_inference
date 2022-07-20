@@ -5,6 +5,118 @@ import torch.nn.functional as F
 from common.Layers import GConv
 
 
+class Extractor(nn.Module):
+    def __init__(self, in_ch, channel_num):
+        super().__init__()
+
+        kernel_down = (3, 3)
+        kernel_up = (3, 3)
+        padding_down = (1, 1)
+        padding_up = (1, 1)
+        stride = (1, 1)
+        stride_2 = (2, 2)
+
+        channel_size_1 = channel_num
+        # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
+        self.dconv1 = GConv(in_ch * 4, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+
+    def forward(self, x):
+        v1 = self.dconv1(x)
+        v1 = self.dconv2(v1)
+        v1 = self.dconv3(v1)
+
+        # Downsample 1
+        v2 = self.dconv4(v1)
+        v2 = self.dconv2(v2)
+        v2 = self.dconv3(v2)
+
+        # Downsample 2
+        v3 = self.dconv4(v2)
+        v3 = self.dconv2(v3)
+        v3 = self.dconv3(v3)
+
+        # Downsample 3
+        v4 = self.dconv4(v3)
+        v4 = self.dconv2(v4)
+        v4 = self.dconv3(v4)
+
+        return v4
+
+
+class VILNormal(nn.Module):
+    def __init__(self, in_ch, out_ch, channel_num):
+        super().__init__()
+
+        kernel_down = (3, 3)
+        kernel_up = (3, 3)
+        padding_down = (1, 1)
+        padding_up = (1, 1)
+        stride = (1, 1)
+        stride_2 = (2, 2)
+
+        channel_size_1 = channel_num
+        channel_size_2 = channel_num * 2
+        channel_size_3 = channel_num * 2
+        # https://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/PIRODDI1/NormConv/node2.html#:~:text=The%20idea%20of%20normalized%20convolution,them%20is%20equal%20to%20zero.
+        self.dconv1 = GConv(in_ch, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv2 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv3 = GConv(channel_size_1, channel_size_1, kernel_down, stride, padding_down)
+        self.dconv4 = GConv(channel_size_1, channel_size_1, kernel_down, stride_2, padding_down)
+
+        self.uconv1_1 = GConv(channel_size_3, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv1 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv2_1 = GConv(channel_size_3, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv2 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv3_1 = GConv(channel_size_3, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
+
+        self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
+
+    def forward(self, vertex, g_feature):
+        v1 = self.dconv1(vertex)
+        v1 = self.dconv2(v1)
+        v1 = self.dconv3(v1)
+
+        # Downsample 1
+        v2 = self.dconv4(v1)
+        v2 = self.dconv2(v2)
+        v2 = self.dconv3(v2)
+
+        # Downsample 2
+        v3 = self.dconv4(v2)
+        v3 = self.dconv2(v3)
+        v3 = self.dconv3(v3)
+
+        # Downsample 3
+        v4 = self.dconv4(v3)
+        v4 = self.dconv2(v4)
+        v4 = self.dconv3(v4)
+
+        # Upsample 1
+        x4_cat = torch.cat((v4, g_feature), 1)
+        x3_cat = F.interpolate(x4_cat, v3.size()[2:], mode='nearest')  # 128,128
+        x3 = self.uconv1_1(x3_cat)
+        v3 = self.uconv1(torch.cat((x3, v3), 1))
+
+        # Upsample 2
+        x2 = F.interpolate(v3, v2.size()[2:], mode='nearest')  # 128,128
+        v2 = self.uconv2(torch.cat((x2, v2), 1))
+
+        # Upsample 3
+        x1 = F.interpolate(v2, v1.size()[2:], mode='nearest')  # 128,128
+
+        v1 = self.uconv3(torch.cat((x1, v1), 1))
+
+        x0 = self.conv1(v1)
+        xout = self.conv2(x0)
+
+        return xout
+
+
 class VI5Net(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
