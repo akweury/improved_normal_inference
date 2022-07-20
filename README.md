@@ -43,6 +43,22 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 ```
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
+
+    srun \
+      --job-name="INI-an2-full" \
+      --time=7-00:00 \
+      -p RTX3090 \
+      --ntasks=1 \
+      --gpus-per-task=1 \
+      --mem=64G \
+      --cpus-per-gpu=6 \
+      --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
+      --container-workdir="`pwd`" \
+      --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
+      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 64
+
+
+
     srun \
       --job-name="INI-vil10-full" \
       --time=7-00:00 \

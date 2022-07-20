@@ -4,7 +4,7 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 
 import torch.nn as nn
-from common.ResNormalGuided import NormalGuided
+from common.NormalizedNNN import GCNN
 
 
 class CNN(nn.Module):
@@ -14,10 +14,10 @@ class CNN(nn.Module):
         self.light_num = light_num
 
         # input confidence estimation network
-        self.light3_3 = NormalGuided(3 * light_num, 3 * light_num, c_num)
+        self.light3_3 = GCNN(3, 3, c_num)
 
     def forward(self, x):
         # general surface training
-        x_light = x[:, 3 + self.light_num:3 + self.light_num + self.light_num * 3, :, :]
+        x_light = x[:, 3:4, :, :]
         xout_light = self.light3_3(x_light)
         return xout_light

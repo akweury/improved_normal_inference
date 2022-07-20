@@ -132,6 +132,9 @@ def get_model(args):
     elif args.exp == "an2":
         import workspace.an2.network as an2
         model = an2.CNN(args.num_channels, args.lightNum)
+    elif args.exp == "an3":
+        import workspace.an3.network as an3
+        model = an3.CNN(args.num_channels, args.lightNum)
     elif args.exp == "vi5":
         import workspace.vi5.network as vi5
         model = vi5.CNN(args.num_channels, args.lightNum)
