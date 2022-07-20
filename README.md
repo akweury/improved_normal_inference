@@ -17,7 +17,7 @@ CUDA_VISIBLE_DEVICES=2 python3 create_dataset.py --data synthetic512 --machine r
 srun \
   --ntasks=1 \
   --cpus-per-task=10 \
-  --mem=64G \
+  --mem=42G \
   --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
@@ -44,7 +44,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
 
     srun \
-      --job-name="INI-vil10-1000" \
+      --job-name="INI-vil10-full" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \
@@ -54,7 +54,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --batch_size 8 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
+      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --batch_size 8 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
 
 srun \
 --job-name="INI-vi5-full" \
@@ -81,7 +81,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 128 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-20_01_18_22/checkpoint-347.pth.tar
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 128 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-20_07_52_40/checkpoint-645.pth.tar
 
 
     srun \
@@ -95,7 +95,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 128
+      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 64
 
 
 ```

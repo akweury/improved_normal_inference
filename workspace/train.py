@@ -483,105 +483,7 @@ def test_epoch(nn_model, epoch):
                         args=nn_model.args)
 
 
-# def train_fugrc(nn_model, epoch, loss_network):
-#     nn_model.args.epoch = epoch
-#     print(
-#         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
-#     # ------------ switch to train mode -------------------
-#     nn_model.model.train()
-#     loss_logs = {'content_loss': [], 'style_loss': [], 'tv_loss': [], 'total_loss': []}
-#     # loss network
-#     # loss_network = None
-#     for i, (input, target, train_idx) in enumerate(nn_model.train_loader):
-#         # put input and target to device
-#         input, target = input[:, :3, :, :].to(nn_model.device), target[:, :3, :, :].to(nn_model.device)
-#
-#         # Wait for all kernels to finish
-#         torch.cuda.synchronize()
-#
-#         # Clear the gradients
-#         nn_model.optimizer.zero_grad()
-#
-#         # Forward pass
-#         out = nn_model.model(input)
-#
-#         if nn_model.args.loss == "perceptual_loss":
-#             target_content_features = extract_features(loss_network, input, nn_model.args.content_layers)
-#             target_style_features = extract_features(loss_network, target, nn_model.args.style_layers)
-#
-#             output_content_features = extract_features(loss_network, out, nn_model.args.content_layers)
-#             output_style_features = extract_features(loss_network, out, nn_model.args.style_layers)
-#
-#             # Compute the loss
-#             content_loss = calc_Content_Loss(output_content_features, target_content_features)
-#             style_loss = calc_Gram_Loss(output_style_features, target_style_features)
-#             tv_loss = calc_TV_Loss(out)
-#
-#             loss = content_loss * nn_model.args.content_weight + style_loss * nn_model.args.style_weight + tv_loss * nn_model.args.tv_weight
-#
-#             loss_logs['content_loss'].append(float(content_loss))
-#             loss_logs['style_loss'].append(float(style_loss))
-#             loss_logs['tv_loss'].append(tv_loss.item())
-#             loss_logs['total_loss'].append(loss.item())
-#         else:
-#             loss = nn_model.loss(out, target, nn_model.args)
-#             loss_logs['total_loss'].append(float(loss))
-#             # print(f"loss: {loss}")
-#         # Backward pass
-#         loss.backward()
-#
-#         # Update the parameters
-#         nn_model.optimizer.step()
-#
-#         # print statistics
-#         np.set_printoptions(precision=5)
-#         torch.set_printoptions(sci_mode=True, precision=3)
-#
-#         # evaluation
-#         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-#             for j, (input, target, test_idx) in enumerate(nn_model.test_loader):
-#                 with torch.no_grad():
-#                     # put input and target to device
-#                     input, target = input.to(nn_model.device), target.to(nn_model.device)
-#                     # Wait for all kernels to finish
-#                     torch.cuda.synchronize()
-#                     # Forward pass
-#                     out = nn_model.model(input)
-#                     input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
-#                         'cpu')
-#                     draw_output(nn_model.args.exp, input, out,
-#                                 target=target,
-#                                 exp_path=nn_model.output_folder,
-#                                 epoch=epoch,
-#                                 i=j,
-#                                 train_idx=test_idx,
-#                                 prefix=f"eval_epoch_{epoch}_{test_idx}_")
-#
-#     # save loss
-#     nn_model.losses[0, epoch] = (np.sum(loss_logs['total_loss']) / len(nn_model.train_loader.dataset))
-#     nn_model.losses[1, epoch] = (np.sum(loss_logs['content_loss']) / len(nn_model.train_loader.dataset))
-#     nn_model.losses[2, epoch] = (np.sum(loss_logs['style_loss']) / len(nn_model.train_loader.dataset))
-#
-#     # indicate for best model saving
-#     if nn_model.best_loss > nn_model.losses[0, epoch]:
-#         nn_model.best_loss = nn_model.losses[0, epoch]
-#         print(f'best loss updated to {nn_model.losses[0, epoch]}.')
-#         is_best = True
-#     else:
-#         is_best = False
-#
-#     # draw line chart
-#     if epoch % 10 == 9:
-#         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-#                         log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
-#         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-#                         log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch)
-#         draw_line_chart(np.array([nn_model.losses[0]]), nn_model.output_folder,
-#                         log_y=True, label=0, epoch=epoch, start_epoch=nn_model.start_epoch, cla_leg=True, title="Loss")
-#     return is_best
 
-
-# ---------------------------------------------- visualisation -------------------------------------------
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
                     label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
@@ -655,14 +557,14 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         light_gt = target[:, 3 + light_num:, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()[:, :, :3]
 
         output_list.append(mu.visual_light(x_out_light, "pred"))
-        output_list.append(mu.visual_light(light_gt, "gt"))
+        # output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
     elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn", "vil10"]:
         x_out_normal[mask] = 0
         x_out_normal[x_out_normal > 1] = 1
         x_out_normal[x_out_normal < -1] = -1
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
-        output_list.append(mu.visual_normal(gt, "gt"))
+        # output_list.append(mu.visual_normal(gt, "gt"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
     elif exp_name == "ag":
         x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()

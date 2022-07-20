@@ -13,10 +13,11 @@ from help_funs import mu
 # from common.NormalizedNNN import NormalizedNNN
 
 class CNN(nn.Module):
-    def __init__(self, channel_num):
+    def __init__(self, channel_num, light_num):
         super().__init__()
         # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
+        self.light_num = light_num
         # self.light_net = NormalGuided(3, 3, channel_num)
         self.g_net = GNet(3, 3, channel_num)
         # self.remove_grad()
@@ -55,9 +56,7 @@ class CNN(nn.Module):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
         x_img = x[:, 3:4, :, :]
-        x_light = x[:, 4:7, :, :]
-        input_mask = torch.sum(torch.abs(x_vertex), dim=1) > 0
-        input_mask = input_mask.unsqueeze(1)
+        x_light = x[:, 3 + self.light_num:6 + self.light_num, :, :]
 
         # albedo predict
         x_normal_out = self.g_net(x_vertex, x_light, x_img)

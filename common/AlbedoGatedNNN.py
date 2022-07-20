@@ -310,4 +310,5 @@ class GNet2(nn.Module):
         x0 = self.conv1(x0)
         xout = self.conv2(x0)
 
+        xout = xout / torch.norm(xout, p=2, dim=1, keepdim=True)
         return xout
