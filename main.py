@@ -115,7 +115,7 @@ def get_model(args):
         model = resng.CNN(args.num_channels)
     elif args.exp == "light":
         import workspace.light.network as light
-        model = light.CNN(args.num_channels)
+        model = light.CNN(args.num_channels, args.lightNum)
     elif args.exp == "fugrc":
         import workspace.fugrc.network as fugrc
         model = fugrc.CNN(args.num_channels)

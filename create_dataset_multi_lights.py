@@ -140,15 +140,15 @@ def convert2training_tensor(path, k, output_type='normal'):
         ###################  target  ####################
         target = np.c_[
             gt_normal,  # 0,1,2
-            img_array,  # 3,4,5,6,7
-            light_gt_array  # 8...22
+            img_array,  #
+            light_gt_array  #
         ]
 
         ################### input #######################
         vertex_norm[mask] = 0
         vectors = np.c_[vertex_norm,  # 0,1,2
-                        img_array,  # 3,4,5,6,7
-                        light_array  # 8...22
+                        img_array,  #
+                        light_array  #
         ]
 
         # convert to tensor

@@ -390,8 +390,9 @@ def train_epoch(nn_model, epoch):
             else:
                 raise ValueError
 
+            light_num = nn_model.args.lightNum
             nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, g_l:g_r, :, :],
-                                                                       target[:, 5:8, :, :],
+                                                                       target[:, 3 + light_num:, :, :],
                                                                        nn_model.args.penalty,
                                                                        epoch,
                                                                        nn_model.args.loss_type)
@@ -478,7 +479,8 @@ def test_epoch(nn_model, epoch):
                         i=j,
                         train_idx=test_idx,
                         prefix=f"eval_epoch_{epoch}_{test_idx}_",
-                        tranculate_threshold=nn_model.args.albedo_threshold)
+                        tranculate_threshold=nn_model.args.albedo_threshold,
+                        args=nn_model.args)
 
 
 # def train_fugrc(nn_model, epoch, loss_network):
@@ -621,7 +623,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
         plt.cla()
 
 
-def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix, tranculate_threshold):
+def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix, tranculate_threshold, args):
     output_list = []
 
     # input
@@ -646,6 +648,12 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     # exp output
     if exp_name == "light":
         x_out_light[mask] = 0
+        x_out_light[x_out_light > 1] = 1
+        x_out_light[x_out_light < -1] = -1
+        
+        light_num = args.lightNum
+        light_gt = target[:, 3 + light_num:, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()[:, :, :3]
+
         output_list.append(mu.visual_light(x_out_light, "pred"))
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))

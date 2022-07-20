@@ -57,7 +57,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       python3 main.py --machine remote --exp vil10 --dataset synthetic128 --batch_size 8 --train-on 1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
 
 srun \
---job-name="INI-vi5-500" \
+--job-name="INI-vi5-full" \
 --time=7-00:00 \
  -p RTX3090 \
  --ntasks=1 \
@@ -67,7 +67,7 @@ srun \
  --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh  \
  --container-workdir="`pwd`" \
  --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
- python3 main.py --machine remote --exp vi5 --dataset synthetic128 --batch_size 16 --train-on 50 --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-14_10_41_23/checkpoint-2074.pth.tar
+ python3 main.py --machine remote --exp vi5 --dataset synthetic128 --batch_size 32  --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-14_10_41_23/checkpoint-2074.pth.tar
 
 
     srun \
