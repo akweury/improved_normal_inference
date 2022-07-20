@@ -648,17 +648,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
-    elif exp_name == "an2":
-        x_out_normal[mask] = 0
-        output_list.append(mu.visual_normal(x_out_normal, "pred"))
-        output_list.append(mu.visual_normal(gt, "gt"))
-        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
-    elif exp_name in ["vi5", "resng"]:
-        x_out_normal[mask] = 0
-        output_list.append(mu.visual_normal(x_out_normal, "pred"))
-        output_list.append(mu.visual_normal(gt, "gt"))
-        output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
-    elif exp_name == "i5":
+    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn"]:
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))
