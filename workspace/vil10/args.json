@@ -3,6 +3,7 @@
   "neighbor": 0,
   "exp": "vil10",
   "num_channels": 128,
+  "lightNum": 10,
   "resume": null,
   "epochs": 10001,
   "init_net": null,

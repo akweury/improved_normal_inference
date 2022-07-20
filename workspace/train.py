@@ -299,7 +299,11 @@ def train_epoch(nn_model, epoch):
         nn_model.optimizer.zero_grad()
         # torch.autograd.set_detect_anomaly(True)
         # Forward pass
-        out = nn_model.model(input)
+        if nn_model.args.exp == "vil10":
+
+            out = nn_model.model(input, nn_model.args.lightNum)
+        else:
+            out = nn_model.model(input)
 
         # Compute the loss
 
@@ -648,7 +652,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
-    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn"]:
+    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn", "vil10"]:
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_normal(gt, "gt"))
