@@ -2,9 +2,8 @@ import sys
 from os.path import dirname
 
 sys.path.append(dirname(__file__))
-import torch
 import torch.nn as nn
-from common.VI5Net import VILNormal, Extractor
+from common.VI5Net import VINormal, Extractor
 
 
 # from common.NormalizedNNN import NormalizedNNN
@@ -15,8 +14,9 @@ class CNN(nn.Module):
         # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
         self.light_num = light_num
+        self.img_num = 5
         # self.light_net = NormalGuided(3, 3, channel_num)
-        self.normal_net = VILNormal(3, 3, channel_num)
+        self.normal_net = VINormal(3, 3, channel_num, self.img_num)
         self.g_extractor = Extractor(light_num, channel_num)
 
         # self.remove_grad()
@@ -54,10 +54,7 @@ class CNN(nn.Module):
     def forward(self, x):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
-        x_img = x[:, 3:3 + self.light_num, :, :]
-        light = x[:, 3 + self.light_num:6 + self.light_num + 3 * self.light_num, :, :]
+        x_img = x[:, 3:3 + self.img_num, :, :] / 255.0
 
-        x_g = self.g_extractor(torch.cat((x_img, light), 1))
-        # albedo predict
-        x_normal_out = self.normal_net(x_vertex, x_g)
+        x_normal_out = self.normal_net(x_vertex, x_img)
         return x_normal_out
