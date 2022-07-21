@@ -44,9 +44,9 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp ag --dataset synth
 CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --dataset synthetic512 --batch_size 8 --train-on 50 
     
     srun \
-      --job-name="INI-an2-full" \
+      --job-name="INI-an2-128-ch-full" \
       --time=7-00:00 \
-      -p RTXA6000 \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \

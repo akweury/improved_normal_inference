@@ -5,12 +5,13 @@
   "num_channels": 128,
   "resume": null,
   "lightNum": 10,
-  "epochs": 10001,
   "init_net": null,
   "init_light_net": null,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "800",
+  "epochs": 2500,
+  "lr_scheduler": "800,1600",
+  "lr_decay_factor": 0.5,
   "momentum": 0.9,
   "penalty": 1.4,
   "albedo_threshold": 255,
@@ -22,7 +23,6 @@
   "normal_huber_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
-  "lr_decay_factor": 0.1,
   "fast_train": false,
   "loss_type": "l2"
 }
