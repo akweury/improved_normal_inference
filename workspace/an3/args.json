@@ -3,7 +3,7 @@
   "neighbor": 0,
   "exp": "an3",
   "batch_size": 8,
-  "num_channels": 4,
+  "num_channels": 128,
   "resume": null,
   "lightNum": 10,
   "lightNumUse": 1,
