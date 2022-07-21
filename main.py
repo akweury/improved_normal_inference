@@ -134,7 +134,7 @@ def get_model(args):
         model = an2.CNN(args.num_channels, args.lightNum)
     elif args.exp == "an3":
         import workspace.an3.network as an3
-        model = an3.CNN(args.num_channels, args.lightNum)
+        model = an3.CNN(args.num_channels, args.lightNum, args.lightNumUse)
     elif args.exp == "vi5":
         import workspace.vi5.network as vi5
         model = vi5.CNN(args.num_channels, args.lightNum)

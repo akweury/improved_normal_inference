@@ -13,11 +13,12 @@ from help_funs import mu
 # from common.NormalizedNNN import NormalizedNNN
 
 class CNN(nn.Module):
-    def __init__(self, channel_num, light_num):
+    def __init__(self, channel_num, light_num, light_num_use):
         super().__init__()
         # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
         self.light_num = light_num
+        self.light_num_use = light_num_use
         # self.light_net = NormalGuided(3, 3, channel_num)
         self.normal_net = GCNN(3, 3, channel_num)
         self.g_net = GNet(3, 3, channel_num)
@@ -56,8 +57,8 @@ class CNN(nn.Module):
     def forward(self, x):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
-        x_img = x[:, 3:4, :, :] / 255.0  # one image map
-        x_light = x[:, 3 + self.light_num:3 + self.light_num + 3, :, :]  # one light map
+        x_img = x[:, 3: 3 + self.light_num_use, :, :] / 255.0  # one image map
+        x_light = x[:, 3 + self.light_num:3 + self.light_num + 3 * self.light_num_use, :, :]  # one light map
 
         # normal predict
         x_normal_out = self.normal_net(x_vertex)
@@ -66,6 +67,6 @@ class CNN(nn.Module):
 
         x_normal_out_rectified = x_normal_out + x_normal_delta
 
-        x_normal_out_rectified = x_normal_out_rectified / torch.norm(x_normal_out_rectified, p=2, dim=1, keepdim=True)
+        # x_normal_out_rectified = x_normal_out_rectified / (torch.norm(x_normal_out_rectified, p=2, dim=1, keepdim=True) + 1e-20)
 
         return x_normal_out_rectified

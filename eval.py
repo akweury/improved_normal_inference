@@ -87,10 +87,13 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
-        "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "an3-815": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
         "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
+        "vil10-l1": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1.pth.tar",
+        "GCNN-c32": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c32.pth.tar",
+        "GCNN-8": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c8.pth.tar",
+        # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
+
         # "fugrc": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
         # "fugrc2": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-1058.pth.tar",
         # loss 13, on training
