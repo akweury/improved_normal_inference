@@ -6,7 +6,6 @@
   "num_channels": 128,
   "resume": null,
   "lightNum": 10,
-  "lightNumUse": 1,
   "epochs": 2500,
   "init_net": null,
   "init_light_net": null,

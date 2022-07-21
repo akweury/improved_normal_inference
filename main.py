@@ -26,6 +26,7 @@ def paser():
     # Mode selection
     parser.add_argument('--machine', type=str, default="local", help='choose the training machin, local or remote')
     parser.add_argument('--num-channels', type=int, help='choose the number of channels in the model')
+    parser.add_argument('--lightNumUse', type=int, default=1, help='choose the number of light maps in the model')
     parser.add_argument('--output_type', type=str, default="normal",
                         help='choose the meaning of output tensor, rgb or normal')
 

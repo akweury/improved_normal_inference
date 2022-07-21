@@ -5,7 +5,6 @@
   "num_channels": 128,
   "batch_size": 8,
   "lightNum": 10,
-  "lightNumUse": 1,
   "resume": null,
   "epochs": 2500,
   "init_net": null,
