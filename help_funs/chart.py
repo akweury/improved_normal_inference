@@ -58,7 +58,7 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
     for i, row in enumerate(data_x):
         b, a = np.polyfit(data_x[i], data_y[i], deg=1)
         plt.scatter(data_x[i], data_y[i], label=labels[i])
-        xseq = np.linspace(0, 100000, num=100000)
+        xseq = np.linspace(0, 9000, num=90000)
         plt.plot(xseq, a + b * xseq, lw=2.5)
 
     if title is not None:

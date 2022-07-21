@@ -35,7 +35,11 @@ class CNN(nn.Module):
         for i in range(self.light_num):
             img = x[:, 3 + i:4 + i, :, :]
             light = x[:, 3 + self.light_num + 3 * i:6 + self.light_num + 3 * i, :, :]
+
+            # encode image and light
             x_light_out = self.illusion_encoder(torch.cat((img, light), 1))
+
+            # concat features for 10 image and light maps
             x_light_feature_cat[:, self.channel_num * i:self.channel_num * (i + 1), :, :] = x_light_out
 
         # max pooling layer
