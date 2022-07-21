@@ -55,7 +55,7 @@ class CNN(nn.Module):
     def forward(self, x):
         # x0: vertex array
         x_vertex = x[:, :3, :, :]
-        x_img = x[:, 3:4, :, :]
+        x_img = x[:, 3:4, :, :] / 255.0
         x_light = x[:, 3 + self.light_num:6 + self.light_num, :, :]
 
         # albedo predict

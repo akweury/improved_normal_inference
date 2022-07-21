@@ -46,10 +46,10 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
     srun \
       --job-name="INI-an2-128-ch-full" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTXA60003090 \
       --ntasks=1 \
       --gpus-per-task=1 \
-      --mem=32G \
+      --mem=42G \
       --cpus-per-gpu=6 \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
@@ -57,17 +57,17 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 32
 
     srun \
-      --job-name="INI-an3-200" \
+      --job-name="INI-an3-full" \
       --time=7-00:00 \
       -p RTXA6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
-      --mem=64G \
+      --mem=42G \
       --cpus-per-gpu=6 \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an3 --dataset synthetic128 --batch_size 64
+      python3 main.py --machine remote --exp an3 --dataset synthetic128 --batch_size 32
 
 
 
