@@ -22,6 +22,7 @@ class CNN(nn.Module):
         # self.light_net = NormalGuided(3, 3, channel_num)
         self.normal_net = GCNN(3, 3, channel_num)
         self.g_net = GNet(3, 3, channel_num)
+        self.last_conv = nn.Conv2d(3, 3, (1, 1), (1, 1), (0, 0))
         # self.remove_grad()
 
     def remove_grad(self):
@@ -66,7 +67,6 @@ class CNN(nn.Module):
         x_normal_delta = self.g_net(x_normal_out, x_light, x_img)
 
         x_normal_out_rectified = x_normal_out + x_normal_delta
-
-        # x_normal_out_rectified = x_normal_out_rectified / (torch.norm(x_normal_out_rectified, p=2, dim=1, keepdim=True) + 1e-20)
+        x_normal_out_rectified = self.last_conv(x_normal_out_rectified)
 
         return x_normal_out_rectified

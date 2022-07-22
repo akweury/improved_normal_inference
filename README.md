@@ -72,7 +72,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
     srun \
-      --job-name="INI-vil10-b8-l1" \
+      --job-name="INI-vil10-l1-5-100-1000" \
       --time=7-00:00 \
       -p RTXA6000 \
       --ntasks=1 \
