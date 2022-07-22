@@ -59,7 +59,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
     srun \
       --job-name="INI-an3-b8-l1" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTXA6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=42G \
