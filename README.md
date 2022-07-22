@@ -57,9 +57,9 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 16
 
     srun \
-      --job-name="INI-an3-3-12-1000" \
+      --job-name="INI-an3-10-1000" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTXA6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=42G \
@@ -67,14 +67,14 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an3 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 3,12,1000
+      python3 main.py --machine remote --exp an3 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 10,1000
 
 
 
     srun \
-      --job-name="vil-10-1000" \
+      --job-name="vil3-3-12-1000" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTXA6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=42G \
@@ -82,7 +82,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --lightNumUse 1 --num-channels 128 --lr-scheduler 10,1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
+      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --lightNumUse 3 --num-channels 128 --lr-scheduler 3,12,1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
 
 srun \
 --job-name="INI-vi5-full" \
