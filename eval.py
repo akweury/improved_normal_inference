@@ -87,6 +87,7 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
+        "nnnn-test": config.ws_path / "nnnn" / "trained_model" / "128" / "model_best.pth.tar",
         "an3-815": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
         "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
         "vil10-l1": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1.pth.tar",
