@@ -277,7 +277,8 @@ def plot_loss_per_axis(loss_total, nn_model, epoch, title):
 def train_epoch(nn_model, epoch):
     nn_model.args.epoch = epoch
     print(
-        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}")
+        f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}"
+        f" start from {date_now} - {time_now}")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     normal_loss_total = torch.tensor([0.0])
