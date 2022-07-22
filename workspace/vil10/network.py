@@ -31,9 +31,9 @@ class CNN(nn.Module):
     def forward(self, x):
 
         # extractor
-        total_channel = self.light_num * self.channel_num
+        total_channel = self.light_num_use * self.channel_num
         x_light_feature_cat = torch.zeros(size=(x.size(0), total_channel, x.size(2) // 8, x.size(3) // 8)).to(x.device)
-        for i in range(self.light_num):
+        for i in range(self.light_num_use):
             img = x[:, 3 + i:4 + i, :, :]
             light = x[:, 3 + self.light_num + 3 * i:6 + self.light_num + 3 * i, :, :]
 

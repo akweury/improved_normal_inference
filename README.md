@@ -109,7 +109,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-21_09_43_38/model_best.pth.tar
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 16 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-21_09_43_38/model_best.pth.tar
 
 
     srun \
