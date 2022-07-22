@@ -452,7 +452,7 @@ def train_epoch(nn_model, epoch):
     else:
         is_best = False
 
-    return is_best
+    return is_best, loss
 
 
 def test_epoch(nn_model, epoch):
@@ -481,8 +481,6 @@ def test_epoch(nn_model, epoch):
                         prefix=f"eval_epoch_{epoch}_{test_idx}_",
                         tranculate_threshold=nn_model.args.albedo_threshold,
                         args=nn_model.args)
-
-
 
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
@@ -552,7 +550,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         x_out_light[mask] = 0
         x_out_light[x_out_light > 1] = 1
         x_out_light[x_out_light < -1] = -1
-        
+
         light_num = args.lightNum
         light_gt = target[:, 3 + light_num:, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()[:, :, :3]
 
@@ -677,7 +675,8 @@ def main(args, exp_dir, network, train_dataset):
         # if nn_model.args.exp == "fugrc":
         #     is_best = train_fugrc(nn_model, epoch, loss_network)
         # else:
-        is_best = train_epoch(nn_model, epoch)
+        is_best, loss = train_epoch(nn_model, epoch)
+
         # Learning rate scheduler
         nn_model.lr_decayer.step()
 
@@ -687,6 +686,9 @@ def main(args, exp_dir, network, train_dataset):
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             test_epoch(nn_model, epoch)
+
+        if loss == torch.nan or loss > 1e+4:
+            break
 
 
 if __name__ == '__main__':
