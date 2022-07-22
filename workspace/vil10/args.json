@@ -10,7 +10,6 @@
   "init_light_net": null,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "30,1000",
   "momentum": 0.9,
   "penalty": 1.4,
   "albedo_threshold": 255,
@@ -22,7 +21,7 @@
   "normal_huber_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
-  "lr_decay_factor": 0.1,
+  "lr_decay_factor": 0.5,
   "fast_train": false,
   "loss_type": "l2"
 }

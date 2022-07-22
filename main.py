@@ -52,6 +52,7 @@ def paser():
                         metavar='LR', help='Initial learning rate (default 0.001)')
 
     parser.add_argument('--momentum', default=0.9, type=float, help='SGD momentum.')
+    parser.add_argument('--lr-scheduler', default="100,1000", type=str, help='lr schedular.')
 
     parser.add_argument('--loss', '-l', default='l1')
     parser.add_argument('--loss-type', default='l2')
