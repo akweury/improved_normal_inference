@@ -72,7 +72,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
     srun \
-      --job-name="INI-vil10-b8-l1" \
+      --job-name="INI-vil10-b8-l3" \
       --time=7-00:00 \
       -p RTXA6000 \
       --ntasks=1 \
@@ -82,7 +82,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --lightNumUse 1 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
+      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --lightNumUse 3 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-18_09_29_25/checkpoint-156.pth.tar
 
 srun \
 --job-name="INI-vi5-full" \

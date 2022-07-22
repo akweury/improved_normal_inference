@@ -10,7 +10,7 @@
   "init_light_net": null,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "3,30,1600",
+  "lr_scheduler": "100,1000",
   "lr_decay_factor": 0.5,
   "momentum": 0.9,
   "penalty": 1.4,
