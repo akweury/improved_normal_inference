@@ -9,7 +9,6 @@
   "epochs": 2500,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "100,1000",
   "momentum": 0.9,
   "loss": "angle",
   "penalty": 1.4,
