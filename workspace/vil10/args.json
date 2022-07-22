@@ -2,7 +2,6 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "vil10",
-  "num_channels": 128,
   "batch_size": 8,
   "lightNum": 10,
   "resume": null,
