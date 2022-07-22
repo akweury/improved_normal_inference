@@ -87,12 +87,17 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
-        "nnnn-test": config.ws_path / "nnnn" / "trained_model" / "128" / "model_best.pth.tar",
-        "an3-815": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
-        "vil10-l1": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1.pth.tar",
-        "GCNN-c32": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c32.pth.tar",
-        "GCNN-8": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c8.pth.tar",
+        # "an3-815": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
+        # "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
+        # "vil10-l1": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1.pth.tar",
+
+        # "GCNN-b8": config.paper_exp / "gcnn" / "checkpoint-b8.pth.tar",
+        "vil-b8-l10": config.paper_exp / "vil10" / "old_best_b8.pth.tar",
+        "vil-b4-l1": config.paper_exp / "vil10" / "mistake_best_b4.pth.tar",
+        "GCNN-b32": config.paper_exp / "gcnn" / "checkpoint-b32.pth.tar",
+        "an3-b64": config.paper_exp / "an3" / "checkpoint-b64.pth.tar",
+
+        # "GCNN-8": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c8.pth.tar",
         # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
 
         # "fugrc": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",

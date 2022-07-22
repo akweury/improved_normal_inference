@@ -11,6 +11,7 @@ ws_path = root / "workspace"
 output_path = root / "output"
 pncnn_path = root / "pncnn"
 paper_pic = root / "paper" / 'akweury' / "Figures"
+paper_exp = root / "paper" / 'exp_result'
 
 # basic dataset path
 geo_data = dataset / "data_geometrical_body"
