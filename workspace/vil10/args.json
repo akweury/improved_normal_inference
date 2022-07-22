@@ -11,7 +11,7 @@
   "init_light_net": null,
   "optimizer": "adam",
   "lr": 0.001,
-  "lr_scheduler": "5,100,1000",
+  "lr_scheduler": "100,1000",
   "momentum": 0.9,
   "penalty": 1.4,
   "albedo_threshold": 255,
