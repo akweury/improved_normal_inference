@@ -969,7 +969,7 @@ def eval_angle_tensor(output, target):
     target_perm = target.permute(0, 2, 3, 1)
     mask = target_perm.sum(dim=-1) == 0
     angle_matrix = torch.zeros(target_perm.shape[:3]).float().to(output.device)
-    angle_matrix[~mask] = radian_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
+    angle_matrix[~mask] = avg_angle_between_tensor(target_perm[~mask].float(), output_perm[~mask].float())
 
     mask = (~torch.prod(output_perm == 0, -1).bool()).unsqueeze(1)
     loss_avg = angle_matrix.sum() / mask.sum()

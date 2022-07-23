@@ -145,7 +145,7 @@ class TrainingModel():
             import random
             training_idxs = np.array(random.sample(range(0, len(train_dataset)), int(train_on)))
             train_dataset.training_case = train_dataset.training_case[training_idxs]
-            test_dataset.training_case = test_dataset.training_case[np.array([0, 1, 2, 3])]
+            # test_dataset.training_case = test_dataset.training_case[np.array([0, 1, 2, 3])]
         print("test case number: " + str(test_dataset.training_case.shape))
         # test_dataset.training_case = test_dataset.training_case[:3]
         train_data_loader = DataLoader(train_dataset,
@@ -462,30 +462,35 @@ def test_epoch(nn_model, epoch):
         with torch.no_grad():
             # put input and target to device
             input, target = input_tensor.to(0), target_tensor.to(0)
-            input = input[-1:, :]
-            target = target[-1:, :]
+            # input = input[-1:, :]
+            # target = target[-1:, :]
             print(test_idx)
-            test_idx = test_idx[-1]
+            # test_idx = test_idx[-1]
             # Wait for all kernels to finish
             torch.cuda.synchronize()
 
             # Forward pass
             out = nn_model.model(input)
+
+            gt = target_tensor[:, :3, :, :].to(out.device)
+
+            loss = mu.eval_angle_tensor(out, gt).to("cpu")
+
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
 
-            loss = draw_output(nn_model.args.exp, input, out,
-                               target=target,
-                               exp_path=nn_model.output_folder,
-                               epoch=epoch,
-                               i=j,
-                               train_idx=test_idx,
-                               prefix=f"eval_epoch_{epoch}_{test_idx}_",
-                               tranculate_threshold=nn_model.args.albedo_threshold,
-                               args=nn_model.args)
+            draw_output(nn_model.args.exp, input[-1:, :], out[-1:, :],
+                        target=target[-1:, :],
+                        exp_path=nn_model.output_folder,
+                        epoch=epoch,
+                        i=j,
+                        train_idx=test_idx[-1],
+                        prefix=f"eval_epoch_{epoch}_{test_idx}_",
+                        tranculate_threshold=nn_model.args.albedo_threshold,
+                        args=nn_model.args)
             eval_loss += loss
 
-    return eval_loss / nn_model.test_loader.__len__()
+    return eval_loss / nn_model.test_loader.dataset.__len__()
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
                     label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
