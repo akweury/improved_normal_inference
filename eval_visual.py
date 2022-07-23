@@ -426,7 +426,7 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
 
-        "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-l1-3-12-1000-3.pth.tar",
+        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-l1-3-12-1000-3.pth.tar",
         # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",

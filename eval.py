@@ -98,8 +98,9 @@ if __name__ == '__main__':
         # "vil3-100-1000": config.paper_exp / "vil10" / "checkpoint-l3-100-1000.pth.tar",
         # "vil10-100-1000": config.paper_exp / "vil10" / "checkpoint-l10-100-1000.pth.tar",
 
-        "GCNN-b8": config.paper_exp / "gcnn" / "checkpoint-1662.pth.tar",
-        # "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
+        # "GCNN-b8": config.paper_exp / "gcnn" / "checkpoint-1662.pth.tar",
+
+        "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
         # "GCNN-b32": config.paper_exp / "gcnn" / "checkpoint-b32.pth.tar",
         # "SVD": None,
 
