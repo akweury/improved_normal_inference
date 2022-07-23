@@ -699,8 +699,8 @@ def main_parameter_search(args, exp_dir, network, train_dataset):
 
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
     from help_funs.chart import line_chart
-    lr_decay_range = np.arange(0.9, 0.7, -0.1)
-    lr_scheduler_range = np.arange(30, 25, -1)
+    lr_decay_range = np.arange(0.7, 0.4, -0.1)
+    lr_scheduler_range = np.arange(15, 5, -1)
     loss_table = np.zeros(shape=(lr_decay_range.shape[0] + lr_scheduler_range.shape[0]))
     loss_decay_table = np.zeros(shape=(lr_decay_range.shape[0], args.epochs))
     loss_scheduler_table = np.zeros(shape=(lr_scheduler_range.shape[0], args.epochs))

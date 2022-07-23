@@ -72,7 +72,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
     srun \
-      --job-name="vil-15-1000" \
+      --job-name="vil-p-lr-0.7-0.4-s-15-5" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \
