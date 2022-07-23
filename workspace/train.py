@@ -453,7 +453,7 @@ def train_epoch(nn_model, epoch):
     else:
         is_best = False
 
-    return is_best, loss
+    return is_best, nn_model.losses
 
 
 def test_epoch(nn_model, epoch):
@@ -688,8 +688,103 @@ def main(args, exp_dir, network, train_dataset):
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             test_epoch(nn_model, epoch)
 
-        if loss == torch.nan or loss > 1e+4:
+        if np.isnan(np.sum(loss[:3, epoch])) or loss > 1e+4:
             break
+
+
+def main_parameter_search(args, exp_dir, network, train_dataset):
+    device_name = "cuda:0"
+
+    output_folder = None
+
+    print(f"- Training Date: {datetime.datetime.today().date()}\n")
+    from help_funs.chart import line_chart
+    lr_decay_range = np.arange(0.9, 0.7, -0.1)
+    lr_scheduler_range = np.arange(30, 25, -1)
+    loss_table = np.zeros(shape=(lr_decay_range.shape[0] + lr_scheduler_range.shape[0]))
+    loss_decay_table = np.zeros(shape=(lr_decay_range.shape[0], args.epochs))
+    loss_scheduler_table = np.zeros(shape=(lr_scheduler_range.shape[0], args.epochs))
+    for index, lr_decay in enumerate(lr_decay_range):
+        nn_model = TrainingModel(args, exp_dir, network, train_dataset)
+        if index == 0:
+            output_folder = nn_model.output_folder
+
+        nn_model.args.lr_scheduler = str(lr_scheduler_range[0])
+        nn_model.args.lr_decay_factor = lr_decay
+
+        best_loss = 1
+        loss = None
+        for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
+            is_best, loss = train_epoch(nn_model, epoch)
+
+            # Learning rate scheduler
+            nn_model.lr_decayer.step()
+
+            # evaluation
+            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+                test_epoch(nn_model, epoch)
+
+            if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
+                break
+            if best_loss > np.sum(loss[:3, epoch]):
+                best_loss = np.sum(loss[:3, epoch]) / 3
+
+        loss[np.isnan(loss)] = 0
+        loss = np.sum(loss[:3, :], axis=0)
+        loss_decay_table[index, :] = loss
+        loss_table[index] = best_loss
+
+    line_chart(loss_decay_table, output_folder, labels=lr_decay_range,
+               title=f"lr-decay-factor-search-schedlu={str(lr_scheduler_range[0])}")
+
+    best_lr_decay_factor = lr_decay_range[np.argmax(loss_table)]
+    print("best decay factor: " + str(best_lr_decay_factor))
+
+    # schedule search
+    plt.cla()
+
+    for index, first_decay in enumerate(lr_scheduler_range):
+        nn_model = TrainingModel(args, exp_dir, network, train_dataset)
+        nn_model.args.lr_scheduler = str(first_decay)
+        nn_model.args.lr_decay_factor = best_lr_decay_factor
+
+        best_loss = 1
+        loss = None
+        for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
+            is_best, loss = train_epoch(nn_model, epoch)
+
+            # Learning rate scheduler
+            nn_model.lr_decayer.step()
+
+            # evaluation
+            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+                test_epoch(nn_model, epoch)
+
+            if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
+                break
+            if best_loss > np.sum(loss[:3, epoch]):
+                best_loss = np.sum(loss[:3, epoch]) / 3
+
+        loss[np.isnan(loss)] = 0
+        loss = np.sum(loss[:3, :], axis=0)
+
+        loss_table[index + lr_decay_range.shape[0]] = best_loss
+        loss_scheduler_table[index, :] = loss
+
+    line_chart(loss_scheduler_table, output_folder, labels=lr_scheduler_range,
+               title=f"lr-schedule-search-decay={str(best_lr_decay_factor)}")
+
+    best_index = np.argmin(loss_table[lr_decay_range.shape[0]:])
+    best_lr_schedule_range = lr_scheduler_range[best_index]
+    print("best lr schedule :" + str(best_lr_schedule_range))
+
+    ## final output
+    plt.cla()
+    loss_table = loss_table.reshape(1, -1)
+    line_chart(loss_table, output_folder, labels=["loss"],
+               title="lr-parameter-search", cla_leg=True)
+
+    np.savetxt("lr-parameter-search.txt", loss_table)
 
 
 if __name__ == '__main__':

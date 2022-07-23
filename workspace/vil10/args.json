@@ -5,7 +5,7 @@
   "batch_size": 8,
   "lightNum": 10,
   "resume": null,
-  "epochs": 2500,
+  "epochs": 20,
   "init_net": null,
   "init_light_net": null,
   "optimizer": "adam",
