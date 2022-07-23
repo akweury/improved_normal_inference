@@ -688,7 +688,7 @@ def main(args, exp_dir, network, train_dataset):
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             test_epoch(nn_model, epoch)
 
-        if np.isnan(np.sum(loss[:3, epoch])) or loss > 1e+4:
+        if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
             break
 
 

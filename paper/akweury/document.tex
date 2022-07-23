@@ -44,7 +44,7 @@ The structure is shown in Figure \ref{fig:albedo-gated-archi}. As mentioned in t
 The network can be consider in two parts. The first part is the image and light map feature encoder, which is identify to the downsampling part of the GCNN architecture. It takes the concatenated image and light map as input, thus the input has 4 channels. Then the network down sampling three times to predict the feature map of the image and light map. The output of this part is the output of third gated convolution layer in the third down-sampling. 
 The second part is basically identify to the original GCNN architecture, but before the start of upsampling part, 2 extra layers are added. First, a concatenate layer is added to fuse the vertex feature and the image and light map feature getting from encoder. Second, a gated convolution layer is added to reduce the channels fit to the following architecture. The rest part of the network is identify to the original GCNN. 
 
-The network concatenate the image and the light together 
+With the help of an extra image-light encoder, the network gained more information of the object surface, which is supposed to predict the surface normal more accurate. In this scenario, the output is still the surface normal, thus the training loss can be the same as GCNN model.
 
 
 
