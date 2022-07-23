@@ -240,12 +240,22 @@ The acknowledgments and the people to thank go here, don't forget to include you
 %	ABBREVIATIONS
 %----------------------------------------------------------------------------------------
 
-\begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
+\begin{notations}{ll} % Include a list of abbreviations (a table of two columns)
 
-\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere\\
-\textbf{WSF} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or\\
+\textbf{I} & Grayscale Image Matrix (Height $ \times $ Width $ \times $ 1)\\
+\textbf{L} & Light Map Matrix (Height $ \times $ Width $ \times $ 3)\\
+\textbf{N} & Normal Map Matrix (Height $ \times $ Width $ \times $ 3)\\
+\textbf{V} & Vertex Map Matrix (Height $ \times $ Width $ \times $ 3)\\
 
-\end{abbreviations}
+\textbf{X} & Input Matrix (Height $ \times $ Width $ \times $ Channels)\\
+\textbf{Y} & Output Matrix (Height $ \times $ Width $ \times $ Channels)\\
+
+\textbf{w} & Width of Matrix\\
+\textbf{h} & Height of Matrix\\
+
+
+
+\end{notations}
 
 %----------------------------------------------------------------------------------------
 %	PHYSICAL CONSTANTS/OTHER DEFINITIONS
@@ -264,17 +274,18 @@ Speed of Light & $c_{0}$ & \SI{2.99792458e8}{\meter\per\second} (exact)\\
 %	SYMBOLS
 %----------------------------------------------------------------------------------------
 
-\begin{symbols}{lll} % Include a list of Symbols (a three column table)
+\begin{operations}{ll} % Include a list of Symbols (a three column table)
 
-$a$ & distance & \si{\meter} \\
-$P$ & power & \si{\watt} (\si{\joule\per\second}) \\
+$[A B]$ & concatenation between A and B \\
+$\oplus$ & element-wise multiplication \\
+$\cdot$ & dot product \\
 %Symbol & Name & Unit \\
 
 \addlinespace % Gap to separate the Roman symbols from the Greek
 
 $\omega$ & angular frequency & \si{\radian} \\
 
-\end{symbols}
+\end{operations}
 
 %----------------------------------------------------------------------------------------
 %	DEDICATION

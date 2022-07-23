@@ -274,11 +274,11 @@ def plot_loss_per_axis(loss_total, nn_model, epoch, title):
 
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
-def train_epoch(nn_model, epoch):
+def train_epoch(nn_model, epoch, eval_loss_best):
     nn_model.args.epoch = epoch
     print(
         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}"
-        f" start from {date_now} - {time_now}")
+        f" start from {date_now} - {time_now} - eval_loss: {eval_loss_best:.1e}")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     normal_loss_total = torch.tensor([0.0])
@@ -457,6 +457,7 @@ def train_epoch(nn_model, epoch):
 
 
 def test_epoch(nn_model, epoch):
+    eval_loss = 0
     for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
         with torch.no_grad():
             # put input and target to device
@@ -473,16 +474,18 @@ def test_epoch(nn_model, epoch):
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
 
-            draw_output(nn_model.args.exp, input, out,
-                        target=target,
-                        exp_path=nn_model.output_folder,
-                        epoch=epoch,
-                        i=j,
-                        train_idx=test_idx,
-                        prefix=f"eval_epoch_{epoch}_{test_idx}_",
-                        tranculate_threshold=nn_model.args.albedo_threshold,
-                        args=nn_model.args)
+            loss = draw_output(nn_model.args.exp, input, out,
+                               target=target,
+                               exp_path=nn_model.output_folder,
+                               epoch=epoch,
+                               i=j,
+                               train_idx=test_idx,
+                               prefix=f"eval_epoch_{epoch}_{test_idx}_",
+                               tranculate_threshold=nn_model.args.albedo_threshold,
+                               args=nn_model.args)
+            eval_loss += loss
 
+    return eval_loss / nn_model.test_loader.__len__()
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
                     label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
@@ -526,7 +529,7 @@ def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=F
 
 def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, prefix, tranculate_threshold, args):
     output_list = []
-
+    loss = None
     # input
     vertex_0 = input[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     gt = target[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
@@ -565,6 +568,12 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         # output_list.append(mu.visual_normal(gt, "gt"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
+
+        _, loss = mu.eval_img_angle(gt, x_out_normal)
+
+
+
+
     elif exp_name == "ag":
         x_out_normal = xout[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
         rho_out = xout[0, 6:7, :, :].permute(1, 2, 0).to('cpu').numpy()
@@ -660,12 +669,14 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
     output_name = str(exp_path / f"{prefix}_epoch_{epoch}_{i}.png")
     cv.imwrite(output_name, output)
 
+    return loss
 
 def main(args, exp_dir, network, train_dataset):
     device_name = "cuda:0"
 
     nn_model = TrainingModel(args, exp_dir, network, train_dataset)
-
+    eval_loss_best = 1e+10
+    stop_factor = 0
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
     # if nn_model.args.exp == "fugrc":
@@ -676,7 +687,7 @@ def main(args, exp_dir, network, train_dataset):
         # if nn_model.args.exp == "fugrc":
         #     is_best = train_fugrc(nn_model, epoch, loss_network)
         # else:
-        is_best, loss = train_epoch(nn_model, epoch)
+        is_best, loss = train_epoch(nn_model, epoch, eval_loss_best)
 
         # Learning rate scheduler
         nn_model.lr_decayer.step()
@@ -686,7 +697,13 @@ def main(args, exp_dir, network, train_dataset):
 
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-            test_epoch(nn_model, epoch)
+            eval_loss = test_epoch(nn_model, epoch)
+            if eval_loss < eval_loss_best:
+                eval_loss_best = eval_loss
+            else:
+                stop_factor += 1
+                if stop_factor > 2:
+                    break
 
         if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
             break

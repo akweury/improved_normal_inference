@@ -41,13 +41,17 @@
 Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). 
 The structure is shown in Figure \ref{fig:albedo-gated-archi}. As mentioned in the name, the network utilizes vertex map, light map and image map to accomplish the normal inference task. 
 
-The network can be consider in two parts. The first part is the image and light map feature encoder, which is identify to the downsampling part of the GCNN architecture. It takes the concatenated image and light map as input, thus the input has 4 channels. Then the network down sampling three times to predict the feature map of the image and light map. The output of this part is the output of third gated convolution layer in the third down-sampling. 
-The second part is basically identify to the original GCNN architecture, but before the start of upsampling part, 2 extra layers are added. First, a concatenate layer is added to fuse the vertex feature and the image and light map feature getting from encoder. Second, a gated convolution layer is added to reduce the channels fit to the following architecture. The rest part of the network is identify to the original GCNN. 
+The network can be consider in two parts. The first part extracts the feature map encoders. It deals with two kinds of input, the vertex map $ X_1 \in \mathbb{R}^{w\times h\times3}$ and the concatenation of light and image map $ X_2 \in \mathbb{R}^{w\times h\times4} $. The network extracts the geometry features $ X_v $ from vertex map $ X_1 $ (represented as a regression function v)
+\[ v: X_1 \rightarrow X_v \]
+meanwhile, the network extracts the photometric features $ X_l $ from image and the light map $ X_2 $ (represented as a regression function $ l $)
+\[ l: X_2 \rightarrow X_l \]
+where the two encoders have the same network architecture based on GCNN model.The second part is basically identify to the original GCNN architecture, but before the start of upsampling part, 2 extra layers are added. First, a concatenate layer is added to fuse the vertex feature and the image and light map feature getting from encoder. 
+Second, a fused feature map is predicted from all the feature maps base on a single gated convolution layer. (represented as a regression function $ m $)
+\[ m: [X_v X_l] \rightarrow X_f \]
+Then the network interpolates the feature maps $ X_f $ using 3 times upsamling with gated convolution layers. Meanwhile, the skip connections from UNet have been kept. Thus the feature maps $ X_{df_1, df_2, ...} $ of each down-sampling time in the regression model $ v $ are considered in the upsamling part.
+\[ n: X_f, X_{df_1, df_2, ...} \rightarrow N \]
 
 With the help of an extra image-light encoder, the network gained more information of the object surface, which is supposed to predict the surface normal more accurate. In this scenario, the output is still the surface normal, thus the training loss can be the same as GCNN model.
-
-
-
 
 
 
