@@ -175,7 +175,7 @@ def main():
     model = get_model(args)
     dataset_path = get_dataset_path(args)
     # start the training
-    train.main_parameter_search(args, exp_path, model, dataset_path)
+    train.main(args, exp_path, model, dataset_path)
 
 
 if __name__ == '__main__':

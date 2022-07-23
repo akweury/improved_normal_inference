@@ -17,12 +17,26 @@
 \newlabel{fig:scatter-gcnn}{{5.4}{24}{Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }{figure.caption.81}{}}
 \@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.3}Speed}{24}{subsection.82}\protected@file@percent }
 \@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{24}{section.83}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{25}{section.84}\protected@file@percent }
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.5}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{25}{figure.caption.85}\protected@file@percent }
-\newlabel{fig:normal-histo-diff}{{5.5}{25}{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }{figure.caption.85}{}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {5.4}model comparison}{26}{section.86}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.1}Light Net Evaluation}{24}{subsection.84}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.5}{\ignorespaces Qualitative evaluation of light net on Sphere, bus and Washington statue. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.\relax }}{25}{figure.caption.85}\protected@file@percent }
+\newlabel{fig:eval-light}{{5.5}{25}{Qualitative evaluation of light net on Sphere, bus and Washington statue. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.\relax }{figure.caption.85}{}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.6}{\ignorespaces The evaluation on 100 test cases of Light Net.\relax }}{25}{figure.caption.86}\protected@file@percent }
+\newlabel{fig:scatter-light}{{5.6}{25}{The evaluation on 100 test cases of Light Net.\relax }{figure.caption.86}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.2}Vertex-Image-Light Net (VIL Net) Evaluation}{25}{subsection.87}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsubsection}{title}{26}{section*.88}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.7}{\ignorespaces Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.\relax }}{26}{figure.caption.89}\protected@file@percent }
+\newlabel{fig:eval-trignet}{{5.7}{26}{Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.\relax }{figure.caption.89}{}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.8}{\ignorespaces The evaluation on 100 test cases of Trignet.\relax }}{26}{figure.caption.90}\protected@file@percent }
+\newlabel{fig:scatter-trignet}{{5.8}{26}{The evaluation on 100 test cases of Trignet.\relax }{figure.caption.90}{}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.3}comparison}{26}{subsection.91}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.9}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{27}{figure.caption.92}\protected@file@percent }
+\newlabel{fig:normal-histo-diff}{{5.9}{27}{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }{figure.caption.92}{}}
+\@writefile{lot}{\defcounter {refsection}{0}\relax }\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene\relax }}{27}{table.caption.93}\protected@file@percent }
+\newlabel{tab:model-error}{{5.1}{27}{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene\relax }{table.caption.93}{}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5.10}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{28}{figure.caption.94}\protected@file@percent }
+\newlabel{fig:normal-histo-diff}{{5.10}{28}{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }{figure.caption.94}{}}
 \@setckpt{Chapters/Chapter05}{
-\setcounter{page}{27}
+\setcounter{page}{29}
 \setcounter{equation}{0}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -32,13 +46,13 @@
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{5}
-\setcounter{section}{4}
-\setcounter{subsection}{0}
+\setcounter{section}{2}
+\setcounter{subsection}{3}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{5}
-\setcounter{table}{0}
+\setcounter{figure}{10}
+\setcounter{table}{1}
 \setcounter{LT@tables}{3}
 \setcounter{LT@chunks}{1}
 \setcounter{caption@flags}{0}
@@ -169,6 +183,6 @@
 \setcounter{r@tfl@t}{1}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{34}
-\setcounter{section@level}{1}
+\setcounter{bookmark@seq@number}{36}
+\setcounter{section@level}{2}
 }

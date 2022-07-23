@@ -83,16 +83,20 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{24}{section.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{25}{section.84}%
+\contentsline {subsection}{\numberline {5.2.1}Light Net Evaluation}{24}{subsection.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}model comparison}{26}{section.86}%
+\contentsline {subsection}{\numberline {5.2.2}Vertex-Image-Light Net (VIL Net) Evaluation}{25}{subsection.87}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{27}{chapter.87}%
+\contentsline {subsubsection}{title}{26}{section*.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{29}{appendix.88}%
+\contentsline {subsection}{\numberline {5.2.3}comparison}{26}{subsection.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{29}{section.89}%
+\contentsline {chapter}{\numberline {6}Conclusion}{29}{chapter.95}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{29}{section.93}%
+\contentsline {chapter}{\numberline {A}Dataset}{31}{appendix.96}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{33}{appendix*.94}%
+\contentsline {section}{\numberline {A.1}Dataset}{31}{section.97}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{31}{section.101}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{35}{appendix*.102}%

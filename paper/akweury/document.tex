@@ -36,136 +36,37 @@
 	
 	
 	
-\section{Guided Gated Convolution Neural Network for Normal Inference }
 
-\subsection{Light Net Evaluation}
+\subsection{VIL Net}
+Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). 
+The structure is shown in Figure \ref{fig:albedo-gated-archi}. As mentioned in the name, the network utilizes vertex map, light map and image map to accomplish the normal inference task. 
 
-We evaluate the GCNN architecture based light net on the test dataset. The light net parameters are further used as the initial parameter of light branch of the Trignet.
+The network can be consider in two parts. The first part is the image and light map feature encoder, which is identify to the downsampling part of the GCNN architecture. It takes the concatenated image and light map as input, thus the input has 4 channels. Then the network down sampling three times to predict the feature map of the image and light map. The output of this part is the output of third gated convolution layer in the third down-sampling. 
+The second part is basically identify to the original GCNN architecture, but before the start of upsampling part, 2 extra layers are added. First, a concatenate layer is added to fuse the vertex feature and the image and light map feature getting from encoder. Second, a gated convolution layer is added to reduce the channels fit to the following architecture. The rest part of the network is identify to the original GCNN. 
 
-A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. The average angular error are lower than $ 0.3 $ degree on all of test cases. In this case, to distinguish the output and the ground truth is already not easily only use naked eyes. 
+The network concatenate the image and the light together 
 
 
-\begin{figure}[th]
+
+
+
+
+\subsection{An3 Net}
+The first branch (shown above) takes a light map introduced in \ref{sec:lightmap} as the input, the structure is the same as GCNN architecture except that the last two standard convolution layers, the skip connections are kept to connect the 3 down/up samplings. 
+The second branch (shown below) takes image as the input, the structure is the same as the first branch other than the input image is 1 channel but not 3 channels. 
+The third branch takes the 3D vertex map as the input. The structure is based on GCNN architecture. However, in order to merge the other two branches, the vertex branch equips 4 times fusions in the up sampling part. Specifically, the first fusion locates immediately after the last gconv layer of the last down sampling, the second fusion after the second gconv layer of first up sampling, the third fusion after the second gconv layer of second up sampling, the fourth fusion after the second gconv layer of the third up sampling. Each fusion follows by an interpolation layer, a gconv layer to reduce the channel back to 32, a skip connection concatenate layer and another gconv layer to reduce the channel back to 32. After the fourth fusion, a gconv layer used for channel reduction, 2 standard conv layer for output prediction.
+
+\begin{sidewaysfigure}[th]
 	\centering
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_output_error.png}
-	
-	\caption{Qualitative evaluation of light net on Sphere, bus and Washington statue. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.}
-	\label{fig:eval-light}
-\end{figure}
-
-Figure \ref{fig:scatter-light} uses a scatter plot to show the average angular error on 100 different test cases. The average pixel-wise angular error is 0.17 degree as shown in Table \ref{tab:model-error}. An regression line has been added in the plot to analysis the tendency of the errors. The angular error slightly goes up when valid point number in the scene increase. It is make sense since the valid pixels are usually connected and concentrate in a single patch, the less of the area of the patch, which corresponding the number of the valid points, the less variation of the light direction among the pixels, thus better the evaluation.
+	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
+	\caption{The architecture of TriGNet}
+	\label{fig:albedo-gated-archi}
+\end{sidewaysfigure}
 
 
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.5\linewidth]{./Figures/scatter-light-noised.png}
-	\caption{The evaluation on 100 test cases of Light Net.}
-	\label{fig:scatter-light}
-\end{figure}
+\subsection{Loss Function}
+For the case of normal output, the loss function is the same as Mask-L2 loss as introduced in \ref{par:maskl2}. For the case of the product of albedo and normal, the loss function utilized a scaled Mask-L2 loss, which gives the range of inliers between $ [0,255] $. 
 
 
-
-\subsection{Trignet Net Evaluation}
-
-
-The qualitative evaluation of Trignet uses the model trained based on masked L2 loss.
-
-\subsubsection{title}
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_output_error.png}
-	
-	\caption{Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.}
-	\label{fig:eval-trignet}
-\end{figure}
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.5\linewidth]{./Figures/scatter-light-noised.png}
-	\caption{The evaluation on 100 test cases of Trignet.}
-	\label{fig:scatter-trignet}
-\end{figure}
-
-
-
-
-\subsection{comparison}
-From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quite well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
-
-It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=\linewidth]{./Figures/normal-histo-diff.png}
-	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
-	\label{fig:normal-histo-diff}
-\end{figure}
-	
-
-\begin{table}[th]
-	
-	\centering
-	\begin{tabular}{l l l l l l l }
-		\toprule
-		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df} & \tabhead{l/i. Nr.}\\
-		\midrule
-		LightNet  & 0.17  & 4.72 & &  & &\\ 
-		\hline
-		GCNN  & 10.57 & 5.25 & 8 & 200,1600 & 0.5 & 0 \\
-		\hline
-		an3 & 9999 & 9999 & 8 &  & & 1\\
-		\hline
-		VIL-1 & 10.64 & 31.57 & 8 & 10,1000 & 0.5 & 1\\
-		\hline
-		VIL-1 & 10.87 & 32.61 & 8 & 3,12,1000 & 0.5 & 1\\
-		\hline
-		VIL-3  & 10.83 & 53.95 & 8 & 100,1000 & 0.1 & 3\\
-		\hline
-		VIL-10  & 11.20 & 134.28 & 8 & 100,1000 & 0.1 &10\\
-		\bottomrule\\
-	\end{tabular}
-	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
-	\label{tab:model-error}
-\end{table}
-
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=\linewidth]{./Figures/regression-comparison.png}
-	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
-	\label{fig:normal-histo-diff}
-\end{figure}
 
 \end{document}
