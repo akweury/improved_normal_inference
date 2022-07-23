@@ -139,7 +139,7 @@ class TrainingModel():
 
         train_dataset = SyntheticDepthDataset(dataset_path, setname='train')
         # test_dataset = SyntheticDepthDataset(dataset_path, setname='selval')
-        test_dataset = SyntheticDepthDataset(dataset_path, setname='selval')
+        test_dataset = SyntheticDepthDataset(dataset_path, setname='test')
         # Select the desired number of images from the training set
         if train_on != 'full':
             import random
@@ -154,7 +154,7 @@ class TrainingModel():
         test_data_loader = DataLoader(test_dataset,
                                       batch_size=self.args.batch_size)
         print('\n- Found {} images in "{}" folder.'.format(train_data_loader.dataset.__len__(), 'train'))
-        print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'selval'))
+        print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'test'))
 
         return train_data_loader, test_data_loader
 
