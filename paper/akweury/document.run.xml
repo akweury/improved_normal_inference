@@ -84,10 +84,10 @@
             <file>document-blx.bib</file>
         </requires>
         <requires type="editable">
-      <file>example.bib</file>
-    </requires>
-    <requires type="static">
-      <file>biblatex.bst</file>
-    </requires>
-  </external>
+            <file>example.bib</file>
+        </requires>
+        <requires type="static">
+            <file>biblatex.bst</file>
+        </requires>
+    </external>
 </requests>

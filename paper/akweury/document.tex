@@ -137,21 +137,35 @@ It is faulty that almost no normal has -1 z-component in GCNN predicted normal m
 \begin{table}[th]
 	
 	\centering
-	\begin{tabular}{l l l}
+	\begin{tabular}{l l l l l l l }
 		\toprule
-		\tabhead{Model} & \tabhead{L2} & \tabhead{Time /ms}\\
+		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df} & \tabhead{l/i. Nr.}\\
 		\midrule
-		LightNet  & 0.17  & 4.72 \\ 
+		LightNet  & 0.17  & 4.72 & &  & &\\ 
 		\hline
-		GCNN  & 9999 & 9999 \\
+		GCNN  & 10.57 & 5.25 & 8 & 200,1600 & 0.5 & 0 \\
 		\hline
-		Trignet  & 9999 & 9999 \\
+		an3 & 9999 & 9999 & 8 &  & & 1\\
 		\hline
-		Trignet  & 9999 & 9999 \\
+		VIL-1 & 10.64 & 31.57 & 8 & 10,1000 & 0.5 & 1\\
+		\hline
+		VIL-1 & 10.87 & 32.61 & 8 & 3,12,1000 & 0.5 & 1\\
+		\hline
+		VIL-3  & 10.83 & 53.95 & 8 & 100,1000 & 0.1 & 3\\
+		\hline
+		VIL-10  & 11.20 & 134.28 & 8 & 100,1000 & 0.1 &10\\
 		\bottomrule\\
 	\end{tabular}
-	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond.}
+	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
 	\label{tab:model-error}
 \end{table}
+
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=\linewidth]{./Figures/regression-comparison.png}
+	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
+	\label{fig:normal-histo-diff}
+\end{figure}
 
 \end{document}

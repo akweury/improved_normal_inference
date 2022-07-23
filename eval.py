@@ -86,33 +86,22 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     models = {
-        # "SVD": None,
+
         # "an3-815": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "vil10-l1": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1.pth.tar",
+
+        "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-l1-10-1000.pth.tar",
+        "vil-3-12-1000": config.paper_exp / "vil10" / "checkpoint-l1-3-12-1000.pth.tar",
+
+        # "vil3-100-1000": config.paper_exp / "vil10" / "checkpoint-l3-100-1000.pth.tar",
+        # "vil10-100-1000": config.paper_exp / "vil10" / "checkpoint-l10-100-1000.pth.tar",
+
+        # "vil-b8-l10": config.paper_exp / "vil10" / "old_best_b8.pth.tar",
+        # "vil-b4-l1": config.paper_exp / "vil10" / "mistake_best_b4.pth.tar",
 
         # "GCNN-b8": config.paper_exp / "gcnn" / "checkpoint-b8.pth.tar",
-        "vil-b8-l10": config.paper_exp / "vil10" / "old_best_b8.pth.tar",
-        "vil-b4-l1": config.paper_exp / "vil10" / "mistake_best_b4.pth.tar",
-        "GCNN-b32": config.paper_exp / "gcnn" / "checkpoint-b32.pth.tar",
-        "an3-b64": config.paper_exp / "an3" / "checkpoint-b64.pth.tar",
-
-        # "GCNN-8": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c8.pth.tar",
-        # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
-
-        # "fugrc": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
-        # "fugrc2": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-1058.pth.tar",
-        # loss 13, on training
+        # "GCNN-b32": config.paper_exp / "gcnn" / "checkpoint-b32.pth.tar",
         # "SVD": None,
-        # "NNNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # fast, loss 14
-        # "HFM": config.ws_path / "hfm" / "trained_model" / "128" / "checkpoint-288.pth.tar",  # image guided
-        # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",
-        # "NG": config.ws_path / "ng" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "an2-984": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-984.pth.tar",
-        # "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
-        # "light1": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-1.pth.tar",
-        # "light2": config.ws_path / "light" / "trained_model" / "512" / "checkpoint-2.pth.tar",
-        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",
+
     }
     test_folder = config.synthetic_data_noise_local / "synthetic128"
 

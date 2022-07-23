@@ -21,7 +21,7 @@
   "normal_huber_loss": true,
   "loss_milestone": 15,
   "lr_decay_step": 1,
-  "lr_decay_factor": 0.5,
+  "lr_decay_factor": 0.75,
   "fast_train": false,
   "loss_type": "l2"
 }

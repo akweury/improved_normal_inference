@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.polynomial.polynomial import polyfit
+
 from help_funs import mu
 
 date_now = datetime.datetime.today().date()
@@ -13,8 +13,7 @@ time_now = datetime.datetime.now().strftime("%H_%M_%S")
 
 
 def line_chart(data, path, labels, x=None, title=None, x_scale=None, y_scale=None, y_label=None, show=False,
-               log_y=False,
-               cla_leg=False):
+               log_y=False, cla_leg=False):
     if data.shape[1] <= 1:
         return
 
@@ -59,7 +58,7 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
         b, a = np.polyfit(data_x[i], data_y[i], deg=1)
         plt.scatter(data_x[i], data_y[i], label=labels[i])
         xseq = np.linspace(0, 9000, num=90000)
-        plt.plot(xseq, a + b * xseq, lw=2.5)
+        plt.plot(xseq, a + b * xseq, lw=1)
 
     if title is not None:
         plt.title(title)
