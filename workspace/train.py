@@ -492,6 +492,7 @@ def test_epoch(nn_model, epoch):
 
     return eval_loss / nn_model.test_loader.dataset.__len__()
 
+
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
                     label=None, epoch=None, cla_leg=False, start_epoch=0, loss_type="mse"):
     if data_1.shape[1] <= 1:
@@ -676,6 +677,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
 
     return loss
 
+
 def main(args, exp_dir, network, train_dataset):
     device_name = "cuda:0"
 
@@ -711,8 +713,12 @@ def main(args, exp_dir, network, train_dataset):
                     print("best loss two times upward going in the evaluation ")
                     break
 
-        if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
-            print("loss is nan.")
+        if epoch > 10:
+            if np.isnan(np.sum(loss[:3, epoch])):
+                print("loss is nan.")
+                break
+        if np.sum(loss[:3, epoch]) > 1e+4:
+            print("loss is greater than 1e+4.")
             break
 
 
