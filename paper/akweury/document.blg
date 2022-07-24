@@ -22,12 +22,23 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: document-blx.bib
 Database file #2: example.bib
+Warning--I didn't find a database entry for "photometric-stereo"
+Warning--I didn't find a database entry for "intrinsic-image"
+Warning--I didn't find a database entry for "yolov3"
+Warning--I didn't find a database entry for "efficientDet"
+Warning--I didn't find a database entry for "unet"
+Warning--I didn't find a database entry for "pncnn0"
+Warning--I didn't find a database entry for "gated_activation"
+Warning--I didn't find a database entry for "lstm"
+Warning--I didn't find a database entry for "gru"
+Warning--I didn't find a database entry for "gconv"
+Warning--I didn't find a database entry for "berhu-loss"
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 You've used 1 entry,
             6393 wiz_defined-function locations,
-            1207 strings with 9031 characters,
+            1219 strings with 9142 characters,
 and the built_in function-call counts, 1522 in all, are:
 = -- 72
 > -- 70
@@ -66,3 +77,4 @@ warning$ -- 0
 while$ -- 64
 width$ -- 0
 write$ -- 20
+(There were 11 warnings)

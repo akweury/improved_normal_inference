@@ -12,29 +12,41 @@
 \newlabel{eq:normal-invertion}{{4}{2}}
 \@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Evaluation}{2}{}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:svd-normal}{{\caption@xref {fig:svd-normal}{ on input line 99}}{2}}
+\newlabel{fig:svd-normal}{{\caption@xref {fig:svd-normal}{ on input line 101}}{2}}
 \@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Normal map of a dragon object predicted by neighbor based method. k=2, angle error=5 \textbf  {Left}: ground-truth normal map \textbf  {Middle}: predicted normal map, \textbf  {Right}: Error map\relax }}{2}{}\protected@file@percent }
-\citation{yolov3}
-\abx@aux@cite{yolov3}
-\abx@aux@segm{0}{0}{yolov3}
-\citation{efficientDet}
-\abx@aux@cite{efficientDet}
-\abx@aux@segm{0}{0}{efficientDet}
-\citation{efficientDet}
-\abx@aux@cite{efficientDet}
-\abx@aux@segm{0}{0}{efficientDet}
-\citation{yolov3}
-\abx@aux@cite{yolov3}
-\abx@aux@segm{0}{0}{yolov3}
-\newlabel{fig:svd-k-eval}{{\caption@xref {fig:svd-k-eval}{ on input line 109}}{3}}
+\citation{photometric-stereo}
+\abx@aux@cite{photometric-stereo}
+\abx@aux@segm{0}{0}{photometric-stereo}
+\citation{intrinsic-image}
+\abx@aux@cite{intrinsic-image}
+\abx@aux@segm{0}{0}{intrinsic-image}
+\newlabel{fig:svd-k-eval}{{\caption@xref {fig:svd-k-eval}{ on input line 111}}{3}}
 \@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Error map of neighbor based method with different $ k $ values. From left to right, $ k=1,2,3,4 $ separately.\relax }}{3}{}\protected@file@percent }
-\newlabel{fig:svd-noise}{{\caption@xref {fig:svd-noise}{ on input line 120}}{3}}
+\newlabel{fig:svd-noise}{{\caption@xref {fig:svd-noise}{ on input line 122}}{3}}
 \@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Evaluation of neighbor based method on a noised dragon model\relax }}{3}{}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {2}Gated Convolution neural network for surface normal estimation}{3}{}\protected@file@percent }
-\newlabel{gcnn}{{2}{3}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {2}Photometric Stereo}{3}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Approaches}{3}{}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image\relax }}{4}{}\protected@file@percent }
+\newlabel{fig:intrinsic-image}{{4}{4}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }}{4}{}\protected@file@percent }
+\newlabel{fig:lambertian-surface}{{5}{4}}
+\citation{yolov3}
+\abx@aux@cite{yolov3}
+\abx@aux@segm{0}{0}{yolov3}
+\citation{efficientDet}
+\abx@aux@cite{efficientDet}
+\abx@aux@segm{0}{0}{efficientDet}
+\citation{efficientDet}
+\abx@aux@cite{efficientDet}
+\abx@aux@segm{0}{0}{efficientDet}
+\citation{yolov3}
+\abx@aux@cite{yolov3}
+\abx@aux@segm{0}{0}{yolov3}
 \citation{unet}
 \abx@aux@cite{unet}
 \abx@aux@segm{0}{0}{unet}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {3}Gated Convolution neural network for surface normal estimation}{5}{}\protected@file@percent }
+\newlabel{sec:gcnn}{{3}{5}}
 \citation{unet}
 \abx@aux@cite{unet}
 \abx@aux@segm{0}{0}{unet}
@@ -44,8 +56,6 @@
 \citation{pncnn0}
 \abx@aux@cite{pncnn0}
 \abx@aux@segm{0}{0}{pncnn0}
-\newlabel{fig:u-net}{{\caption@xref {fig:u-net}{ on input line 144}}{4}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The structure of UNet. \cite {unet}\relax }}{4}{}\protected@file@percent }
 \citation{gated_activation}
 \abx@aux@cite{gated_activation}
 \abx@aux@segm{0}{0}{gated_activation}
@@ -58,49 +68,41 @@
 \citation{gconv}
 \abx@aux@cite{gconv}
 \abx@aux@segm{0}{0}{gconv}
+\newlabel{fig:u-net}{{\caption@xref {fig:u-net}{ on input line 219}}{6}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The structure of UNet. \cite {unet}\relax }}{6}{}\protected@file@percent }
 \citation{unet}
 \abx@aux@cite{unet}
 \abx@aux@segm{0}{0}{unet}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Gated Convolution}{5}{}\protected@file@percent }
-\newlabel{gconv}{{6}{5}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Architecture}{5}{}\protected@file@percent }
-\newlabel{sec:architecture}{{2.2}{5}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication.\relax }}{6}{}\protected@file@percent }
-\newlabel{fig:gconvLayer}{{5}{6}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Loss Function}{6}{}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L1 Loss}{6}{}\protected@file@percent }
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. \relax }}{7}{}\protected@file@percent }
-\newlabel{fig:gcnn-archi}{{6}{7}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L2 Loss}{7}{}\protected@file@percent }
-\newlabel{par:maskl2}{{2.3}{7}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{7}{}\protected@file@percent }
-\newlabel{gcnn-loss}{{7}{7}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Gated Convolution}{7}{}\protected@file@percent }
+\newlabel{gconv}{{6}{7}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Architecture}{7}{}\protected@file@percent }
+\newlabel{sec:architecture}{{3.2}{7}}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication.\relax }}{8}{}\protected@file@percent }
+\newlabel{fig:gconvLayer}{{7}{8}}
 \citation{berhu-loss}
 \abx@aux@cite{berhu-loss}
 \abx@aux@segm{0}{0}{berhu-loss}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Reversed Huber Loss}{8}{}\protected@file@percent }
-\newlabel{berhu-loss}{{8}{8}}
-\citation{intrinsic-image}
-\abx@aux@cite{intrinsic-image}
-\abx@aux@segm{0}{0}{intrinsic-image}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {3}Guided normal inference using GCNN}{9}{}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Intrinsic image decomposition}{9}{}\protected@file@percent }
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image\relax }}{9}{}\protected@file@percent }
-\newlabel{fig:intrinsic-image}{{7}{9}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }}{9}{}\protected@file@percent }
-\newlabel{fig:lambertian-surface}{{8}{9}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Light Map}{10}{}\protected@file@percent }
-\newlabel{sec:lightmap}{{3.2}{10}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Loss Function}{9}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L1 Loss}{9}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{L2 Loss}{9}{}\protected@file@percent }
+\newlabel{par:maskl2}{{3.3}{9}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{9}{}\protected@file@percent }
+\newlabel{gcnn-loss}{{7}{9}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {paragraph}{Reversed Huber Loss}{10}{}\protected@file@percent }
+\newlabel{berhu-loss}{{8}{10}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {section}{\numberline {4}Guided normal inference using GCNN}{10}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Light Map}{10}{}\protected@file@percent }
+\newlabel{sec:lightmap}{{4.1}{10}}
 \newlabel{light-direction}{{9}{10}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The light map calculated from vertex map and the light source\relax }}{11}{}\protected@file@percent }
-\newlabel{fig:light-input}{{9}{11}}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Light Net for light inpainting based on GCNN architecture.\relax }}{11}{}\protected@file@percent }
-\newlabel{fig:light-net-archi}{{10}{11}}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}VIL Net}{11}{}\protected@file@percent }
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The light map calculated from vertex map and the light source\relax }}{10}{}\protected@file@percent }
+\newlabel{fig:light-input}{{9}{10}}
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}VIL Net}{11}{}\protected@file@percent }
+\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}An3 Net}{11}{}\protected@file@percent }
 \abx@aux@read@bbl@mdfivesum{9304A158905EF5DF34C85A4707D38A5C}
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}An3 Net}{12}{}\protected@file@percent }
-\@writefile{toc}{\defcounter {refsection}{0}\relax }\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Loss Function}{12}{}\protected@file@percent }
 \newlabel{RF1}{13}
-\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces The architecture of TriGNet\relax }}{13}{}\protected@file@percent }
-\newlabel{fig:albedo-gated-archi}{{11}{13}}
-\gdef \@abspage@last{13}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.\relax }}{13}{}\protected@file@percent }
+\newlabel{fig:gcnn-archi}{{8}{13}}
+\newlabel{RF2}{14}
+\@writefile{lof}{\defcounter {refsection}{0}\relax }\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces The architecture of TriGNet\relax }}{14}{}\protected@file@percent }
+\newlabel{fig:VIL-Net}{{10}{14}}
+\gdef \@abspage@last{14}

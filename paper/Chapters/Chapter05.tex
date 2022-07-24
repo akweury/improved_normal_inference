@@ -7,6 +7,62 @@ The experiments are performed on two normal inference tasks: normal inference ba
 The model is trained with PyTorch 1.10.2, CUDA 10.2.89, GPU with single NVIDIA GEFORCE GTX 1080Ti.
 
 
+\section{GCNN model evaluation}
+
+In order to ease this issue, a light inpainting model has been trained based on the GCNN network with the identity architecture but the input and output, which takes the semi-dense light map as input and predict the fully dense light map as output. 
+
+
+\begin{figure}[th]
+	\centering
+	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
+	\begin{tikzpicture}
+		%% -------------------------------------- parameters ------------------------------------------------
+		\pgfmathsetmacro{\vdist}{0.4}
+		
+		\pgfmathsetmacro{\boxsizea}{2}	%% width 512
+		\pgfmathsetmacro{\boxwidtha}{2}	%% width 3
+		
+		%% https://www.tug.org/pracjourn/2007-4/walden/color.pdf
+		\definecolor{netcolor}{rgb}{0.5,0.7,0.7}
+		
+		%% 	d_in							3x512x512
+		%%	dconv1: 	d_in-->x1 			32x512x512
+		\pgfmathsetmacro{\disttimes}{1}	%% width 32
+		\pgfmathsetmacro{\yshift}{1}	%% width 32
+		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
+		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 32
+		\pgfmathsetmacro{\yschift}{-1}
+		
+		
+		\node[inner sep=0pt] (input) at (\vdist*\disttimes-6,\yschift-0.8)
+		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light_input.png}};
+		\node[text width=3.5cm] at (\vdist*\disttimes-6,\yschift-2.4) {Semi-dense Light Map};
+		
+		\node[inner sep=0pt] (output) at (\vdist*\disttimes+3,\yschift-0.8)
+		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light.png}};
+		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {Semi-dense Light Map};
+		
+		\draw [-stealth] (\vdist*\disttimes-4.5,\yschift-1) -- (\vdist*\disttimes-3.5,\yschift-1);
+		\draw [-stealth] (\vdist*\disttimes,\yschift-1) -- (\vdist*\disttimes+1,\yschift-1);
+		
+		
+		\pgfmathsetmacro{\disttimes}{-2}	%% width 32		
+		\pgfmathsetmacro{\yschift}{-1}
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
+		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
+		
+		\node[text width=3.5cm] at (\vdist*\disttimes,\yschift-1) {Light Net};
+	\end{tikzpicture}
+	\caption{Light Net for light inpainting based on GCNN architecture.}
+	\label{fig:light-net-archi}
+\end{figure}
+
+
+
+
+
+
 %% nnnn exp
 \section{Surface Normal Inference based on Depth Map}
 The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) ( \ref{gcnn}) is trained and is compared with similar approaches. We evaluate the performance of the model in dataset ``synthetic50-5" introduced in  \ref{ch:04} including 5K depth maps with size  $ 512\times512\times3 $ for training. All the depth maps add simulated noise as introduced in \ref{sec:noise}. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, penalty-l2 loss. The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape. 

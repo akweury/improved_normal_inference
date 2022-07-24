@@ -11,6 +11,7 @@
 \usetikzlibrary{calc,patterns,angles,quotes}
 \usepackage{breqn}
 \usepackage{bm}
+\usepackage{float}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{multirow}
@@ -41,6 +42,7 @@ The normal inference task estimate the surface normal of a 3D object. There are 
 
 
 \section{Geometry based normal estimation}
+
 
 \subsection{Approach}
 The geometry based normal estimation uses point cloud of the object surface as input.
@@ -110,7 +112,7 @@ The neighbor based method is depended on a well-chosen parameter $ k $. Figure \
 	\caption{Error map of neighbor based method with different $ k $ values. From left to right, $ k=1,2,3,4 $ separately.}
 \end{figure}
 
-The performance of neighbor based method is good enough for a well chosen $ k $, and it can be further improved by simply use different $ k $ for different area prediction. However, for the case of noised point cloud as input, this approach will broken, since the noise will failed the neighbor selection and also reduce the number of possible neighbors of each point for a fixed $ k $.
+The performance of neighbor based method is good enough for a well chosen $ k $. However, for the case of noised point cloud as input, this approach will broken, since the noise will failed the neighbor assumption and also reduce the number of possible neighbors of each point for a fixed $ k $.
 \begin{figure}[th]
 	\centering
 	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_point_cloud_noise.png}
@@ -123,12 +125,85 @@ The performance of neighbor based method is good enough for a well chosen $ k $,
 
 
 
-
-
-
 % ---------------------- gated convolution neural network ------------------------
+
+
+
+\section{Photometric Stereo}
+Photometric stereo was initially introduced by \cite{photometric-stereo}, which estimates the surface normal of the object by observing the object in the same position but under different illuminated scenes. It based on the fact that the light reflected by a surface is dependent on the surface normal and the light direction. 
+
+\subsection{Approaches}
+Given an image $ I $, it can be decomposed in to two parts, the reflectance $ R $ and the shading $ S $,
+\[ I = R\oplus S\]
+where $ \oplus $ denotes the element-wise product. This decomposition of the image is based on the intrinsic image model, which proposed by  \cite{intrinsic-image}. It interprets the observed image into reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
+%% insert a image for decompositions
+\begin{figure}[th]
+	\centering
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_reflectance.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_shading.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_light.png}}
+	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_normal.png}}
+	\caption{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image}
+	\label{fig:intrinsic-image}
+\end{figure}
+
+The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ N $ and the light source direction $ L $.
+\[ I = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
+note that the surface normal $ N $ and light direction $ L $ are unit vectors thus they have only two degrees of freedom. 
+
+\begin{figure}[th]
+	\centering
+	\begin{tikzpicture} 
+		% reference lines
+		\coordinate (light) at (-1,3);
+		\coordinate (p) at (2,0);
+		\coordinate (normal) at (2,3);
+		\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
+		\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
+		\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
+		\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
+		\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
+		\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
+		\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
+	\end{tikzpicture}
+	\caption{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
+	\label{fig:lambertian-surface}
+\end{figure}
+
+The equation can be further rearranged as follows
+\[ I = \textbf{g} \cdot \textbf{L} =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
+The shape from shading method employed the equation mentioned above to predict the both surface albedo $ \rho $ and the normal $ \textbf{N} $ with knowning light source direction $ \textbf{L} $. More specifically, a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in the image, an equation system can be set up 
+
+\[ 
+\begin{pmatrix}
+	L_1^T \\
+	L_2^T \\
+	\cdots \\
+	L_k^T
+\end{pmatrix} g(x,y) = 
+\begin{pmatrix}
+	I_1(x,y) \\
+	I_2(x,y) \\
+	\cdots \\
+	I_3(x,y)
+\end{pmatrix}
+\]
+for the simplicity, $ L_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ 
+The equation can be solved based on least square methods. 
+Since normal $ N(x,y) $ is unit vector, thus we have 
+
+\[ \|g(x,y)\|_2 = \|L_0\rho(x,y)N(x,y)\|_2 = L_0\rho(x,y) \]
+
+Then the normal can be obtained as follow
+
+\[  N(x,y) = \frac{g(x,y)}{L_0\rho(x,y)}\]
+
+In another word, the surface normal including the albedo can be obtained directly based on a set of images and light directions. 
+
+
 \section{Gated Convolution neural network for surface normal estimation}
-\label{gcnn}
+\label{sec:gcnn}
 
 
 Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
@@ -215,392 +290,21 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 \label{sec:architecture}
 Based on the implementation mentioned above, the architecture roughly follows on UNet proposed by \cite{unet}, as shown in Figure \ref{fig:gcnn-archi}. 
 
-Instead of using pooling layers for down/up samplings, gated convolution layer with stride $ (1,1) $ is used. The gated convolution using Sigmoid function for gating layer and LeakyReLU function for feature layer. All the layers are gated convolution layer with the exception of last two layers, which instead uses standard convolution layer to scale the output in range $\left[-1, 1\right]$. Other than the last two layers which use $ 1\times 1 $ kernels, all the gated convolution layer use $ 3\times 3 $ kernels with $ 1\times1 $ padding. 
-
-The input is 3D vertex with size $ 512\times512\times3 $, and output is $ 512\times512\times3 $ normal map, which has the same resolution. There are 3 times downsamplings, each scale with 3 gated convolution layers, the third layer has stride 2. The upsampling part interpolate the feature maps 3 times with 1 gated convolution layer in each scale. 
-
-It keeps the skip connection in UNet to remain the fine detail features. 
-
-% GCNN Architecture
-\begin{figure}[!h]
+\begin{sidewaysfigure}[th]
 	\centering
-	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
-	\begin{tikzpicture}
-		%% -------------------------------------- parameters ------------------------------------------------
-		\pgfmathsetmacro{\vdist}{0.4}
-		
-		\pgfmathsetmacro{\boxsizea}{3}	%% width 512
-		\pgfmathsetmacro{\boxsizeb}{1.5}	%% width 256
-		\pgfmathsetmacro{\boxsizec}{1}	%% width 128
-		\pgfmathsetmacro{\boxsized}{0.7}	%% width 64
-		
-		
-		\pgfmathsetmacro{\boxwidthd}{0.1}	%% width 1
-		\pgfmathsetmacro{\boxwidtha}{0.2}	%% width 3
-		\pgfmathsetmacro{\boxwidthb}{\boxwidtha*1.3}	%% width 32
-		\pgfmathsetmacro{\boxwidthc}{\boxwidtha*3}		%% width 64
-		
-		\pgfmathsetmacro{\convwshift}{9}
-		\pgfmathsetmacro{\preprocessingshift}{4}
-		\pgfmathsetmacro{\labelshift}{1.5}
-		\pgfmathsetmacro{\gconvwshift}{0}
-		
-		\pgfmathsetmacro{\secrowshift}{-6}
-		
-		\pgfmathsetmacro{\convrowstart}{4}
-		\pgfmathsetmacro{\secondrowstart}{4}
-		
-		%% https://www.tug.org/pracjourn/2007-4/walden/color.pdf
-		\definecolor{gconvcolor}{rgb}{0.5,0.7,0.7}
-		\definecolor{convcolor}{rgb}{0.5,0.7,0.3}
-		\definecolor{gconvdilatedcolor}{rgb}{0.6,0,0.3}
-		
-		
-		%% ---------------------------------- preprocessing --------------------------------------------
-		%%  img_in 1x512x512
-		\pgfmathsetmacro{\disttimes}{3.5}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-input.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1.5) {3D Vertex};
-		
-		\draw [-stealth](1.45,\yschift-1.8) -- (1.45,\yschift-2.6);
-		
-		\draw [-stealth]  (\vdist*\disttimes+1.6,\yschift) -- (\vdist*\disttimes+1.1,\yschift);
-		
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-depth-noise}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1.5) {Add Noise};
-		
-		\draw [-stealth] (\vdist*\disttimes+1.6,\yschift) -- (\vdist*\disttimes+1.1,\yschift);
-		
-		\pgfmathsetmacro{\disttimes}{16.5}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-depth.png}};
-		\node[text width=2cm] at (\vdist*\disttimes+0.2,\yschift-1.5) {Depth Map};
-		
-		
-		%% ----------------------------------- output normal map -------------------------------------
-		\pgfmathsetmacro{\disttimes}{25}
-		\pgfmathsetmacro{\yschift}{\preprocessingshift}
-		\node[inner sep=0pt] (depthmap) at (\vdist*\disttimes,\yschift)
-		{\includegraphics[width=.15\textwidth]{./Figures/train-normal-gt.png}};
-		\node[text width=2.5cm] at (\vdist*\disttimes,\yschift-1.5) {Normal Map};
-		
-		\draw [-stealth] (\vdist*\disttimes+0.2,\yschift-2.7) -- (\vdist*\disttimes+0.2,\yschift-1.8);
-		
-		
-		%% ------------------------------------------- vertex input ----------------------------------------------
-		%% 	d_in							3x512x512
-		%%	dconv1: 	d_in-->x1 			32x512x512
-		\pgfmathsetmacro{\disttimes}{1}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%%	dconv2:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{2}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%%	dconv3:		x1-->x1				32x512x512
-		\pgfmathsetmacro{\disttimes}{3}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes-0.2,\yschift-3.2) -- (\vdist*\disttimes-0.2,\yschift-4);
-		\draw (\vdist*\disttimes-0.2,\yschift-4) -- (\vdist*\disttimes+6.5,\yschift-4);
-		\draw [-stealth] (\vdist*\disttimes+6.5,\yschift-4) -- (\vdist*\disttimes+6.5,\yschift-3.2);
-		
-		
-		%% downsample 1
-		%%	dconv4:		x1-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{4}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{5}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x2-->x2				32x256x256
-		\pgfmathsetmacro{\disttimes}{6}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.5}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-1.6) -- (\vdist*\disttimes-0.1,\yschift-2.7);
-		\draw (\vdist*\disttimes-0.1,\yschift-2.7) -- (\vdist*\disttimes+4.2,\yschift-2.7);
-		\draw [-stealth] (\vdist*\disttimes+4.2,\yschift-2.7) -- (\vdist*\disttimes+4.2,\yschift-1.7);
-		
-		
-		%% downsample 2
-		%%	dconv4:		x2-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{7}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{8}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x3-->x3				32x128x128
-		\pgfmathsetmacro{\disttimes}{9}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.8}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\draw (\vdist*\disttimes-0.1,\yschift-1.2) -- (\vdist*\disttimes-0.1,\yschift-1.8);
-		\draw (\vdist*\disttimes-0.1,\yschift-1.8) -- (\vdist*\disttimes+1.8,\yschift-1.8);
-		\draw [-stealth] (\vdist*\disttimes+1.8,\yschift-1.8) -- (\vdist*\disttimes+1.8,\yschift-1.2);
-		
-		
-		%% downsample 3
-		%%	dconv4:		x3-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv2:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{11}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%%	dconv3:		x4-->x4				32x64x64
-		\pgfmathsetmacro{\disttimes}{12}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%		%% dilated
-		%		%%	dilated1:	x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{13}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%		%%	dilated2:	x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{14}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%		%%	dilated3:	x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{15}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%		%%	dilated4:	x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{16}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvdilatedcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%		
-		%		
-		%		
-		%		
-		%		%%	dconv2:		x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{17}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%		%%	dconv3:		x4-->x4				32x64x64
-		%		\pgfmathsetmacro{\disttimes}{18}
-		%		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 64
-		%		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		%		\pgfmathsetmacro{\yschift}{\gconvwshift-1}	%% width 32
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		%		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% ----------------------------------- upsampling -------------------------------------
-		
-		%% upsample 1
-		%% interpolate	x4-->x3_us			64x128x128
-		\pgfmathsetmacro{\disttimes}{13}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% concatenate x3_us
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv1		x3_us-->x3			32x128x128
-		\pgfmathsetmacro{\disttimes}{15}
-		\pgfmathsetmacro{\boxsize}{\boxsizec}	%% size 128
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.9}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% upsample 2
-		%% interpolate	x3-->x2_us			32x256x256
-		\pgfmathsetmacro{\disttimes}{16}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%% concatenated x2
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% uconv2 		x2,x2_us-->x2		32x256x256
-		\pgfmathsetmacro{\disttimes}{18}
-		\pgfmathsetmacro{\boxsize}{\boxsizeb}	%% size 256
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift-0.6}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% upsample 3
-		%% interpolate	x2-->x1_us			32x512x512
-		\pgfmathsetmacro{\disttimes}{19}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		%% concatenated x1 and x1_us
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes+\boxwidth,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% uconv3		x1,x1_us-->x1		32x512x512
-		\pgfmathsetmacro{\disttimes}{21}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 32
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		%% conv1		x1-->xout			3x512x512
-		\pgfmathsetmacro{\disttimes}{22}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthb}	%% width 3
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		
-		%% conv2		xout-->xout			3x512x512
-		\pgfmathsetmacro{\disttimes}{23}
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthd}	%% width 3
-		\pgfmathsetmacro{\yschift}{\gconvwshift}	%% width 32
-		\node[text width=1cm] at (\vdist*\disttimes+0.5,\yschift-3.3) {3};
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		%% ------------------------------------- label ----------------------------------------------		
-		\pgfmathsetmacro{\disttimes}{10}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Conv2d};
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=convcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\pgfmathsetmacro{\disttimes}{15}
-		\pgfmathsetmacro{\boxsize}{\boxsized}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidthc}	%% width 3
-		\pgfmathsetmacro{\yschift}{\labelshift}	%% width 32
-		\node[text width=3.5cm] at (\vdist*\disttimes+1,\yschift-1) {Gated};
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=gconvcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		
-		
-	\end{tikzpicture}
-	
-	\caption{Basic Normal Neural Network model based on Gated Convolution layer and UNet architecture. }
+	\includegraphics[width=1\textwidth]{Figures/gcnn}
+	\caption{The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.}
 	\label{fig:gcnn-archi}
-\end{figure}
+\end{sidewaysfigure}
+In order to describe the network in a common way, the parameters of the network are represented by letters.
+The network is constructed by a downsampling part and a upsampling part. In the downsampling part, the input is the $ X \in \mathbb{R}^{w\times w\times ch}$. The input matrix goes through 3 downsampling layer blocks, each block has two gated convolution layers with stride (1,1) and an extra gated convolution layers with stride (2,2) as a downsampling operation. 
+The total three times downsamplings extract the geometry features $ X_v $ from input matrix $ X $ (represented as a regression function $ f $)
+\[ f: X \rightarrow X_f \]
+After the feature extraction, the network upsampling the feature map 3 times to get the output matrix $ Y $. Each upsampling consists of an interpolation operation uses nearest neighboring interpolations for resolution upsamling, then a concatenate layer that concatenate the interpolated result and the corresponding high resolution feature map  $ X_{df_1, df_2, ...} $  from the downsampling part. This is also called skip connection. In the last, a gated convolution layer is utilized to reduce the channel size to fit the next upsampling block. After the three times upsampling, two standard convolution layer is added in the last without activation function to predict the surface normal. The whole upsampling branch can be represented as a regression function $ n $,
+\[ n: X_v, X_{df_1, df_2, ...} \rightarrow N \]
+All the convolution layers in the network use same kernel size $ 3\times 3 $. 
+
+One of the key feature of the network is the output has the same size as the input. This is achieved by the (1,1) padding and the same channel number in the convolution layers. Thus the surface normal can be achieved 1-1 estimation. Another key point of the network is the robustness of the noise. The network takes semi-dense matrix as input then predicts the fully-dense matrix as output. The last feature is the multi-purpose using scenarios. In the description, no specific input type has been indicated. In this thesis, two application scenarios have been verified. The first is the missing-pixel estimation but with out the transformation of the style of the input matrix, which takes the semi-dense matrix as input and simply fill the missing pixels in the output. The second is the missing pixel estimation with style-transferred of the matrix. In this case, the network takes the semi-dense matrix as input, the output matrix is fully-dense but each pixel has the different meaning as the input. Actually, the first scenario can be consider as the specially case of the second scenario which the style of output and the input remain the same. The network is test in Chapter \ref{ch:05}, which is shown the good performance on noise filtering task and also the normal surface estimation task.
 
 \subsection{Loss Function}
 
@@ -643,189 +347,61 @@ where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is
 where $ c=0.2\max (|\tilde y - y|) $.
 
 
-
-
-\newpage
-
 \section{Guided normal inference using GCNN}
-
-\subsection{Intrinsic image decomposition}
-Intrinsic image model was introduced by \cite{intrinsic-image}. It interprets that an image $ I $ can be decomposed as the element-wise product between the reflectance $ R $ of the object and the shading $ S $ produced by the interaction between light and objects.
-\[ I =R  \odot S\]
-It interprets the observed image into reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
-%% insert a image for decompositions
-\begin{figure}[th]
-	\centering
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_reflectance.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_shading.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_light.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_normal.png}}
-	\caption{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image}
-	\label{fig:intrinsic-image}
-\end{figure}
-
-The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ N $ and the light source direction $ L $.
-\[ I = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
-note that the surface normal $ N $ and light direction $ L $ are unit vectors thus they have only two degrees of freedom. 
-
-\begin{figure}[th]
-	\centering
-	\begin{tikzpicture} 
-		% reference lines
-		\coordinate (light) at (-1,3);
-		\coordinate (p) at (2,0);
-		\coordinate (normal) at (2,3);
-		\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
-		\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
-		\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
-		\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
-		\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
-		\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
-		\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
-	\end{tikzpicture}
-	\caption{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
-	\label{fig:lambertian-surface}
-\end{figure}
-
-The equation can be further rearranged as follows
-\[ I = \textbf{g} \cdot \textbf{L} =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
-The shape from shading method employed the equation mentioned above to predict the both surface albedo $ \rho $ and the normal $ \textbf{N} $ with knowning light source direction $ \textbf{L} $. More specifically, a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in the image, an equation system can be set up 
-
-\[ 
-\begin{pmatrix}
-	L_1^T \\
-	L_2^T \\
-	\cdots \\
-	L_k^T
-\end{pmatrix} g(x,y) = 
-\begin{pmatrix}
-	I_1(x,y) \\
-	I_2(x,y) \\
-	\cdots \\
-	I_3(x,y)
-\end{pmatrix}
-\]
-for the simplicity, $ L_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ 
-The equation can be solved based on least square methods. 
-Since normal $ N(x,y) $ is unit vector, thus we have 
-
-\[ \|g(x,y)\|_2 = \|L_0\rho(x,y)N(x,y)\|_2 = L_0\rho(x,y) \]
-
-Then the normal can be obtained as follow
-
-\[  N(x,y) = \frac{g(x,y)}{L_0\rho(x,y)}\]
-
-In another word, the surface normal including the albedo can be obtained directly based on images and light directions. 
-
+The guided normal inference takes the light direction and the image into consideration. It is under the assumption that the scene image $ I $ is captured by a calibrated camera, i.e. knowing the intrinsic $ K $ and extrinsic camera matrix $ [R|t] $, and a the light position $ (s_x, s_y, s_z) $ of the single light source. The geometry based approach inference the surface normal from the point cloud, whereas the photometric stereo inference the surface normal from a set of calibrated illuminated images. The idea behind this chapter is that improve the geometry based approach with the help of one calibrated illuminated image. Since the calibrated illuminated image contains the information about the surface feature, it is supposed to help the geometry approach in a proper way. Based on this idea, two networks are proposed in this section.
 
 \subsection{Light Map}
 \label{sec:lightmap}
-The light map $ L $ can be derived from vertex map and the light source position. As shown in Figure \ref{fig:lambertian-surface}, the incoming light direction is a vector point from light source to the surface point, therefor it can be calculated as follows
+The light map $ L $ can be derived from vertex map $ V $ and the light source position $ s $. As shown in Figure \ref{fig:lambertian-surface}, the incoming light direction is a vector point from light source to the surface point, therefor it can be calculated as follows
 \begin{equation}\label{light-direction}
 	\begin{array}{ll}
 		L(x,y)&= \dfrac{V(x,y)-(s_x,s_y)}{\|V(x,y)-(s_x,s_y)\|_2}\\ 
 	\end{array}
 \end{equation}
-where $ (s_x,s_y) $ is the light source position and $ V $ is the vertices, both $  (s_x,s_y) $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. 
-The light map is a matrix corresponding the light direction of whole image where each pixel corresponding with each other, thus it has the same size as the vertex map.
-
-
-It is important to note that due to the exist noise in the vertex map, the getting light map is only semi-dense, as shown in Figure \ref{fig:light-input}. 
-
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
-	{\includegraphics[width=.4\textwidth]{./Figures/intrinsic_image_vertex_input.png}}
-	{\includegraphics[width=.4\textwidth]{./Figures/intrinsic_image_light_input.png}}
+	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_vertex_input.png}}
+	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_light_input.png}}
 	\caption{The light map calculated from vertex map and the light source}
 	\label{fig:light-input}
 \end{figure}
+where $ (s_x,s_y) $ is the light source position and $ V $ is the vertices, both $  (s_x,s_y) $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. Using the equation above for all the pixels in the point cloud can obtain the corresponding light map, which is a matrix with same size as point clouds. However, it is important to note that due to the exist noise in the vertex map, the getting light map is only semi-dense, as shown in Figure \ref{fig:light-input}. 
 
-In order to ease this issue, a light inpainting model has been trained based on the GCNN network with the identity architecture but the input and output, which takes the semi-dense light map as input and predict the fully dense light map as output. 
 
-\begin{figure}[th]
-	\centering
-	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
-	\begin{tikzpicture}
-		%% -------------------------------------- parameters ------------------------------------------------
-		\pgfmathsetmacro{\vdist}{0.4}
-		
-		\pgfmathsetmacro{\boxsizea}{2}	%% width 512
-		\pgfmathsetmacro{\boxwidtha}{2}	%% width 3
-		
-		%% https://www.tug.org/pracjourn/2007-4/walden/color.pdf
-		\definecolor{netcolor}{rgb}{0.5,0.7,0.7}
-		
-		%% 	d_in							3x512x512
-		%%	dconv1: 	d_in-->x1 			32x512x512
-		\pgfmathsetmacro{\disttimes}{1}	%% width 32
-		\pgfmathsetmacro{\yshift}{1}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 32
-		\pgfmathsetmacro{\yschift}{-1}
-		
-		
-		\node[inner sep=0pt] (input) at (\vdist*\disttimes-6,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light_input.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes-6,\yschift-2.4) {Semi-dense Light Map};
-		
-		\node[inner sep=0pt] (output) at (\vdist*\disttimes+3,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {Semi-dense Light Map};
-		
-		\draw [-stealth] (\vdist*\disttimes-4.5,\yschift-1) -- (\vdist*\disttimes-3.5,\yschift-1);
-		\draw [-stealth] (\vdist*\disttimes,\yschift-1) -- (\vdist*\disttimes+1,\yschift-1);
-		
-		
-		\pgfmathsetmacro{\disttimes}{-2}	%% width 32		
-		\pgfmathsetmacro{\yschift}{-1}
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\node[text width=3.5cm] at (\vdist*\disttimes,\yschift-1) {Light Net};
-	\end{tikzpicture}
-	\caption{Light Net for light inpainting based on GCNN architecture.}
-	\label{fig:light-net-archi}
-\end{figure}
 
-	
 	
 
 \subsection{VIL Net}
-Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). 
-The structure is based on GCNN model which use downsampling two times as shown in Figure \ref{fig:albedo-gated-archi}. As mentioned in the name, the network utilizes vertex map, light map and image map to accomplish the normal inference task. 
+Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). The structure is basically derived from GCNN model as mentioned in \ref{sec:gcnn}, which is shown in Figure 
+\ref{fig:VIL-Net}.
 
-The network can be consider in two parts. The first part extracts the feature maps. It deals with two kinds of input, the vertex map $ X_1 \in \mathbb{R}^{w\times h\times3}$, and the concatenation of light and image map $ X_2 \in \mathbb{R}^{w\times h\times4} $. The network extracts the geometry features $ X_v $ from vertex map $ X_1 $ (represented as a regression function v)
+As mentioned in the name, the \textbf{VIL}-Net utilizes \textbf{V}ertex map, \textbf{L}ight map and \textbf{I}mage map to accomplish the normal inference task. 
+
+The network can be consider in two parts. The first part extracts the feature maps from the input data. It deals with two kinds of input, the vertex map $ X_1 \in \mathbb{R}^{w\times h\times3}$, and the concatenation of light and image map $ X_2 \in \mathbb{R}^{w\times h\times4} $. The network extracts the geometry features $ X_v $ from vertex map $ X_1 $ (represented as a regression function v)
 \[ v: X_1 \rightarrow X_v \]
 and the photometric features $ X_l $ from image and the light map $ X_2 $ (represented as a regression function $ l $)
 \[ l: X_2 \rightarrow X_l \]
-where the two encoders have the same network architecture based on the downsampling part of GCNN model. After the feature extraction, 2 extra layers are added. First, a concatenate layer is added to fuse the vertex feature, and the image and light map feature getting from encoder. 
-Second, a fused feature map is predicted from all the feature maps base on a single gated convolution layer. (represented as a regression function $ m $)
+where the two encoders have the same network architecture based on the downsampling part of GCNN model. After the feature extraction, 2 extra layers are added: 1, a concatenate layer is added to fuse the vertex feature, and the image and light map feature getting from the encoder. 
+2, a fused feature map is predicted from all the feature maps base on a single gated convolution layer. (represented as a regression function $ m $)
 \[ m: [X_v X_l] \rightarrow X_f \]
-Then the network interpolates the feature maps $ X_f $ 3 times using interpolation and gated convolution layers to inference the normal map $ N $. Meanwhile, the skip connections from UNet have been kept. Thus the feature maps $ X_{df_1, df_2, ...} $ of each down-sampling time in the regression model $ v $ are considered in the upsamling part.
+Then the network interpolates the feature maps $ X_f $ 3 times using interpolation and gated convolution layers to inference the normal map $ N $. Meanwhile, the skip connections fuse the high resolution features $ X_{df_1, df_2, ...} $ from the downsampling part during the upsamplings. The upsampling is represented as a regression function $ n $:
 \[ n: X_f, X_{df_1, df_2, ...} \rightarrow N \]
 
 With the help of an extra image-light encoder, the network gained more information of the object surface, which is supposed to predict the surface normal more accurate. In this scenario, the output is still the surface normal, thus the training loss can be the same as GCNN model.
 
+
+\begin{sidewaysfigure}[th]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
+	\caption{The architecture of TriGNet}
+	\label{fig:VIL-Net}
+\end{sidewaysfigure}
 
 
 \subsection{An3 Net}
 The first branch (shown above) takes a light map introduced in \ref{sec:lightmap} as the input, the structure is the same as GCNN architecture except that the last two standard convolution layers, the skip connections are kept to connect the 3 down/up samplings. 
 The second branch (shown below) takes image as the input, the structure is the same as the first branch other than the input image is 1 channel but not 3 channels. 
 The third branch takes the 3D vertex map as the input. The structure is based on GCNN architecture. However, in order to merge the other two branches, the vertex branch equips 4 times fusions in the up sampling part. Specifically, the first fusion locates immediately after the last gconv layer of the last down sampling, the second fusion after the second gconv layer of first up sampling, the third fusion after the second gconv layer of second up sampling, the fourth fusion after the second gconv layer of the third up sampling. Each fusion follows by an interpolation layer, a gconv layer to reduce the channel back to 32, a skip connection concatenate layer and another gconv layer to reduce the channel back to 32. After the fourth fusion, a gconv layer used for channel reduction, 2 standard conv layer for output prediction.
-
-\begin{sidewaysfigure}[th]
-	\centering
-	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
-	\caption{The architecture of TriGNet}
-	\label{fig:albedo-gated-archi}
-\end{sidewaysfigure}
-
-
-\subsection{Loss Function}
-For the case of normal output, the loss function is the same as Mask-L2 loss as introduced in \ref{par:maskl2}. For the case of the product of albedo and normal, the loss function utilized a scaled Mask-L2 loss, which gives the range of inliers between $ [0,255] $. 
-
 
 
 \end{document}
