@@ -51,7 +51,7 @@ def avg_angle_between_tensor(v1, v2):
     radian_diff = radian_between_tensor(v1, v2)
     deg_diff = torch.rad2deg(radian_diff)
     avg_angle = deg_diff.sum() / deg_diff.size()[0]
-    return avg_angle.to("cpu")
+    return avg_angle
 
 
 def vertex2light_direction(vertex_map, light_sorce):
