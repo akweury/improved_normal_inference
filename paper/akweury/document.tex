@@ -400,9 +400,12 @@ With the help of an extra image-light encoder, the network gained more informati
 
 \subsection{TriG-Net}
 
+We propose a light and image guided network called Triple-pipe-gated-Network (Trip-Net), which employs the GCNN architecture three times to accomplish the normal inference task. The architecture is shown in Figure \ref{fig:Trig-Net}.
 
-Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). The structure is basically derived from GCNN model as mentioned in \ref{sec:gcnn}, which is shown in Figure 
-\ref{fig:VIL-Net}.
+The network has three pipes combined with one main pipe and two side pipes. Each pipe deals with different task. The main pipe deals with the geometry information, which takes the vertex map as the input and used to predict the surface normal. The light map is a side pipe which take light map as input and extract the light feature then forward the features to the main pipe as a supplementary information for the main pipe. The image pipe takes the image as the input and extracts the image features then forward the features to the main pipe as well. The supplementary pipes provide the illumination information which helps the main pipe to refine the inferred normals.
+\subsubsection{Side-Pipe(Light)}
+The task of light pipe in the network is to predict the light feature from the phtometric information using the light direction in the scene, which is calculated from the point cloud and the light position. The light map also inherits the noise from the point cloud, which lead to a semi-dense input map. Therefore this side pipe utilizes gated convolution layers for feature map extraction. The input vertex map is downsampled three times in this part. Each downsampling utilizes three gated layers, the first two layers have stride (1,1) and the third one has stride (2,2) to reduce the feature scale. 
+In the upsampling part, the network also has three times upsampling as a symmetric design. In each upsampling, it first uses nearest neighbor interpolation algorithms to expend the feature map size. Then it concatenates the corresponding feature map from the downsampling part. In the last, the feature map goes through a gated convolution layer to reduce the channel size. In the upsampling part, 
 
 As mentioned in the name, the \textbf{VIL}-Net utilizes \textbf{V}ertex map, \textbf{L}ight map and \textbf{I}mage map to accomplish the normal inference task. 
 
@@ -431,7 +434,7 @@ The third branch takes the 3D vertex map as the input. The structure is based on
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
 	\caption{The architecture of Trig-Net}
-	\label{fig:VIL-Net}
+	\label{fig:Trig-Net}
 \end{sidewaysfigure}
 
 
