@@ -112,12 +112,12 @@ def get_model(args):
         import workspace.ng.network as ng
 
         model = ng.CNN(args.num_channels)
-    elif args.exp == "resng":
-        import workspace.resng.network as resng
+    elif args.exp == "vertex":
+        import workspace.vertex.network as resng
         model = resng.CNN(args.num_channels)
     elif args.exp == "light":
         import workspace.light.network as light
-        model = light.CNN(args.num_channels, args.lightNum)
+        model = light.CNN(args.num_channels, args.lightNum, args.net_type)
     elif args.exp == "fugrc":
         import workspace.fugrc.network as fugrc
         model = fugrc.CNN(args.num_channels)

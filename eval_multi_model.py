@@ -190,8 +190,8 @@ if __name__ == '__main__':
         "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
         # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        # "s-window": config.ws_path / "resng" / "trained_model" / "64" / "checkpoint.pth.tar",
-        "GCNN": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "s-window": config.ws_path / "vertex" / "trained_model" / "64" / "checkpoint.pth.tar",
+        "GCNN": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

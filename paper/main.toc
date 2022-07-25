@@ -7,96 +7,110 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Acknowledgements}{ix}{section*.3}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.14}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.12}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.16}%
+\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.14}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{ Structured Point Cloud Based}{3}{section*.17}%
+\contentsline {paragraph}{ Structured Point Cloud Based}{3}{section*.15}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Unstructured Point Cloud Based}{3}{section*.18}%
+\contentsline {paragraph}{Unstructured Point Cloud Based}{3}{section*.16}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Depth Based}{3}{section*.19}%
+\contentsline {paragraph}{Depth Based}{3}{section*.17}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{RGB based}{4}{section*.20}%
+\contentsline {paragraph}{RGB based}{4}{section*.18}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{RGB-D based}{4}{section*.21}%
+\contentsline {paragraph}{RGB-D based}{4}{section*.19}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Approaches}{5}{chapter.22}%
+\contentsline {chapter}{\numberline {3}Approaches}{5}{chapter.20}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Neighbor based surface normal estimation}{5}{section.23}%
+\contentsline {section}{\numberline {3.1}Geometry based normal estimation}{5}{section.21}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1.1}Approach}{5}{subsection.24}%
+\contentsline {subsection}{\numberline {3.1.1}Approach}{5}{subsection.22}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1.2}Evaluation}{6}{subsection.28}%
+\contentsline {subsection}{\numberline {3.1.2}Evaluation}{6}{subsection.27}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Gated Convolution neural network for surface normal estimation}{7}{section.32}%
+\contentsline {section}{\numberline {3.2}Photometric Stereo}{7}{section.31}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Gated Convolution}{8}{subsection.35}%
+\contentsline {subsection}{\numberline {3.2.1}Approaches}{7}{subsection.32}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.2}Architecture}{9}{subsection.38}%
+\contentsline {section}{\numberline {3.3}Gated Convolution neural network for surface normal estimation}{9}{section.35}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.3}Loss Function}{10}{subsection.40}%
+\contentsline {subsection}{\numberline {3.3.1}Gated Convolution}{10}{subsection.38}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L1 Loss}{10}{section*.41}%
+\contentsline {subsection}{\numberline {3.3.2}Architecture}{10}{subsection.41}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L2 Loss}{10}{section*.42}%
+\contentsline {subsection}{\numberline {3.3.3}Loss Function}{12}{subsection.43}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{10}{section*.43}%
+\contentsline {paragraph}{L1 Loss}{12}{section*.44}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Reversed Huber Loss}{11}{section*.45}%
+\contentsline {paragraph}{L2 Loss}{12}{section*.45}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Guided normal inference using GCNN}{12}{section.47}%
+\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{12}{section*.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Intrinsic image decomposition}{12}{subsection.48}%
+\contentsline {paragraph}{Reversed Huber Loss}{13}{section*.48}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Light Map}{13}{subsection.51}%
+\contentsline {section}{\numberline {3.4}Guided normal inference using GCNN}{13}{section.50}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.3}Light and image guided normal inference using GCNN}{13}{subsection.55}%
+\contentsline {subsection}{\numberline {3.4.1}Light Map}{13}{subsection.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.4}Loss Function}{14}{subsection.57}%
+\contentsline {subsection}{\numberline {3.4.2}VIL Net}{14}{subsection.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{17}{chapter.58}%
+\contentsline {subsection}{\numberline {3.4.3}TriG-Net}{14}{subsection.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{17}{section.59}%
+\contentsline {subsubsection}{Side-Pipe(Light)}{15}{section*.57}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{17}{subsection.60}%
+\contentsline {subsubsection}{Side-Pipe(Image)}{15}{section*.58}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{17}{subsection.62}%
+\contentsline {subsubsection}{Main-Pipe(Vertex)}{15}{section*.59}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{19}{subsection.65}%
+\contentsline {subsection}{\numberline {3.4.4}Light and image guided normal inference using GCNN}{15}{subsection.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{20}{subsection.67}%
+\contentsline {subsection}{\numberline {3.4.5}Loss Function}{16}{subsection.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Noise}{21}{subsection.70}%
+\contentsline {chapter}{\numberline {4}Dataset}{21}{chapter.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{21}{subsection.72}%
+\contentsline {section}{\numberline {4.1}Synthetic Dataset}{21}{section.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{23}{chapter.74}%
+\contentsline {subsection}{\numberline {4.1.1}Resource}{21}{subsection.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Surface Normal Inference based on Depth Map}{23}{section.75}%
+\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{21}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.1}Qualitative Evaluation}{23}{subsection.76}%
+\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{23}{subsection.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.2}Quantitative Evaluation }{23}{subsection.80}%
+\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{24}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.1.3}Speed}{24}{subsection.82}%
+\contentsline {subsection}{\numberline {4.1.5}Noise}{25}{subsection.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Guided Gated Convolution Neural Network for Normal Inference }{24}{section.83}%
+\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{25}{subsection.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.2.1}Light Net Evaluation}{24}{subsection.84}%
+\contentsline {chapter}{\numberline {5}Experiments}{27}{chapter.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.2.2}Vertex-Image-Light Net (VIL Net) Evaluation}{25}{subsection.87}%
+\contentsline {section}{\numberline {5.1}GCNN model evaluation}{27}{section.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{title}{26}{section*.88}%
+\contentsline {section}{\numberline {5.2}Surface Normal Inference based on Depth Map}{27}{section.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.2.3}comparison}{26}{subsection.91}%
+\contentsline {subsection}{\numberline {5.2.1}Qualitative Evaluation}{28}{subsection.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{29}{chapter.95}%
+\contentsline {subsection}{\numberline {5.2.2}Quantitative Evaluation }{28}{subsection.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{31}{appendix.96}%
+\contentsline {subsection}{\numberline {5.2.3}Speed}{29}{subsection.90}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{31}{section.97}%
+\contentsline {section}{\numberline {5.3}Guided Gated Convolution Neural Network for Normal Inference }{29}{section.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{31}{section.101}%
+\contentsline {subsection}{\numberline {5.3.1}Light Net Evaluation}{29}{subsection.92}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{35}{appendix*.102}%
+\contentsline {subsection}{\numberline {5.3.2}Vertex-Image-Light Net (VIL Net) Evaluation}{30}{subsection.95}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{title}{30}{section*.96}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.3.3}comparison}{31}{subsection.99}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}Conclusion}{35}{chapter.103}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Dataset}{37}{appendix.104}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}Dataset}{37}{section.105}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}How do I change the colors of links?}{37}{section.109}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{41}{appendix*.110}%

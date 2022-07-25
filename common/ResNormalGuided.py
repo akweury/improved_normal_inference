@@ -30,7 +30,7 @@ class GConv(_ConvNd):
 class NormalGuided(nn.Module):
     def __init__(self, in_ch, out_ch, c_num):
         super().__init__()
-        # self.__name__ = 'resng'
+        # self.__name__ = 'vertex'
         kernel_down = (3, 3)
         kernel_up = (3, 3)
         padding_down = (1, 1)

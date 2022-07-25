@@ -426,7 +426,8 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
 
-        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-l1-3-12-1000-3.pth.tar",
+        "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
+        "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
         # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
@@ -436,8 +437,8 @@ if __name__ == '__main__':
         # "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",
         # "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
-        # "GCNN3-32-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
-        # "GCNN3-64-512": config.ws_path / "resng" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
+        # "GCNN3-32-512": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        # "GCNN3-64-512": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
 
         # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",

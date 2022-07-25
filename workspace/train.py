@@ -384,11 +384,11 @@ def train_epoch(nn_model, epoch, eval_loss_best):
                 raise ValueError
 
             light_num = nn_model.args.lightNum
-            nn_model.light_loss = loss_utils.weighted_unit_vector_loss(out[:, g_l:g_r, :, :],
-                                                                       target[:, 3 + light_num:, :, :],
-                                                                       nn_model.args.penalty,
-                                                                       epoch,
-                                                                       nn_model.args.loss_type)
+            nn_model.light_loss = loss_utils.weighted_unit_vector_huber_loss(out[:, g_l:g_r, :, :],
+                                                                             target[:, 3 + light_num:, :, :],
+                                                                             nn_model.args.penalty,
+                                                                             epoch,
+                                                                             nn_model.args.loss_type)
             loss += nn_model.light_loss
 
             # for plot purpose
@@ -559,7 +559,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         # output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
-    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn", "vil10", "an3", "an"]:
+    elif exp_name in ["vi5", "vertex", "i5", "an2", "nnnn", "vil10", "an3", "an"]:
         x_out_normal[mask] = 0
         x_out_normal[x_out_normal > 1] = 1
         x_out_normal[x_out_normal < -1] = -1

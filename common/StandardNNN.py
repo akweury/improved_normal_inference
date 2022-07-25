@@ -15,7 +15,6 @@ output: normal  (3,512,512)
 class NormalNN(nn.Module):
     def __init__(self, in_ch, out_ch, ch_size):
         super().__init__()
-        self.__name__ = 'NormalNN'
         kernel_down = (3, 3)
         kernel_up = (3, 3)
         padding_down = (1, 1)
@@ -39,8 +38,8 @@ class NormalNN(nn.Module):
         self.uconv2 = Conv(channel_size_2, channel_size_1, kernel_up, stride, padding_up, active_function="LeakyReLU")
         self.uconv3 = Conv(channel_size_2, channel_size_1, kernel_up, stride, padding_up, active_function="LeakyReLU")
 
-        self.conv1 = Conv(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0), active_function="LeakyReLU")
-        self.conv2 = Conv(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv1 = nn.Conv2d(channel_size_1, out_ch, (1, 1), (1, 1), (0, 0))
+        self.conv2 = nn.Conv2d(out_ch, out_ch, (1, 1), (1, 1), (0, 0))
 
     def forward(self, x0):
         x1 = self.dconv1(x0)

@@ -986,6 +986,7 @@ def eval_albedo_tensor(output, target):
 
 
 def angle2rgb(angle_matrix):
+    angle_matrix[0, 0] = 90
     angle_matrix_8bit = cv.normalize(angle_matrix, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
     return cv.applyColorMap(angle_matrix_8bit, cv.COLORMAP_HOT)
 
