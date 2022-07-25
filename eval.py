@@ -87,14 +87,16 @@ if __name__ == '__main__':
 
     models = {
         # test
-        "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-236.pth.tar",
-        "vil-8-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-239.pth.tar",
-        "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-243.pth.tar",
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-208.pth.tar",
+        # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-469.pth.tar",
+        # "vil-8-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-779.pth.tar",
+        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-170.pth.tar",
+        # "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
 
         # record
-        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-l1-3-12-1000.pth.tar",
-        # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-        # "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
+        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
+        "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
+        "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
         # "SVD": None,
 
     }

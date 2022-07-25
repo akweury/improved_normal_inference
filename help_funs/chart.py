@@ -72,7 +72,7 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
         plt.yscale('log')
 
     plt.legend()
-
+    plt.figure(figsize=(10, 10 * 0.618))
     if not os.path.exists(str(path)):
         os.mkdir(path)
     plt.savefig(

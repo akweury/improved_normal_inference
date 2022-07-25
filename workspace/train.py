@@ -306,11 +306,7 @@ def train_epoch(nn_model, epoch, eval_loss_best):
         # Compute the loss
 
         if nn_model.args.normal_loss:
-            if nn_model.args.exp == "an":
-                a = out.detach().clone()
-                normal_out = a / (torch.linalg.norm(a, dim=1, keepdim=True, ord=2) + 1e-20)
-            else:
-                normal_out = out[:, :3, :, :]
+            normal_out = out[:, :3, :, :]
 
             nn_model.normal_loss = loss_utils.weighted_unit_vector_loss(normal_out,
                                                                         target[:, :3, :, :],
@@ -324,11 +320,7 @@ def train_epoch(nn_model, epoch, eval_loss_best):
             loss_total += normal_loss_total
 
         if nn_model.args.normal_huber_loss:
-            if nn_model.args.exp == "an":
-                a = out.detach().clone()
-                normal_out = a / (torch.linalg.norm(a, dim=1, keepdim=True, ord=2) + 1e-20)
-            else:
-                normal_out = out[:, :3, :, :]
+            normal_out = out[:, :3, :, :]
 
             nn_model.normal_loss = loss_utils.weighted_unit_vector_huber_loss(normal_out,
                                                                               target[:, :3, :, :],
@@ -567,7 +559,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         # output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
-    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn", "vil10", "an3"]:
+    elif exp_name in ["vi5", "resng", "i5", "an2", "nnnn", "vil10", "an3", "an"]:
         x_out_normal[mask] = 0
         x_out_normal[x_out_normal > 1] = 1
         x_out_normal[x_out_normal < -1] = -1
@@ -594,7 +586,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         x_out_normal[mask] = 0
         output_list.append(mu.visual_normal(x_out_normal, "pred"))
         output_list.append(mu.visual_diff(gt, x_out_normal, "angle"))
-    elif exp_name == "an":
+    elif exp_name == "an4":
         # g
         g_out = xout[0, 0:3, :, :].permute(1, 2, 0).to('cpu').numpy()
         g_out[mask] = 0
