@@ -133,17 +133,18 @@ srun \
 
 
     srun \
-      --job-name="INI-light-128-huber-full" \
+      --job-name="INI-light-cnn-8-1000" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
-      --mem=42G \
-      --cpus-per-gpu=6 \
+      --mem=30G \
+      --cpus-per-gpu=4 \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 128 --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-20_16_03_36/checkpoint-77.pth.tar
+      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
+
 
 
 ```

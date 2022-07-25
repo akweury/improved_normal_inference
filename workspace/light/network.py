@@ -4,7 +4,7 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 
 import torch.nn as nn
-from common.NormalizedNNN import GCNN
+from common.NormalizedNNN import GCNN, GCNN_NOC
 from common.StandardNNN import NormalNN
 
 
@@ -19,6 +19,8 @@ class CNN(nn.Module):
             self.light3_3 = GCNN(3, 3, c_num)
         elif net_type == "cnn":
             self.light3_3 = NormalNN(3, 3, c_num)
+        elif net_type == "gcnn_noc":
+            self.light3_3 = GCNN_NOC(3, 3, c_num)
 
     def forward(self, x):
         # general surface training

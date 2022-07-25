@@ -28,16 +28,4 @@ real_data_dfki = Path("/datasets/sha/data_real")
 
 # pretrained model
 
-light_3_32 = ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar"
-# light_3_32 = ws_path / "light" / "trained_model" / "512" / "checkpoint-1708.pth.tar"
-
-gcnn_model_64 = ws_path / "nnnn" / "trained_model" / "64" / "checkpoint.pth.tar"
-gcnn_model_128 = ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar"
-gcnn_model_256 = ws_path / "nnnn" / "trained_model" / "256" / "checkpoint.pth.tar"
-gcnn_model_512 = ws_path / "nnnn" / "trained_model" / "512" / "checkpoint.pth.tar"
-gcnn_3_32 = ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-32.pth.tar"
-
-resng_model_64 = ws_path / "vertex" / "trained_model" / "64" / "checkpoint.pth.tar"
-resng_model_128 = ws_path / "vertex" / "trained_model" / "128" / "checkpoint.pth.tar"
-resng_model_256 = ws_path / "vertex" / "trained_model" / "256" / "checkpoint.pth.tar"
-resng_model_512 = ws_path / "vertex" / "trained_model" / "512" / "checkpoint.pth.tar"
+light_c64 = paper_exp / "light" / "checkpoint-640.pth.tar"

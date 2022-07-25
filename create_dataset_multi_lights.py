@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
-parser.add_argument('--data', type=str, default="synthetic512",
+parser.add_argument('--data', type=str, default="synthetic128",
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0",
                     help="loading dataset from local or dfki machine")
@@ -170,7 +170,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["test", "selval", "train"]:
+    for folder in ["selval"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
