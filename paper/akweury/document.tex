@@ -39,9 +39,11 @@ The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \
 
 
 \section{GCNN model evaluation}
-The GCNN model is the base model of the whole thesis. In this section, we first discuss the noise filter performance of the model and then evaluate the performance on normal inference.
+The GCNN model is the base model of the whole thesis. In this section, we first evaluate the inpainting performance of the model based on light map input. Then we use the same model for normal inference task.
 
-\subsection{Noise Filter Result}
+
+\subsection{Light Inpainting}
+The light inpainting task in this section in order to evaluate the noise inpainting performance of GCNN model. It takes semi-dense light map as input to predict the fully dense light map, as shown in Figure \ref{fig:light-net-archi}.
 
 \begin{figure}[th]
 	\centering
@@ -66,12 +68,12 @@ The GCNN model is the base model of the whole thesis. In this section, we first 
 		
 		
 		\node[inner sep=0pt] (input) at (\vdist*\disttimes-6,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light_input.png}};
+		{\includegraphics[width=.2\textwidth]{./Figures/gcnn-synthetic/intrinsic_image_light_input.png}};
 		\node[text width=3.5cm] at (\vdist*\disttimes-6,\yschift-2.4) {Semi-dense Light Map};
 		
 		\node[inner sep=0pt] (output) at (\vdist*\disttimes+3,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/intrinsic_image_light.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {Semi-dense Light Map};
+		{\includegraphics[width=.2\textwidth]{./Figures/gcnn-synthetic/intrinsic_image_light.png}};
+		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {fully-dense Light Map};
 		
 		\draw [-stealth] (\vdist*\disttimes-4.5,\yschift-1) -- (\vdist*\disttimes-3.5,\yschift-1);
 		\draw [-stealth] (\vdist*\disttimes,\yschift-1) -- (\vdist*\disttimes+1,\yschift-1);
@@ -83,15 +85,39 @@ The GCNN model is the base model of the whole thesis. In this section, we first 
 		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
 		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
 		
-		\node[text width=3.5cm] at (\vdist*\disttimes,\yschift-1) {Light Net};
+		\node[text width=3.5cm] at (\vdist*\disttimes+0.3,\yschift-1) {GCNN};
 	\end{tikzpicture}
-	\caption{Light Net for light inpainting based on GCNN architecture.}
+	\caption{Light map inpainting based on GCNN architecture.}
 	\label{fig:light-net-archi}
 \end{figure}
 
+The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting}
 
 
-
+\begin{table}[th]
+	
+	\centering
+	\begin{tabular}{l l l l l l l l }
+		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df} & \tabhead{l/i. Nr.} & over-perform\\
+		LightNet  & 0.17  & 4.72 & &  & & & \\ 
+		\hline
+		GCNN  & 10.57 & 5.25 & 8 & 200,1600 & 0.5 & 0 & - \\
+		\hline
+		an3 & 10.46 & 64.86 & 8 & 3,12,1000  & 0.5 & 1 & yes\\
+		\hline
+		an3 & 10.81 & 65.34 & 8 & 10,1000  & 0.5 & 1 & no(yes) \\
+		\hline
+		VIL-1 & 10.50 & 31.57 & 8 & 10,1000 & 0.5 & 1 & yes \\
+		\hline
+		VIL-1 & 10.82 & 32.61 & 8 & 3,12,1000 & 0.5 & 1 & no(yes) \\
+		\hline
+		VIL-3  & 10.79 & 54.76 & 8 & 100,1000 & 0.1 & 3 & no(yes) \\
+		\hline
+		VIL-10  & 11.10 & 132.32 & 8 & 100,1000 & 0.1 &10 & no(yes)\\
+	\end{tabular}
+	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
+	\label{tab:light-inpainting}
+\end{table}
 
 
 %% nnnn exp

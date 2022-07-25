@@ -105,7 +105,7 @@ def get_model(args):
     elif args.exp == "nnnn":
         import workspace.nnnn.network as nnnn
 
-        model = nnnn.CNN(args.num_channels)
+        model = nnnn.CNN(args.num_channels, args.net_type)
     # elif args.exp == "nnn24":
     #     model = nnn24.CNN()
     elif args.exp == "ng":

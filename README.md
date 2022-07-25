@@ -133,9 +133,9 @@ srun \
 
 
     srun \
-      --job-name="INI-light-cnn-8-1000" \
+      --job-name="INI-light-gcnn-noc-8-1000" \
       --time=7-00:00 \
-      -p RTX3090 \
+      -p RTX2080Ti \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=30G \
