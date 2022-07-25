@@ -54,6 +54,8 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
                   x_label=None, y_label=None, show=False, log_y=False, cla_leg=False):
     if data_x.shape[1] <= 1:
         return
+
+    plt.figure(figsize=(10, 6))
     for i, row in enumerate(data_x):
         b, a = np.polyfit(data_x[i], data_y[i], deg=1)
         plt.scatter(data_x[i], data_y[i], label=labels[i])
@@ -72,7 +74,8 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
         plt.yscale('log')
 
     plt.legend()
-    plt.figure(figsize=(10, 10 * 0.618))
+
+    # plt.figure(figsize=(1000, 1000 * 0.618))
     if not os.path.exists(str(path)):
         os.mkdir(path)
     plt.savefig(

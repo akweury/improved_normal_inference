@@ -51,6 +51,7 @@ def avg_angle_between_tensor(v1, v2):
     radian_diff = radian_between_tensor(v1, v2)
     deg_diff = torch.rad2deg(radian_diff)
     avg_angle = deg_diff.sum() / deg_diff.size()[0]
+    avg_angle[avg_angle > 90] = 180 - avg_angle[avg_angle > 90]
     return avg_angle
 
 
@@ -563,7 +564,7 @@ def depth2normal(depth, mask, cam_pos, k_idx, K, R, t):
 
 
 # -------------------------------------- openCV Utils ------------------------------------------
-def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255)):
+def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255), thickness=1):
     h, w = img.shape[:2]
     if pos == 'upper_left':
         position = (10, 50)
@@ -578,7 +579,7 @@ def addText(img, text, pos='upper_left', font_size=1.6, color=(255, 255, 255)):
 
     cv.putText(img, text=text, org=position,
                fontFace=cv.FONT_HERSHEY_SIMPLEX, fontScale=font_size, color=color,
-               thickness=1, lineType=cv.LINE_AA)
+               thickness=thickness, lineType=cv.LINE_AA)
 
 
 # https://docs.opencv.org/4.x/d1/db7/tutorial_py_histogram_begins.html
@@ -1175,8 +1176,8 @@ def visual_diff(gt, out, eval_type):
     else:
         raise ValueError
 
-    addText(diff_img, "Error")
-    addText(diff_img, f"error: {diff_avg}", pos="upper_right", font_size=0.65)
+    # addText(diff_img, "Error")
+    addText(diff_img, f"err: {diff_avg:.2f}", pos="upper_right", font_size=1, thickness=2)
 
     return diff_img
 

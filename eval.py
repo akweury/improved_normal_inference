@@ -92,12 +92,13 @@ if __name__ == '__main__':
         # "vil-8-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-779.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-170.pth.tar",
         # "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
+        "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-1099.pth.tar",
 
         # record
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
-        "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-        "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
-        # "SVD": None,
+        # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
+        # "GCNN-3-12-1000": config.paper_exp / "gcnn" / "checkpoint-3-12-1000.pth.tar",
+        "SVD": None,
 
     }
     test_folder = config.synthetic_data_noise_local / "synthetic128"

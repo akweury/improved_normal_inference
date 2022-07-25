@@ -205,8 +205,8 @@ def start2(models_path_dict):
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         scaleProd_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-        light_gt = gt_tensor[:, 5:8, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-        light_input = test_0_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        light_gt = gt_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        light_input = test_0_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         vertex_0 = test_0_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         img_0 = test_0_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
@@ -424,15 +424,15 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        "SVD": None,
+        # "SVD": None,
 
-        "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
-        "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
+        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
+        # "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
         # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "light": config.ws_path / "light" / "trained_model" / "512" / "checkpoint.pth.tar",  # image guided
+        # "light": config.paper_exp / "light" / "checkpoint-640.pth.tar",  # image guided
         # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
         # "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",

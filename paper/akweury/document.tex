@@ -91,43 +91,44 @@ The light inpainting task in this section in order to evaluate the noise inpaint
 	\label{fig:light-net-archi}
 \end{figure}
 
-The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting}
-
-
+The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting} In order to show the performance of the model in a better way, we use two extra model as the comparison. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network. 
+%% TODO: add the experiment result and analysis.
 \begin{table}[th]
 	
 	\centering
-	\begin{tabular}{l l l l l l l l }
-		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df} & \tabhead{l/i. Nr.} & over-perform\\
-		LightNet  & 0.17  & 4.72 & &  & & & \\ 
+	\begin{tabular}{l l l l l l }
+		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df}\\
+		GCNN  & 0.17  & 4.72 & 8 & 8,1000 & 0.5\\ 
 		\hline
-		GCNN  & 10.57 & 5.25 & 8 & 200,1600 & 0.5 & 0 & - \\
+		GCNN-NOC  &  &  & 8 & 8,1000 & 0.5\\
 		\hline
-		an3 & 10.46 & 64.86 & 8 & 3,12,1000  & 0.5 & 1 & yes\\
-		\hline
-		an3 & 10.81 & 65.34 & 8 & 10,1000  & 0.5 & 1 & no(yes) \\
-		\hline
-		VIL-1 & 10.50 & 31.57 & 8 & 10,1000 & 0.5 & 1 & yes \\
-		\hline
-		VIL-1 & 10.82 & 32.61 & 8 & 3,12,1000 & 0.5 & 1 & no(yes) \\
-		\hline
-		VIL-3  & 10.79 & 54.76 & 8 & 100,1000 & 0.1 & 3 & no(yes) \\
-		\hline
-		VIL-10  & 11.10 & 132.32 & 8 & 100,1000 & 0.1 &10 & no(yes)\\
+		CNN & & & & 8,1000 & 0.5\\
 	\end{tabular}
-	\caption{The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
+	\caption{The inpainting performance of the GCNN model for light map inpainting. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
 	\label{tab:light-inpainting}
 \end{table}
 
 
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_img.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_input.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_gt.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_light.png}
+	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_error_light.png}
+	\caption{GCNN Normal Inference for light map inpainting based on dragon object. From left to right, grayscale image, semi-dense light map(input), ground-truth light map, predicted light map, the angle error of the predicted light map.}
+	\label{fig:gcnn-eval-synthetic}
+\end{figure}
+
+
+
+
+
+\newpage
 %% nnnn exp
-\section{Surface Normal Inference based on Depth Map}
-The goal of surface normal inference is to calculate the tangent surface normal map $ N $ from a single depth map $ D $. A network named Gated Convolution Neural Network (GCNN) ( \ref{gcnn}) is trained and is compared with similar approaches. We evaluate the performance of the model in dataset ``synthetic50-5" introduced in  \ref{ch:04} including 5K depth maps with size  $ 512\times512\times3 $ for training. All the depth maps add simulated noise as introduced in \ref{sec:noise}. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, penalty-l2 loss. The output is directly the tangent normal in range $ \left[-1,1\right] $. The output and input has the same shape. 
+\subsection{Surface Normal Inference based on GCNN}
 
-\subsection{Qualitative Evaluation}
 
-The evaluation visualization on test dataset is shown in Figure \ref{fig:gcnn-eval-synthetic}. As shown in the picture, GCNN model 
-Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
 \begin{figure}[th]
 	\centering
 	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_point_cloud_noise.png}
@@ -173,6 +174,13 @@ Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the d
 \end{figure}
 
 
+We evaluate the performance of the normal inference task based on a single GCNN architecture. The model is trained on 3000 images from "synthetic50-5" dataset. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
+
+The model takes a single vertex map as input and predict the corresponding normal map in the output. A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval-synthetic} and Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the neighbor based approach based on SVD optimization is considered as a base line. The GCNN based approach has apparently better performance than SVD based approach, which get rid of the trace of the noise in the input vertex map. Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
+ As shown in the figure, the area of beard of the dragon and its neck are on the different surface, which can be easily seen on GCNN result, whereas the SVD based approach is confused and get a very randomly surface normal.
+
+
+
 
 The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-eval-real}
 \begin{figure}[th]
@@ -198,15 +206,7 @@ The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-ev
 \end{figure}
 
 
-
-\subsection{Quantitative Evaluation }
-
-
-
-
-
-The evaluation result on test scenes is shown in Figure \ref{fig:scatter-gcnn}.
-The GCNN based method has angle error between 5 to 15 degrees in both type of inputs. The error trends to higher with point number decrease. It is because the less points in the point cloud, the more detail is hided due to the insufficient of resolution. Therefore the recorded surface based on the point cloud is more coarse, which also increase the difficulty of the normal inference.
+We evaluate the GCNN model on 100 test images as a quantitative evaluation. The result is shown in Figure \ref{fig:scatter-gcnn}. The GCNN based method has angle error between 5 to 15 degrees in both type of inputs. The error trends to higher when point number decreases. It is because the less points in the point cloud, the more detail is hided due to the insufficient of resolution. Therefore the recorded surface based on the point cloud is more coarse, which also increase the difficulty of the normal inference.
 
 \begin{figure}[h!]
 	\centering
@@ -217,13 +217,7 @@ The GCNN based method has angle error between 5 to 15 degrees in both type of in
 \end{figure}
 
 
-
-
-\subsection{Speed}
-
-
-
-
+\newpage
 \section{Guided Gated Convolution Neural Network for Normal Inference }
 
 \subsection{Light Net Evaluation}
