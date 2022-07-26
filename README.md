@@ -133,7 +133,7 @@ srun \
 
 
     srun \
-      --job-name="INI-light-gcnn-noc-8-1000" \
+      --job-name="INI-light-gcnn-8-1000" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \

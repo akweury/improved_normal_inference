@@ -311,7 +311,7 @@ def start2(models_path_dict):
 
                         eval_res[model_idx, i] = diff
 
-                    elif args.exp == "an":
+                    elif args.exp == "an4":
                         g_out = xout[:, :, 0:3]
                         g_out[mask] = 0
                         mask_tensor = torch.prod(gt_tensor == 0, dim=1, keepdim=True).bool()
@@ -425,9 +425,23 @@ if __name__ == '__main__':
 
     models = {
         # "SVD": None,
+        # "an-8-1000": config.paper_exp / "an" / "checkpoint-239.pth.tar",
+        # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-692.pth.tar",
+        # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1599.pth.tar",
+        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-209.pth.tar",
 
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+
+        # record
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
+        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
+        # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
+        # "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
         # "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
+
         # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
         # "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",

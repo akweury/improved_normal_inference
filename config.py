@@ -29,3 +29,9 @@ real_data_dfki = Path("/datasets/sha/data_real")
 # pretrained model
 
 light_c64 = paper_exp / "light" / "checkpoint-640.pth.tar"
+light_noc = paper_exp / "light" / "checkpoint-noc-499.pth.tar"
+light_cnn = paper_exp / "light" / "checkpoint-cnn-599.pth.tar"
+
+gcnn_cnn = paper_exp / "gcnn" / "checkpoint-cnn-473.pth.tar"
+gcnn_noc = paper_exp / "gcnn" / "checkpoint-noc-619.pth.tar"
+gcnn_gcnn = paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar"

@@ -85,7 +85,7 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
 
             if "light" in name:
                 light_output = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-                light_gt = target[:, 5:8, :, :].permute(0, 2, 3, 1).squeeze(0)
+                light_gt = target[:, 13:16, :, :].permute(0, 2, 3, 1).squeeze(0)
                 diff = mu.avg_angle_between_tensor(light_output[mask], light_gt[mask]).to("cpu").detach().numpy()
             else:
 

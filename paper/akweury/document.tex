@@ -91,20 +91,20 @@ The light inpainting task in this section in order to evaluate the noise inpaint
 	\label{fig:light-net-archi}
 \end{figure}
 
-The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting} In order to show the performance of the model in a better way, we use two extra model as the comparison. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network. 
+The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting} In order to show the performance of the model in a better way, we use two extra model as the comparison. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network. All the models are tested on a laptop with a single NVIDIA GeForce 940MX, 2GB memory.
 %% TODO: add the experiment result and analysis.
 \begin{table}[th]
 	
 	\centering
 	\begin{tabular}{l l l l l l }
 		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df}\\
-		GCNN  & 0.17  & 4.72 & 8 & 8,1000 & 0.5\\ 
+		U-GCNN  & 0.59  & 14.45 & 8 & 8,1000 & 0.5\\ 
 		\hline
-		GCNN-NOC  &  &  & 8 & 8,1000 & 0.5\\
+		U-GCNN-NOC & 1.31 & 16.14 & 8 & 8,1000 & 0.5\\
 		\hline
-		CNN & & & & 8,1000 & 0.5\\
+		U-CNN & 4.10 & 10.52 & 8 & 8,1000 & 0.5\\
 	\end{tabular}
-	\caption{The inpainting performance of the GCNN model for light map inpainting. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
+	\caption{The performance of the GCNN model for light map inpainting. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
 	\label{tab:light-inpainting}
 \end{table}
 
