@@ -1,5 +1,4 @@
 \documentclass[border=15pt, multi, tikz]{article}
-\usepackage{amssymb}
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
 \addbibresource{example.bib} % The filename of the bibliography
@@ -35,7 +34,8 @@
 
 \begin{document}
 	
-The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. The input matrix has $ 128\times 128 $ height and width. Each vertex map has dimension $ 128\times 128\times3 $, light map has $ 128\times 128 \times 3 $, image has dimension $ 128\times 128 \times 1 $. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090.
+The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. The input matrix has $ 128\times 128 $ height and width. Each vertex map has dimension $ 128\times 128\times3 $, light map has $ 128\times 128 \times 3 $, image has dimension $ 128\times 128 \times 1 $.  The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
+The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. 
 
 
 \section{GCNN model evaluation}
@@ -43,8 +43,10 @@ The GCNN model is the base model of the whole thesis. In this section, we first 
 
 
 \subsection{Light Inpainting}
-The light inpainting task in this section in order to evaluate the noise inpainting performance of GCNN model. It takes semi-dense light map as input to predict the fully dense light map, as shown in Figure \ref{fig:light-net-archi}.
+The light inpainting task in this section in order to evaluate the noise inpainting performance of GCNN model. It takes semi-dense light map as input to predict the fully dense light map, as shown in Figure \ref{fig:light-net-archi}. 
+The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. All the models are tested on a laptop with a single NVIDIA GeForce 940MX, 2GB memory.
 
+%% light eval model structure
 \begin{figure}[th]
 	\centering
 	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
@@ -91,9 +93,11 @@ The light inpainting task in this section in order to evaluate the noise inpaint
 	\label{fig:light-net-archi}
 \end{figure}
 
-The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. The result is shown in Table \ref{tab:light-inpainting} In order to show the performance of the model in a better way, we use two extra model as the comparison. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network. All the models are tested on a laptop with a single NVIDIA GeForce 940MX, 2GB memory.
-%% TODO: add the experiment result and analysis.
-\begin{table}[th]
+The result is shown in Table \ref{tab:light-inpainting}. Besides the GCNN model, we use two extra model as the comparisons. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network.
+The GCNN architecture achieves the average angle error lower than 1 degree. As a comparison, U-CNN model has 4 degrees error, which shows the relative weakness of noise filter competence. Besides, the skip connection also booster the performance, since the no skip connection version still has error greater than 1 degree. The both two models for the inpainting task reveals the superiority of GCNN architecture. Figure \ref{fig:light-scatter} and \ref{fig:light-eval} gives a quantitative and qualitative evaluation.
+
+%% light eval table
+\begin{table}[H]
 	
 	\centering
 	\begin{tabular}{l l l l l l }
@@ -109,80 +113,179 @@ The network is trained on 3000 light maps in the "synthetic-50-5" dataset with i
 \end{table}
 
 
-\begin{figure}[th]
+%% light eval visualization
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_error_light.png}
-	\caption{GCNN Normal Inference for light map inpainting based on dragon object. From left to right, grayscale image, semi-dense light map(input), ground-truth light map, predicted light map, the angle error of the predicted light map.}
-	\label{fig:gcnn-eval-synthetic}
-\end{figure}
-
-
-
-
-
-\newpage
-%% nnnn exp
-\subsection{Surface Normal Inference based on GCNN}
-
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_point_cloud_noise.png}
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_groundtruth.png}
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_normal_GCNN3-32-512.png}
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_normal_SVD.png}
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_error_GCNN3-32-512.png}
-	\includegraphics[width=0.15\linewidth]{./Figures/comparison/fancy_eval_6_error_SVD.png}
-	\caption{GCNN Normal Inference on Synthetic Dataset (object: dragon) From left to right: Input vertex map, ground-truth, GCNN normal map, SVD normal map, GCNN error map, SVD error map}
-	\label{fig:gcnn-eval-synthetic}
-\end{figure}
-
-
-
-\begin{figure}[th]
-	\centering
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_input.png}
-		\caption{Input}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_img.png}
+		\caption{gray-scale image}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_GT.png}
-		\caption{GT}
+	\begin{subfigure}[b]{0.24\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_input.png}
+		\caption{Vertex(Input)}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_GCNN.png}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_gt.png}
+		\caption{ground-truth}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_light.png}
 		\caption{GCNN}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_normal_SVD.png}
-		\caption{SVD}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_light-cnn.png}
+	\caption{U-CNN}
+\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_light-noc.png}
+	\caption{U-GCNN-NOC}
+\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_error_light.png}
+	\caption{U-GCNN Error}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_error_GCNN.png}
-		\caption{}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_error_light-cnn.png}
+	\caption{U-CNN Error}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.15\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison/eval_2_error_SVD.png}
-		\caption{}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-light/fancy_eval_1_light_error_light-noc.png}
+	\caption{U-NOC Error}
 	\end{subfigure}
-	\caption{Zoom in of dragon object evaluation.}
-	\label{fig:gcnn-eval-synthetic-zoom-in}
+
+	\begin{tikzpicture}
+	\node[text width=0.1\textwidth] at (10,-1) {90};
+	\node[inner sep=0pt] (input) at (8,-1)
+	{\includegraphics[width=.2\textwidth]{./Figures/colorscale_hot-vertical.jpg}};
+	\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+
+	\caption{GCNN Normal Inference for light map inpainting based on dragon object. The degree error map is shown in last row. The average error is shown in the upper right corner in the error map.}
+	\label{fig:light-eval}
+\end{figure}
+
+%% light eval scatter
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{./Figures/gcnn-light/scatter-light.png}
+	\caption{GCNN for light map inpainting on 100 scenes. The evaluated models are corresponding to the table \ref{tab:light-inpainting}, the line in the figure is the corresponding regression line of each model.}
+	\label{fig:light-scatter}
 \end{figure}
 
 
-We evaluate the performance of the normal inference task based on a single GCNN architecture. The model is trained on 3000 images from "synthetic50-5" dataset. The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
 
-The model takes a single vertex map as input and predict the corresponding normal map in the output. A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval-synthetic} and Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the neighbor based approach based on SVD optimization is considered as a base line. The GCNN based approach has apparently better performance than SVD based approach, which get rid of the trace of the noise in the input vertex map. Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the hindhead area of the dragon object which provides a closer comparison with the ground-truth.
- As shown in the figure, the area of beard of the dragon and its neck are on the different surface, which can be easily seen on GCNN result, whereas the SVD based approach is confused and get a very randomly surface normal.
+
+%% nnnn exp
+\subsection{Surface Normal Inference}
+
+We evaluate geometry based approach for surface normal estimation using a pure GCNN architecture.  The input of the model is 3D vertex map whereas the output is directly the corresponding tangent surface normal map in range $ [-1,1] $. The training parameters are as same as light inpainting task mentioned above.
+
+A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval-synthetic} and Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, theb SVD approach is considered as a base line. The GCNN based approach has apparently better performance than SVD based approach, which completely get rid of the trace of the noise in the input vertex map. Figure \ref{fig:gcnn-eval-synthetic-zoom-in} zooms in the right leg area of the Washington statue object to give a closer comparison with the ground-truth.
+As shown in the figure, the GCNN method successfully predict the surface connection area between the lower hem of the gown and the stone chair, whereas the no skip version is blurry in the same area. The two surface is still distinguishable but the sharp details has been lost.  The CNN version has the skip connection thus gives a better detail than NOC version. However, if we compare the error map of U-GCNN and U-CNN in figure \ref{fig:gcnn-eval-synthetic}, the basement of the stone chair that Washington sit is actually a smooth flat stage, the U-GCNN shows an accurate predict, but the same area in U-CNN has an average higher error. The whole basement surface has a overall higher error. It holds also for the other smooth areas like the side of the stone chair, the gown and the upper body of the statue. It is because the noise of the input still disturb the CNN model and take the input noise into account for normal estimation which deviate to the correct surface normal. When we look back to the U-GCNN based method, we can found that the surface normal has better performance in the smooth area compare to the CNN approach and a sharp detail compare to the no skip connection version.
+
+
+%% gcnn-eval
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_groundtruth.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-CNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-NOC.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_SVD.png}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-GCNN.png}
+		\caption{U-GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-CNN.png}
+		\caption{U-CNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-NOC.png}
+		\caption{U-NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_SVD.png}
+	\caption{SVD}
+	\end{subfigure}
+	
+	\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (10,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+	
+	\caption{Surface Normal Inference based GCNN model on "Washington´´ object. The first row shows the estimated surface normal. The second row is the degree error map.}
+	\label{fig:gcnn-eval}
+\end{figure}
+
+%% fig:gcnn-eval-synthetic-zoom-in
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GT.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-NOC.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-CNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_SVD.png}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-GCNN.png}
+		\caption{GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-NOC.png}
+		\caption{NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-CNN.png}
+		\caption{CNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_SVD.png}
+	\caption{SVD}
+	\end{subfigure}
+
+	\caption{Zoom in of the center region of Washington object. The first row is surface normal, the second row is the corresponding errors.}
+	\label{fig:gcnn-eval-synthetic-zoom-in}
+\end{figure}
 
 
 
 
 The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-eval-real}
+%% fig:gcnn-eval-real
 \begin{figure}[th]
 	\centering
 	\begin{subfigure}[b]{0.24\linewidth}
@@ -206,19 +309,19 @@ The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-ev
 \end{figure}
 
 
-We evaluate the GCNN model on 100 test images as a quantitative evaluation. The result is shown in Figure \ref{fig:scatter-gcnn}. The GCNN based method has angle error between 5 to 15 degrees in both type of inputs. The error trends to higher when point number decreases. It is because the less points in the point cloud, the more detail is hided due to the insufficient of resolution. Therefore the recorded surface based on the point cloud is more coarse, which also increase the difficulty of the normal inference.
+We evaluate the U-GCNN model on 100 test images as a quantitative evaluation. The result is shown in Figure \ref{fig:scatter-gcnn}. The GCNN based method has average angle error around 10 degrees, whereas the no skip connection version has error above 12 degrees and the CNN version has error above 15 degrees.
 
+%% scatter_gcnn
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-no-noise.png}
-	\includegraphics[width=.4\textwidth]{./Figures/scatter-gcnn-noised.png}
-	\caption{Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf{Left} one using point cloud without noise, the \textbf{right} one has noise.}
+	\includegraphics[width=.8\textwidth]{./Figures/gcnn-synthetic/gcnn-scatter.png}
+	\caption{Evaluation of average angular loss on the whole test dataset with 100 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The lines show in the picture are the regression line of each model.}
 	\label{fig:scatter-gcnn}
 \end{figure}
 
 
 \newpage
-\section{Guided Gated Convolution Neural Network for Normal Inference }
+\section{Surface Normal Inference based on Calibrated Illuminated RGBD images }
 
 \subsection{Light Net Evaluation}
 

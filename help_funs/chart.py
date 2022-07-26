@@ -60,7 +60,7 @@ def scatter_chart(data_x, data_y, path, title=None, x_scale=None, y_scale=None, 
         b, a = np.polyfit(data_x[i], data_y[i], deg=1)
         plt.scatter(data_x[i], data_y[i], label=labels[i])
         xseq = np.linspace(0, 9000, num=90000)
-        plt.plot(xseq, a + b * xseq, lw=1)
+        plt.plot(xseq, a + b * xseq, lw=2)
 
     if title is not None:
         plt.title(title)

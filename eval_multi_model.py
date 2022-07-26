@@ -27,6 +27,8 @@ def evaluate_epoch(args, model, input_tensor, device):
         # store the predicted normal
         output = output[0, :].permute(1, 2, 0)
         output = output.to('cpu').numpy()
+        output[output > 1] = 1
+        output[output < -1] = -1
     return output[:, :, :3]
 
 
@@ -76,7 +78,7 @@ def preprocessing(models):
     return models, path, output_path, eval_res, eval_date, eval_time, all_names, args.datasize
 
 
-def start(models_path_dict, infos, s_window_length=32):
+def start(models_path_dict, infos, s_window_length=16):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, data_size = preprocessing(
         models_path_dict)
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
@@ -89,6 +91,7 @@ def start(models_path_dict, infos, s_window_length=32):
         test_0_tensor = test_0['input_tensor'].unsqueeze(0)
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        img = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         w, h = test_0_tensor.size(2), test_0_tensor.size(3)
 
@@ -97,6 +100,8 @@ def start(models_path_dict, infos, s_window_length=32):
         below = int(h / 2 - s_window_length)
         top = int(h / 2 + s_window_length)
         s_gt = gt[left: right, below:top, :]
+        s_img = img[left: right, below:top, :]
+
         s_input = test_0_tensor[:, :, left: right, below:top]
         s_input_numpy = s_input.clone()
         s_input_numpy = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
@@ -104,9 +109,7 @@ def start(models_path_dict, infos, s_window_length=32):
         s_mask = s_gt.sum(axis=2) == 0
 
         cv.imwrite(str(folder_path / f"eval_{i}_input.png"),
-                   cv.cvtColor(mu.visual_vertex(s_input_numpy,
-                                                ""),
-                               cv.COLOR_RGB2BGR))
+                   cv.cvtColor(mu.visual_vertex(s_input_numpy, ""), cv.COLOR_RGB2BGR))
 
         cv.imwrite(str(folder_path / f"eval_{i}_normal_GT.png"),
                    cv.cvtColor(mu.visual_normal(s_gt, "", histogram=False),
@@ -153,14 +156,16 @@ def start(models_path_dict, infos, s_window_length=32):
             diff_img, diff_angle = mu.eval_img_angle(normal, s_gt)
             diff = np.sum(diff_angle) / (np.count_nonzero(diff_angle) + 1e-20)
 
+            # cv.imwrite(str(folder_path / f"eval_{i}_error_{name}.png"),
+            #            cv.cvtColor(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1),
+            #                        cv.COLOR_RGB2BGR))
             cv.imwrite(str(folder_path / f"eval_{i}_error_{name}.png"),
-                       cv.cvtColor(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1),
-                                   cv.COLOR_RGB2BGR))
-
+                       cv.cvtColor(mu.visual_diff(normal, s_gt, "angle"), cv.COLOR_RGB2BGR))
             if infos["title"]:
                 img_list.append(mu.visual_img(diff_img, name, upper_right=int(diff), font_scale=1))
             else:
-                img_list.append(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1))
+                # img_list.append(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=2))
+                img_list.append(cv.cvtColor(mu.visual_diff(normal, s_gt, "angle"), cv.COLOR_RGB2BGR))
 
             # diff_angle = np.uint8(diff_angle)
             # if diff_list is None:
@@ -170,15 +175,13 @@ def start(models_path_dict, infos, s_window_length=32):
             eval_res[model_idx, i] = diff
 
         # save the results
+        cv.imwrite(str(folder_path / f"eval_{i}_img.png"), mu.visual_img(s_img, ""))
         output = cv.cvtColor(cv.hconcat(img_list), cv.COLOR_RGB2BGR)
-        # diff_list = cv.normalize(diff_list, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-
-        # diff_img = cv.applyColorMap(diff_list, cv.COLORMAP_JET)
-
-        # dmask = np.c_[mask]
-        # diff_img[dmask] = 0
-        # mu.show_images(diff_img,"ss")
         cv.imwrite(str(folder_path / f"eval_{i}_normal.png"), output)
+        from help_funs import file_io
+        img = file_io.load_24bitImage(str(config.paper_pic / "colorscale_hot-vertical.jpg"))
+        cv.imwrite(str(folder_path / f"colorscale_blue.png"), cv.cvtColor(img, cv.COLOR_RGB2BGR))
+
         # cv.imwrite(str(folder_path / f"eval_{i}_error.png"),  mu.hconcat_resize(diff_list))
         print(f"{data_idx} has been evaluated.")
 
@@ -189,9 +192,9 @@ if __name__ == '__main__':
     models = {
         "SVD": None,
         # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
-        # "AG": config.ws_path / "ag" / "trained_model" / "128" / "checkpoint.pth.tar",  # with light direction
-        # "s-window": config.ws_path / "vertex" / "trained_model" / "64" / "checkpoint.pth.tar",
-        "GCNN": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
+        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
+        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
         # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
 
     }

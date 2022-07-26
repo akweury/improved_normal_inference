@@ -232,6 +232,22 @@ def start2(models_path_dict):
             if name == "SVD":
                 print(f'- model {name} evaluation...')
                 normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=1)
+
+                #
+
+                normal = normal[:, :, :3]
+                normal[normal > 1] = 1
+                normal[normal < -1] = -1
+                normal[mask] = 0
+                diff_img, diff_angle = mu.eval_img_angle(normal, gt)
+                diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
+
+                cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
+                           cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+                cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
+                    mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
+                    cv.COLOR_RGB2BGR))
+
             else:
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
@@ -371,8 +387,9 @@ def start2(models_path_dict):
 
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
                                    cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
-                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"),
-                                   mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale))
+                        cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
+                            mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
+                            cv.COLOR_RGB2BGR))
 
                         eval_res[model_idx, i] = diff
 
@@ -424,21 +441,23 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        # "SVD": None,
+        "SVD": None,
         # "an-8-1000": config.paper_exp / "an" / "checkpoint-239.pth.tar",
         # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-692.pth.tar",
         # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1599.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-209.pth.tar",
 
-        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
         # record
         # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
         # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-        # "GCNN-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
+        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
+        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
         # "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
 

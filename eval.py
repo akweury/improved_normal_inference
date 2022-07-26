@@ -91,12 +91,13 @@ if __name__ == '__main__':
         # "an-8-1000": config.paper_exp / "an" / "checkpoint-526.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-489.pth.tar",
 
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-348.pth.tar",
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
-        # "gcnn-cnn": config.paper_exp / "gcnn" / "checkpoint-cnn-473.pth.tar",
-        # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-619.pth.tar",
+        # "gcnn-cnn": config.paper_exp / "gcnn" / "checkpoint-cnn-858.pth.tar",
+        # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-955.pth.tar",
         # "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
 
         # record

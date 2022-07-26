@@ -144,9 +144,6 @@ srun \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
       python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
-
-
-
 ```
 
 #### evaluate the test dataset (no visualisation)
