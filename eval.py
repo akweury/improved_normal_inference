@@ -88,21 +88,21 @@ if __name__ == '__main__':
     test_folder = config.synthetic_data_noise_local / "synthetic128"
     models = {
         # test
-        "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
+        # "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-660.pth.tar",
 
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-679.pth.tar",
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-1099.pth.tar",
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
         # "gcnn-cnn": config.paper_exp / "gcnn" / "checkpoint-cnn-858.pth.tar",
         # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-955.pth.tar",
-        "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
+        # "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
 
         # record
         # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1256.pth.tar",
-        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
         # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-692.pth.tar",
         # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
