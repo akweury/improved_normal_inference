@@ -323,7 +323,12 @@ We evaluate the U-GCNN model on 100 test images as a quantitative evaluation. Th
 \newpage
 \section{Surface Normal Inference based on Calibrated Illuminated RGBD images }
 
+For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net that introduced in \ref{sec:trip-net}. 
+The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparison, we create a similar model, which keeps the vertex and light pipes same but replace the image pipe with standard convolution layers (corresponding "AN" model in the figures and tables).
 
+
+
+The quantitative evaluation is shown in figure \ref{fig:trip-scatter}.
 We evaluate the GCNN architecture based light net on the test dataset. The light net parameters are further used as the initial parameter of light branch of the Trignet.
 
 A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. The average angular error are lower than $ 0.3 $ degree on all of test cases. In this case, to distinguish the output and the ground truth is already not easily only use naked eyes. 
@@ -476,8 +481,6 @@ It is faulty that almost no normal has -1 z-component in GCNN predicted normal m
 	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
 	\label{fig:normal-histo-diff}
 \end{figure}
-
-
 
 
 \end{document}
