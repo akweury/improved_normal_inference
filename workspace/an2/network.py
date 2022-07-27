@@ -5,7 +5,7 @@ sys.path.append(dirname(__file__))
 import torch
 import torch.nn as nn
 from common.NormalizedNNN import GCNN
-from common.AlbedoGatedNNN import GNet, GNetF3F, GNetF3B, GNetF2F, GNetF2B
+from common.AlbedoGatedNNN import GNet, GNetF3F, GNetF3B, GNetF2F, GNetF2B, GNetF1B, GNetF1F
 import config
 from help_funs import mu
 
@@ -29,6 +29,10 @@ class CNN(nn.Module):
             self.g_net = GNetF2F(3, 3, channel_num)
         elif net_type == "gnet-f2b":
             self.g_net = GNetF2B(3, 3, channel_num)
+        elif net_type == "gnet-f1f":
+            self.g_net = GNetF1F(3, 3, channel_num)
+        elif net_type == "gnet-f1b":
+            self.g_net = GNetF1B(3, 3, channel_num)
 
         self.last_conv = nn.Conv2d(3, 3, (1, 1), (1, 1), (0, 0))
         # self.remove_grad()
