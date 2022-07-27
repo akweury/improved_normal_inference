@@ -2,7 +2,7 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "light",
-  "net_type": "gcnn_noc",
+  "net_type": "cnn",
   "num_channels": 128,
   "resume": null,
   "lightNum": 10,
