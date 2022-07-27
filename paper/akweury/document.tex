@@ -323,86 +323,111 @@ We evaluate the U-GCNN model on 100 test images as a quantitative evaluation. Th
 \newpage
 \section{Surface Normal Inference based on Calibrated Illuminated RGBD images }
 
-\subsection{Light Net Evaluation}
 
 We evaluate the GCNN architecture based light net on the test dataset. The light net parameters are further used as the initial parameter of light branch of the Trignet.
 
 A qualitative evaluation of light net is shown in Figure \ref{fig:eval-light}. The average angular error are lower than $ 0.3 $ degree on all of test cases. In this case, to distinguish the output and the ground truth is already not easily only use naked eyes. 
 
 
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_output_error.png}
-	
-	\caption{Qualitative evaluation of light net on Sphere, bus and Washington statue. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.}
-	\label{fig:eval-light}
-\end{figure}
-
 Figure \ref{fig:scatter-light} uses a scatter plot to show the average angular error on 100 different test cases. The average pixel-wise angular error is 0.17 degree as shown in Table \ref{tab:model-error}. An regression line has been added in the plot to analysis the tendency of the errors. The angular error slightly goes up when valid point number in the scene increase. It is make sense since the valid pixels are usually connected and concentrate in a single patch, the less of the area of the patch, which corresponding the number of the valid points, the less variation of the light direction among the pixels, thus better the evaluation.
 
 
-\begin{figure}[th]
+%% gcnn-eval
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\linewidth]{./Figures/scatter-light-noised.png}
-	\caption{The evaluation on 100 test cases of Light Net.}
-	\label{fig:scatter-light}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_groundtruth.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-CNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_GCNN-NOC.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_normal_SVD.png}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-GCNN.png}
+		\caption{U-GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-CNN.png}
+		\caption{U-CNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_GCNN-NOC.png}
+		\caption{U-NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/fancy_eval_5_error_SVD.png}
+		\caption{SVD}
+	\end{subfigure}
+	
+	\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (10,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+	
+	\caption{Surface Normal Inference based GCNN model on "Washington´´ object. The first row shows the estimated surface normal. The second row is the degree error map.}
+	\label{fig:gcnn-eval}
+\end{figure}
+
+%% fig:gcnn-eval-synthetic-zoom-in
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GT.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-NOC.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_GCNN-CNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_normal_SVD.png}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-GCNN.png}
+		\caption{GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-NOC.png}
+		\caption{NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_GCNN-CNN.png}
+		\caption{CNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_5_error_SVD.png}
+		\caption{SVD}
+	\end{subfigure}
+	
+	\caption{Zoom in of the center region of Washington object. The first row is surface normal, the second row is the corresponding errors.}
+	\label{fig:gcnn-eval-synthetic-zoom-in}
 \end{figure}
 
 
-
-\subsection{Vertex-Image-Light Net (VIL Net) Evaluation}
-
-
-The qualitative evaluation of VIL net uses the model trained based on masked L2 loss.
-
-\subsubsection{title}
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_0_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_1_output_error.png}
-	
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_img.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_input.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_light.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_light_gt.png}
-	\includegraphics[width=0.18\linewidth]{./Figures/light-synthetic/fancy_eval_4_output_error.png}
-	
-	\caption{Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.}
-	\label{fig:eval-trignet}
-\end{figure}
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=0.5\linewidth]{./Figures/scatter-light-noised.png}
-	\caption{The evaluation on 100 test cases of Trignet.}
-	\label{fig:scatter-trignet}
-\end{figure}
 
 
 
