@@ -88,10 +88,10 @@ if __name__ == '__main__':
     test_folder = config.synthetic_data_noise_local / "synthetic128"
     models = {
         # test
-        # "an-8-1000": config.paper_exp / "an" / "checkpoint-526.pth.tar",
-        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-489.pth.tar",
+        # "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
+        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-660.pth.tar",
 
-        "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-348.pth.tar",
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-679.pth.tar",
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",

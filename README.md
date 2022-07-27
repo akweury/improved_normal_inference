@@ -143,7 +143,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
+      python3 main.py --machine remote --exp light --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-26_13_39_56/checkpoint-599.pth.tar
 ```
 
 #### evaluate the test dataset (no visualisation)
