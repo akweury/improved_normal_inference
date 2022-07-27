@@ -305,7 +305,7 @@ class GNetF3F(nn.Module):
         return xout
 
 
-class GNetF2(nn.Module):
+class GNetF3B(nn.Module):
     def __init__(self, in_ch, out_ch, channel_num):
         super().__init__()
         # self.__name__ = 'gnet'
@@ -407,9 +407,8 @@ class GNetF2(nn.Module):
         i4 = self.i_dconv3(i4)
 
         # Upsample 1
-        x4_cat = torch.cat((v4, l4, i4), 1)
-        x3_cat = F.interpolate(x4_cat, v3.size()[2:], mode='nearest')  # 128,128
-        x3 = self.uconv3_1(x3_cat)
+        x3 = F.interpolate(v4, v3.size()[2:], mode='nearest')  # 128,128
+        x3 = self.uconv3_1(x3)
         v3 = self.uconv3(torch.cat((x3, v3), 1))
 
         l3_us = F.interpolate(l4, l3.size()[2:], mode='nearest')  # 128,128
