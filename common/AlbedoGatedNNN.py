@@ -871,7 +871,7 @@ class GNetF1B(nn.Module):
         self.uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
         self.uconv4_1 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
         self.uconv4 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
-        self.uconv5_1 = GConv(channel_size_3, channel_size_1, kernel_up, stride, padding_up)
+        self.uconv5_1 = GConv(channel_size_1, channel_size_1, kernel_up, stride, padding_up)
         self.uconv5 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
 
         self.l_uconv3 = GConv(channel_size_2, channel_size_1, kernel_up, stride, padding_up)
@@ -961,9 +961,8 @@ class GNetF1B(nn.Module):
         i2 = self.i_uconv4(torch.cat((i2, i2_us), 1))
 
         # Upsample 3
-        x2_cat = torch.cat((v2, l2, i2), 1)
-        x1_cat = F.interpolate(x2_cat, v1.size()[2:], mode='nearest')  # 128,128
-        x1 = self.uconv5_1(x1_cat)
+        x1 = F.interpolate(v2, v1.size()[2:], mode='nearest')  # 128,128
+        x1 = self.uconv5_1(x1)
         v1 = self.uconv5(torch.cat((x1, v1), 1))
 
         l1_us = F.interpolate(l2, l1.size()[2:], mode='nearest')  # 128,128
