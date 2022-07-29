@@ -50,7 +50,7 @@ def preprocessing(models):
     elif args.data == "synthetic":
         path = config.synthetic_data / args.datasize / "selval" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
-        path = config.real_data / "selval" / "tensor"  # key tests 103, 166, 189,9
+        path = config.real_data / "test" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
         path = config.paper_pic
     else:
@@ -450,12 +450,13 @@ if __name__ == '__main__':
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+        "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
 
         # record
-        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
         # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
+        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
         # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
         # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",

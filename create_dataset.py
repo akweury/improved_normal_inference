@@ -155,7 +155,7 @@ def resize_matrix(matrix, resize_factor):
     return resized_matrix
 
 
-def convert2training_tensor_resized(path, k, output_type='normal', resize_factor=2):
+def convert2training_tensor_resized(path, k, output_type='normal', resize_factor=0):
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):

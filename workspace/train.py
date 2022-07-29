@@ -559,7 +559,7 @@ def draw_output(exp_name, input, xout, target, exp_path, epoch, i, train_idx, pr
         output_list.append(mu.visual_light(x_out_light, "pred"))
         # output_list.append(mu.visual_light(light_gt, "gt"))
         output_list.append(mu.visual_diff(light_gt, x_out_light, "angle"))
-    elif exp_name in ["vi5", "vertex", "i5", "an2", "nnnn", "vil10", "an3", "an"]:
+    elif exp_name in ["vi5", "vertex", "i5", "an2", "nnnn", "vil10", "an3", "an", "an_real"]:
         x_out_normal[mask] = 0
         x_out_normal[x_out_normal > 1] = 1
         x_out_normal[x_out_normal < -1] = -1
