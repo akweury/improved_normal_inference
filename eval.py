@@ -18,7 +18,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Eval')
 
     # Mode selection
-    parser.add_argument('--data', type=str, default='real', help="choose evaluate dataset")
+    parser.add_argument('--data', type=str, default='synthetic128', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
     parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
@@ -85,16 +85,17 @@ if __name__ == '__main__':
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
-    # test_folder = config.synthetic_data_noise_local / "synthetic128"
-    test_folder = config.real_data
+    test_folder = config.synthetic_data_noise_local / "synthetic128"
+    # test_folder = config.real_data
     models = {
         # test
         # "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
-        "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
+        # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-1199.pth.tar",
 
         # "an2-f3f": config.paper_exp / "an2" / "checkpoint-f3f-303.pth.tar",
         # "an2-f3b": config.paper_exp / "an2" / "checkpoint-f3b-308.pth.tar",
+        "an2-f1b": config.paper_exp / "an2" / "checkpoint-f1b-313.pth.tar",
 
         # record
         # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1256.pth.tar",
@@ -111,7 +112,7 @@ if __name__ == '__main__':
 
         # "gcnn-cnn": config.paper_exp / "gcnn" / "checkpoint-cnn-858.pth.tar",
         # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-955.pth.tar",
-        "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
+        # "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
 
         "SVD": None,
 
