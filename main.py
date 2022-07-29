@@ -137,6 +137,9 @@ def get_model(args):
     elif args.exp == "an3":
         import workspace.an3.network as an3
         model = an3.CNN(args.num_channels, args.lightNum, args.lightNumUse)
+    elif args.exp == "an_real":
+        import workspace.an_real.network as an_real
+        model = an_real.CNN(args.num_channels, args.lightNum, args.lightNumUse, args.net_type)
     elif args.exp == "vi5":
         import workspace.vi5.network as vi5
         model = vi5.CNN(args.num_channels, args.lightNum)
@@ -160,9 +163,19 @@ def get_model(args):
 
 def get_dataset_path(args):
     if args.machine == "local":
-        dataset_path = config.synthetic_data_noise_local / args.dataset
+        if "real" in args.dataset:
+            dataset_path = config.real_data
+        elif "synthetic" in args.dataset:
+            dataset_path = config.synthetic_data_noise_local / args.dataset
+        else:
+            raise ValueError
     elif args.machine == "remote":
-        dataset_path = config.synthetic_data_noise_dfki / args.dataset
+        if "real" in args.dataset:
+            dataset_path = config.real_data_dfki
+        elif "synthetic" in args.dataset:
+            dataset_path = config.synthetic_data_noise_dfki / args.dataset
+        else:
+            raise ValueError
     else:
         raise ValueError
     return dataset_path
