@@ -452,7 +452,7 @@ if __name__ == '__main__':
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
         # record
-        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
+        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
         # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
         # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
         "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",

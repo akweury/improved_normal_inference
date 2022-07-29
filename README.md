@@ -1,13 +1,17 @@
 # Improved Normal Inference
 
 ### Command for remote machine
+
 serv-3305.kl.dfki.de (kiew)
 serv-3306.kl.dfki.de (koeln)
+
 #### copy dataset from local to remote
 
 ```
 scp D:\TUK\improved_normal_inference\dataset\data_synthetic\synthetic512-5000.zip serv-3305.kl.dfki.de:/netscratch/sha/data_synthetic/synthetic512
 ```
+
+##### copy model to remote
 
 #### Create dataset
 
@@ -21,7 +25,7 @@ srun \
   --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 create_dataset_multi_lights.py --data synthetic128 --machine remote --max_k 0 --clear true
+  python3 create_dataset.py --machine remote --max_k 0
   
 
 ```
@@ -47,7 +51,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
     srun \
       --job-name="INI-an-8-1000" \
       --time=7-00:00 \
-      -p RTXA6000 \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \

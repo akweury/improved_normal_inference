@@ -41,31 +41,16 @@ class CNN(nn.Module):
         for param in self.light_net.parameters():
             param.requires_grad = False
 
-    # def init_net(self):
-    #     light_source_net = GCNN(3, 3, self.channel_num)
-    #     light_checkpoint = torch.load(config.light_3_32)
-    #
-    #     light_source_net.load_state_dict(light_checkpoint['model'].light3_3.state_dict())
-    #     light_source_net_dict = light_source_net.state_dict()
-    #     light_net_dict = self.g_net.state_dict()
-    #
-    #     light_source_net_dict = mu.change_light_dict_name(light_source_net_dict, light_net_dict, "l_")
-    #
-    #     light_source_net_dict = {k: v for k, v in light_source_net_dict.items() if
-    #                              k in light_net_dict and v.size() == light_net_dict[k].size()}
-    #
-    #     light_net_dict.update(light_source_net_dict)
-    #     self.g_net.load_state_dict(light_net_dict)
-    #
-    #     normal_source_net = GCNN(3, 3, self.channel_num)
-    #     normal_checkpoint = torch.load(config.gcnn_3_32)
-    #     normal_source_net.load_state_dict(normal_checkpoint['model'].nconv3_3.state_dict())
-    #     normal_source_net_dict = normal_source_net.state_dict()
-    #     normal_net_dict = self.g_net.state_dict()
-    #     normal_source_net_dict = {k: v for k, v in normal_source_net_dict.items() if
-    #                               k in normal_net_dict and v.size() == normal_net_dict[k].size()}
-    #     normal_net_dict.update(normal_source_net_dict)
-    #     self.g_net.load_state_dict(normal_net_dict)
+    def init_net(self):
+        normal_source_net = GNet(3, 3, self.channel_num)
+        normal_checkpoint = torch.load(config.an2_trip_net_remote)
+        normal_source_net.load_state_dict(normal_checkpoint['model'].g_net.state_dict())
+        normal_source_net_dict = normal_source_net.state_dict()
+        normal_net_dict = self.g_net.state_dict()
+        normal_source_net_dict = {k: v for k, v in normal_source_net_dict.items() if
+                                  k in normal_net_dict and v.size() == normal_net_dict[k].size()}
+        normal_net_dict.update(normal_source_net_dict)
+        self.g_net.load_state_dict(normal_net_dict)
 
     def forward(self, x):
         # x0: vertex array

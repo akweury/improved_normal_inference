@@ -24,7 +24,7 @@ synthetic_data_noise_dfki = Path("/netscratch/sha/data_synthetic_noise")
 
 # real dataset path
 real_data = dataset / "data_real"
-real_data_dfki = Path("/datasets/sha/data_real")
+real_data_dfki = Path("/netscratch/sha/data_real")
 
 # pretrained model
 
@@ -35,3 +35,6 @@ light_cnn = paper_exp / "light" / "checkpoint-cnn-599.pth.tar"
 gcnn_cnn = paper_exp / "gcnn" / "checkpoint-cnn-473.pth.tar"
 gcnn_noc = paper_exp / "gcnn" / "checkpoint-noc-619.pth.tar"
 gcnn_gcnn = paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar"
+
+an2_trip_net = ws_path / "an2" / "trained_model" / "128" / "checkpoint-655.pth.tar"
+an2_trip_net_remote = Path("/netscratch/sha/model/an2_best_655.pth.tar")
