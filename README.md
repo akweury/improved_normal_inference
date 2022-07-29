@@ -146,7 +146,7 @@ srun \
     srun \
       --job-name="INI-nnnn-real" \
       --time=7-00:00 \
-      -p GTX1080Ti \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=30G \
