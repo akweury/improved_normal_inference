@@ -134,19 +134,19 @@ We replace all of the gated layer to standard convolution layers in the network 
 \end{figure}
 
 \section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
-The Trip-Net model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
+The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of Trip-Net architecture. Since the Trip-Net is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. 
 
-In order to verify the applicability of UNet architecture and Gated Convolution layer for the normal inference task, two similar models are created. 
-We replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same in model ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". Another model called ``NOC" is designed to verify the skip connection in the UNet, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show the validation of skip connections. Figure \ref{fig:gcnn-training-history} shows the training history of these models on BerHu Loss. The GCNN approach achieves a lower loss from start to the end of the training.
+As shown in the loss figure, ... (discussion about the figure)
 
 \begin{figure}[th]
 	\centering
 	\includegraphics[width=.8\textwidth]{./Figures/gcnn_loss_compare.png}
-	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN.}
-	\label{fig:gcnn-training-history}
+	\caption{The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.}
+	\label{fig:trip-net-training-history}
 \end{figure}
 
 
+\section{Evaluation}
 
 %% gcnn-eval
 \begin{figure}[H]

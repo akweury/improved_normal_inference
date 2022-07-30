@@ -6,10 +6,6 @@ from help_funs import chart
 
 models = {
     # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c32.pth.tar",
-    # "vil10-100-1000": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l10-100-1000.pth.tar",
-    # "vil3-100-1000": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l3-100-1000.pth.tar",
-    # "vil-3-12-1000": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1-3-12-1000.pth.tar",
-    # "vil-10-1000": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1-10-1000.pth.tar",
 
     "GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
     # "NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",

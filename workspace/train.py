@@ -231,6 +231,7 @@ class TrainingModel():
                  'model': self.model,
                  'optimizer': self.optimizer,
                  'angle_losses': self.angle_losses[:, :epoch],
+                 'eval_losses': self.losses_eval[:, :epoch],
                  'losses': self.losses[:, :epoch],
                  }
 
