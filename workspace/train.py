@@ -22,7 +22,7 @@ from torch.utils.data import Dataset
 
 from help_funs import mu
 from workspace import loss_utils
-
+import config
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 mse_criterion = torch.nn.MSELoss(reduction='mean')
@@ -161,7 +161,10 @@ class TrainingModel():
         return train_data_loader, test_data_loader
 
     def init_output_folder(self):
-        folder_path = self.exp_dir / f"output_{date_now}_{time_now}"
+        if self.args.machine == "remote":
+            folder_path = config.model_dfki / f"output_{date_now}_{time_now}"
+        else:
+            folder_path = self.exp_dir / f"output_{date_now}_{time_now}"
         if not os.path.exists(str(folder_path)):
             os.mkdir(str(folder_path))
         return folder_path

@@ -26,6 +26,9 @@ synthetic_data_noise_dfki = Path("/netscratch/sha/data_synthetic_noise")
 real_data = dataset / "data_real"
 real_data_dfki = Path("/netscratch/sha/data_real")
 
+# model path
+model_dfki = Path("/netscratch/sha/models")
+
 # pretrained model
 
 light_c64 = paper_exp / "light" / "checkpoint-640.pth.tar"
