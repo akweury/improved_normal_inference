@@ -117,29 +117,10 @@ The training processes are evaluated in every 100 epochs with 29 evaluation scen
 	\label{fig:test-scene}
 \end{figure}
 
+The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
-The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. 
-
-
-\section{GCNN model evaluation}
+\section{GCNN model evaluation based on Geometry Information}
 The GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
 %% gcnn-eval
 \begin{figure}[H]

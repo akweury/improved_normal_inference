@@ -265,12 +265,16 @@ def plot_loss_per_axis(loss_total, nn_model, epoch, title):
 
     # draw line chart
     if epoch % 10 == 9:
-        draw_line_chart(np.array([nn_model.losses[0 + shift]]), nn_model.output_folder,
-                        log_y=True, label=0, epoch=epoch, start_epoch=0, title=title)
-        draw_line_chart(np.array([nn_model.losses[1 + shift]]), nn_model.output_folder,
-                        log_y=True, label=1, epoch=epoch, start_epoch=0, title=title)
-        draw_line_chart(np.array([nn_model.losses[2 + shift]]), nn_model.output_folder,
-                        log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title=title)
+        average_loss = (np.array([nn_model.losses[2 + shift]]) + np.array([nn_model.losses[1 + shift]]) + np.array(
+            [nn_model.losses[0 + shift]])) / 3
+        draw_line_chart(average_loss, nn_model.output_folder,
+                        log_y=True, label="loss", epoch=epoch, start_epoch=0, title=title)
+        # draw_line_chart(np.array([nn_model.losses[0 + shift]]), nn_model.output_folder,
+        #                 log_y=True, label=0, epoch=epoch, start_epoch=0, title=title)
+        # draw_line_chart(np.array([nn_model.losses[1 + shift]]), nn_model.output_folder,
+        #                 log_y=True, label=1, epoch=epoch, start_epoch=0, title=title)
+        # draw_line_chart(np.array([nn_model.losses[2 + shift]]), nn_model.output_folder,
+        #                 log_y=True, label=2, epoch=epoch, start_epoch=0, cla_leg=True, title=title)
 
 
 # ---------------------------------------------- Epoch ------------------------------------------------------------------
