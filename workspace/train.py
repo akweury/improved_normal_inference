@@ -739,11 +739,6 @@ def main(args, exp_dir, network, train_dataset):
 
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss
-            else:
-                stop_factor += 1
-                if stop_factor > 2:
-                    print("best loss two times upward going in the evaluation ")
-                    break
 
         if epoch > 10:
             if np.isnan(np.sum(loss[:3, epoch])):
