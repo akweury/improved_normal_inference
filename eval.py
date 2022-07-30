@@ -85,15 +85,15 @@ if __name__ == '__main__':
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
-    test_folder = config.synthetic_data_noise_local / "synthetic128"
-    # test_folder = config.real_data
+    # test_folder = config.synthetic_data_noise_local / "synthetic128"
+    test_folder = config.real_data
     models = {
         # test
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
-        # "SVD": None,
+        "SVD": None,
 
         # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
         # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
@@ -108,7 +108,8 @@ if __name__ == '__main__':
 
         # "an2-f3f": config.paper_exp / "an2" / "checkpoint-f3f-303.pth.tar",
         # "an2-f3b": config.paper_exp / "an2" / "checkpoint-f3b-308.pth.tar",
-        "an2-f1b": config.paper_exp / "an2" / "checkpoint-f1b-453.pth.tar",
+        # "an2-f1b-793": config.paper_exp / "an2" / "checkpoint-f1b-798.pth.tar",
+        # "an2-f1b-801": config.paper_exp / "an2" / "checkpoint-f1b-801.pth.tar",
 
         # record
         # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1256.pth.tar",

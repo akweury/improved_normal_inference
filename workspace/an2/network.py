@@ -54,7 +54,7 @@ class CNN(nn.Module):
 
     def forward(self, x):
         # x0: vertex array
-        # self.light_num = 1
+        self.light_num = 1
         x_vertex = x[:, :3, :, :]
         x_img = x[:, 3: 3 + self.light_num_use, :, :] / 255.0  # one image map
         x_light = x[:, 3 + self.light_num:3 + self.light_num + 3 * self.light_num_use, :, :]  # one light map

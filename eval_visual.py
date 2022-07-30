@@ -441,18 +441,18 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
-
+        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+        #
         "SVD": None,
-
+        #
         "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-        "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
-
-        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-        "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
+        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+        #
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+        # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
         # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
 

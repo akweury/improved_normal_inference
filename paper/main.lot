@@ -9,15 +9,17 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{23}{table.caption.70}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{21}{table.caption.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{25}{table.caption.75}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{23}{table.caption.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{25}{table.caption.79}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{23}{table.caption.75}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.1}{\ignorespaces The error of models. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene\relax }}{31}{table.caption.101}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces The performance of the GCNN model for geometry information based normal inference. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.\relax }}{26}{table.caption.80}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.2}{\ignorespaces A quantitative evaluation on proposed approaches. The angle error is the average angle error of all valid pixels in the test case. The time unit is in millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene\relax }}{28}{table.caption.84}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

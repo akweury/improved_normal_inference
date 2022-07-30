@@ -33,8 +33,92 @@
 
 
 \begin{document}
+
+\section{Training Details}
+
+The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 \times $ in height, width and channel, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
+
+The training processes are evaluated in every 100 epochs with 29 evaluation scenes that model never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work.
+
+\begin{figure}[H]
+	\centering
 	
-The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. The screen size is $ 128\times 128 $ in height and width. The corresponding vertex matrix has dimension $ 128\times 128\times3 $, light map has dimension $ 128\times 128 \times 3 $, image has dimension $ 128\times 128 \times 1 $.  The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
+		\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.normal0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.normal0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.normal0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.normal0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
+	\end{subfigure}
+	
+	
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.depth0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0.png}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.image0.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.image0.png}
+		\caption{GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.image0.png}
+		\caption{CNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.image0.png}
+		\caption{NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
+		\caption{SVD}
+	\end{subfigure}	
+	\caption{Surface Normal Inference based GCNN model on "Dragon´´ object. The first row shows the estimated surface normal. The second row is the angle error map.}
+	\label{fig:gcnn-eval}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate of  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. 
 The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. 
 
 
@@ -243,18 +327,6 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 \end{figure}
 
 
-\subsection{comparison}
-From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quite well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
-
-It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=\linewidth]{./Figures/normal-histo-diff.png}
-	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
-	\label{fig:normal-histo-diff}
-\end{figure}
-
-
 \begin{table}[th]
 	
 	\centering
@@ -266,21 +338,225 @@ It is faulty that almost no normal has -1 z-component in GCNN predicted normal m
 		\hline
 		TripNet-CNN & 10.46 & 28.74 & 8 & 8,1000  & 0.5 & 1 \\
 		\hline
-		TripNet-F1B & \textbf{9.26} & 43.79 & 8 & 8,1000  & 0.5 & 1 \\
+		TripNet-F1B & 9.22 &44.59 & 8 & 8,1000  & 0.5 & 1 \\
 		\hline
 		TripNet & \textbf{9.17} & 43.79 & 8 & 8,1000  & 0.5 & 1 \\
 	\end{tabular}
-	\caption{A quantitative evaluation on proposed approaches. The angle error is the average angle error of all valid pixels in the test case. The time unit is millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
+	\caption{A quantitative evaluation on proposed approaches. The angle error is the average angle error of all valid pixels in the test case. The time unit is in millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
 	\label{tab:model-error}
 \end{table}
 
 
-\begin{figure}[th]
+
+
+\subsection{Comparison}
+
+\newpage
+%% Final-Visual
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=\linewidth]{./Figures/regression-comparison.png}
-	\caption{The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)}
-	\label{fig:normal-histo-diff}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_groundtruth.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_an2-8-1000.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_SVD.png}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_img.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_SVD.png}
+\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_groundtruth.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_SVD.png}
+\end{subfigure}
+
+
+
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_img.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_SVD.png}
+\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_groundtruth.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_SVD.png}
+\end{subfigure}
+	
+	
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_img.png}
+	\caption{GT}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_an2-8-1000.png}
+	\caption{TripNet}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_GCNN-GCNN.png}
+	\caption{GCNN}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_SVD.png}
+	\caption{SVD}
+\end{subfigure}
+	
+	
+	\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (10,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+	
+	\caption{Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).}
+	\label{fig:final-eval}
 \end{figure}
+
+
+%% Final-Visual-Zoom-In
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_GT.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_an2-8-1000.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_SVD.png}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_img.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_SVD.png}
+\end{subfigure}
+
+
+
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_GT.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_SVD.png}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_img.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_SVD.png}
+\end{subfigure}
+
+
+
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_GT.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_an2-8-1000.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_GCNN-GCNN.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_SVD.png}
+\end{subfigure}
+
+	
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_an2-8-1000.png}
+		\caption{Trip-Net}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_GCNN-GCNN.png}
+		\caption{GCNN}
+	\end{subfigure}
+		\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_SVD.png}
+		\caption{SVD}
+	\end{subfigure}
+	
+	\caption{Zoom in of the center region of the objects in Figure \ref{fig:final-eval}}
+	\label{fig:tripnet-eval-synthetic-zoom-in}
+\end{figure}
+
+
+
+
+
+
+From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quite well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
+
+It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
+
 
 
 \subsection{Light Inpainting}

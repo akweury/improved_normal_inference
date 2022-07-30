@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
-parser.add_argument('--data', type=str, default="synthetic128",
+parser.add_argument('--data', type=str, default="synthetic512",
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0",
                     help="loading dataset from local or dfki machine")
@@ -29,8 +29,8 @@ args = parser.parse_args()
 
 
 def convert2training_tensor(path, k, output_type='normal'):
-    width = 128
-    light_num = 10
+    width = 512
+    light_num = 1
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -102,9 +102,9 @@ def convert2training_tensor(path, k, output_type='normal'):
         # light
         # light_pos = (data['lightPos'] - shift_vector) / scale_factors
 
-        light_direction_gt_array = np.zeros((width, width, 30))
-        light_direction_array = np.zeros((width, width, 30))
-        img_array = np.zeros((width, width, 10))
+        light_direction_gt_array = np.zeros((width, width, 3 * light_num))
+        light_direction_array = np.zeros((width, width, 3 * light_num))
+        img_array = np.zeros((width, width, 1 * light_num))
         img_file_prefix = data_files[item].split(".")[0] + ".image"
         for i in range(light_num):
             img_file = img_file_prefix + str(i) + ".png"

@@ -25,56 +25,42 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.9}{\ignorespaces The light map calculated from vertex map and the light source\relax }}{13}{figure.caption.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.\relax }}{17}{figure.caption.42}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.\relax }}{16}{figure.caption.42}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces The architecture of VIL-Net\relax }}{18}{figure.caption.55}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.11}{\ignorespaces The architecture of Trig-Net\relax }}{19}{figure.caption.60}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.12}{\ignorespaces The architecture of TriGNet\relax }}{20}{figure.caption.62}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces The architecture of Trig-Net\relax }}{17}{figure.caption.59}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{22}{figure.caption.67}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{20}{figure.caption.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{22}{figure.caption.69}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{20}{figure.caption.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{23}{figure.caption.72}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{21}{figure.caption.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{24}{figure.caption.74}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{22}{figure.caption.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{25}{figure.caption.77}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{23}{figure.caption.73}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Light Net for light inpainting based on GCNN architecture.\relax }}{27}{figure.caption.82}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Surface Normal Inference based GCNN model on "Dragon´´ object. The first row shows the estimated surface normal. The second row is the angle error map.\relax }}{25}{figure.caption.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces GCNN Normal Inference on Synthetic Dataset (object: dragon) From left to right: Input vertex map, ground-truth, GCNN normal map, SVD normal map, GCNN error map, SVD error map\relax }}{28}{figure.caption.85}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Zoom in of the center region of Dragon object. The first row is surface normal, the second row is the corresponding errors. NOC model has no skip connnection, CNN model replace gated convolution layer to standard convolution layer.\relax }}{26}{figure.caption.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Zoom in of dragon object evaluation.\relax }}{28}{figure.caption.86}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces TripNet qualitative evaluation. Surface Normal Inference on ``Dragon" object. The first row shows the estimated surface normal. The second row is the angle error map.\relax }}{27}{figure.caption.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Evaluation on Real Dataset\relax }}{28}{figure.caption.87}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Zoom in of the center region of Dragon object. The first row is surface normal, the second row is the corresponding errors.\relax }}{27}{figure.caption.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Evaluation of average angular loss on the whole test dataset with 90 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The \textbf {Left} one using point cloud without noise, the \textbf {right} one has noise.\relax }}{29}{figure.caption.89}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{29}{figure.caption.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Qualitative evaluation of light net on Sphere, bus and Washington statue. From left to right, grayscale image, semi-dense light map(input), full-dense light map(output), full-dense light map(ground-truth), error map.\relax }}{29}{figure.caption.93}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.7}{\ignorespaces The evaluation on 100 test cases of Light Net.\relax }}{30}{figure.caption.94}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Qualitative evaluation of Trignet net on Sphere, bus and Washington statue. From left to right, semi 3D vertex map, full-dense normal map(output), full-dense normal map(ground-truth), error map.\relax }}{30}{figure.caption.97}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.9}{\ignorespaces The evaluation on 100 test cases of Trignet.\relax }}{31}{figure.caption.98}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.10}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{32}{figure.caption.100}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.11}{\ignorespaces The normal difference of between GCNN and ground-truth in x, y, z-axis respectively. The y axis indicates the number of points, x axis indicates the value of normal in x/y/z axis. (The chart is based on the "dragon" scene showing above)\relax }}{33}{figure.caption.102}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of the center region of the objects in Figure \ref {fig:final-eval}\relax }}{30}{figure.caption.87}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{38}{figure.caption.106}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{34}{figure.caption.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{39}{figure.caption.107}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{35}{figure.caption.92}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{40}{figure.caption.108}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{36}{figure.caption.93}%
