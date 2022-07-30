@@ -735,7 +735,7 @@ def main(args, exp_dir, network, train_dataset):
             # draw line chart
             if epoch % 10 == 9:
                 draw_line_chart(nn_model.losses_eval, nn_model.output_folder,
-                                log_y=True, label="loss", epoch=epoch, start_epoch=0, title="eval_loss")
+                                log_y=True, label="eval_loss", epoch=epoch, start_epoch=0, title="eval_loss")
 
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss
