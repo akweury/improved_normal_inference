@@ -3,7 +3,7 @@
   "neighbor": 0,
   "exp": "an2",
   "net_type": "gnet-f4",
-  "num_channels": 64,
+  "num_channels": 32,
   "resume": null,
   "lightNum": 1,
   "epochs": 1500,
