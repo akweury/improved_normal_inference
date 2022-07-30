@@ -7,7 +7,7 @@
   "net_type": "gcnn",
   "init_net": null,
   "init_light_net": null,
-  "epochs": 2500,
+  "epochs": 1500,
   "optimizer": "adam",
   "lr": 0.001,
   "momentum": 0.9,
