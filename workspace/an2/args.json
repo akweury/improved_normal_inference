@@ -2,7 +2,7 @@
   "output_type": "normal_noise",
   "neighbor": 0,
   "exp": "an2",
-  "net_type": "gnet-f4",
+  "net_type": "gnet-f1f",
   "num_channels": 128,
   "resume": null,
   "lightNum": 10,

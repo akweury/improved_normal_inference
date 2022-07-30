@@ -441,41 +441,20 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+
         "SVD": None,
-        # "an-8-1000": config.paper_exp / "an" / "checkpoint-239.pth.tar",
-        # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-692.pth.tar",
-        # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1599.pth.tar",
-        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-209.pth.tar",
 
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
-        "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
+        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+        "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
 
-        # record
-        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
-        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
-        # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
-        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
-        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-629.pth.tar",
-        # "gcnn-8-1000": config.paper_exp / "gcnn" / "checkpoint-8-1000-819.pth.tar",
+        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+        "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
-        # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "an2-666": config.ws_path / "an2" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "an3-450": config.ws_path / "an3" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "vil10-294": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint.pth.tar",
-        # "light": config.paper_exp / "light" / "checkpoint-640.pth.tar",  # image guided
-        # "albedoGated": config.ws_path / "albedoGated" / "trained_model" / "512" / "checkpoint.pth.tar",
-        # "an": config.ws_path / "an" / "trained_model" / "512" / "checkpoint.pth.tar",
-        # "TrignetBerhu": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-berhu.pth.tar",
-        # "TrignetL2": config.ws_path / "an2" / "trained_model" / "512" / "checkpoint-l2.pth.tar",
-        # "GCNN3-32-512": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-32.pth.tar",
-        # "GCNN3-64-512": config.ws_path / "vertex" / "trained_model" / "512" / "checkpoint-3-64.pth.tar",
-
-        # "AG": config.ws_path / "ag" / "trained_model" / "512" / "checkpoint.pth.tar",  # with light direction
-        # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
+        # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
 
     }
     start2(models)

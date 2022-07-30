@@ -104,12 +104,13 @@ def start(models_path_dict, infos, s_window_length=16):
 
         s_input = test_0_tensor[:, :, left: right, below:top]
         s_input_numpy = s_input.clone()
-        s_input_numpy = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        s_input_numpy_3ch = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        s_input_numpy_fch = s_input_numpy[:, :, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         s_mask = s_gt.sum(axis=2) == 0
 
         cv.imwrite(str(folder_path / f"eval_{i}_input.png"),
-                   cv.cvtColor(mu.visual_vertex(s_input_numpy, ""), cv.COLOR_RGB2BGR))
+                   cv.cvtColor(mu.visual_vertex(s_input_numpy_3ch, ""), cv.COLOR_RGB2BGR))
 
         cv.imwrite(str(folder_path / f"eval_{i}_normal_GT.png"),
                    cv.cvtColor(mu.visual_normal(s_gt, "", histogram=False),
@@ -126,7 +127,8 @@ def start(models_path_dict, infos, s_window_length=16):
             # diff_list = []
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(s_input_numpy, ~s_mask, np.array([0, 0, -7]), farthest_neighbour=2)
+                normal, gpu_time = svd.eval_single(s_input_numpy_3ch, ~s_mask, np.array([0, 0, -7]),
+                                                   farthest_neighbour=2)
             else:
                 checkpoint = torch.load(model)
                 args = checkpoint['args']
@@ -136,9 +138,9 @@ def start(models_path_dict, infos, s_window_length=16):
                 print(f'- model {name} evaluation...')
 
                 if name == "s-window":
-                    normal = evaluate_epoch(args, model, s_input[:, :3, :, :], device)
+                    normal = evaluate_epoch(args, model, s_input[:, :, :, :], device)
                 else:
-                    normal = evaluate_epoch(args, model, test_0_tensor[:, :3, :, :], device)
+                    normal = evaluate_epoch(args, model, test_0_tensor[:, :, :, :], device)
                     normal = normal[left: right, below:top, :]
 
             normal[s_mask] = 0
@@ -190,12 +192,18 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
+        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+
         "SVD": None,
-        # "GCNN": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint.pth.tar",  # image guided
-        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
-        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
-        # "FUGRC": config.ws_path / "fugrc" / "trained_model" / "128" / "checkpoint-608.pth.tar",
+
+        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+        "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+
+        "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+        "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
     }
     infos = {

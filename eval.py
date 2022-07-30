@@ -89,13 +89,26 @@ if __name__ == '__main__':
     # test_folder = config.real_data
     models = {
         # test
+        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+
+        # "SVD": None,
+
+        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+
+        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+        # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
+
         # "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
         # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
         # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-1199.pth.tar",
 
         # "an2-f3f": config.paper_exp / "an2" / "checkpoint-f3f-303.pth.tar",
         # "an2-f3b": config.paper_exp / "an2" / "checkpoint-f3b-308.pth.tar",
-        "an2-f1b": config.paper_exp / "an2" / "checkpoint-f1b-313.pth.tar",
+        "an2-f1b": config.paper_exp / "an2" / "checkpoint-f1b-453.pth.tar",
 
         # record
         # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1256.pth.tar",
@@ -114,7 +127,7 @@ if __name__ == '__main__':
         # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-955.pth.tar",
         # "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
 
-        "SVD": None,
+        # "SVD": None,
 
     }
 
