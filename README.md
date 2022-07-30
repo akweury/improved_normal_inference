@@ -144,9 +144,9 @@ srun \
 
 
     srun \
-      --job-name="INI-nnnn-cnn-huber" \
+      --job-name="INI-nnnn-GCNN-huber" \
       --time=7-00:00 \
-      -p RTX6000 \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \
