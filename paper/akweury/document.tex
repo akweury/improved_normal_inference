@@ -120,7 +120,7 @@ The training processes are evaluated in every 100 epochs with 29 evaluation scen
 The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
 
 
-\section{GCNN model evaluation based on Geometry Information}
+\section{GCNN model based on Geometry Information}
 The GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
 
 In order to verify the applicability of UNet architecture and Gated Convolution layer for the normal inference task, two similar models are created. 
@@ -133,6 +133,18 @@ We replace all of the gated layer to standard convolution layers in the network 
 	\label{fig:gcnn-training-history}
 \end{figure}
 
+\section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
+The Trip-Net model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
+
+In order to verify the applicability of UNet architecture and Gated Convolution layer for the normal inference task, two similar models are created. 
+We replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same in model ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". Another model called ``NOC" is designed to verify the skip connection in the UNet, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show the validation of skip connections. Figure \ref{fig:gcnn-training-history} shows the training history on BerHu Loss. The GCNN approach achieves a lower loss from start to the end of the training.
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=.8\textwidth]{./Figures/gcnn_loss_compare.png}
+	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN.}
+	\label{fig:gcnn-training-history}
+\end{figure}
 
 
 

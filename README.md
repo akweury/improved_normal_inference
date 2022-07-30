@@ -144,9 +144,9 @@ srun \
 
 
     srun \
-      --job-name="INI-nnnn-512" \
+      --job-name="INI-nnnn-l2" \
       --time=7-00:00 \
-      -p RTXA6000 \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \
@@ -154,7 +154,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.10-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp nnnn --dataset synthetic512 --batch_size 2 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
 
 
     srun \

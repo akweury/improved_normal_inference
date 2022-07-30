@@ -118,11 +118,13 @@ class TrainingModel():
         self.angle_losses = np.zeros((1, args.epochs))
         self.angle_losses_light = np.zeros((1, args.epochs))
         self.angle_sharp_losses = np.zeros((1, args.epochs))
+        self.losses_eval = np.zeros((1, args.epochs))
         self.model = self.init_network(network)
         self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
         self.val_loader = None
         self.albedo_loss = None
         self.normal_loss = None
+        self.normal_loss_eval = None
         self.light_loss = None
         self.g_loss = None
         self.normal_huber_loss = None
@@ -282,7 +284,7 @@ def train_epoch(nn_model, epoch, eval_loss_best):
     nn_model.args.epoch = epoch
     print(
         f"-{datetime.datetime.now().strftime('%H:%M:%S')} Epoch [{epoch}] lr={nn_model.optimizer.param_groups[0]['lr']:.1e}"
-        f" start from {date_now} - {time_now} - eval_loss: {eval_loss_best:.1e}")
+        f" start from {date_now} - {time_now} - eval_loss: {float(eval_loss_best):.1e}")
     # ------------ switch to train mode -------------------
     nn_model.model.train()
     normal_loss_total = torch.tensor([0.0])
@@ -454,10 +456,12 @@ def train_epoch(nn_model, epoch, eval_loss_best):
 
 def test_epoch(nn_model, epoch):
     eval_loss = 0
+    normal_loss_total = torch.tensor([0.0])
+    loss_total = torch.tensor([0.0])
     for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
         with torch.no_grad():
             # put input and target to device
-            input, target = input_tensor.to(0), target_tensor.to(0)
+            input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor([0.0]).to(0)
             # input = input[-1:, :]
             # target = target[-1:, :]
             print(test_idx)
@@ -470,23 +474,48 @@ def test_epoch(nn_model, epoch):
 
             gt = target_tensor[:, :3, :, :].to(out.device)
 
-            loss = mu.eval_angle_tensor(out, gt).to("cpu")
+            if nn_model.args.normal_loss:
+                normal_out = out[:, :3, :, :]
+
+                nn_model.normal_loss_eval = loss_utils.weighted_unit_vector_loss(normal_out,
+                                                                                 target[:, :3, :, :],
+                                                                                 nn_model.args.penalty,
+                                                                                 epoch,
+                                                                                 nn_model.args.loss_type)
+
+                loss += nn_model.normal_loss_eval
+                # for plot purpose
+                normal_loss_total += nn_model.normal_loss_eval.detach().to('cpu')
+                loss_total += normal_loss_total
+
+            if nn_model.args.normal_huber_loss:
+                normal_out = out[:, :3, :, :]
+
+                nn_model.normal_loss_eval = loss_utils.weighted_unit_vector_huber_loss(normal_out,
+                                                                                       target[:, :3, :, :],
+                                                                                       nn_model.args.penalty,
+                                                                                       epoch,
+                                                                                       nn_model.args.loss_type)
+
+                loss += nn_model.normal_loss_eval
+                # for plot purpose
+                normal_loss_total += nn_model.normal_loss_eval.detach().to('cpu')
+                loss_total += normal_loss_total
 
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
                 'cpu')
 
-            draw_output(nn_model.args.exp, input[-1:, :], out[-1:, :],
-                        target=target[-1:, :],
-                        exp_path=nn_model.output_folder,
-                        epoch=epoch,
-                        i=j,
-                        train_idx=test_idx[-1],
-                        prefix=f"eval_epoch_{epoch}_{test_idx}_",
-                        tranculate_threshold=nn_model.args.albedo_threshold,
-                        args=nn_model.args)
-            eval_loss += loss
+            # draw_output(nn_model.args.exp, input[-1:, :], out[-1:, :],
+            #             target=target[-1:, :],
+            #             exp_path=nn_model.output_folder,
+            #             epoch=epoch,
+            #             i=j,
+            #             train_idx=test_idx[-1],
+            #             prefix=f"eval_epoch_{epoch}_{test_idx}_",
+            #             tranculate_threshold=nn_model.args.albedo_threshold,
+            #             args=nn_model.args)
 
-    return eval_loss / nn_model.test_loader.dataset.__len__()
+    return loss_total / (nn_model.test_loader.dataset.__len__() / nn_model.args.batch_size)
 
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
@@ -701,6 +730,13 @@ def main(args, exp_dir, network, train_dataset):
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             eval_loss = test_epoch(nn_model, epoch)
+            nn_model.losses_eval[0, epoch] = eval_loss
+
+            # draw line chart
+            if epoch % 10 == 9:
+                draw_line_chart(nn_model.losses_eval, nn_model.output_folder,
+                                log_y=True, label="loss", epoch=epoch, start_epoch=0, title="eval_loss")
+
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss
             else:
@@ -718,99 +754,99 @@ def main(args, exp_dir, network, train_dataset):
             break
 
 
-def main_parameter_search(args, exp_dir, network, train_dataset):
-    device_name = "cuda:0"
-
-    output_folder = None
-
-    print(f"- Training Date: {datetime.datetime.today().date()}\n")
-    from help_funs.chart import line_chart
-    lr_decay_range = np.arange(0.7, 0.4, -0.1)
-    lr_scheduler_range = np.arange(15, 5, -1)
-    loss_table = np.zeros(shape=(lr_decay_range.shape[0] + lr_scheduler_range.shape[0]))
-    loss_decay_table = np.zeros(shape=(lr_decay_range.shape[0], args.epochs))
-    loss_scheduler_table = np.zeros(shape=(lr_scheduler_range.shape[0], args.epochs))
-    for index, lr_decay in enumerate(lr_decay_range):
-        nn_model = TrainingModel(args, exp_dir, network, train_dataset)
-        if index == 0:
-            output_folder = nn_model.output_folder
-
-        nn_model.args.lr_scheduler = str(lr_scheduler_range[0])
-        nn_model.args.lr_decay_factor = lr_decay
-
-        best_loss = 1
-        loss = None
-        for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
-            is_best, loss = train_epoch(nn_model, epoch)
-
-            # Learning rate scheduler
-            nn_model.lr_decayer.step()
-
-            # evaluation
-            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                test_epoch(nn_model, epoch)
-
-            if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
-                break
-            if best_loss > np.sum(loss[:3, epoch]):
-                best_loss = np.sum(loss[:3, epoch]) / 3
-
-        loss[np.isnan(loss)] = 0
-        loss = np.sum(loss[:3, :], axis=0)
-        loss_decay_table[index, :] = loss
-        loss_table[index] = best_loss
-
-    line_chart(loss_decay_table, output_folder, labels=lr_decay_range,
-               title=f"lr-decay-factor-search-schedlu={str(lr_scheduler_range[0])}")
-
-    best_lr_decay_factor = lr_decay_range[np.argmax(loss_table)]
-    print("best decay factor: " + str(best_lr_decay_factor))
-
-    # schedule search
-    plt.cla()
-
-    for index, first_decay in enumerate(lr_scheduler_range):
-        nn_model = TrainingModel(args, exp_dir, network, train_dataset)
-        nn_model.args.lr_scheduler = str(first_decay)
-        nn_model.args.lr_decay_factor = best_lr_decay_factor
-
-        best_loss = 1
-        loss = None
-        for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
-            is_best, loss = train_epoch(nn_model, epoch)
-
-            # Learning rate scheduler
-            nn_model.lr_decayer.step()
-
-            # evaluation
-            if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
-                test_epoch(nn_model, epoch)
-
-            if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
-                break
-            if best_loss > np.sum(loss[:3, epoch]):
-                best_loss = np.sum(loss[:3, epoch]) / 3
-
-        loss[np.isnan(loss)] = 0
-        loss = np.sum(loss[:3, :], axis=0)
-
-        loss_table[index + lr_decay_range.shape[0]] = best_loss
-        loss_scheduler_table[index, :] = loss
-
-    line_chart(loss_scheduler_table, output_folder, labels=lr_scheduler_range,
-               title=f"lr-schedule-search-decay={str(best_lr_decay_factor)}")
-
-    best_index = np.argmin(loss_table[lr_decay_range.shape[0]:])
-    best_lr_schedule_range = lr_scheduler_range[best_index]
-    print("best lr schedule :" + str(best_lr_schedule_range))
-
-    ## final output
-    plt.cla()
-    loss_table = loss_table.reshape(1, -1)
-    line_chart(loss_table, output_folder, labels=["loss"],
-               title="lr-parameter-search", cla_leg=True)
-
-    np.savetxt("lr-parameter-search.txt", loss_table)
+# def main_parameter_search(args, exp_dir, network, train_dataset):
+#     device_name = "cuda:0"
+#
+#     output_folder = None
+#
+#     print(f"- Training Date: {datetime.datetime.today().date()}\n")
+#     from help_funs.chart import line_chart
+#     lr_decay_range = np.arange(0.7, 0.4, -0.1)
+#     lr_scheduler_range = np.arange(15, 5, -1)
+#     loss_table = np.zeros(shape=(lr_decay_range.shape[0] + lr_scheduler_range.shape[0]))
+#     loss_decay_table = np.zeros(shape=(lr_decay_range.shape[0], args.epochs))
+#     loss_scheduler_table = np.zeros(shape=(lr_scheduler_range.shape[0], args.epochs))
+#     for index, lr_decay in enumerate(lr_decay_range):
+#         nn_model = TrainingModel(args, exp_dir, network, train_dataset)
+#         if index == 0:
+#             output_folder = nn_model.output_folder
+#
+#         nn_model.args.lr_scheduler = str(lr_scheduler_range[0])
+#         nn_model.args.lr_decay_factor = lr_decay
+#
+#         best_loss = 1
+#         loss = None
+#         for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
+#             is_best, loss = train_epoch(nn_model, epoch)
+#
+#             # Learning rate scheduler
+#             nn_model.lr_decayer.step()
+#
+#             # evaluation
+#             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+#                 test_epoch(nn_model, epoch)
+#
+#             if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
+#                 break
+#             if best_loss > np.sum(loss[:3, epoch]):
+#                 best_loss = np.sum(loss[:3, epoch]) / 3
+#
+#         loss[np.isnan(loss)] = 0
+#         loss = np.sum(loss[:3, :], axis=0)
+#         loss_decay_table[index, :] = loss
+#         loss_table[index] = best_loss
+#
+#     line_chart(loss_decay_table, output_folder, labels=lr_decay_range,
+#                title=f"lr-decay-factor-search-schedlu={str(lr_scheduler_range[0])}")
+#
+#     best_lr_decay_factor = lr_decay_range[np.argmax(loss_table)]
+#     print("best decay factor: " + str(best_lr_decay_factor))
+#
+#     # schedule search
+#     plt.cla()
+#
+#     for index, first_decay in enumerate(lr_scheduler_range):
+#         nn_model = TrainingModel(args, exp_dir, network, train_dataset)
+#         nn_model.args.lr_scheduler = str(first_decay)
+#         nn_model.args.lr_decay_factor = best_lr_decay_factor
+#
+#         best_loss = 1
+#         loss = None
+#         for epoch in range(nn_model.start_epoch, nn_model.args.epochs):
+#             is_best, loss = train_epoch(nn_model, epoch)
+#
+#             # Learning rate scheduler
+#             nn_model.lr_decayer.step()
+#
+#             # evaluation
+#             if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+#                 test_epoch(nn_model, epoch)
+#
+#             if np.isnan(np.sum(loss[:3, epoch])) or np.sum(loss[:3, epoch]) > 1e+4:
+#                 break
+#             if best_loss > np.sum(loss[:3, epoch]):
+#                 best_loss = np.sum(loss[:3, epoch]) / 3
+#
+#         loss[np.isnan(loss)] = 0
+#         loss = np.sum(loss[:3, :], axis=0)
+#
+#         loss_table[index + lr_decay_range.shape[0]] = best_loss
+#         loss_scheduler_table[index, :] = loss
+#
+#     line_chart(loss_scheduler_table, output_folder, labels=lr_scheduler_range,
+#                title=f"lr-schedule-search-decay={str(best_lr_decay_factor)}")
+#
+#     best_index = np.argmin(loss_table[lr_decay_range.shape[0]:])
+#     best_lr_schedule_range = lr_scheduler_range[best_index]
+#     print("best lr schedule :" + str(best_lr_schedule_range))
+#
+#     ## final output
+#     plt.cla()
+#     loss_table = loss_table.reshape(1, -1)
+#     line_chart(loss_table, output_folder, labels=["loss"],
+#                title="lr-parameter-search", cla_leg=True)
+#
+#     np.savetxt("lr-parameter-search.txt", loss_table)
 
 
 if __name__ == '__main__':

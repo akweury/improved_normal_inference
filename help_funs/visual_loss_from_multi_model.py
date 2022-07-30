@@ -12,8 +12,11 @@ models = {
     # "vil-10-1000": config.ws_path / "vil10" / "trained_model" / "128" / "checkpoint-l1-10-1000.pth.tar",
 
     "GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-    "NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-    "CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+    # "NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+    # "CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+    "Trip-Net": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+    "Trip-Net-F1B": config.paper_exp / "an2" / "checkpoint-f1b-798.pth.tar",  # Trip Net
+    "Trip-Net-C": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
 }
 
