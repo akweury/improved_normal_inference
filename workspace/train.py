@@ -709,6 +709,7 @@ def main(args, exp_dir, network, train_dataset):
     nn_model = TrainingModel(args, exp_dir, network, train_dataset)
     eval_loss_best = 1e+10
     stop_factor = 0
+    is_best = False
     print(f'- Training GPU: {nn_model.device}')
     print(f"- Training Date: {datetime.datetime.today().date()}\n")
     # if nn_model.args.exp == "fugrc":
@@ -719,13 +720,10 @@ def main(args, exp_dir, network, train_dataset):
         # if nn_model.args.exp == "fugrc":
         #     is_best = train_fugrc(nn_model, epoch, loss_network)
         # else:
-        is_best, loss = train_epoch(nn_model, epoch, eval_loss_best)
+        _, loss = train_epoch(nn_model, epoch, eval_loss_best)
 
         # Learning rate scheduler
         nn_model.lr_decayer.step()
-
-        # Save checkpoint in case evaluation crashed
-        nn_model.save_checkpoint(is_best, epoch)
 
         # evaluation
         if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
@@ -739,6 +737,10 @@ def main(args, exp_dir, network, train_dataset):
 
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss
+                is_best = True
+
+        # Save checkpoint in case evaluation crashed
+        nn_model.save_checkpoint(is_best, epoch)
 
         if epoch > 10:
             if np.isnan(np.sum(loss[:3, epoch])):
