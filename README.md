@@ -88,9 +88,9 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
     
     srun \
-      --job-name="INI-an2" \
+      --job-name="INI-an2-f3f" \
       --time=7-00:00 \
-      -p RTXA6000 \
+      -p RTX6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \
@@ -98,7 +98,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-27_21_31_59/checkpoint-303.pth.tar 
+      python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --resume /home/sha/improved_normal_inference/workspace/an2/output_2022-07-27_21_31_59/checkpoint-303.pth.tar 
 
 
     srun \
