@@ -4,7 +4,7 @@
   "exp": "nnnn",
   "resume": null,
   "num_channels": 128,
-  "net_type": "gcnn_noc",
+  "net_type": "cnn",
   "init_net": null,
   "init_light_net": null,
   "epochs": 1500,

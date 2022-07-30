@@ -144,7 +144,7 @@ srun \
 
 
     srun \
-      --job-name="INI-nnnn-GCNN-huber" \
+      --job-name="INI-nnnn-GCNN-noc" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \
