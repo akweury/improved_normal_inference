@@ -134,9 +134,9 @@ We replace all of the gated layer to standard convolution layers in the network 
 \end{figure}
 
 \section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
-The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of Trip-Net architecture. Since the Trip-Net is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. 
+The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of Trip-Net architecture. Since the Trip-Net is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. We set learning rate=$ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen 8.
 
-As shown in the loss figure, ... (discussion about the figure)
+Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. As shown in the loss figure, ... (discussion about the figure)
 
 \begin{figure}[th]
 	\centering
@@ -147,6 +147,36 @@ As shown in the loss figure, ... (discussion about the figure)
 
 
 \section{Evaluation}
+We evaluate the trained models on ``synthetic-50-5". 5 different objects are included with 100 scenes in total. The test objects do not exist in the training dataset. The dataset is evaluated based on angle metrics. 
+
+
+
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l }
+		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  & 38.53  &11.09 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus & 32.61  & 7.82 & 8.98 & 11.95 & 7.35\\ 
+		\hline
+		Dragon &45.04& 10.61 & 15.31 & 16.05 & 7.35\\
+		\hline
+		Garfield & 42.15& 10.22 & 12.52 & 14.47 & 9.15\\
+		\hline
+		Washington &47.36 & 13.47 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{The performance of the GCNN model for geometry information based normal inference. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
+	\label{tab:gcnn-eval}
+\end{table}
+
+
+
+
+
+
+
+
 
 %% gcnn-eval
 \begin{figure}[H]

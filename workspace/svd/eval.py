@@ -45,7 +45,7 @@ def eval(dataloader, farthest_neighbour):
         # record time and loss
         loss_list[i] = diff
         time_list[i] = gpu_time * 1000
-        print(f"[SVD] Test Case: {i}/{loss_list.shape[0]}, Angle Loss: {diff}, Time: {(gpu_time * 1000):.2e} ms")
+        # print(f"[SVD] Test Case: {i}/{loss_list.shape[0]}, Angle Loss: {diff}, Time: {(gpu_time * 1000):.2e} ms")
 
     return loss_list, time_list, size_list
 

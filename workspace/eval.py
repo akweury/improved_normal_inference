@@ -28,7 +28,7 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     # SVD model
     if model_path is None:
         # load dataset
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="test")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
         data_loader = DataLoader(dataset, shuffle=False, batch_size=1, num_workers=1)
         loss_list, time_list, size_list = svd.eval(data_loader, 2)
         return loss_list, time_list, size_list
@@ -46,9 +46,9 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     print("load dataset...", end="")
     # load dataset
     if dataset_path == config.real_data:
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="test")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
     else:
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="test")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,
@@ -96,8 +96,8 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
             loss_list[i] = diff
             time_list[i] = gpu_time * 1000
 
-            print(
-                f"[{name}] Test Case: {i + 1}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
+            # print(
+            #     f"[{name}] Test Case: {i + 1}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
 
     return loss_list, time_list, size_list
 
