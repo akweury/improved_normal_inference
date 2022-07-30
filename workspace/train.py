@@ -162,7 +162,7 @@ class TrainingModel():
 
     def init_output_folder(self):
         if self.args.machine == "remote":
-            folder_path = config.model_dfki / f"output_{date_now}_{time_now}"
+            folder_path = config.model_dfki / f"{self.args.exp}_{self.args.net_type}_{date_now}_{time_now}"
         else:
             folder_path = self.exp_dir / f"output_{date_now}_{time_now}"
         if not os.path.exists(str(folder_path)):
