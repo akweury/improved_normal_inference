@@ -25,7 +25,7 @@ srun \
   --container-image=/netscratch/enroot/dlcc_pytorch_20.07.sqsh \
   --container-workdir="`pwd`" \
   --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  python3 create_dataset.py --machine remote --max_k 0
+  python3 create_dataset_multi_lights.py --machine remote --max_k 0
   
 
 ```
