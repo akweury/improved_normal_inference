@@ -42,16 +42,27 @@ def main(models, test_folder, args):
 
     loss_avg = {}
     time_avg = {}
+    median_avg = {}
+    d5_avg = {}
+    d11_avg = {}
+    d22_avg = {}
+    d30_avg = {}
     losses = []
     times = []
     sizes = []
     # evaluate CNN models one by one
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
-        loss_list, time_list, size_list = eval.eval(test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
+        loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
+            test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
+        median_avg[name] = np.array(median_loss_list).sum() / np.array(median_loss_list).shape[0]
+        d5_avg[name] = np.array(d5_list).sum() / np.array(d5_list).shape[0]
+        d11_avg[name] = np.array(d11_list).sum() / np.array(d11_list).shape[0]
+        d22_avg[name] = np.array(d22_list).sum() / np.array(d22_list).shape[0]
+        d30_avg[name] = np.array(d30_list).sum() / np.array(d30_list).shape[0]
         losses.append(loss_list)
         times.append(time_list[5:])
         sizes.append(size_list)

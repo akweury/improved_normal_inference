@@ -22,6 +22,12 @@ def eval(dataloader, farthest_neighbour):
     loss_list = np.zeros(len(dataloader.dataset))
     time_list = np.zeros(len(dataloader.dataset))
     size_list = np.zeros(len(dataloader.dataset))
+    median_loss_list = np.zeros(dataloader.dataset.__len__())
+
+    d5_list = np.zeros(dataloader.dataset.__len__())
+    d11_list = np.zeros(dataloader.dataset.__len__())
+    d22_list = np.zeros(dataloader.dataset.__len__())
+    d30_list = np.zeros(dataloader.dataset.__len__())
 
     for i, (input, target, idx) in enumerate(dataloader):
         input, target = input.to("cpu"), target.to("cpu")
@@ -38,16 +44,24 @@ def eval(dataloader, farthest_neighbour):
         # angle_loss = mu.angle_between(normal[~mask], target[~mask]).sum() / mask.sum()
         normal_target = torch.from_numpy(target)[~mask]
         normal = torch.from_numpy(normal)[~mask]
-        diff = mu.avg_angle_between_tensor(normal, normal_target).to("cpu").detach().numpy()
+        diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
+            normal, normal_target)
 
         # record data load time
 
         # record time and loss
         loss_list[i] = diff
         time_list[i] = gpu_time * 1000
+
+        median_loss_list[i] = median_err
+        d5_list[i] = deg_diff_5
+        d11_list[i] = deg_diff_11d25
+        d22_list[i] = deg_diff_22d5
+        d30_list[i] = deg_diff_30
+
         # print(f"[SVD] Test Case: {i}/{loss_list.shape[0]}, Angle Loss: {diff}, Time: {(gpu_time * 1000):.2e} ms")
 
-    return loss_list, time_list, size_list
+    return loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list
 
 
 def eval_single(v, mask, cam_pos, farthest_neighbour):

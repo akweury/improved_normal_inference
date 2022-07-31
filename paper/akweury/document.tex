@@ -154,29 +154,122 @@ We evaluate the trained models on ``synthetic-50-5". 5 different objects are inc
 \begin{table}[H]
 	
 	\centering
-	\begin{tabular}{l l l l l l }
-		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  & 38.53  &11.09 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  		& 20 & 38.53  &11.09 & 13.59 & 15.55 & 9.82\\ 
 		\hline
-		Bus & 32.61  & 7.82 & 8.98 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 32.61  & 7.82 & 8.98 & 11.95 & 7.35\\ 
 		\hline
-		Dragon &45.04& 10.61 & 15.31 & 16.05 & 7.35\\
+		Dragon  		& 20 & 45.04& 10.61 & 15.31 & 16.05 & 7.35\\
 		\hline
-		Garfield & 42.15& 10.22 & 12.52 & 14.47 & 9.15\\
+		Garfield 		& 20 & 42.15& 10.22 & 12.52 & 14.47 & 9.15\\
 		\hline
-		Washington &47.36 & 13.47 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 47.36 & 13.47 & 17.65 & 18.78 & 12.18\\
 	\end{tabular}
-	\caption{The performance of the GCNN model for geometry information based normal inference. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
-	\label{tab:gcnn-eval}
+	\caption{Average Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-mean}
 \end{table}
 
 
 
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  		& 20 & 38.53  &8.86 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus 			& 20 & 32.61  & 4.44 & 4.44 & 11.95 & 7.35\\ 
+		\hline
+		Dragon	 		& 20 & 45.04 & 7.62 & 7.62 & 16.05 & 7.35\\
+		\hline
+		Garfield 		& 20 & 42.15 & 6.40 & 6.40 & 14.47 & 9.15\\
+		\hline
+		Washington 		& 20 & 47.36 & 7.64 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{Median Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-median}
+\end{table}
 
 
 
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  		& 20 & 0.56  & 0.25 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus 			& 20 & 32.61  & 0.56 & 8.98 & 11.95 & 7.35\\ 
+		\hline
+		Dragon 			& 20 & 45.04& 0.31 & 15.31 & 16.05 & 7.35\\
+		\hline
+		Garfield 		& 20 & 42.15& 0.41 & 12.52 & 14.47 & 9.15\\
+		\hline
+		Washington 		& 20 & 47.36 & 0.38 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{5 Average Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-d5}
+\end{table}
 
 
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  	& 20 & 0.81 & 0.62 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus 		& 20 & 32.61 & 0.81 & 8.98 & 11.95 & 7.35\\ 
+		\hline
+		Dragon 		& 20 & 45.04 & 0.69 & 15.31 & 16.05 & 7.35\\
+		\hline
+		Garfield 	& 20 & 42.15 & 0.72 & 12.52 & 14.47 & 9.15\\
+		\hline
+		Washington 	& 20 & 47.36 & 0.62 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{11.5 Average Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-d11}
+\end{table}
+
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  & 20 & 0.90  &	0.90 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus & 20 & 32.61  &			0.93 & 8.98 & 11.95 & 7.35\\ 
+		\hline
+		Dragon & 20 & 45.04& 		0.90 & 15.31 & 16.05 & 7.35\\
+		\hline
+		Garfield & 20 & 42.15& 		0.90 & 12.52 & 14.47 & 9.15\\
+		\hline
+		Washington & 20 & 47.36 &	0.81 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{22.5 Average Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-d22}
+\end{table}
+
+
+\begin{table}[H]
+	
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
+		Baoshanlu  & 20 & 0.96  &0.96 & 13.59 & 15.55 & 9.82\\ 
+		\hline
+		Bus & 20 & 32.61  & 0.96 & 8.98 & 11.95 & 7.35\\ 
+		\hline
+		Dragon & 20 & 45.04& 0.95 & 15.31 & 16.05 & 7.35\\
+		\hline
+		Garfield & 20 & 42.15& 0.94 & 12.52 & 14.47 & 9.15\\
+		\hline
+		Washington & 20 & 47.36 &0.88 & 17.65 & 18.78 & 12.18\\
+	\end{tabular}
+	\caption{30 Angle Error of the evaluation dataset.}	
+	\label{tab:gcnn-eval-d30}
+\end{table}
 
 %% gcnn-eval
 \begin{figure}[H]

@@ -42,16 +42,27 @@ def main(models, test_folder, args, name):
 
     loss_avg = {}
     time_avg = {}
+    median_avg = {}
+    d5_avg = {}
+    d11_avg = {}
+    d22_avg = {}
+    d30_avg = {}
     losses = []
     times = []
     sizes = []
     # evaluate CNN models one by one
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
-        loss_list, time_list, size_list = eval.eval(test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
+        loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
+            test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
+        median_avg[name] = np.array(median_loss_list).sum() / np.array(median_loss_list).shape[0]
+        d5_avg[name] = np.array(d5_list).sum() / np.array(d5_list).shape[0]
+        d11_avg[name] = np.array(d11_list).sum() / np.array(d11_list).shape[0]
+        d22_avg[name] = np.array(d22_list).sum() / np.array(d22_list).shape[0]
+        d30_avg[name] = np.array(d30_list).sum() / np.array(d30_list).shape[0]
         losses.append(loss_list)
         times.append(time_list[5:])
         sizes.append(size_list)
@@ -72,6 +83,11 @@ def main(models, test_folder, args, name):
                   'test_folder': str(test_folder),
                   }
     print(f"{name}: {str(loss_avg.values())}")
+    print(f"median: {str(median_avg.values())}")
+    print(f"d5: {str(d5_avg.values())}")
+    print(f"d11: {str(d11_avg.values())}")
+    print(f"d22: {str(d22_avg.values())}")
+    print(f"d30: {str(d30_avg.values())}")
     with open(str(folder_path / "evaluation.txt"), 'w') as f:
         f.write(json.dumps(saved_json))
 
@@ -94,13 +110,13 @@ if __name__ == '__main__':
             # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
             # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
-            # "SVD": None,
+            "SVD": None,
 
             # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-            # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-            # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+            "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+            "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
 
-            "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+            # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
             # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
         }
 

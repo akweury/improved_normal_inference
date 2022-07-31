@@ -30,8 +30,9 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
         # load dataset
         dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
         data_loader = DataLoader(dataset, shuffle=False, batch_size=1, num_workers=1)
-        loss_list, time_list, size_list = svd.eval(data_loader, 2)
-        return loss_list, time_list, size_list
+        loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = svd.eval(data_loader,
+                                                                                                            2)
+        return loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list
 
     # load model
     checkpoint = torch.load(model_path)
@@ -57,8 +58,14 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     print(f'ok, {data_loader.dataset.__len__()} items.')
 
     loss_list = np.zeros(data_loader.dataset.__len__())
+    median_loss_list = np.zeros(data_loader.dataset.__len__())
     time_list = np.zeros(data_loader.dataset.__len__())
     size_list = np.zeros(data_loader.dataset.__len__())
+
+    d5_list = np.zeros(data_loader.dataset.__len__())
+    d11_list = np.zeros(data_loader.dataset.__len__())
+    d22_list = np.zeros(data_loader.dataset.__len__())
+    d30_list = np.zeros(data_loader.dataset.__len__())
 
     for i, (input, target, scale_factor) in enumerate(data_loader):
         with torch.no_grad():
@@ -91,15 +98,21 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
 
                 normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
                 normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-                diff = mu.avg_angle_between_tensor(normal[mask], normal_target[mask]).to("cpu").detach().numpy()
+                diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
+                    normal[mask], normal_target[mask])
 
             loss_list[i] = diff
             time_list[i] = gpu_time * 1000
 
+            median_loss_list[i] = median_err
+            d5_list[i] = deg_diff_5
+            d11_list[i] = deg_diff_11d25
+            d22_list[i] = deg_diff_22d5
+            d30_list[i] = deg_diff_30
             # print(
             #     f"[{name}] Test Case: {i + 1}/{loss_list.shape[0]}, Angle Loss: {diff:.2e}, Time: {(gpu_time * 1000):.2e} ms")
 
-    return loss_list, time_list, size_list
+    return loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list
 
 
 def eval_post_processing(normal, normal_img, normal_gt, name):

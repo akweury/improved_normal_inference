@@ -50,9 +50,29 @@ def radian_between_tensor(v1, v2):
 def avg_angle_between_tensor(v1, v2):
     radian_diff = radian_between_tensor(v1, v2)
     deg_diff = torch.rad2deg(radian_diff)
+    deg_diff[deg_diff > 90] = 180 - deg_diff[deg_diff > 90]
+
+    deg_diff_5 = deg_diff > 5
+    deg_diff_5 = deg_diff_5.sum() / deg_diff.count_nonzero()
+
+    deg_diff_11d25 = deg_diff > 11.25
+    deg_diff_11d25 = deg_diff_11d25.sum() / deg_diff.count_nonzero()
+
+    deg_diff_22d5 = deg_diff > 22.5
+    deg_diff_22d5 = deg_diff_22d5.sum() / deg_diff.count_nonzero()
+
+    deg_diff_30 = deg_diff > 30
+    deg_diff_30 = deg_diff_30.sum() / deg_diff.count_nonzero()
+
     avg_angle = deg_diff.sum() / deg_diff.size()[0]
-    avg_angle[avg_angle > 90] = 180 - avg_angle[avg_angle > 90]
-    return avg_angle
+    median_angle = deg_diff.median()
+
+    return avg_angle.to("cpu").detach().numpy(), \
+           median_angle.to("cpu").detach().numpy(), \
+           deg_diff_5.to("cpu").detach().numpy(), \
+           deg_diff_11d25.to("cpu").detach().numpy(), \
+           deg_diff_22d5.to("cpu").detach().numpy(), \
+           deg_diff_30.to("cpu").detach().numpy()
 
 
 def vertex2light_direction(vertex_map, light_sorce):
