@@ -121,7 +121,7 @@ CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-        python3 eval.py  --machine remote 
+        python3 eval_single_obj.py  --machine remote 
 
 
 ```
