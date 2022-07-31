@@ -5,9 +5,7 @@ import config
 from help_funs import chart
 
 models = {
-    # "GCNN-1534": config.ws_path / "nnnn" / "trained_model" / "128" / "checkpoint-c32.pth.tar",
 
-    "CNN-2": config.ws_path / "nnnn" / "output_2022-07-30_20_37_43" / "checkpoint-476.pth.tar",  # GCNN
     "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-459.pth.tar",
     "CNN": config.ws_path / "nnnn" / "output_2022-07-30_20_41_10" / "checkpoint-461.pth.tar",
     # "Trip-Net": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net

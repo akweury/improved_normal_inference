@@ -116,35 +116,10 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
 
-    srun \
-      --job-name="vil-10-8-1000" \
-      --time=7-00:00 \
-      -p RTXA6000 \
-      --ntasks=1 \
-      --gpus-per-task=1 \
-      --mem=32G \
-      --cpus-per-gpu=4 \
-      --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
-      --container-workdir="`pwd`" \
-      --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp vil10 --dataset synthetic128 --lightNumUse 10 --num-channels 128 --lr-scheduler 8,1000 --resume /home/sha/improved_normal_inference/workspace/vil10/output_2022-07-23_16_18_46/checkpoint-201.pth.tar
-
-srun \
---job-name="INI-vi5-full" \
---time=7-00:00 \
- -p RTX3090 \
- --ntasks=1 \
- --gpus-per-task=1  \
- --mem=64G  \
- --cpus-per-gpu=6 \
- --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh  \
- --container-workdir="`pwd`" \
- --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
- python3 main.py --machine remote --exp vi5 --dataset synthetic128 --batch_size 32  --resume /home/sha/improved_normal_inference/workspace/light/output_2022-07-14_10_41_23/checkpoint-2074.pth.tar
 
 
     srun \
-      --job-name="INI-GCNN-CNN" \
+      --job-name="INI-GCNN" \
       --time=7-00:00 \
       -p RTX3090 \
       --ntasks=1 \
@@ -154,7 +129,7 @@ srun \
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.10-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --print-freq 1 --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --print-freq 1 --net_type gcnn --resume /home/sha/improved_normal_inference/workspace/nnnn/output_2022-07-24_12_08_51/checkpoint-199.pth.tar
 
 
     srun \
