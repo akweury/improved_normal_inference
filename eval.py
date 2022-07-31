@@ -85,56 +85,18 @@ if __name__ == '__main__':
 
     if args.machine == "local":
         test_folder = config.synthetic_data_noise_local / "synthetic512"
+        models = {
+            # "SVD": None,
+            "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-138.pth.tar",  # GCNN
+            "Trip-Net-512": config.ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar",  # GCNN
+        }
     else:
         test_folder = config.synthetic_data_noise_dfki / "synthetic512"
-    # test_folder = config.real_data
-    models = {
-        # test
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+        models = {
+            # "SVD": None,
+            "GCNN-512": config.model_dfki / "checkpoint-nnnn-147.pth.tar",  # GCNN
+            "Trip-Net-512": config.model_dfki / "checkpoint-an2-34.pth.tar",  # GCNN
+        }
 
-        # "SVD": None,
-
-        "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-138.pth.tar",  # GCNN
-        # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "model_best.pth.tar",  # GCNN
-        "Trip-Net-512": config.ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar",  # GCNN
-
-        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
-
-        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-        # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
-
-        # "an-818": config.paper_exp / "an" / "checkpoint-818.pth.tar",
-        # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
-        # "vil10-8-1000": config.paper_exp / "vil10" / "checkpoint-10-8-1000-1199.pth.tar",
-
-        # "an2-f3f": config.paper_exp / "an2" / "checkpoint-f3f-303.pth.tar",
-        # "an2-f3b": config.paper_exp / "an2" / "checkpoint-f3b-308.pth.tar",
-        # "an2-f1b-793": config.paper_exp / "an2" / "checkpoint-f1b-798.pth.tar",
-        # "an2-f1b-801": config.paper_exp / "an2" / "checkpoint-f1b-801.pth.tar",
-
-        # record
-        # "vil-8-10-1000": config.paper_exp / "vil10" / "checkpoint-8-1000-1256.pth.tar",
-        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",
-        # "an3-3-12-1000": config.paper_exp / "an3" / "checkpoint-3-12-1000-899.pth.tar",
-        # "an3-8-1000": config.paper_exp / "an3" / "checkpoint-8-1000-692.pth.tar",
-        # "vil-10-1000": config.paper_exp / "vil10" / "checkpoint-10-1000.pth.tar",
-
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-gcnn-1799.pth.tar",
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-1299.pth.tar",
-        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
-
-        # "gcnn-cnn": config.paper_exp / "gcnn" / "checkpoint-cnn-858.pth.tar",
-        # "gcnn-noc": config.paper_exp / "gcnn" / "checkpoint-noc-955.pth.tar",
-        # "gcnn-gcnn": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",
-
-        # "SVD": None,
-
-    }
 
     main(models, test_folder, args)
