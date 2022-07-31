@@ -179,9 +179,6 @@ However, the sacrifice of accuracy gives a relatively lighter model. Since we re
 
 
 \section{Evaluation}
-We evaluate the trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
-
-Among all the columns, the most important models are $ GCNN $ (depth map based) and  $ F4 $ (calibrated illuminated RGB-D image based), which is the core result of this thesis. When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline.
 
 Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robust to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
 
@@ -197,6 +194,10 @@ The metric calculate the percentage of the predicted normals that has error less
 The metric calculate the percentage of the predicted normals that has error less than 22.5 degrees comparing to ground-truth.
 \paragraph{30 Degree Error Metric}
 The metric calculate the percentage of the predicted normals that has error less than 30 degrees comparing to ground-truth.
+
+We evaluate the trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
+
+Among all the columns, the most important models are $ GCNN $ (depth map based) and  $ F4 $ (calibrated illuminated RGB-D image based), which is the core result of this thesis. When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline.
 
 
 %% mean metric
@@ -321,44 +322,29 @@ The metric calculate the percentage of the predicted normals that has error less
 
 
 
-%% gcnn-eval
+
+\section{Visualization evaluation on GCNN model}
+A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure  \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg, the head of dragon object, CNN model gives a much brighter error map (which lead to a higher angle error).
+
+
+%% GCNN-eval
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-CNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-NOC.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_SVD.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.18\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
+		\caption{Image}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
 		\caption{GT}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
+		\caption{Predict}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-GCNN.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-CNN.png}
-		\caption{CNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-NOC.png}
-		\caption{NOC}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_SVD.png}
-		\caption{SVD}
+		\caption{Error}
 	\end{subfigure}
 	
 	\begin{tikzpicture}
@@ -368,84 +354,94 @@ The metric calculate the percentage of the predicted normals that has error less
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	
-	\caption{Surface Normal Inference based GCNN model on "Dragon´´ object. The first row shows the estimated surface normal. The second row is the angle error map.}
+	\caption{Normal inference based on GCNN. Test image has resolution $ 128\times128 $}
 	\label{fig:gcnn-eval}
 \end{figure}
 
-
-A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. SVD approach is considered as the baseline shown in last column. As shown in the figure, learning based methods performs better than SVD in terms of angle error. The SVD approach is failed to deal with semi-dense input since there exists many points that missing neighbors. The GCNN model is especially good at noise input due to the gated convolution layer design. As a further detailed comparison, \ref{fig:gcnn-eval-synthetic-zoom-in} gives a closer visualization on the same object. 
-
-
-
-%% fig:gcnn-eval-synthetic-zoom-in
+%% GCNN zoom in eval
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GT.png}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_22_-8_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GCNN-GCNN.png}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_2_22_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GCNN-NOC.png}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_32_12_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GCNN-CNN.png}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_42_-28_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_SVD.png}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_12_-48_normal.png}
 	\end{subfigure}
 	
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_img.png}
-		\caption{GT}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_22_-8_error.png}
+		\caption{Scale}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_GCNN-GCNN.png}
-		\caption{GCNN}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_2_22_error.png}
+		\caption{Head}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_GCNN-NOC.png}
-		\caption{NOC}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_32_12_error.png}
+		\caption{Foreleg}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_GCNN-CNN.png}
-		\caption{CNN}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_42_-28_error.png}
+		\caption{Hindleg}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_SVD.png}
-		\caption{SVD}
+		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_12_-48_error.png}
+		\caption{Tail}
 	\end{subfigure}
 	
-	\caption{Zoom in of the center region of Dragon object. The first row is surface normal, the second row is the corresponding errors. NOC model has no skip connnection, CNN model replace gated convolution layer to standard convolution layer.}
+	
+	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
 	\label{fig:gcnn-eval-synthetic-zoom-in}
 \end{figure}
-As shown in figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the GCNN method gives a sharper edge prediction on the horn area of the dragon object, as well as the scales, whereas the no skip version (NOC) is blurry in the same area.
 
-The CNN version has the skip connection thus gives a better detail than NOC model. However, if we compare the error map of GCNN and CNN in figure \ref{fig:gcnn-eval}, the CNN has less accurate in the smooth area than GCNN model. Like the dragon body, CNN model has a overall higher error than GCNN. It is because the noise of the input still disturb the CNN model and it takes the input noise into account for normal estimation which deviate to the correct surface normal. When we look back to the GCNN based method, we can found that the surface normal has better performance in the smooth area compare to the CNN approach and a sharp detail compare to the no skip connection version.
+%% compare to other models
 
-Table \ref{tab:gcnn-eval} gives a quantitative evaluation for GCNN model. It bases on 100 different test scenes in the "synthetic-50-5´´ dataset with angle metrics for evaluation.
-
-
-
-\begin{table}[H]
-	
+%% GCNN zoom in eval
+\begin{figure}[H]
 	\centering
-	\begin{tabular}{l l l l l l }
-		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df}\\
-		SVD(baseline)  & 41.14  & 320.40 & 8 & 8,1000 & 0.5\\ 
-		\hline
-		GCNN  & 10.64  & 10.44 & 8 & 8,1000 & 0.5\\ 
-		\hline
-		GCNN-NOC & 13.61 & 5.38 & 8 & 8,1000 & 0.5\\
-		\hline
-		CNN & 15.35 & 4.15 & 8 & 8,1000 & 0.5\\
-	\end{tabular}
-	\caption{The performance of the GCNN model for geometry information based normal inference. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
-	\label{tab:gcnn-eval}
-\end{table}
-
-
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-NOC.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-CNN.png}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-GCNN.png}
+		\caption{GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-NOC.png}
+		\caption{NOC}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-CNN.png}
+		\caption{CNN}
+	\end{subfigure}
+	
+	
+	\caption{Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.}
+	\label{fig:gcnn-eval-multi-model}
+\end{figure}
 
 
 
@@ -453,7 +449,10 @@ Table \ref{tab:gcnn-eval} gives a quantitative evaluation for GCNN model. It bas
 \section{Surface Normal Inference based on Calibrated Illuminated RGBD images }
 
 For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net introduced in \ref{sec:trip-net}. 
-The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparison, we placed GCNN result in the last column. The training settings for all the models are exact the same to ensure fairness. As shown in the figure, TripNet uses illuminated calibrated RGBD image has a better performance than GCNN model. The dragon scales are sharper in TripNet result. Figure \ref{fig:tripnet-eval-synthetic-zoom-in} gives a closer visualization.
+The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is 6 degree whereas the GCNN is 9. 
+
+As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN.
+
 %% TripNet-eval
 \begin{figure}[H]
 	\centering
@@ -481,7 +480,7 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	
-	\caption{Normal inference based on Trip-Net. Test image resolution $ 128\times128 $}
+	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
 	\label{fig:trip-eval}
 \end{figure}
 
@@ -489,61 +488,58 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GT.png}
+		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_22_-8_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_an2-8-1000.png}
+		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_2_22_normal.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_normal_GCNN-GCNN.png}
+	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_32_12_normal.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_42_-28_normal.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_12_-48_normal.png}
 	\end{subfigure}
 	
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_img.png}
-		\caption{GT}
+		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_22_-8_error.png}
+		\caption{Scale}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_an2-8-1000.png}
-	\caption{Trip-Net}
+	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_2_22_error.png}
+	\caption{Head}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_7_error_GCNN-GCNN.png}
-		\caption{GCNN}
+	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_32_12_error.png}
+	\caption{Foreleg}
+\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_42_-28_error.png}
+	\caption{Hindleg}
+\end{subfigure}
+	\begin{subfigure}[b]{0.18\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_12_-48_error.png}
+		\caption{Tail}
 	\end{subfigure}
 
 	
-	\caption{Zoom in of the center region of Dragon object. The first row is surface normal, the second row is the corresponding errors.}
+	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
 	\label{fig:tripnet-eval-synthetic-zoom-in}
 \end{figure}
 
 
-\begin{table}[th]
-	
-	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df} & \tabhead{l/i. Nr.}\\
-		SVD  & 41.14  & 320.40 & - & - & - & 0 \\ 
-		\hline
-		GCNN  & 10.64 & 10.44 & 8 & 8,1000 & 0.5 & 0 \\
-		\hline
-		TripNet-CNN & 10.46 & 28.74 & 8 & 8,1000  & 0.5 & 1 \\
-		\hline
-		TripNet-F1B & 9.22 &44.59 & 8 & 8,1000  & 0.5 & 1 \\
-		\hline
-		TripNet & \textbf{9.17} & 43.79 & 8 & 8,1000  & 0.5 & 1 \\
-	\end{tabular}
-	\caption{A quantitative evaluation on proposed approaches. The angle error is the average angle error of all valid pixels in the test case. The time unit is in millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene}	
-	\label{tab:model-error}
-\end{table}
 
 
 
 
-\subsection{Comparison}
 
+\section{More Comparison}
+Figure \ref{fig:final-eval} gives more visualization on model SVD, GCNN and Trip-Net. Figure \ref{fig:final-eval-zoom-in} is the corresponding zoom-in visualization.
 \newpage
 %% Final-Visual
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_groundtruth.png}
@@ -644,7 +640,7 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 
 
 %% Final-Visual-Zoom-In
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_GT.png}
@@ -735,189 +731,7 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 	\end{subfigure}
 	
 	\caption{Zoom in of the center region of the objects in Figure \ref{fig:final-eval}}
-	\label{fig:tripnet-eval-synthetic-zoom-in}
+	\label{fig:final-eval-zoom-in}
 \end{figure}
-
-
-
-
-
-
-From the Figure \ref{fig:normal-histo-diff} we can observe the normal difference between ground-truth and GCNN predicted normals in another dimension. It separates the interval $ \left[ -1,1 \right] $, which is exactly the range of normal vector, to 256 sections. Then it counts the number of points locates in each section for 3 axes.  The 3 axes are fitted quite well in most of interval but other than $ \left[ -0.25,0.25 \right] $ for x and y axes and  interval close to $ -1 $ for z axis. Therefore a further constraint can be considered to the loss function related to the normal difference shown in this figure.
-
-It is faulty that almost no normal has -1 z-component in GCNN predicted normal map. The reason?
-
-
-
-\subsection{Light Inpainting}
-The light inpainting task in this section in order to evaluate the noise inpainting performance of GCNN model. It takes semi-dense light map as input to predict the fully dense light map, as shown in Figure \ref{fig:light-net-archi}. 
-The network is trained on 3000 light maps in the "synthetic-50-5" dataset with initial learning rate 0.001, learning schedule 8,1000 with decay factor 0.5, the batch size is 8, the feature map channel is 128 in all of the gated convolution layers. All the models are tested on a laptop with a single NVIDIA GeForce 940MX, 2GB memory.
-
-%% light eval model structure
-\begin{figure}[th]
-	\centering
-	%% https://tex.stackexchange.com/questions/12020/what-is-the-easiest-way-to-draw-a-3d-cube-with-tikz
-	\begin{tikzpicture}
-		%% -------------------------------------- parameters ------------------------------------------------
-		\pgfmathsetmacro{\vdist}{0.4}
-		
-		\pgfmathsetmacro{\boxsizea}{2}	%% width 512
-		\pgfmathsetmacro{\boxwidtha}{2}	%% width 3
-		
-		%% https://www.tug.org/pracjourn/2007-4/walden/color.pdf
-		\definecolor{netcolor}{rgb}{0.5,0.7,0.7}
-		
-		%% 	d_in							3x512x512
-		%%	dconv1: 	d_in-->x1 			32x512x512
-		\pgfmathsetmacro{\disttimes}{1}	%% width 32
-		\pgfmathsetmacro{\yshift}{1}	%% width 32
-		\pgfmathsetmacro{\boxsize}{\boxsizea}	%% size 512
-		\pgfmathsetmacro{\boxwidth}{\boxwidtha}	%% width 32
-		\pgfmathsetmacro{\yschift}{-1}
-		
-		
-		\node[inner sep=0pt] (input) at (\vdist*\disttimes-6,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/gcnn-synthetic/intrinsic_image_light_input.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes-6,\yschift-2.4) {Semi-dense Light Map};
-		
-		\node[inner sep=0pt] (output) at (\vdist*\disttimes+3,\yschift-0.8)
-		{\includegraphics[width=.2\textwidth]{./Figures/gcnn-synthetic/intrinsic_image_light.png}};
-		\node[text width=3.5cm] at (\vdist*\disttimes+3,\yschift-2.4) {fully-dense Light Map};
-		
-		\draw [-stealth] (\vdist*\disttimes-4.5,\yschift-1) -- (\vdist*\disttimes-3.5,\yschift-1);
-		\draw [-stealth] (\vdist*\disttimes,\yschift-1) -- (\vdist*\disttimes+1,\yschift-1);
-		
-		
-		\pgfmathsetmacro{\disttimes}{-2}	%% width 32		
-		\pgfmathsetmacro{\yschift}{-1}
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,-\boxsize,0) -- ++(\boxwidth,0,0) -- cycle;
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(0,0,-\boxsize) -- ++(0,-\boxsize,0) -- ++(0,0,\boxsize) -- cycle;
-		\draw[black, fill=netcolor] (\vdist*\disttimes,\yschift,0) -- ++(-\boxwidth,0,0) -- ++(0,0,-\boxsize) -- ++(\boxwidth,0,0) -- cycle;
-		
-		\node[text width=3.5cm] at (\vdist*\disttimes+0.3,\yschift-1) {GCNN};
-	\end{tikzpicture}
-	\caption{Light map inpainting based on GCNN architecture.}
-	\label{fig:light-net-archi}
-\end{figure}
-
-The result is shown in Table \ref{tab:light-inpainting}. Besides the GCNN model, we use two extra model as the comparisons. The first one is GCNN-NOC, where NOC means "no skip connection", the second one is CNN, which has the same architecture as the GCNN but only use standard convolution layers in the network.
-The GCNN architecture achieves the average angle error lower than 1 degree. As a comparison, U-CNN model has 4 degrees error, which shows the relative weakness of noise filter competence. Besides, the skip connection also booster the performance, since the no skip connection version still has error greater than 1 degree. The both two models for the inpainting task reveals the superiority of GCNN architecture. Figure \ref{fig:light-scatter} and \ref{fig:light-eval} gives a quantitative and qualitative evaluation.
-
-%% light eval table
-\begin{table}[H]
-	
-	\centering
-	\begin{tabular}{l l l l l l }
-		\tabhead{Model} & \tabhead{Angle} & \tabhead{Time /ms} & \tabhead{bz} & \tabhead{lr-schedule} & \tabhead{lr-df}\\
-		U-GCNN  & 0.59  & 14.45 & 8 & 8,1000 & 0.5\\ 
-		\hline
-		U-GCNN-NOC & 1.31 & 16.14 & 8 & 8,1000 & 0.5\\
-		\hline
-		U-CNN & 4.10 & 10.52 & 8 & 8,1000 & 0.5\\
-	\end{tabular}
-	\caption{The performance of the GCNN model for light map inpainting. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.}	
-	\label{tab:light-inpainting}
-\end{table}
-
-
-%% light eval visualization
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
-		\caption{gray-scale image}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_input.png}
-		\caption{Light Direction}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_gt.png}
-		\caption{ground-truth}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_light-gcnn.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_light-cnn.png}
-		\caption{U-CNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_light-noc.png}
-		\caption{U-GCNN-NOC}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_error_light-gcnn.png}
-		\caption{U-GCNN Error}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_error_light-cnn.png}
-		\caption{U-CNN Error}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_light_error_light-noc.png}
-		\caption{U-NOC Error}
-	\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (10,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_hot-vertical.jpg}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	
-	\caption{GCNN Normal Inference for light map inpainting based on dragon object. The degree error map is shown in last row. The average error is shown in the upper right corner in the error map.}
-	\label{fig:light-eval}
-\end{figure}
-
-%% light eval scatter
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.9\linewidth]{./Figures/gcnn-light/scatter-light.png}
-	\caption{GCNN for light map inpainting on 100 scenes. The evaluated models are corresponding to the table \ref{tab:light-inpainting}, the line in the figure is the corresponding regression line of each model.}
-	\label{fig:light-scatter}
-\end{figure}
-
-
-The evaluation visualization on real dataset is shown in Figure \ref{fig:gcnn-eval-real}
-%% fig:gcnn-eval-real
-\begin{figure}[th]
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-real/fancy_eval_1_point_cloud_noise.png}
-		\caption{point cloud}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-real/fancy_eval_1_groundtruth.png}
-		\caption{ground-truth}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-real/fancy_eval_1_normal_GCNN.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-real/fancy_eval_1_error_GCNN.png}
-		\caption{Angle Error}
-	\end{subfigure}
-	\caption{Evaluation on Real Dataset}
-	\label{fig:gcnn-eval-real}
-\end{figure}
-
-
-We evaluate the U-GCNN model on 100 test images as a quantitative evaluation. The result is shown in Figure \ref{fig:scatter-gcnn}. The GCNN based method has average angle error around 10 degrees, whereas the no skip connection version has error above 12 degrees and the CNN version has error above 15 degrees.
-
-%% scatter_gcnn
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=.8\textwidth]{./Figures/gcnn-synthetic/gcnn-scatter.png}
-	\caption{Evaluation of average angular loss on the whole test dataset with 100 scenes. The x-axis indicates the point number, the y-axis indicates the angles. The lines show in the picture are the regression line of each model.}
-	\label{fig:scatter-gcnn}
-\end{figure}
-
-
-
 
 \end{document}

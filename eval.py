@@ -84,18 +84,28 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.machine == "local":
-        test_folder = config.synthetic_data_noise_local / "synthetic512"
+        test_folder = config.synthetic_data_noise_local / "synthetic128"
         models = {
             # "SVD": None,
-            "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-138.pth.tar",  # GCNN
-            "Trip-Net-512": config.ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar",  # GCNN
+
+            # "CNN": config.ws_path / "nnnn" / "output_2022-07-30_20_41_10" / "checkpoint-899.pth.tar",  # Trip Net
+            # "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-899.pth.tar",  # Trip Net
+            # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-407.pth.tar",  # Trip Net
+            # "GCNN-l2": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_44_30" / "checkpoint-421.pth.tar",  # Trip Net
+
+            # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+            # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-403.pth.tar",
+            # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-380.pth.tar",
+            # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "model_best.pth.tar",
+            "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
         }
     else:
         test_folder = config.synthetic_data_noise_dfki / "synthetic512"
         models = {
             # "SVD": None,
-            "GCNN-512": config.model_dfki / "checkpoint-nnnn-147.pth.tar",  # GCNN
-            "Trip-Net-512": config.model_dfki / "checkpoint-an2-34.pth.tar",  # GCNN
+            "GCNN-512": config.model_dfki / "checkpoint-179.pth.tar",  # GCNN
+            "Trip-Net-512": config.model_dfki / "checkpoint-42.pth.tar",  # GCNN
+            "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-11.pth.tar",  # GCNN
         }
 
 

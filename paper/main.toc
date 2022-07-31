@@ -55,7 +55,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.4.2}VIL Net}{14}{subsection.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.3}TriG-Net}{14}{subsection.55}%
+\contentsline {subsection}{\numberline {3.4.3}Trip-Net}{14}{subsection.55}%
 \defcounter {refsection}{0}\relax 
 \contentsline {subsubsection}{Side-Pipe(Light)}{15}{section*.56}%
 \defcounter {refsection}{0}\relax 
@@ -81,16 +81,36 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {5}Experiments}{25}{chapter.76}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}GCNN model evaluation}{25}{section.77}%
+\contentsline {section}{\numberline {5.1}Training Details}{25}{section.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Surface Normal Inference based on Calibrated Illuminated RGBD images }{27}{section.81}%
+\contentsline {section}{\numberline {5.2}GCNN model based on Geometry Information}{26}{section.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.2.1}Comparison}{27}{subsection.85}%
+\contentsline {section}{\numberline {5.3}Trip-Net model based on Calibrated Illuminated RGB-D Image}{27}{section.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{31}{chapter.88}%
+\contentsline {section}{\numberline {5.4}Evaluation}{28}{section.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{33}{appendix.89}%
+\contentsline {paragraph}{Average Angle Error Metric}{28}{section*.85}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{33}{section.90}%
+\contentsline {paragraph}{Median Angle Error Metric}{28}{section*.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{37}{appendix*.94}%
+\contentsline {paragraph}{5 Degree Error Metric}{28}{section*.87}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{11.5 Degree Error Metric}{29}{section*.88}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{22.5 Degree Error Metric}{29}{section*.89}%
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{30 Degree Error Metric}{29}{section*.90}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.5}Visualization evaluation on GCNN model}{30}{section.97}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.6}Surface Normal Inference based on Calibrated Illuminated RGBD images }{32}{section.101}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.7}More Comparison}{32}{section.104}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}Conclusion}{35}{chapter.107}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Dataset}{37}{appendix.108}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}Dataset}{37}{section.109}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{41}{appendix*.113}%

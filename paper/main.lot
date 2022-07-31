@@ -17,9 +17,19 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.1}{\ignorespaces The performance of the GCNN model for geometry information based normal inference. The angle error is the average angle error of all valid pixels in the test case. bz stands for batch size, lr-schedule stands for learning rate schedule, lr-df stands for learning rate decay factor.\relax }}{26}{table.caption.80}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{28}{table.caption.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.2}{\ignorespaces A quantitative evaluation on proposed approaches. The angle error is the average angle error of all valid pixels in the test case. The time unit is in millisecond. bz is the batch size, lr-schedule is learning rate schedule. lr-df is learning rate decay factor, l/i. Nr is the number of light-image maps used for each scene\relax }}{28}{table.caption.84}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Average Angle Error of the evaluation dataset.\relax }}{29}{table.caption.91}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.3}{\ignorespaces Median Angle Error of the evaluation dataset.\relax }}{29}{table.caption.92}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.4}{\ignorespaces Percent of error less than 5 degree of the evaluation dataset.\relax }}{29}{table.caption.93}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.5}{\ignorespaces Percent of error less than 11.5 degree of the evaluation dataset.\relax }}{30}{table.caption.94}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.6}{\ignorespaces Percent of error less than 22.5 degree of the evaluation dataset.\relax }}{30}{table.caption.95}%
+\defcounter {refsection}{0}\relax 
+\contentsline {table}{\numberline {5.7}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{30}{table.caption.96}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

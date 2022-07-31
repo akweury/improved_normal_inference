@@ -185,11 +185,11 @@ if __name__ == '__main__':
         #
         # "SVD": None,
         #
-        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
         # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
         # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
 
-        "an2": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+        # "an2": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
         # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
     }
