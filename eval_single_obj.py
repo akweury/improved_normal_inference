@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # test_folder = config.synthetic_data_noise_local / "synthetic128"
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / folder_name
+            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             models = {
                 # "SVD": None,
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
                 "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
             }
         else:
-            test_folder = config.synthetic_data_noise_dfki / "synthetic512" / folder_name
+            test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
             models = {
                 # "SVD": None,
                 "GCNN-512": config.model_dfki / "checkpoint-179.pth.tar",  # GCNN
