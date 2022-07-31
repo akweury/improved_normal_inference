@@ -38,84 +38,85 @@
 
 The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 \times $ in height, width and channel, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
 
-The training processes are evaluated in every 100 epochs with 29 evaluation scenes that model never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work.
-
 \begin{figure}[H]
 	\centering
 	
-		\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.normal0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.normal0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.normal0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.normal0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.18\linewidth}
+	\begin{subfigure}[b]{0.20\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.depth0.png}
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0_noise.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0.png}
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.image0.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0.png}
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.normal0.png}
 	\end{subfigure}
 
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0_noise.png}
+	\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.depth0_noise.png}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0_noise.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.18\linewidth}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.image0.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.normal0.png}
+\end{subfigure}
+
+	\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
 	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0_noise.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0_noise.png}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.image0.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0_noise.png}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.normal0.png}
 \end{subfigure}
 
-	
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.image0.png}
-		\caption{Baoshanlu}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05109.image0.png}
-		\caption{Vase}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.image0.png}
-		\caption{Garfield}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.image0.png}
-		\caption{Dragon}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
-		\caption{Bus}
-	\end{subfigure}	
-	\caption{Some of the test scenes during the training. From top to bottom, normal map, depth map, noised depth map, grayscale image.}
+
+	\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0_noise.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.image0.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.normal0.png}
+\end{subfigure}
+
+	\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0.png}
+	\caption{Depth Map}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0_noise.png}
+	\caption{Add noise}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
+	\caption{Image}
+\end{subfigure}
+\begin{subfigure}[b]{0.20\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
+	\caption{Normal}
+\end{subfigure}
+
+	\caption{Some of the test scenes during the training. From top to bottom, baoshanlu, Washington, Garfield, Dragon, Bus}
 	\label{fig:test-scene}
 \end{figure}
+
+
+The training processes are evaluated in every epochs with 29 evaluation scenes that model never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work. Note that the position of objects are not placed naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
 
 The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
 
@@ -128,148 +129,197 @@ We replace all of the gated layer to standard convolution layers in the network 
 
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.8\textwidth]{./Figures/gcnn_loss_compare.png}
-	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN.}
+	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
+	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
+	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN. The left shows the training loss history whereas the right one shows the evaluation loss history.}
 	\label{fig:gcnn-training-history}
 \end{figure}
 
 \section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
-The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of Trip-Net architecture. Since the Trip-Net is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. We set learning rate=$ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen 8.
+The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture. Since it is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $F, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate.  we set $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
 
-Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. As shown in the loss figure, ... (discussion about the figure)
+Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. As shown in the loss figure, all of the four models has a reasonable learning rate. Trip-Net with four times fusion converges faster than others and also achieve a lower loss. Trip-Net-F3F converges slower than Trip-Net but achieved to a similar evaluation loss. The evaluation loss in Trip-Net-F1F and Trip-Net-F2F are relative higher than 3 or 4 times fusions model. 
 
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.8\textwidth]{./Figures/trip_net_loss.png}
+	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
+	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
 	\caption{The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.}
 	\label{fig:trip-net-training-history}
 \end{figure}
 
-
-\section{Evaluation}
-We evaluate the trained models on ``synthetic-50-5". 5 different objects are included with 100 scenes in total. The test objects do not exist in the training dataset. The dataset is evaluated based on angle metrics. 
-
+However, the sacrifice of accuracy gives a relatively lighter model. Since we remove the fusions between different pipes, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
 
 
 \begin{table}[H]
 	
 	\centering
 	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  		& 20 & 38.53  &11.09 & 13.59 & 15.55 & 9.82\\ 
+		\tabhead{Model} & $ \# $\textbf{Total} &\textbf{ V-P} & \textbf{L-P} & \textbf{I-P} & \tabhead{Size /MB} & \tabhead{Time /h}\\
+		Trip-Net-F1F  			& 88 &  40 & 24 & 24 & 106  &  9.82\\ 
 		\hline
-		Bus 			& 20 & 32.61  & 7.82 & 8.98 & 11.95 & 7.35\\ 
+		Trip-Net-F2F 			& 92 & 40 & 26 & 26 & 137 &  7.35\\ 
 		\hline
-		Dragon  		& 20 & 45.04& 10.61 & 15.31 & 16.05 & 7.35\\
+		Trip-Net-F3F 			& 96 & 40 & 28 & 28 & 167 &  7.35\\
 		\hline
-		Garfield 		& 20 & 42.15& 10.22 & 12.52 & 14.47 & 9.15\\
+		Trip-Net 				& 100 & 40 & 30 & 30 & 198 & 9.15\\
 		\hline
-		Washington 		& 20 & 47.36 & 13.47 & 17.65 & 18.78 & 12.18\\
+		GCNN 					& 32 & 32 & 0 & 0 & 46 & 2.18\\
 	\end{tabular}
-	\caption{Average Angle Error of the evaluation dataset.}	
+	\caption{Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
 	\label{tab:gcnn-eval-mean}
 \end{table}
 
 
 
+
+
+
+
+
+
+\section{Evaluation}
+We evaluate the trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
+
+Among all the columns, the most important models are $ GCNN $ (depth map based) and  $ F4 $ (calibrated illuminated RGB-D image based), which is the core result of this thesis. When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline.
+
+Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robust to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
+
+\paragraph{Average Angle Error Metric}
+The metric calculate the average angle error for each point between the inferred normal and ground-truth normal. 
+\paragraph{Median Angle Error Metric}
+The metric calculate the median angle error of all the point in the normal map.
+\paragraph{5 Degree Error Metric}
+The metric calculate the percentage of the predicted normals that has error less than 5 degrees comparing to ground-truth.
+\paragraph{11.5 Degree Error Metric}
+The metric calculate the percentage of the predicted normals that has error less than 11.5 degrees comparing to ground-truth.
+\paragraph{22.5 Degree Error Metric}
+The metric calculate the percentage of the predicted normals that has error less than 22.5 degrees comparing to ground-truth.
+\paragraph{30 Degree Error Metric}
+The metric calculate the percentage of the predicted normals that has error less than 30 degrees comparing to ground-truth.
+
+
+%% mean metric
 \begin{table}[H]
-	
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  		& 20 & 38.53  &8.86 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l | l | l l l | l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 35.66 & 11.09 & 13.58 & 15.55 & & & & 9.82 \\ 
 		\hline
-		Bus 			& 20 & 32.61  & 4.44 & 4.44 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 31.93 & 7.79 & 8.95 & 11.93 & & & & 7.32\\ 
 		\hline
-		Dragon	 		& 20 & 45.04 & 7.62 & 7.62 & 16.05 & 7.35\\
+		Dragon 			& 20 & 39.57 & 10.60 & 15.29 & 16.03 & & & & 7.35 \\
 		\hline
-		Garfield 		& 20 & 42.15 & 6.40 & 6.40 & 14.47 & 9.15\\
+		Garfield 		& 20 & 39.69 & 10.20 & 12.50 & 14.46 & & & & 9.15 \\
 		\hline
-		Washington 		& 20 & 47.36 & 7.64 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 42.83 & 13.43 & 17.59 & 18.71 & & & & 12.13\\
+	\end{tabular}
+	\caption{Average Angle Error of the evaluation dataset.}	
+	\label{tab:eval-mean}
+\end{table}
+
+%% median metric
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l l | l | l l l | l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 34.06 & 8.86 & 10.82 & 13.25 & & & & 7.62 \\ 
+		\hline
+		Bus 			& 20 & 34.14 & 4.44 & 5.02 & 8.69 & & & & 4.01 \\ 
+		\hline
+		Dragon 			& 20 & 36.43 & 7.62 & 11.10 & 13.26 & & & & 5.06 \\
+		\hline
+		Garfield 		& 20 & 37.60 & 6.40 & 8.90 &11.31 & & & & 5.81\\
+		\hline
+		Washington 		& 20 & 36.89 & 7.64 & 11.38 & 13.64& & & & 6.76\\
 	\end{tabular}
 	\caption{Median Angle Error of the evaluation dataset.}	
-	\label{tab:gcnn-eval-median}
+	\label{tab:eval-median}
 \end{table}
 
 
-
+%% 5 degree metric
 \begin{table}[H]
-	
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  		& 20 & 0.56  & 0.25 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l | l | l l l |l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 0.01 & 0.25 & 0.18 & 0.11 & & & & 0.31\\ 
 		\hline
-		Bus 			& 20 & 32.61  & 0.56 & 8.98 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 0.00 & 0.56 & 0.50 & 0.23 & & & & 0.59 \\ 
 		\hline
-		Dragon 			& 20 & 45.04& 0.31 & 15.31 & 16.05 & 7.35\\
+		Dragon 			& 20 & 0.00 & 0.31 & 0.17 & 0.10 & & & & 0.50\\
 		\hline
-		Garfield 		& 20 & 42.15& 0.41 & 12.52 & 14.47 & 9.15\\
+		Garfield 		& 20 & 0.00 & 0.41 & 0.27 & 0.14 & & & & 0.45\\
 		\hline
-		Washington 		& 20 & 47.36 & 0.38 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 0.00 & 0.38 & 0.26 & 0.10 & & & & 0.41\\
 	\end{tabular}
-	\caption{5 Average Angle Error of the evaluation dataset.}	
-	\label{tab:gcnn-eval-d5}
+	\caption{Percent of error less than 5 degree of the evaluation dataset.}	
+	\label{tab:eval-5d}
 \end{table}
 
 
+%% 11.5 degree metric
 \begin{table}[H]
-	
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  	& 20 & 0.81 & 0.62 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l | l | l l l | l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 0.03 & 0.62 & 0.52 & 0.41 & & & & 0.69\\ 
 		\hline
-		Bus 		& 20 & 32.61 & 0.81 & 8.98 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 0.05 & 0.81 & 0.78 & 0.65 & & & & 0.83 \\ 
 		\hline
-		Dragon 		& 20 & 45.04 & 0.69 & 15.31 & 16.05 & 7.35\\
+		Dragon 			& 20 & 0.02 & 0.69 & 0.51 & 0.40 & & & & 0.82\\
 		\hline
-		Garfield 	& 20 & 42.15 & 0.72 & 12.52 & 14.47 & 9.15\\
+		Garfield 		& 20 & 0.03 & 0.72 & 0.62 & 0.51 & & & & 0.75\\
 		\hline
-		Washington 	& 20 & 47.36 & 0.62 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 0.02 & 0.62 & 0.50 & 0.40 & & & & 0.66\\
 	\end{tabular}
-	\caption{11.5 Average Angle Error of the evaluation dataset.}	
-	\label{tab:gcnn-eval-d11}
+	\caption{Percent of error less than 11.5 degree of the evaluation dataset.}	
+	\label{tab:eval-11d}
 \end{table}
 
+
+
+%% 22.5 degree metric
 \begin{table}[H]
-	
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  & 20 & 0.90  &	0.90 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l | l | l l l | l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 0.18 & 0.90 & 0.84 & 0.79 & & & & 0.92\\ 
 		\hline
-		Bus & 20 & 32.61  &			0.93 & 8.98 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 0.26 & 0.93 & 0.91 & 0.89 & & & & 0.94\\ 
 		\hline
-		Dragon & 20 & 45.04& 		0.90 & 15.31 & 16.05 & 7.35\\
+		Dragon 			& 20 & 0.14 & 0.90 & 0.79 & 0.80 & & & & 0.95\\
 		\hline
-		Garfield & 20 & 42.15& 		0.90 & 12.52 & 14.47 & 9.15\\
+		Garfield 		& 20 & 0.13 & 0.89 & 0.86 & 0.84 & & & & 0.91\\
 		\hline
-		Washington & 20 & 47.36 &	0.81 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 0.14 & 0.81 & 0.72 & 0.72 & & & & 0.84\\
 	\end{tabular}
-	\caption{22.5 Average Angle Error of the evaluation dataset.}	
-	\label{tab:gcnn-eval-d22}
+	\caption{Percent of error less than 22.5 degree of the evaluation dataset.}	
+	\label{tab:eval-22d}
 \end{table}
 
 
+%% 30 degree metric
 \begin{table}[H]
-	
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{GCNN-NOC} & \tabhead{GCNN-CNN} & \tabhead{Trip-Net}\\
-		Baoshanlu  & 20 & 0.96  &0.96 & 13.59 & 15.55 & 9.82\\ 
+	\begin{tabular}{l l | l | l l l | l l l l }
+		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		Baoshanlu  		& 20 & 0.37 & 0.96 & 0.93 & 0.90 & & & & 0.97 \\ 
 		\hline
-		Bus & 20 & 32.61  & 0.96 & 8.98 & 11.95 & 7.35\\ 
+		Bus 			& 20 & 0.43 & 0.96 & 0.94 & 0.93 & & & & 0.96 \\ 
 		\hline
-		Dragon & 20 & 45.04& 0.95 & 15.31 & 16.05 & 7.35\\
+		Dragon 			& 20 & 0.30 & 0.95 & 0.88 & 0.90 & & & & 0.98 \\
 		\hline
-		Garfield & 20 & 42.15& 0.94 & 12.52 & 14.47 & 9.15\\
+		Garfield 		& 20 & 0.27 & 0.94 & 0.92 & 0.91 & & & & 0.95 \\
 		\hline
-		Washington & 20 & 47.36 &0.88 & 17.65 & 18.78 & 12.18\\
+		Washington 		& 20 & 0.28 & 0.88 & 0.81 & 0.82 & & & & 0.90\\
 	\end{tabular}
-	\caption{30 Angle Error of the evaluation dataset.}	
-	\label{tab:gcnn-eval-d30}
+	\caption{Percent of error less than 30 degree of the evaluation dataset.}	
+	\label{tab:eval-30d}
 \end{table}
+
+
+
 
 %% gcnn-eval
 \begin{figure}[H]
@@ -407,29 +457,22 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 %% TripNet-eval
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.18\linewidth}
+		\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
+		\caption{Image}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
 		\caption{GT}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_an2-8-1000.png}
-		\caption{TripNet}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_an2-8-1000.png}
+		\caption{Predict}
 	\end{subfigure}
-\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-GCNN.png}
-	\caption{GCNN}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_an2-8-1000.png}
+	\caption{Error}
 \end{subfigure}
-
 	
 	\begin{tikzpicture}
 		\node[text width=0.1\textwidth] at (10,-1) {90};
@@ -438,7 +481,7 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. As a comparis
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	
-	\caption{TripNet qualitative evaluation. Surface Normal Inference on ``Dragon" object. The first row shows the estimated surface normal. The second row is the angle error map.}
+	\caption{Normal inference based on Trip-Net. Test image resolution $ 128\times128 $}
 	\label{fig:trip-eval}
 \end{figure}
 

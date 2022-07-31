@@ -18,7 +18,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Eval')
 
     # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic128', help="choose evaluate dataset")
+    parser.add_argument('--data', type=str, default='synthetic512', help="choose evaluate dataset")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
     parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
@@ -96,15 +96,19 @@ if __name__ == '__main__':
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
-    # test_folder = config.synthetic_data_noise_local / "synthetic128"
-    test_folder = config.real_data
+    test_folder = config.synthetic_data_noise_local / "synthetic512"
+    # test_folder = config.real_data
     models = {
         # test
         # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
 
-        "SVD": None,
+        # "SVD": None,
+
+        "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-138.pth.tar",  # GCNN
+        # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "model_best.pth.tar",  # GCNN
+        "Trip-Net-512": config.ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar",  # GCNN
 
         # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
         # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",

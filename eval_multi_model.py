@@ -78,6 +78,17 @@ def preprocessing(models):
     return models, path, output_path, eval_res, eval_date, eval_time, all_names, args.datasize
 
 
+def get_s_image(test_0_tensor, s_window_length, img, x_shift, y_shift):
+    w, h = test_0_tensor.size(2), test_0_tensor.size(3)
+
+    left = int(w / 2 - s_window_length)
+    right = int(w / 2 + s_window_length)
+    below = int(h / 2 - s_window_length)
+    top = int(h / 2 + s_window_length)
+    s_img = img[left + x_shift: right + x_shift, below + y_shift:top + y_shift, :]
+    return s_img
+
+
 def start(models_path_dict, infos, s_window_length=16):
     models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, data_size = preprocessing(
         models_path_dict)
@@ -92,6 +103,7 @@ def start(models_path_dict, infos, s_window_length=16):
         gt_tensor = test_0['gt_tensor'].unsqueeze(0)
         gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         img = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        vertex = test_0_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         w, h = test_0_tensor.size(2), test_0_tensor.size(3)
 
@@ -99,13 +111,15 @@ def start(models_path_dict, infos, s_window_length=16):
         right = int(w / 2 + s_window_length)
         below = int(h / 2 - s_window_length)
         top = int(h / 2 + s_window_length)
-        s_gt = gt[left: right, below:top, :]
-        s_img = img[left: right, below:top, :]
 
-        s_input = test_0_tensor[:, :, left: right, below:top]
-        s_input_numpy = s_input.clone()
-        s_input_numpy_3ch = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-        s_input_numpy_fch = s_input_numpy[:, :, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        s_gt = get_s_image(test_0_tensor, s_window_length, gt, 0, 0)
+        s_img = get_s_image(test_0_tensor, s_window_length, img, 0, 0)
+        s_input_numpy_3ch = get_s_image(test_0_tensor, s_window_length, vertex, 0, 0)
+
+        # s_input = test_0_tensor[:, :, left: right, below:top]
+        # s_input_numpy = s_input.clone()
+        # s_input_numpy_3ch = s_input_numpy[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        # s_input_numpy_fch = s_input_numpy[:, :, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         s_mask = s_gt.sum(axis=2) == 0
 
@@ -123,25 +137,15 @@ def start(models_path_dict, infos, s_window_length=16):
 
         # evaluate CNN models
         for model_idx, (name, model) in enumerate(models.items()):
-            # load model
-            # diff_list = []
-            if name == "SVD":
-                print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(s_input_numpy_3ch, ~s_mask, np.array([0, 0, -7]),
-                                                   farthest_neighbour=2)
-            else:
-                checkpoint = torch.load(model)
-                args = checkpoint['args']
-                start_epoch = checkpoint['epoch']
-                device = torch.device("cuda:0")
-                model = checkpoint['model'].to(device)
-                print(f'- model {name} evaluation...')
 
-                if name == "s-window":
-                    normal = evaluate_epoch(args, model, s_input[:, :, :, :], device)
-                else:
-                    normal = evaluate_epoch(args, model, test_0_tensor[:, :, :, :], device)
-                    normal = normal[left: right, below:top, :]
+            checkpoint = torch.load(model)
+            args = checkpoint['args']
+            device = torch.device("cuda:0")
+            model = checkpoint['model'].to(device)
+            print(f'- model {name} evaluation...')
+
+            normal = evaluate_epoch(args, model, test_0_tensor[:, :, :, :], device)
+            normal = normal[left: right, below:top, :]
 
             normal[s_mask] = 0
 
@@ -157,10 +161,6 @@ def start(models_path_dict, infos, s_window_length=16):
 
             diff_img, diff_angle = mu.eval_img_angle(normal, s_gt)
             diff = np.sum(diff_angle) / (np.count_nonzero(diff_angle) + 1e-20)
-
-            # cv.imwrite(str(folder_path / f"eval_{i}_error_{name}.png"),
-            #            cv.cvtColor(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=1),
-            #                        cv.COLOR_RGB2BGR))
             cv.imwrite(str(folder_path / f"eval_{i}_error_{name}.png"),
                        cv.cvtColor(mu.visual_diff(normal, s_gt, "angle"), cv.COLOR_RGB2BGR))
             if infos["title"]:
@@ -169,11 +169,6 @@ def start(models_path_dict, infos, s_window_length=16):
                 # img_list.append(mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=2))
                 img_list.append(cv.cvtColor(mu.visual_diff(normal, s_gt, "angle"), cv.COLOR_RGB2BGR))
 
-            # diff_angle = np.uint8(diff_angle)
-            # if diff_list is None:
-            #     diff_list = diff_angle
-            # else:
-            #     diff_list = np.c_[diff_list, diff_angle]
             eval_res[model_idx, i] = diff
 
         # save the results
@@ -192,18 +187,18 @@ if __name__ == '__main__':
     # load test model names
 
     models = {
-        "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
-
-        "SVD": None,
-
-        "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-        "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+        #
+        # "SVD": None,
+        #
+        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
 
         "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-        "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
+        # "an-8-1000": config.paper_exp / "an" / "checkpoint-818.pth.tar",
 
     }
     infos = {

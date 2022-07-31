@@ -20,9 +20,10 @@ from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
+import config
 from help_funs import mu
 from workspace import loss_utils
-import config
+
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
 mse_criterion = torch.nn.MSELoss(reduction='mean')
@@ -747,10 +748,6 @@ def main(args, exp_dir, network, train_dataset):
         # Save checkpoint in case evaluation crashed
         nn_model.save_checkpoint(is_best, epoch)
 
-        if epoch > 10:
-            if np.isnan(np.sum(loss[:3, epoch])):
-                print("loss is nan.")
-                break
         if np.sum(loss[:3, epoch]) > 1e+4:
             print("loss is greater than 1e+4.")
             break
