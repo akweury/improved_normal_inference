@@ -14,19 +14,6 @@ from help_funs import chart
 from workspace import eval
 
 
-def get_args():
-    parser = argparse.ArgumentParser(description='Eval')
-
-    # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic512', help="choose evaluate dataset")
-    parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
-    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
-                        help="loading dataset from local or dfki machine")
-    args = parser.parse_args()
-
-    return args
-
 
 def main(models, test_folder, args):
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
@@ -96,7 +83,10 @@ if __name__ == '__main__':
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
-    test_folder = config.synthetic_data_noise_local / "synthetic512"
+    if args.machine == "local":
+        test_folder = config.synthetic_data_noise_local / "synthetic512"
+    else:
+        test_folder = config.synthetic_data_noise_dfki / "synthetic512"
     # test_folder = config.real_data
     models = {
         # test
