@@ -448,15 +448,7 @@ def train_epoch(nn_model, epoch, eval_loss_best):
         draw_line_chart(np.array([nn_model.losses[9]]), nn_model.output_folder,
                         log_y=True, label="albedo", epoch=epoch, start_epoch=0, title="albedo_loss", cla_leg=True)
 
-    # indicate for best model saving
-    if nn_model.best_loss > loss_total:
-        nn_model.best_loss = loss_total
-        print(f'best loss updated to {float(loss_total / len(nn_model.train_loader.dataset)):.8e}')
-        is_best = True
-    else:
-        is_best = False
-
-    return is_best, nn_model.losses
+    return False, nn_model.losses
 
 
 def test_epoch(nn_model, epoch):
@@ -494,13 +486,13 @@ def test_epoch(nn_model, epoch):
                 loss_total += normal_loss_total
 
             if nn_model.args.normal_huber_loss:
-                normal_out = out[:, :3, :, :]
-
-                nn_model.normal_loss_eval = loss_utils.weighted_unit_vector_huber_loss(normal_out,
-                                                                                       target[:, :3, :, :],
-                                                                                       nn_model.args.penalty,
-                                                                                       epoch,
-                                                                                       nn_model.args.loss_type)
+                normal_out = out[:, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
+                gt = target[:, :3, :, :].permute(2, 3, 1, 0).to("cpu").squeeze(-1).numpy()
+                mask = gt.sum(axis=2) == 0
+                normal_out[mask] = 0
+                normal_out[normal_out > 1] = 1
+                normal_out[normal_out < -1] = -1
+                _, nn_model.normal_loss_eval = mu.eval_img_angle(gt, normal_out)
 
                 loss += nn_model.normal_loss_eval
                 # for plot purpose
@@ -740,6 +732,11 @@ def main(args, exp_dir, network, train_dataset):
                 draw_line_chart(nn_model.losses_eval, nn_model.output_folder,
                                 log_y=True, label="eval_loss", epoch=epoch, start_epoch=0, title="eval_loss",
                                 cla_leg=True)
+            if eval_loss_best < eval_loss:
+                stop_factor += 1
+                if stop_factor > 2:
+                    print("two times error up. stop training")
+                    break
 
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss

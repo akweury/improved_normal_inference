@@ -115,10 +115,13 @@ if __name__ == '__main__':
                 # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-883.pth.tar",  # Trip Net
                 # "GCNN-best": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "model_best.pth.tar",  # Trip Net
                 # "GCNN-l2": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_44_30" / "checkpoint-923.pth.tar",  # Trip Net
-
-                "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-                "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
-                "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
+                "CNN": config.ws_path / "nnnn" / "output_2022-07-30_20_41_10" / "checkpoint-1414.pth.tar",  # Trip Net
+                "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-1415.pth.tar",  # Trip Net
+                "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-992.pth.tar",
+                # Trip Net
+                # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+                # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
+                # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
                 # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
                 # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
             }
