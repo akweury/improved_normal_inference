@@ -54,7 +54,7 @@ def main(models, test_folder, args, name):
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
-            test_folder, name, model, gpu=args.gpu, data_type=args.data)
+            test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
 
         loss_avg[name] = ("%.2f" % (np.array(loss_list).sum() / np.array(loss_list).shape[0]))
         time_avg[name] = ("%.2f" % (np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]))
@@ -96,7 +96,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Eval')
     # Mode selection
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data', type=str, default="normal_noise", help="choose data type")
+    parser.add_argument('--data_type', type=str, default="normal_noise", help="choose data type")
+    parser.add_argument('--data', type=str, default="synthetic", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
@@ -104,8 +105,8 @@ if __name__ == '__main__':
     # test_folder = config.synthetic_data_noise_local / "synthetic128"
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
-            # test_folder = config.real_data / "test"
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            test_folder = config.real_data / "test"
+            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             models = {
                 # "SVD": None,
 
@@ -121,7 +122,7 @@ if __name__ == '__main__':
                 "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
             }
         else:
-            if args.data == "normal_noise":
+            if args.data == "synthetic":
 
                 test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
             else:

@@ -46,10 +46,8 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     print("ok.")
     print("load dataset...", end="")
     # load dataset
-    if dataset_path == config.real_data:
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
-    else:
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
+
+    dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,
