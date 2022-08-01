@@ -9,7 +9,6 @@
   "init_net": true,
   "init_light_net": null,
   "optimizer": "adam",
-  "lr": 0.0001,
   "lr_decay_factor": 0.5,
   "momentum": 0.9,
   "penalty": 1.4,
