@@ -34,704 +34,254 @@
 
 \begin{document}
 
-\section{Training Details}
+ In this thesis, we require two kinds of input data for model training. 
+ First we need geometry information of the object surface. This can be collected by a depth camera, which records the Z-axis distance of the object surface point to the camera position. 
+ Second we need illuminated information of the object surface, which considers as a help-information of the geometry based model to further improve the inference accuracy. This kind of information is collected by a light scanner, which usually has known intrinsic and extrinsic camera matrix, so that we can convert the point between camera coordinate system and the world coordinate system. Besides, an extra spot light will be placed in a known position to illuminate the object surface. Then, the light scanner can capture the scene as a grayscale/RGB image, save the camera matrix and light position. So we can based on the light position and the depth map acquired from depth camera to calculate light direction and further use image to estimate the surface normal.
+ 
+ In order to acquire these data, we can use a light scanner to scan the objects in laboratory. However, the scanner is failed to scan dark, shinny and transparent region, which leaves a plenty of missing pixels and holes in the depth map. Thus the corresponding surface points are incomplete for the object. It leads to the missing ground-truth in the normal map. Second, to train a deep learning based model usually require a huge dataset, especially for the network without backbone. To create a single depth map dataset for this thesis would be too much of work and resource requirement. A proper way for getting huge depth map data with illumination information can be considered using a game engine, which can simulate any number of data that we required.
+ 
+ In this thesis, we use Unity game engine for data generation. Based on a $ C\# $ script, we can set on a similar configuration in the laboratory. Then create a mount of data based on the collected object models. The dataset that we created for this thesis is called \textit{synthetic-50-5}, since it has 50 different object models for training and 5 object models for testing.
 
-The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 \times $ in height, width and channel, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
 
-\begin{figure}[H]
+
+\section{Resource}
+The object model we used are coming from internet.
+\cite{data1}, \cite{data2}, \cite{data3} and \cite{data4} published a set of point cloud dataset for computer vision research. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. Each objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds makes the normal inference task trivial since the neighbor based method performs good enough for these kind of task. Some of the point cloud even equipped with pre-computed normal map based on more advanced methods. They all provides the accurate ground-truth for the supervised learning method.
+
+The \textit{synthetic50-5} is a datset with 50 point clouds as training set and 5 point clouds as test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. The category of the models include figure, animal, statue, toy, furniture, antique, car model, which include the smooth surface model like \textit{arm, bus, bunny, cat, zebra} and also the model with highly elaborate details, like \textit{Washington, Car-Engine, Armadillo}. 
+The dataset is created base on the work of this thesis and using for normal inference task. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
+
+\begin{figure}[!h]
 	\centering
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/00.apoll.png}
+		\caption{apoll}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/01.arm.png}
+		\caption{arm}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/02.armadillo.png}
+		\caption{armadillo}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/03.bearded-guy.png}
+		\caption{bearded-guy}
+	\end{subfigure}
 	
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0.png}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/04.bronze-sculpture.png}
+		\caption{sculpture}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0_noise.png}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/05.bunny.png}
+		\caption{bunny}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.image0.png}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/06.car-engine.png}
+		\caption{car-engine}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.normal0.png}
+	\begin{subfigure}[b]{0.23\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/07.cat.png}
+		\caption{cat}
 	\end{subfigure}
-
-	\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0_noise.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.image0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.normal0.png}
-\end{subfigure}
-
-	\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0_noise.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.image0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.normal0.png}
-\end{subfigure}
-
-
-	\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0_noise.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.image0.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.normal0.png}
-\end{subfigure}
-
-	\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0.png}
-	\caption{Depth Map}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0_noise.png}
-	\caption{Add noise}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
-	\caption{Image}
-\end{subfigure}
-\begin{subfigure}[b]{0.20\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
-	\caption{Normal}
-\end{subfigure}
-
-	\caption{Some of the test scenes during the training. From top to bottom, baoshanlu, Washington, Garfield, Dragon, Bus}
-	\label{fig:test-scene}
-\end{figure}
-
-
-The training processes are evaluated in every epochs with 29 evaluation scenes that model never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work. Note that the position of objects are not placed naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
-
-The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
-
-
-\section{GCNN model based on Geometry Information}
-The GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
-
-In order to verify the applicability of UNet architecture and Gated Convolution layer for the normal inference task, two similar models are created. 
-We replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same in model ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". Another model called ``NOC" is designed to verify the skip connection in the UNet, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show the validation of skip connections. Figure \ref{fig:gcnn-training-history} shows the training history on BerHu Loss. The GCNN approach achieves a lower loss from start to the end of the training.
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
-	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN. The left shows the training loss history whereas the right one shows the evaluation loss history.}
-	\label{fig:gcnn-training-history}
-\end{figure}
-
-\section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
-The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture. Since it is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $F, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate.  we set $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
-
-Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. As shown in the loss figure, all of the four models has a reasonable learning rate. Trip-Net with four times fusion converges faster than others and also achieve a lower loss. Trip-Net-F3F converges slower than Trip-Net but achieved to a similar evaluation loss. The evaluation loss in Trip-Net-F1F and Trip-Net-F2F are relative higher than 3 or 4 times fusions model. 
-
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
-	\caption{The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.}
-	\label{fig:trip-net-training-history}
-\end{figure}
-
-However, the sacrifice of accuracy gives a relatively lighter model. Since we remove the fusions between different pipes, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
-
-
-\begin{table}[H]
 	
+	\label{fig:dataset-demo}
+	\caption{Point clouds scanned by high resolution scanners}
+\end{figure}
+
+
+\section{Synthesize Scenes using Unity}
+In order to fit the using scenario of Kinect as much as possible, the dataset consists of the generated synthetic 3D scenes via Unity, which is a game engine using for 3D games creation. 
+
+In the synthetic scenes from engine, the object is placed on a cylinder platform, which is lighted by a directional light nearby. A camera focus on the platform and captured the scene. The layout in the game engine is shown in Figure \ref{fig:unity-workplace}. In order to simulate more scenarios, the positions of the camera and directional light are randomly changed in each new scene. For 50 training objects, 1000 scenes are generated and each scene is saved in 3 kinds of resolutions $ 512\times512\times3 $, $ 256\times256\times3 $ and $ 128\times128\times3 $.
+
+\begin{figure}[h!]
 	\centering
-	\begin{tabular}{l l l l l l l }
-		\tabhead{Model} & $ \# $\textbf{Total} &\textbf{ V-P} & \textbf{L-P} & \textbf{I-P} & \tabhead{Size /MB} & \tabhead{Time /h}\\
-		Trip-Net-F1F  			& 88 &  40 & 24 & 24 & 106  &  9.82\\ 
+	\includegraphics[width=.8\textwidth]{./Figures/unity-workplace.PNG}
+	\caption{The layout of synthetic scenes generation in Unity.}
+	\label{fig:unity-workplace}
+\end{figure}
+
+The main advantage using generated scene is the availability of complete information. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control.
+
+For each scene, following information is recorded
+\begin{table}
+	\caption{The information saved for each scene in ``synthetic50-5".}
+	\label{tab:data-files}
+	\centering
+	\begin{tabular}{l l}
+		\tabhead{Data} & \tabhead{Size} \\
+		Depth map & $ 512\times512\times3 $ \\
+		\hline 
+		Depth range  & $ 2\times1 $ \\  
 		\hline
-		Trip-Net-F2F 			& 92 & 40 & 26 & 26 & 137 &  7.35\\ 
+		Grayscale Image	& $ 512\times512\times1 $ \\  
+		\hline 
+		Normal Map &  $ 512\times512\times3 $  \\
+		\hline 
+		Light Position &  $ 3\times1 $  \\
 		\hline
-		Trip-Net-F3F 			& 96 & 40 & 28 & 28 & 167 &  7.35\\
-		\hline
-		Trip-Net 				& 100 & 40 & 30 & 30 & 198 & 9.15\\
-		\hline
-		GCNN 					& 32 & 32 & 0 & 0 & 46 & 2.18\\
+		Camera Intrinsic Matrix &  $ 3\times 3 $  \\
+		\hline 
+		Camera Extrinsic Matrix &  $ 3\times 4 $  \\
+		\hline 
 	\end{tabular}
-	\caption{Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
-	\label{tab:gcnn-eval-mean}
+\end{table}
+
+A depth map $ D $ is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. The grayscale image can be used as guided normal inference task and also as a readable scene for human. The gray-color is converted from RGB color based on following equation 
+\[ gray: \frac{r+2g+b}{4}  \]
+The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on following equation:
+\begin{dgroup*}
+	\begin{dmath*}
+		n_x = \frac{R}{255} * 2 - 1
+	\end{dmath*}
+	\begin{dmath*}
+		n_y = \frac{G}{255}*2 - 1
+	\end{dmath*} 
+	\begin{dmath*}
+		n_z = 1-\frac{B}{255} * 2
+	\end{dmath*}
+\end{dgroup*}
+If consider the relation between Lambertian reflection and normal direction, the light source can be used to calculate the reflect direction of each point.
+The camera intrinsic and extrinsic matrix helps point cloud calculation.
+
+It is necessary to point out again that ``synthetic50-5" aiming to rebuild the using scenarios of Kinect, where all types of the generated data files shown in Table \ref{tab:data-files} are also the same format of the Kinect data.
+
+
+
+\subsection{Convert to Point Cloud}
+\label{sec:depth-map-to-point-cloud}
+The depth map can be converted to 3D vertex point cloud as the input of the normal inference model. 
+
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture} 
+		% reference lines
+		\draw[thick,dashed]	(0,0) -- (10,0) ; % bottom
+		\draw[thick,dashed]	(0,3) -- (10,3) node[pos=0.9, above] {image plane}; % middle
+		\draw[thick,dashed]	(0,6) -- (10,6); % top
+		% camera 
+		\filldraw[black] (5,0) circle (2pt) node[anchor=south west]{Camera Position};
+		% world point 
+		\filldraw[black] (7,6) circle (2pt) node[anchor=north west]{Point};
+		% image point
+		\filldraw[black] (6,3) circle (2pt) node[anchor=north west]{Pixel};
+		% similiar triangles
+		\draw[thick] (5,0) -- (5,6); % AB
+		\draw[thick] (5,0) -- (7,6); % AC
+		\draw[thick] (5,6) -- (7,6) node[midway, below] {$ X $}; % BC
+		\draw[thick] (5,3) -- (6,3) node[midway, below] {$ u $};
+		% measure arrows
+		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
+		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
+	\end{tikzpicture}	
+	\caption{Convert depth to point in camera coordinate system}
+	\label{fig:depth-triangulation}
+\end{figure}
+
+Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The $ x  $ and $ y $ axes perpendicular with each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ in camera coordinate system. The $ X $ and $ Y $ can be calculated based on the triangle similarity
+\begin{dgroup*}
+	
+	\begin{dmath*}
+		X = \frac{uZ}{fk_u}
+	\end{dmath*}
+	\begin{dmath*}
+		Y = \frac{vZ}{fk_v}
+	\end{dmath*}
+\end{dgroup*}
+
+where $ fk_u, fk_v $ is the focal length in pixels align $ u $ and $ v $ axes.
+Converted a point from camera coordinate system to world coordinate system, using extrinsic matrix $ R $ and $ t $
+\[P_W = P_CR+t \]
+
+\subsection{Point Cloud Normalization}
+\label{sec:dataset-normalization}
+%% How to represent input tensor, to make it fast converse
+The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus the normalization is required before feed training objects into the models.
+The range of each axis is shown in Figure \ref{fig:data-range}.  Table \ref{tab:data-range} gives a quantitative measurement of corresponding average values. 
+
+The normalization has been performed as follows. First translate the points to the original point as close as possible, then choose the range value of one axis as a scale factor, normalize the points to unit vectors. The equation is shown as follows
+\begin{dgroup*}
+	
+	\begin{dmath*}
+		X_n =\frac{X-\min(X)}{s}
+	\end{dmath*}
+	\begin{dmath*}
+		Y_n = \frac{Y-\min(Y)}{s}
+	\end{dmath*}
+	
+	\begin{dmath*}
+		Z_n = \frac{Z-\min(Z)}{s}
+	\end{dmath*}
+\end{dgroup*}
+
+where $ s $ is a scale factor, 
+
+\begin{dmath*}
+	s = \max(X)-\min(X)
+\end{dmath*}
+It is calculated as the range in $ X $ axis, but theoretically can be used by $ Y $ or $ Z $ axes as well.
+
+\begin{figure}[!h]
+	\centering
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
+	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
+	\label{fig:data_range}
+	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
+\end{figure}
+
+\begin{table}[h!]
+	\caption{ The fluctuation of extreme values and their ranges in 100 random training items. 
+	}
+	\label{tab:data-range}
+	\centering
+	\begin{tabular}{c c c c}
+		\tabhead{Axis} & \tabhead{Scale} & \tabhead{Min} & \tabhead{Max}\\
+		X & 1.48 & -0.75 & 0.73\\
+		Y & 1.56 & -0.76 & 0.80\\
+		Z & 1.47 & 6.53 & 8.00\\
+
+	\end{tabular}
 \end{table}
 
 
 
-
-
-
-
-
-
-\section{Evaluation}
-
-Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robust to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
-
-\paragraph{Average Angle Error Metric}
-The metric calculate the average angle error for each point between the inferred normal and ground-truth normal. 
-\paragraph{Median Angle Error Metric}
-The metric calculate the median angle error of all the point in the normal map.
-\paragraph{5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 5 degrees comparing to ground-truth.
-\paragraph{11.5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 11.5 degrees comparing to ground-truth.
-\paragraph{22.5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 22.5 degrees comparing to ground-truth.
-\paragraph{30 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 30 degrees comparing to ground-truth.
-
-We evaluate the trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
-
-Among all the columns, the most important models are $ GCNN $ (depth map based) and  $ F4 $ (calibrated illuminated RGB-D image based), which is the core result of this thesis. When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline.
-
-
-%% mean metric
-\begin{table}[H]
+\subsection{Noise}
+\label{sec:noise}
+The raw depth maps captured by Kinect usually have missing pixels. Therefore, the ``synthetic50-5" dataset adds a similar properties.
+As shown in Figure \ref{fig:depth_map_kinect}. the depth map has missing pixels distributed all around the scene.  Correspondingly, an uniformly distributed pixel-delete noise is used for noise simulation. 
+Furthermore, a parameter $ \mu $ is used to control the intensity of noise, it denotes the $ \mu $-percent pixel dropoff. For example, $ \mu-10 $ means removes 10\% pixels randomly. For each scene, the noising operation based on a random $ \mu $ in a range $ \left[0, 50\right] $, therefore some scenes have more missing pixels and some have less. The random noise intensity also enables the model to learn scenarios not only with noise, but also with minor noise or even without noise.
+Figure \ref{fig:noise-intensity} shows the noise effect on different $ \mu $.
+%% add noise image
+\begin{figure}[!h]
 	\centering
-	\begin{tabular}{l l | l | l l l | l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 35.66 & 11.09 & 13.58 & 15.55 & & & & 9.82 \\ 
+	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
+	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
+	\label{fig:noise-intensity}
+\end{figure}
+
+
+\subsection{Fit to PyTorch}
+In order to saving the training time, the dataset is compressed in PyTorch format. The structure of a single item is shown in Table \ref{tab:tensor-structure}.
+\begin{table}
+	\caption{The structure of a single tensor in the dataset.}
+	\label{tab:tensor-structure}
+	\centering
+	\begin{tabular}{l l}
+		\tabhead{Name} & \tabhead{Content} \\
+		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
 		\hline
-		Bus 			& 20 & 31.93 & 7.79 & 8.95 & 11.93 & & & & 7.32\\ 
+		\multirow{3}{*}{output-tensor}  & GT-Normal \\ & Image \\ & GT-Light-Direction \\
 		\hline
-		Dragon 			& 20 & 39.57 & 10.60 & 15.29 & 16.03 & & & & 7.35 \\
-		\hline
-		Garfield 		& 20 & 39.69 & 10.20 & 12.50 & 14.46 & & & & 9.15 \\
-		\hline
-		Washington 		& 20 & 42.83 & 13.43 & 17.59 & 18.71 & & & & 12.13\\
+		Light position & light position \\
+		\hline 
+		Camera Matrix  & K,R,t\\
+		\hline 
+		Depth Range  & minDepth, maxDepth\\
 	\end{tabular}
-	\caption{Average Angle Error of the evaluation dataset.}	
-	\label{tab:eval-mean}
 \end{table}
 
-%% median metric
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l l | l | l l l | l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 34.06 & 8.86 & 10.82 & 13.25 & & & & 7.62 \\ 
-		\hline
-		Bus 			& 20 & 34.14 & 4.44 & 5.02 & 8.69 & & & & 4.01 \\ 
-		\hline
-		Dragon 			& 20 & 36.43 & 7.62 & 11.10 & 13.26 & & & & 5.06 \\
-		\hline
-		Garfield 		& 20 & 37.60 & 6.40 & 8.90 &11.31 & & & & 5.81\\
-		\hline
-		Washington 		& 20 & 36.89 & 7.64 & 11.38 & 13.64& & & & 6.76\\
-	\end{tabular}
-	\caption{Median Angle Error of the evaluation dataset.}	
-	\label{tab:eval-median}
-\end{table}
-
-
-%% 5 degree metric
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l l | l | l l l |l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 0.01 & 0.25 & 0.18 & 0.11 & & & & 0.31\\ 
-		\hline
-		Bus 			& 20 & 0.00 & 0.56 & 0.50 & 0.23 & & & & 0.59 \\ 
-		\hline
-		Dragon 			& 20 & 0.00 & 0.31 & 0.17 & 0.10 & & & & 0.50\\
-		\hline
-		Garfield 		& 20 & 0.00 & 0.41 & 0.27 & 0.14 & & & & 0.45\\
-		\hline
-		Washington 		& 20 & 0.00 & 0.38 & 0.26 & 0.10 & & & & 0.41\\
-	\end{tabular}
-	\caption{Percent of error less than 5 degree of the evaluation dataset.}	
-	\label{tab:eval-5d}
-\end{table}
-
-
-%% 11.5 degree metric
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l l | l | l l l | l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 0.03 & 0.62 & 0.52 & 0.41 & & & & 0.69\\ 
-		\hline
-		Bus 			& 20 & 0.05 & 0.81 & 0.78 & 0.65 & & & & 0.83 \\ 
-		\hline
-		Dragon 			& 20 & 0.02 & 0.69 & 0.51 & 0.40 & & & & 0.82\\
-		\hline
-		Garfield 		& 20 & 0.03 & 0.72 & 0.62 & 0.51 & & & & 0.75\\
-		\hline
-		Washington 		& 20 & 0.02 & 0.62 & 0.50 & 0.40 & & & & 0.66\\
-	\end{tabular}
-	\caption{Percent of error less than 11.5 degree of the evaluation dataset.}	
-	\label{tab:eval-11d}
-\end{table}
-
-
-
-%% 22.5 degree metric
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l l | l | l l l | l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 0.18 & 0.90 & 0.84 & 0.79 & & & & 0.92\\ 
-		\hline
-		Bus 			& 20 & 0.26 & 0.93 & 0.91 & 0.89 & & & & 0.94\\ 
-		\hline
-		Dragon 			& 20 & 0.14 & 0.90 & 0.79 & 0.80 & & & & 0.95\\
-		\hline
-		Garfield 		& 20 & 0.13 & 0.89 & 0.86 & 0.84 & & & & 0.91\\
-		\hline
-		Washington 		& 20 & 0.14 & 0.81 & 0.72 & 0.72 & & & & 0.84\\
-	\end{tabular}
-	\caption{Percent of error less than 22.5 degree of the evaluation dataset.}	
-	\label{tab:eval-22d}
-\end{table}
-
-
-%% 30 degree metric
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l l | l | l l l | l l l l }
-		\tabhead{Object} & $ \# $ & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
-		Baoshanlu  		& 20 & 0.37 & 0.96 & 0.93 & 0.90 & & & & 0.97 \\ 
-		\hline
-		Bus 			& 20 & 0.43 & 0.96 & 0.94 & 0.93 & & & & 0.96 \\ 
-		\hline
-		Dragon 			& 20 & 0.30 & 0.95 & 0.88 & 0.90 & & & & 0.98 \\
-		\hline
-		Garfield 		& 20 & 0.27 & 0.94 & 0.92 & 0.91 & & & & 0.95 \\
-		\hline
-		Washington 		& 20 & 0.28 & 0.88 & 0.81 & 0.82 & & & & 0.90\\
-	\end{tabular}
-	\caption{Percent of error less than 30 degree of the evaluation dataset.}	
-	\label{tab:eval-30d}
-\end{table}
-
-
-
-
-
-\section{Visualization evaluation on GCNN model}
-A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure  \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg, the head of dragon object, CNN model gives a much brighter error map (which lead to a higher angle error).
-
-
-%% GCNN-eval
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
-		\caption{Image}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
-		\caption{Predict}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-GCNN.png}
-		\caption{Error}
-	\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (10,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	
-	\caption{Normal inference based on GCNN. Test image has resolution $ 128\times128 $}
-	\label{fig:gcnn-eval}
-\end{figure}
-
-%% GCNN zoom in eval
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_22_-8_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_2_22_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_32_12_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_42_-28_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_12_-48_normal.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_22_-8_error.png}
-		\caption{Scale}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_2_22_error.png}
-		\caption{Head}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_32_12_error.png}
-		\caption{Foreleg}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_42_-28_error.png}
-		\caption{Hindleg}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn-synthetic/eval_7_12_-48_error.png}
-		\caption{Tail}
-	\end{subfigure}
-	
-	
-	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
-	\label{fig:gcnn-eval-synthetic-zoom-in}
-\end{figure}
-
-%% compare to other models
-
-%% GCNN zoom in eval
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-NOC.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_GCNN-CNN.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-GCNN.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-NOC.png}
-		\caption{NOC}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_GCNN-CNN.png}
-		\caption{CNN}
-	\end{subfigure}
-	
-	
-	\caption{Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.}
-	\label{fig:gcnn-eval-multi-model}
-\end{figure}
-
-
-
-\newpage
-\section{Surface Normal Inference based on Calibrated Illuminated RGBD images }
-
-For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net introduced in \ref{sec:trip-net}. 
-The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is 6 degree whereas the GCNN is 9. 
-
-As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN.
-
-%% TripNet-eval
-\begin{figure}[H]
-	\centering
-		\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_img.png}
-		\caption{Image}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_groundtruth.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_normal_an2-8-1000.png}
-		\caption{Predict}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_7_error_an2-8-1000.png}
-	\caption{Error}
-\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (10,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	
-	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
-	\label{fig:trip-eval}
-\end{figure}
-
-%% tripNet zoom in eval
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_22_-8_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_2_22_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_32_12_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_42_-28_normal.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_12_-48_normal.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_22_-8_error.png}
-		\caption{Scale}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_2_22_error.png}
-	\caption{Head}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_32_12_error.png}
-	\caption{Foreleg}
-\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_42_-28_error.png}
-	\caption{Hindleg}
-\end{subfigure}
-	\begin{subfigure}[b]{0.18\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/tripnet_synthetic/eval_7_12_-48_error.png}
-		\caption{Tail}
-	\end{subfigure}
-
-	
-	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
-	\label{fig:tripnet-eval-synthetic-zoom-in}
-\end{figure}
-
-
-
-
-
-
-
-\section{More Comparison}
-Figure \ref{fig:final-eval} gives more visualization on model SVD, GCNN and Trip-Net. Figure \ref{fig:final-eval-zoom-in} is the corresponding zoom-in visualization.
-\newpage
-%% Final-Visual
-\begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_normal_SVD.png}
-	\end{subfigure}
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_img.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_2_error_SVD.png}
-\end{subfigure}
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_groundtruth.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_normal_SVD.png}
-\end{subfigure}
-
-
-
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_img.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_3_error_SVD.png}
-\end{subfigure}
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_groundtruth.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_normal_SVD.png}
-\end{subfigure}
-	
-	
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_img.png}
-	\caption{GT}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_an2-8-1000.png}
-	\caption{TripNet}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_GCNN-GCNN.png}
-	\caption{GCNN}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/fancy_eval_9_error_SVD.png}
-	\caption{SVD}
-\end{subfigure}
-	
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (10,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	
-	\caption{Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).}
-	\label{fig:final-eval}
-\end{figure}
-
-
-%% Final-Visual-Zoom-In
-\begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_normal_SVD.png}
-	\end{subfigure}
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_img.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_2_error_SVD.png}
-\end{subfigure}
-
-
-
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_GT.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_normal_SVD.png}
-\end{subfigure}
-
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_img.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_3_error_SVD.png}
-\end{subfigure}
-
-
-
-	\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_GT.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_an2-8-1000.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_GCNN-GCNN.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.24\linewidth}
-	\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_normal_SVD.png}
-\end{subfigure}
-
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_img.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_an2-8-1000.png}
-		\caption{Trip-Net}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_GCNN-GCNN.png}
-		\caption{GCNN}
-	\end{subfigure}
-		\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/visual_eval/eval_9_error_SVD.png}
-		\caption{SVD}
-	\end{subfigure}
-	
-	\caption{Zoom in of the center region of the objects in Figure \ref{fig:final-eval}}
-	\label{fig:final-eval-zoom-in}
-\end{figure}
 
 \end{document}
