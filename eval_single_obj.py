@@ -96,7 +96,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Eval')
     # Mode selection
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
+    parser.add_argument('--data', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
@@ -104,6 +104,7 @@ if __name__ == '__main__':
     # test_folder = config.synthetic_data_noise_local / "synthetic128"
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
+            # test_folder = config.real_data / "test"
             test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             models = {
                 # "SVD": None,
@@ -120,12 +121,16 @@ if __name__ == '__main__':
                 "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
             }
         else:
-            test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
+            if args.data == "normal_noise":
+
+                test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
+            else:
+                test_folder = config.real_data / "train"
             models = {
                 # "SVD": None,
                 "GCNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
                 "Trip-Net-512": config.model_dfki / "checkpoint-53.pth.tar",  # GCNN
-                "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-33.pth.tar",
+                # "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-33.pth.tar",
                 # GCNN
             }
 
