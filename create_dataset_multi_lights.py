@@ -29,8 +29,8 @@ args = parser.parse_args()
 
 
 def convert2training_tensor(path, k, output_type='normal'):
-    width = 128
-    light_num = 10
+    width = 512
+    light_num = 1
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -39,12 +39,12 @@ def convert2training_tensor(path, k, output_type='normal'):
         depth_files = np.array(sorted(glob.glob(str(path / "*depth0_noise.png"), recursive=True)))
         depth_gt_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
     elif output_type == "normal":
-        depth_files = np.array(sorted(glob.glob(str(path / "*depth0.png"), recursive=True)))
+        depth_files = np.array(sorted(glob.glob(str(path / "*depth*.png"), recursive=True)))
     else:
         raise ValueError("output_file is not supported. change it in args.json")
 
-    gt_files = np.array(sorted(glob.glob(str(path / "*normal0.png"), recursive=True)))
-    data_files = np.array(sorted(glob.glob(str(path / "*data0.json"), recursive=True)))
+    gt_files = np.array(sorted(glob.glob(str(path / "*normal*.png"), recursive=True)))
+    data_files = np.array(sorted(glob.glob(str(path / "*data*.json"), recursive=True)))
     img_files = np.array(sorted(glob.glob(str(path / "*image*.png"), recursive=True)))
 
     for item in range(len(data_files)):
@@ -57,7 +57,10 @@ def convert2training_tensor(path, k, output_type='normal'):
         f.close()
         light_pos_list = []
         for i in range(light_num):
-            light_posi = np.array(data[f'lightPos{str(i)}'])
+            if output_type == "normal":
+                light_posi = np.array(data[f'lightPos'])
+            else:
+                light_posi = np.array(data[f'lightPos{str(i)}'])
             # light_posi = np.array(data[f'lightPos'])
             # light_posi = np.array(data['R']) @ light_posi.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
             light_posi = light_posi.reshape(3, 1) + np.array(data['t']).reshape(3, 1)
@@ -203,9 +206,10 @@ if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
 
 
 elif args.data == "real":
-    dataset_folder = config.real_data / "selval"
-    for k in args.max_k.split(','):
-        print(f"K = {k}, {dataset_folder}")
-        convert2training_tensor(dataset_folder, k=int(k), output_type="normal")
+    for folder in ["train", "test"]:
+        dataset_folder = config.real_data / folder
+        for k in args.max_k.split(','):
+            print(f"K = {k}, {dataset_folder}")
+            convert2training_tensor(dataset_folder, k=int(k), output_type="normal")
 else:
     raise ValueError
