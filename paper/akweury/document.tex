@@ -16,6 +16,7 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{rotating}
+\usepackage{booktabs}
 \usetikzlibrary{fit}
 \usetikzlibrary {arrows.meta,graphs,shapes.misc}
 \usetikzlibrary {positioning}
@@ -45,81 +46,86 @@
 
 
 \section{Resource}
-The object model we used are coming from internet.
+The object model we used are searched from internet.
 \cite{data1}, \cite{data2}, \cite{data3} and \cite{data4} published a set of point cloud dataset for computer vision research. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. Each objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds makes the normal inference task trivial since the neighbor based method performs good enough for these kind of task. Some of the point cloud even equipped with pre-computed normal map based on more advanced methods. They all provides the accurate ground-truth for the supervised learning method.
 
-The \textit{synthetic50-5} is a datset with 50 point clouds as training set and 5 point clouds as test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. The category of the models include figure, animal, statue, toy, furniture, antique, car model, which include the smooth surface model like \textit{arm, bus, bunny, cat, zebra} and also the model with highly elaborate details, like \textit{Washington, Car-Engine, Armadillo}. 
+The \textit{synthetic50-5} is a datset we generated in this thesis with 50 point clouds as training set and 5 point clouds as test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. The category of the models include figure, animal, statue, toy, furniture, antique, car model, which include the smooth surface model like \textit{arm, bus, bunny, cat, zebra} and also the model with highly elaborate details, like \textit{Washington, Car-Engine, Armadillo}. 
 The dataset is created base on the work of this thesis and using for normal inference task. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
 
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}[b]{0.23\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/train-dataset/00.apoll.png}
 		\caption{apoll}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/train-dataset/01.arm.png}
 		\caption{arm}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/train-dataset/02.armadillo.png}
 		\caption{armadillo}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/train-dataset/03.bearded-guy.png}
 		\caption{bearded-guy}
 	\end{subfigure}
 	
-	\begin{subfigure}[b]{0.23\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/train-dataset/04.bronze-sculpture.png}
-		\caption{sculpture}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/08.pergolesi-side-chair_texture.png}
+		\caption{chair}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/train-dataset/05.bunny.png}
-		\caption{bunny}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/train-dataset/42.zebra_texture.png}
+		\caption{zebra}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/train-dataset/06.car-engine.png}
-		\caption{car-engine}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test-dataset/01.bus_texture.png}
+		\caption{bus}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.23\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/train-dataset/07.cat.png}
-		\caption{cat}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/test-dataset/03.baoshanlu_texture.png}
+		\caption{baoshanlu}
 	\end{subfigure}
 	
 	\label{fig:dataset-demo}
 	\caption{Point clouds scanned by high resolution scanners}
 \end{figure}
 
+Besides, some of the objects also has its own texture, as shown in the second row of Figure \ref{fig:dataset-demo}. This is specially prepared for illuminated approach since they will take the image as account to evaluate the surface normal. The object surface gives a different reflectence with different surface texture, which further impact the model performance. 
 
+\definecolor{direction-light-color}{RGB}{255,244,214}
+\newcommand{\col}[1]{%
+	\textcolor{#1}{\vrule width 0.5cm}}
 \section{Synthesize Scenes using Unity}
-In order to fit the using scenario of Kinect as much as possible, the dataset consists of the generated synthetic 3D scenes via Unity, which is a game engine using for 3D games creation. 
+In order to simulate the the data collection scenario close to the real life in the laboratory as much as possible. We placed a flat cylinder called $ stage $ in the center in the 3D space as a platform to place objects. The stage is fixed in a determined position, which is not moved when the scene is captured. 
+A directional light with RGB color FFF4D6 \col{direction-light-color}  placed in a top-view direction around 25 meters away to provide as ambient light, which also has a fixed position.
+A RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera is the sensor to capture the depth map and the grayscale image, which is random moved after a new scene. The moving range of the camera has 0.1m in both directions of X, Y, and Z axis and 1 degree random changed Euler angle. 
+A point light placed around 5 meters away as the illumination light, which is also randomly moved after a new scene. The moving range is 0.3m in both directions of X, Y, and Z axis and 1 degree random in Euler angle.
 
-In the synthetic scenes from engine, the object is placed on a cylinder platform, which is lighted by a directional light nearby. A camera focus on the platform and captured the scene. The layout in the game engine is shown in Figure \ref{fig:unity-workplace}. In order to simulate more scenarios, the positions of the camera and directional light are randomly changed in each new scene. For 50 training objects, 1000 scenes are generated and each scene is saved in 3 kinds of resolutions $ 512\times512\times3 $, $ 256\times256\times3 $ and $ 128\times128\times3 $.
+During the data collection, the object is randomly selected and placed on the stage. The object has a random upto 30 degrees rotation align $ roll $-axis, 30-degrees rotation align $ pitch $-axis and 180-degrees align $ yaw $-axis. Thus the camera has the opportunity to capture every direction of the object and consequently abundant the dataset. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128\times3 $ and 5000 scenes with resolution $ 512\times512\times3 $.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=.8\textwidth]{./Figures/unity-workplace.PNG}
+	\includegraphics[width=.99\textwidth]{./Figures/unity-workplace.PNG}
 	\caption{The layout of synthetic scenes generation in Unity.}
 	\label{fig:unity-workplace}
 \end{figure}
 
-The main advantage using generated scene is the availability of complete information. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control.
-
-For each scene, following information is recorded
+The main advantage using generated scenes is the availability of complete information. The depth map can be captured in a loss-free way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control. Table \ref{tab:data-files} gives more dataset information.
 \begin{table}
 	\caption{The information saved for each scene in ``synthetic50-5".}
 	\label{tab:data-files}
 	\centering
 	\begin{tabular}{l l}
 		\tabhead{Data} & \tabhead{Size} \\
-		Depth map & $ 512\times512\times3 $ \\
+		Depth map & Width$ \times $Height$ \times $ 1 \\
 		\hline 
-		Depth range  & $ 2\times1 $ \\  
+		Depth range  & MinDepth, MaxDepth \\  
 		\hline
-		Grayscale Image	& $ 512\times512\times1 $ \\  
+		Grayscale Image	&  Width$ \times $Height$ \times $ 1 \\  
 		\hline 
-		Normal Map &  $ 512\times512\times3 $  \\
+		Normal Map &   Width$ \times $Height$ \times $ 3  \\
 		\hline 
 		Light Position &  $ 3\times1 $  \\
 		\hline
@@ -130,8 +136,36 @@ For each scene, following information is recorded
 	\end{tabular}
 \end{table}
 
-A depth map $ D $ is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. The grayscale image can be used as guided normal inference task and also as a readable scene for human. The gray-color is converted from RGB color based on following equation 
+One important detail that we must care about is the camera exposure. Or we have to control the light radiance on the object surface. As shown in figure \ref{fig:camera_exposure}, too less exposure on the object neutralizes the illumination information, which only left ambient light effect. Too much exposure makes the surface texture hard to recognize. When we did the experiments, we found that a suitable light setting is essential to the illuminated based approach. A too much or too less light effects won't improve the illuminated based approach.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{./Figures/wrong_exposure_2.png}
+		\caption{Too dim}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+	\includegraphics[width=\textwidth]{./Figures/right_exposure.png}
+	\caption{Just Right}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+	\includegraphics[width=\textwidth]{./Figures/wrong_exposure.png}
+	\caption{Too bright}
+	\end{subfigure}
+	\caption{Different exposure to the objects.}
+	\label{fig:camera_exposure}
+\end{figure}
+
+
+
+
+\section{Data preprocessing}
+The raw data captured from Unity required further preprocessing before feed them into the training models. 
+A depth map is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. 
+
+The grayscale image can be used as guided normal inference task and also as a readable scene for human. Since the image captured by camera is RGB format, we need to convert it to gray-color for our models. It based on following equation
 \[ gray: \frac{r+2g+b}{4}  \]
+
 The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on following equation:
 \begin{dgroup*}
 	\begin{dmath*}
@@ -144,12 +178,10 @@ The normal map is the tangent surface normal, which is saved in 32-bit RGB color
 		n_z = 1-\frac{B}{255} * 2
 	\end{dmath*}
 \end{dgroup*}
+
 If consider the relation between Lambertian reflection and normal direction, the light source can be used to calculate the reflect direction of each point.
+
 The camera intrinsic and extrinsic matrix helps point cloud calculation.
-
-It is necessary to point out again that ``synthetic50-5" aiming to rebuild the using scenarios of Kinect, where all types of the generated data files shown in Table \ref{tab:data-files} are also the same format of the Kinect data.
-
-
 
 \subsection{Convert to Point Cloud}
 \label{sec:depth-map-to-point-cloud}
@@ -181,7 +213,7 @@ The depth map can be converted to 3D vertex point cloud as the input of the norm
 	\label{fig:depth-triangulation}
 \end{figure}
 
-Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The $ x  $ and $ y $ axes perpendicular with each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ in camera coordinate system. The $ X $ and $ Y $ can be calculated based on the triangle similarity
+Consider a 3-dimensional Euclidean space. Use $ z $ axis denotes the depth. The $ x  $ and $ y $ axis perpendicular with each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ with respect to camera coordinate system. The $ X $ and $ Y $ can be calculated based on the triangle similarity
 \begin{dgroup*}
 	
 	\begin{dmath*}
@@ -200,7 +232,7 @@ Converted a point from camera coordinate system to world coordinate system, usin
 \label{sec:dataset-normalization}
 %% How to represent input tensor, to make it fast converse
 The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus the normalization is required before feed training objects into the models.
-The range of each axis is shown in Figure \ref{fig:data-range}.  Table \ref{tab:data-range} gives a quantitative measurement of corresponding average values. 
+The data fluctuation in each axis is shown in Figure \ref{fig:data-range}.  Table \ref{tab:data-range} gives a quantitative measurement of corresponding average values. 
 
 The normalization has been performed as follows. First translate the points to the original point as close as possible, then choose the range value of one axis as a scale factor, normalize the points to unit vectors. The equation is shown as follows
 \begin{dgroup*}
@@ -237,11 +269,16 @@ It is calculated as the range in $ X $ axis, but theoretically can be used by $ 
 	}
 	\label{tab:data-range}
 	\centering
-	\begin{tabular}{c c c c}
+	\begin{tabular}{c | c c c}
+		\hline 
 		\tabhead{Axis} & \tabhead{Scale} & \tabhead{Min} & \tabhead{Max}\\
+		\hline 
 		X & 1.48 & -0.75 & 0.73\\
+		\hline 
 		Y & 1.56 & -0.76 & 0.80\\
+		\hline 
 		Z & 1.47 & 6.53 & 8.00\\
+		\hline 
 
 	\end{tabular}
 \end{table}
@@ -250,10 +287,9 @@ It is calculated as the range in $ X $ axis, but theoretically can be used by $ 
 
 \subsection{Noise}
 \label{sec:noise}
-The raw depth maps captured by Kinect usually have missing pixels. Therefore, the ``synthetic50-5" dataset adds a similar properties.
-As shown in Figure \ref{fig:depth_map_kinect}. the depth map has missing pixels distributed all around the scene.  Correspondingly, an uniformly distributed pixel-delete noise is used for noise simulation. 
-Furthermore, a parameter $ \mu $ is used to control the intensity of noise, it denotes the $ \mu $-percent pixel dropoff. For example, $ \mu-10 $ means removes 10\% pixels randomly. For each scene, the noising operation based on a random $ \mu $ in a range $ \left[0, 50\right] $, therefore some scenes have more missing pixels and some have less. The random noise intensity also enables the model to learn scenarios not only with noise, but also with minor noise or even without noise.
-Figure \ref{fig:noise-intensity} shows the noise effect on different $ \mu $.
+The raw depth maps captured by light scanner usually have missing pixels. In order to fit well with real-data, the synthetic data has been added uniform distributed noise, which is randomly remove the valid pixels in the maps.
+The simulated noise is distributed evenly around the whole map with a specific noise intensity. A parameter $ \mu $ is used to control the intensity of noise, it denotes the $ \mu $-percent pixel dropoff. For example, $ \mu-10 $ removes 10\% pixels randomly. For each scene, the noising operation based on a random $ \mu $ in a range $ \left[0, 50\right]  $ is used. Some scenes have more missing pixels and some have less. The random noise intensity also enables the model to learn scenarios not only with noise, but also with minor noise or even without noise.
+Figure \ref{fig:noise-intensity} shows the noise effect with different $ \mu $.
 %% add noise image
 \begin{figure}[!h]
 	\centering
@@ -265,11 +301,11 @@ Figure \ref{fig:noise-intensity} shows the noise effect on different $ \mu $.
 
 \subsection{Fit to PyTorch}
 In order to saving the training time, the dataset is compressed in PyTorch format. The structure of a single item is shown in Table \ref{tab:tensor-structure}.
-\begin{table}
+\begin{table}[H]
 	\caption{The structure of a single tensor in the dataset.}
 	\label{tab:tensor-structure}
 	\centering
-	\begin{tabular}{l l}
+	\begin{tabular}{l | l}
 		\tabhead{Name} & \tabhead{Content} \\
 		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
 		\hline

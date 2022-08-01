@@ -65,52 +65,52 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}Dataset}{19}{chapter.60}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Synthetic Dataset}{19}{section.61}%
+\contentsline {section}{\numberline {4.1}Resource}{19}{section.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.1}Resource}{19}{subsection.62}%
+\contentsline {section}{\numberline {4.2}Synthesize Scenes using Unity}{20}{section.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.2}Synthesize Scenes using Unity}{19}{subsection.64}%
+\contentsline {section}{\numberline {4.3}Data preprocessing}{22}{section.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.3}Convert to Point Cloud}{21}{subsection.67}%
+\contentsline {subsection}{\numberline {4.3.1}Convert to Point Cloud}{22}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.4}Point Cloud Normalization}{22}{subsection.69}%
+\contentsline {subsection}{\numberline {4.3.2}Point Cloud Normalization}{23}{subsection.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.5}Noise}{23}{subsection.72}%
+\contentsline {subsection}{\numberline {4.3.3}Noise}{24}{subsection.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1.6}Fit to PyTorch}{23}{subsection.74}%
+\contentsline {subsection}{\numberline {4.3.4}Fit to PyTorch}{24}{subsection.75}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{25}{chapter.76}%
+\contentsline {chapter}{\numberline {5}Experiments}{27}{chapter.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Training Details}{25}{section.77}%
+\contentsline {section}{\numberline {5.1}Training Details}{27}{section.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}GCNN model based on Geometry Information}{26}{section.79}%
+\contentsline {section}{\numberline {5.2}GCNN model based on Geometry Information}{28}{section.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Trip-Net model based on Calibrated Illuminated RGB-D Image}{27}{section.81}%
+\contentsline {section}{\numberline {5.3}Trip-Net model based on Calibrated Illuminated RGB-D Image}{29}{section.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Evaluation}{28}{section.84}%
+\contentsline {section}{\numberline {5.4}Evaluation}{30}{section.85}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Average Angle Error Metric}{28}{section*.85}%
+\contentsline {paragraph}{Average Angle Error Metric}{30}{section*.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Median Angle Error Metric}{28}{section*.86}%
+\contentsline {paragraph}{Median Angle Error Metric}{30}{section*.87}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{5 Degree Error Metric}{28}{section*.87}%
+\contentsline {paragraph}{5 Degree Error Metric}{30}{section*.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{11.5 Degree Error Metric}{29}{section*.88}%
+\contentsline {paragraph}{11.5 Degree Error Metric}{31}{section*.89}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{22.5 Degree Error Metric}{29}{section*.89}%
+\contentsline {paragraph}{22.5 Degree Error Metric}{31}{section*.90}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{30 Degree Error Metric}{29}{section*.90}%
+\contentsline {paragraph}{30 Degree Error Metric}{31}{section*.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}Visualization evaluation on GCNN model}{30}{section.97}%
+\contentsline {section}{\numberline {5.5}Visualization evaluation on GCNN model}{32}{section.98}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Surface Normal Inference based on Calibrated Illuminated RGBD images }{32}{section.101}%
+\contentsline {section}{\numberline {5.6}Surface Normal Inference based on Calibrated Illuminated RGBD images }{34}{section.102}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}More Comparison}{32}{section.104}%
+\contentsline {section}{\numberline {5.7}More Comparison}{34}{section.105}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{35}{chapter.107}%
+\contentsline {chapter}{\numberline {6}Conclusion}{37}{chapter.108}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{37}{appendix.108}%
+\contentsline {chapter}{\numberline {A}Dataset}{39}{appendix.109}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{37}{section.109}%
+\contentsline {section}{\numberline {A.1}Dataset}{39}{section.110}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{41}{appendix*.113}%
+\contentsline {chapter}{Bibliography}{43}{appendix*.114}%

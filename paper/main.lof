@@ -31,44 +31,46 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{20}{figure.caption.63}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Point clouds scanned by high resolution scanners\relax }}{20}{figure.caption.62}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{20}{figure.caption.65}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scenes generation in Unity.\relax }}{21}{figure.caption.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{21}{figure.caption.68}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Different exposure to the objects.\relax }}{22}{figure.caption.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{22}{figure.caption.70}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Convert depth to point in camera coordinate system\relax }}{23}{figure.caption.69}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{23}{figure.caption.73}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{24}{figure.caption.71}%
 \defcounter {refsection}{0}\relax 
-\addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Some of the test scenes during the training. From top to bottom, baoshanlu, Washington, Garfield, Dragon, Bus\relax }}{26}{figure.caption.78}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN. The left shows the training loss history whereas the right one shows the evaluation loss history.\relax }}{27}{figure.caption.80}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.3}{\ignorespaces The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.\relax }}{28}{figure.caption.82}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Normal inference based on GCNN. Test image has resolution $ 128\times 128 $\relax }}{31}{figure.caption.98}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{31}{figure.caption.99}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.\relax }}{31}{figure.caption.100}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{32}{figure.caption.102}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{32}{figure.caption.103}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{33}{figure.caption.105}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Zoom in of the center region of the objects in Figure \ref {fig:final-eval}\relax }}{34}{figure.caption.106}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Noise-intensity on $ \mu -0, \mu -10,\mu -20, \mu -30, \mu -40, \mu -50,$. Object Name: elephant-zun-lid.\relax }}{24}{figure.caption.74}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Some of the test scenes during the training. From top to bottom, baoshanlu, Washington, Garfield, Dragon, Bus\relax }}{28}{figure.caption.79}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.2}{\ignorespaces The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN. The left shows the training loss history whereas the right one shows the evaluation loss history.\relax }}{29}{figure.caption.81}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.3}{\ignorespaces The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.\relax }}{30}{figure.caption.83}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Normal inference based on GCNN. Test image has resolution $ 128\times 128 $\relax }}{33}{figure.caption.99}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{33}{figure.caption.100}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.\relax }}{33}{figure.caption.101}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{34}{figure.caption.103}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{34}{figure.caption.104}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{35}{figure.caption.106}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Zoom in of the center region of the objects in Figure \ref {fig:final-eval}\relax }}{36}{figure.caption.107}%
+\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{38}{figure.caption.110}%
+\addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{39}{figure.caption.111}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{40}{figure.caption.111}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{40}{figure.caption.112}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B\relax }}{41}{figure.caption.112}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{42}{figure.caption.113}%

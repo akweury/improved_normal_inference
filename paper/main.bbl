@@ -1213,6 +1213,34 @@
     \field{year}{2017}
   \endentry
 
+  \entry{photometric-stereo}{article}{}
+    \name{author}{1}{}{%
+      {{hash=WR}{%
+         family={Woodham},
+         familyi={W\bibinitperiod},
+         given={Robert},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{WR1}
+    \strng{fullhash}{WR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1992}
+    \field{labeldatesource}{}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \verb{doi}
+    \verb 10.1117/12.7972479
+    \endverb
+    \field{title}{Photometric Method for Determining Surface Orientation from
+  Multiple Images}
+    \field{volume}{19}
+    \field{journaltitle}{Optical Engineering}
+    \field{month}{01}
+    \field{year}{1992}
+  \endentry
+
   \entry{depth-inpainting-distribution}{inproceedings}{}
     \name{author}{3}{}{%
       {{hash=YNE}{%

@@ -96,7 +96,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Eval')
     # Mode selection
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data_type', type=str, default="normal", help="choose data type")
+    parser.add_argument('--data_type', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--data', type=str, default="synthetic", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
@@ -105,8 +105,8 @@ if __name__ == '__main__':
     # test_folder = config.synthetic_data_noise_local / "synthetic128"
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
-            test_folder = config.real_data / "test"
-            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            # test_folder = config.real_data / "test"
+            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             models = {
                 # "SVD": None,
 
@@ -116,10 +116,10 @@ if __name__ == '__main__':
                 # "GCNN-l2": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_44_30" / "checkpoint-421.pth.tar",  # Trip Net
 
                 # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-                # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-403.pth.tar",
-                # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-380.pth.tar",
-                # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "model_best.pth.tar",
-                "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
+                "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
+                "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
+                "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-01_12_09_47" / "checkpoint-368.pth.tar",
+                "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-452.pth.tar",
             }
         else:
             if args.data == "synthetic":
@@ -131,7 +131,7 @@ if __name__ == '__main__':
                 # "SVD": None,
                 "GCNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
                 "Trip-Net-512": config.model_dfki / "checkpoint-53.pth.tar",  # GCNN
-                "Trip-Net-Finetune": config.model_dfki / "checkpoint-4.pth.tar",  # GCNN
+                "Trip-Net-Finetune": config.model_dfki / "checkpoint-11.pth.tar",  # GCNN
                 # "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-33.pth.tar",
                 # GCNN
             }

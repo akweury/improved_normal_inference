@@ -9,27 +9,27 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{21}{table.caption.66}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{21}{table.caption.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{23}{table.caption.71}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{24}{table.caption.72}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{23}{table.caption.75}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{25}{table.caption.76}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.1}{\ignorespaces Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{28}{table.caption.83}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{30}{table.caption.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.2}{\ignorespaces Average Angle Error of the evaluation dataset.\relax }}{29}{table.caption.91}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Average Angle Error of the evaluation dataset.\relax }}{31}{table.caption.92}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.3}{\ignorespaces Median Angle Error of the evaluation dataset.\relax }}{29}{table.caption.92}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Median Angle Error of the evaluation dataset.\relax }}{31}{table.caption.93}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.4}{\ignorespaces Percent of error less than 5 degree of the evaluation dataset.\relax }}{29}{table.caption.93}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Percent of error less than 5 degree of the evaluation dataset.\relax }}{31}{table.caption.94}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.5}{\ignorespaces Percent of error less than 11.5 degree of the evaluation dataset.\relax }}{30}{table.caption.94}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Percent of error less than 11.5 degree of the evaluation dataset.\relax }}{32}{table.caption.95}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.6}{\ignorespaces Percent of error less than 22.5 degree of the evaluation dataset.\relax }}{30}{table.caption.95}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Percent of error less than 22.5 degree of the evaluation dataset.\relax }}{32}{table.caption.96}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.7}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{30}{table.caption.96}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{32}{table.caption.97}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
