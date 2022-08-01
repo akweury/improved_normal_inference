@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
                 test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
             else:
-                test_folder = config.real_data / "train"
+                test_folder = config.real_data_dfki / "train"
             models = {
                 # "SVD": None,
                 "GCNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
