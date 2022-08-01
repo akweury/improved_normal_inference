@@ -64,7 +64,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
     
     srun \
-      --job-name="INI-an2-128-f4" \
+      --job-name="INI-an2-128-f3" \
       --time=3-00:00 \
       -p RTX3090 \
       --ntasks=1 \
@@ -74,7 +74,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f4 
+      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f3f 
 
     srun \
       --job-name="real_refine_gcnn" \
@@ -137,6 +137,21 @@ CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
     python3 eval_single_obj.py  --machine remote --data synthetic --data_type normal_noise
+    
+        srun \
+      --job-name="INI-eval" \
+      --time=7-00:00 \
+      -p batch \
+      --ntasks=1 \
+      --gpus-per-task=1 \
+      --mem=30G \
+      --cpus-per-gpu=4 \
+      --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
+      --container-workdir="`pwd`" \
+      --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
+    python3 eval_visual.py  --machine remote --datasize synthetic512 --data synthetic_noise_dfki
+    
+    
 ```
 
 #### Copy the trained model from remote

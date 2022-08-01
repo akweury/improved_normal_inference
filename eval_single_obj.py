@@ -130,12 +130,9 @@ if __name__ == '__main__':
                 test_folder = config.real_data_dfki / "test"
             models = {
                 # "SVD": None,
-                # "GCNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
-                # "GCNN-512-269": config.model_dfki / "checkpoint-269.pth.tar",  # GCNN
-                # "Trip-Net-512": config.model_dfki / "checkpoint-64.pth.tar",  # GCNN
+                "GCNN-512-269": config.model_dfki / "checkpoint-289.pth.tar",  # GCNN
+                "Trip-Net-512": config.model_dfki / "checkpoint-68.pth.tar",  # GCNN
                 # "Trip-Net-Finetune": config.model_dfki / "checkpoint-11.pth.tar",  # GCNN
-                "Trip-Net-512-2": config.model_dfki / "checkpoint-53.pth.tar",
-                # GCNN
             }
 
         main(models, test_folder, args, folder_name)
