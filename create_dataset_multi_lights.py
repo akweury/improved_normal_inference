@@ -207,7 +207,10 @@ if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
 
 elif args.data == "real":
     for folder in ["train", "test"]:
-        dataset_folder = config.real_data / folder
+        if args.machine == "remote":
+            dataset_folder = config.real_data_dfki / folder
+        else:
+            dataset_folder = config.real_data / folder
         for k in args.max_k.split(','):
             print(f"K = {k}, {dataset_folder}")
             convert2training_tensor(dataset_folder, k=int(k), output_type="normal")
