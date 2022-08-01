@@ -44,7 +44,10 @@ class CNN(nn.Module):
 
     def init_net(self):
         normal_source_net = GNet(3, 3, self.channel_num)
+
         normal_checkpoint = torch.load(config.an2_trip_net_remote)
+        # normal_checkpoint = torch.load(config.an2_trip_net)
+
         normal_source_net.load_state_dict(normal_checkpoint['model'].g_net.state_dict())
         normal_source_net_dict = normal_source_net.state_dict()
         normal_net_dict = self.g_net.state_dict()
