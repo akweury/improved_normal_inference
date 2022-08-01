@@ -155,7 +155,7 @@ class TrainingModel():
                                        shuffle=True,
                                        batch_size=self.args.batch_size)
         test_data_loader = DataLoader(test_dataset,
-                                      batch_size=self.args.batch_size)
+                                      batch_size=1)
         print('\n- Found {} images in "{}" folder.'.format(train_data_loader.dataset.__len__(), 'train'))
         print('\n- Found {} images in "{}" folder.'.format(test_data_loader.dataset.__len__(), 'selval'))
 
@@ -486,8 +486,8 @@ def test_epoch(nn_model, epoch):
                 loss_total += normal_loss_total
 
             if nn_model.args.normal_huber_loss:
-                normal_out = out[:, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
-                gt = target[:, :3, :, :].permute(2, 3, 1, 0).to("cpu").squeeze(-1).numpy()
+                normal_out = out[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
+                gt = target[0, :3, :, :].permute(1, 2, 0).to("cpu").numpy()
                 mask = gt.sum(axis=2) == 0
                 normal_out[mask] = 0
                 normal_out[normal_out > 1] = 1
@@ -496,7 +496,7 @@ def test_epoch(nn_model, epoch):
 
                 loss += nn_model.normal_loss_eval
                 # for plot purpose
-                normal_loss_total += nn_model.normal_loss_eval.detach().to('cpu')
+                normal_loss_total += nn_model.normal_loss_eval
                 loss_total += normal_loss_total
 
             input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
