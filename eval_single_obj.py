@@ -96,7 +96,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Eval')
     # Mode selection
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data_type', type=str, default="normal_noise", help="choose data type")
+    parser.add_argument('--data_type', type=str, default="normal", help="choose data type")
     parser.add_argument('--data', type=str, default="synthetic", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
