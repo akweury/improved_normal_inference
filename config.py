@@ -40,4 +40,5 @@ gcnn_noc = paper_exp / "gcnn" / "checkpoint-noc-619.pth.tar"
 gcnn_gcnn = paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar"
 
 an2_trip_net = ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar"
-an2_trip_net_remote = Path("/netscratch/sha/models/checkpoint-53.pth.tar")
+an2_trip_net_remote = Path("/netscratch/sha/models/checkpoint-32.pth.tar")
+gcnn_512_remote = Path("/netscratch/sha/models/checkpoint-269.pth.tar")

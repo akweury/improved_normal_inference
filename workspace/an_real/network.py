@@ -11,7 +11,7 @@ from help_funs import mu
 
 
 class CNN(nn.Module):
-    def __init__(self, channel_num, light_num, light_num_use, net_type):
+    def __init__(self, channel_num, light_num, light_num_use, net_type, refine_net):
         super().__init__()
         # self.__name__ = 'albedoGated'
         self.channel_num = channel_num
@@ -19,7 +19,7 @@ class CNN(nn.Module):
         self.light_num_use = light_num_use
         # self.light_net = NormalGuided(3, 3, channel_num)
         # self.normal_net = GCNN(3, 3, channel_num)
-
+        self.refine_net = refine_net
         if net_type == "gnet-f4":
             self.g_net = GNet(3, 3, channel_num)
         elif net_type == "gnet-f3f":
@@ -44,8 +44,10 @@ class CNN(nn.Module):
 
     def init_net(self):
         normal_source_net = GNet(3, 3, self.channel_num)
-
-        normal_checkpoint = torch.load(config.an2_trip_net_remote)
+        if self.refine_net == "gcnn":
+            normal_checkpoint = torch.load(config.gcnn_512_remote)
+        else:
+            normal_checkpoint = torch.load(config.an2_trip_net_remote)
         # normal_checkpoint = torch.load(config.an2_trip_net)
 
         normal_source_net.load_state_dict(normal_checkpoint['model'].g_net.state_dict())
