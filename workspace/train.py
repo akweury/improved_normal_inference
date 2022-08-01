@@ -732,12 +732,6 @@ def main(args, exp_dir, network, train_dataset):
                 draw_line_chart(nn_model.losses_eval, nn_model.output_folder,
                                 log_y=True, label="eval_loss", epoch=epoch, start_epoch=0, title="eval_loss",
                                 cla_leg=True)
-            if eval_loss_best < eval_loss:
-                stop_factor += 1
-                if stop_factor > 2:
-                    print("two times error up. stop training")
-                    break
-
             if eval_loss < eval_loss_best:
                 eval_loss_best = eval_loss
                 is_best = True
