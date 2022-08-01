@@ -54,7 +54,7 @@ def main(models, test_folder, args, name):
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
-            test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
+            test_folder, name, model, gpu=args.gpu, data_type=args.data)
 
         loss_avg[name] = ("%.2f" % (np.array(loss_list).sum() / np.array(loss_list).shape[0]))
         time_avg[name] = ("%.2f" % (np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]))
