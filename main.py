@@ -48,6 +48,7 @@ def paser():
                         help='Total number of epochs to run (default: 30)')
 
     parser.add_argument('--optimizer', '-o', default='adam')
+    parser.add_argument('--refine-net', type=str, default="GCNN")
 
     parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='Initial learning rate (default 0.001)')
@@ -140,7 +141,7 @@ def get_model(args):
         model = an3.CNN(args.num_channels, args.lightNum, args.lightNumUse)
     elif args.exp == "an_real":
         import workspace.an_real.network as an_real
-        model = an_real.CNN(args.num_channels, args.lightNum, args.lightNumUse, args.net_type)
+        model = an_real.CNN(args.num_channels, args.lightNum, args.lightNumUse, args.net_type, args.refine_net)
     elif args.exp == "vi5":
         import workspace.vi5.network as vi5
         model = vi5.CNN(args.num_channels, args.lightNum)
