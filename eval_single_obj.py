@@ -123,9 +123,9 @@ if __name__ == '__main__':
             test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
             models = {
                 # "SVD": None,
-                "GCNN-512": config.model_dfki / "checkpoint-179.pth.tar",  # GCNN
-                "Trip-Net-512": config.model_dfki / "checkpoint-42.pth.tar",  # GCNN
-                "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-13.pth.tar",
+                "GCNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
+                "Trip-Net-512": config.model_dfki / "checkpoint-53.pth.tar",  # GCNN
+                "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-33.pth.tar",
                 # GCNN
             }
 
