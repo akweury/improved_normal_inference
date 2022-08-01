@@ -37,7 +37,8 @@ def preprocessing(models):
     parser.add_argument('--data', type=str, default='synthetic_noise', help="choose evaluate dataset")
     parser.add_argument('--datasize', type=str, default='synthetic128', help="choose evaluate dataset size")
     parser.add_argument('--combine', type=str, default='true', help="combine the output images in one")
-
+    parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
+    parser.add_argument('--data_type', type=str, default="normal_noise", help="choose data type")
     parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
@@ -440,24 +441,31 @@ def start2(models_path_dict):
 if __name__ == '__main__':
     # load test model names
 
+    # models = {
+    #     # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
+    #     # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
+    #     # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
+    #     #
+    #     # "SVD": None,
+    #     #
+    #     # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
+    #     # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
+    #     # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+    #     #
+    #     # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+    #     # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
+    #     # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
+    #     "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
+    #     # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
+    #
+    #     # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
+    #
+    # }
+
     models = {
-        # "light-gcnn": config.paper_exp / "light" / "checkpoint-640.pth.tar",
-        # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
-        # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
-        #
-        # "SVD": None,
-        #
-        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
-        #
-        # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-        "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-403.pth.tar",
-        "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-380.pth.tar",
-        "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
-        "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-287.pth.tar",
-
-        # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",
-
+        "SVD": None,
+        "GCNN-512-269": config.model_dfki / "checkpoint-289.pth.tar",  # GCNN
+        "Trip-Net-512": config.model_dfki / "checkpoint-68.pth.tar",  # GCNN
     }
+
     start2(models)
