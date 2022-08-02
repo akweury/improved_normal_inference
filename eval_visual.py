@@ -214,7 +214,7 @@ def start2(models_path_dict):
         light_input = test_0_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
         vertex_0 = test_0_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
-        img_0 = test_0_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+        img_0 = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
 
         mask = gt.sum(axis=2) == 0
         # mask_input = vertex_0.sum(axis=2) == 0
@@ -463,8 +463,8 @@ if __name__ == '__main__':
         # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-02_01_06_20" / "model_best.pth.tar",
 
         # "Trip-Net-512-36": config.ws_path / "an2" / "checkpoint-36.pth.tar",  # GCNN
-        "Trip-Net-512": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
-        "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
+        # "Trip-Net-512": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
+        # "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
         "An2-real-resume": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
         "SVD": None,
         "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
