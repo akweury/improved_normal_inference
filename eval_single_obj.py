@@ -105,6 +105,20 @@ if __name__ == '__main__':
                 # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-234.pth.tar",
 
             }
+
+        elif args.machine == "pc-2103":
+            if args.data == "synthetic":
+                test_folder = config.synthetic_data_noise_pc2103 / "synthetic512" / "test"
+            else:
+                test_folder = config.real_data_dfki / "test"
+            models = {
+                # "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
+                # "Trip-Net-512-36": config.ws_path / "an2" / "checkpoint-36-trip-net-512.pth.tar",  # GCNN
+                "Trip-Net-512-41": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
+                "SVD": None,
+                # "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
+
+            }
         else:
             if args.data == "synthetic":
                 test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
