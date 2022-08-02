@@ -54,6 +54,8 @@ def preprocessing(models):
         path = config.synthetic_data / args.datasize / "selval" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
         path = config.real_data / "test" / "tensor"  # key tests 103, 166, 189,9
+    elif args.data == "real_pc2103":
+        path = config.real_data_pc2103 / "test" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "paper":
         path = config.paper_pic
     else:
