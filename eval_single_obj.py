@@ -95,9 +95,14 @@ if __name__ == '__main__':
             test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
-                "SVD": None,
-                "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
-                "Trip-Net": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
+                # "SVD": None,
+                "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-01_22_55_17" / "checkpoint-456.pth.tar",
+                "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-01_22_55_21" / "checkpoint-435.pth.tar",
+                "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-01_21_50_45" / "checkpoint-460.pth.tar",
+                # Trip Net
+                # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
+                # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-01_22_32_35" / "checkpoint-296.pth.tar",
+                # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-234.pth.tar",
 
             }
         else:
@@ -110,6 +115,9 @@ if __name__ == '__main__':
                 "NNNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
                 "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
                 "Trip-Net-512-36": config.model_dfki / "ccheckpoint-36-trip-net-512.pth.tar",  # GCNN
+
+                "Real-train": config.model_dfki / "ccheckpoint-68-real-train.pth.tar",  # GCNN
+                "Real-refine": config.model_dfki / "ccheckpoint-404-real-refine.pth.tar",  # GCNN
 
             }
 

@@ -38,77 +38,38 @@
 
 \section{Training Details}
 
-The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 \times $ in height, width and channel, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
+The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 $ in height and width, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
 
 \begin{figure}[H]
 	\centering
 	
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.depth0_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.image0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05051.normal0.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0_noise.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.image0.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.normal0.png}
 	\end{subfigure}
 	
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.depth0_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.image0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05111.normal0.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.depth0_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.image0.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/test_scenes/05113.normal0.png}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.20\linewidth}
+
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0.png}
 		\caption{Depth Map}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0_noise.png}
 		\caption{Add noise}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
 		\caption{Image}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.20\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
 		\caption{Normal}
 	\end{subfigure}
@@ -118,21 +79,24 @@ The approaches are trained on dataset "synthetic-50-5" as mentioned in Chapter \
 \end{figure}
 
 
-The training processes are evaluated in every epochs with 29 evaluation scenes that model never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work. Note that the position of objects are not placed naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
+The training processes are evaluated in every epochs with 29 evaluation scenes that models never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work. Note that the position of objects are not placed always naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
 
-The training pipeline use batch size $ 8 $,  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
+For the training parameters, we set the training pipeline with batch size $ 8 $, we found that a higher batch size will reduce the final performance.  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTX 3090. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
 
 
 \section{GCNN model based on Geometry Information}
 The GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
 
-In order to verify the applicability of UNet architecture and Gated Convolution layer for the normal inference task, two similar models are created. 
-We replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same in model ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". Another model called ``NOC" is designed to verify the skip connection in the UNet, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show the validation of skip connections. Figure \ref{fig:gcnn-training-history} shows the training history on BerHu Loss. The GCNN approach achieves a lower loss from start to the end of the training.
+In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
+Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. 
+
+We use Reversed Huber Loss as loss function during the training, since we found it gives a better final error compare to L2 loss. The model is evaluated after every epoch training and calculate the angle error on the test dataset. The training history is shown in Figure \ref{fig:gcnn-training-history}. We can see that all of these three models can learn the normal inference task where the model ``NOC" has the highest error, which is the effect of the missing of skip connection. The ``CNN" model has the skip connection but use standard convolution layer has a better performance. The GCNN model use the skip connection and the gated convolution layer further reduce the error.
 
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
+	\includegraphics[width=\textwidth]{./Figures/gcnn_training_loss.png}
+	
+	\includegraphics[width=\textwidth]{./Figures/gcnn_eval_loss.png}
 	\caption{The training history of GCNN model. The line chart records the training BerHu loss of the model GCNN, NOC and CNN. The left shows the training loss history whereas the right one shows the evaluation loss history.}
 	\label{fig:gcnn-training-history}
 \end{figure}

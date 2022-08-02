@@ -26,7 +26,7 @@ def line_chart(data, path, labels, x=None, title=None, x_scale=None, y_scale=Non
         if x is None:
             x = np.arange(row.shape[0]) * x_scale[1] + x_scale[0]
         y = row
-        plt.plot(x, y, label=labels[i])
+        plt.plot(x, y, label=labels[i], lw=5)
 
     if title is not None:
         plt.title(title)

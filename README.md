@@ -143,7 +143,7 @@ CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_
         srun \
       --job-name="INI-eval" \
       --time=7-00:00 \
-      -p batch \
+      -p A100 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=30G \
