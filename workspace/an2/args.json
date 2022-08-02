@@ -5,7 +5,7 @@
   "num_channels": 128,
   "resume": null,
   "lightNum": 1,
-  "epochs": 50,
+  "epochs": 999,
   "init_net": null,
   "init_light_net": null,
   "optimizer": "adam",
