@@ -48,6 +48,8 @@ def preprocessing(models):
         path = config.synthetic_data_noise_local / args.datasize / "selval" / "tensor"
     elif args.data == "synthetic_noise_dfki":
         path = config.synthetic_data_noise_dfki / args.datasize / "test" / "tensor"
+    elif args.data == "synthetic_noise_pc2103":
+        path = config.synthetic_data_noise_pc2103 / args.datasize / "test" / "tensor"
     elif args.data == "synthetic":
         path = config.synthetic_data / args.datasize / "selval" / "tensor"  # key tests 103, 166, 189,9
     elif args.data == "real":
