@@ -456,7 +456,11 @@ if __name__ == '__main__':
         #
         # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
         # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
-        "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-02_01_06_20" / "model_best.pth.tar",
+        # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-02_01_06_20" / "model_best.pth.tar",
+
+        "Trip-Net-512-36": config.ws_path / "an2" / "checkpoint-36.pth.tar",  # GCNN
+        "Trip-Net-512-32": config.ws_path / "an2" / "checkpoint-32.pth.tar",  # GCNN
+
         # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
         # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
 
