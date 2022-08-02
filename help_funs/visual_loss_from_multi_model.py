@@ -12,9 +12,9 @@ models = {
     # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-02_14_47_28" / "checkpoint-100.pth.tar",
     # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-02_14_48_32" / "checkpoint-100.pth.tar",
     #
-    "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-02_14_28_34" / "checkpoint-208.pth.tar",
+    "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-02_14_28_34" / "checkpoint-200.pth.tar",
     "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-02_14_29_25" / "checkpoint-200.pth.tar",
-    "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-02_14_31_00" / "checkpoint-249.pth.tar",
+    "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-02_14_31_00" / "checkpoint-200.pth.tar",
 
 }
 
@@ -31,7 +31,7 @@ for model_idx, (name, model) in enumerate(models.items()):
     # loss = checkpoint['losses']
     loss = checkpoint['eval_losses']
     normal_loss_avg = np.sum(loss[:3], axis=0, keepdims=True) / 3
-    normal_loss_avg = (normal_loss_avg * 100 / 8) / 8
+    normal_loss_avg = normal_loss_avg / 100
 
     for idx in range(normal_loss_avg.shape[1]):
         if normal_loss_avg[0, idx] == 0:

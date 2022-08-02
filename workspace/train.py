@@ -453,52 +453,29 @@ def train_epoch(nn_model, epoch, eval_loss_best):
 
 
 def test_epoch(nn_model, epoch):
-    eval_loss = 0
-    normal_loss_total = torch.tensor([0.0])
     loss_total = torch.tensor([0.0])
     for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
+
         with torch.no_grad():
             # put input and target to device
             input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor([0.0]).to(0)
-            # input = input[-1:, :]
-            # target = target[-1:, :]
-            print(test_idx)
-            # test_idx = test_idx[-1]
-            # Wait for all kernels to finish
-            torch.cuda.synchronize()
+            mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+            mask = mask.permute(1, 2, 0).squeeze(-1)
 
+            print(test_idx)
+            torch.cuda.synchronize()
             # Forward pass
             out = nn_model.model(input)
+            out = mu.filter_noise(out, threshold=[-1, 1])
 
-            gt = target_tensor[:, :3, :, :].to(out.device)
             if nn_model.args.normal_huber_loss:
-                normal_out = out[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
-                gt = target[0, :3, :, :].permute(1, 2, 0).to("cpu").numpy()
-                mask = gt.sum(axis=2) == 0
-                normal_out[mask] = 0
-                normal_out[normal_out > 1] = 1
-                normal_out[normal_out < -1] = -1
-                _, nn_model.normal_loss_eval = mu.eval_img_angle(gt, normal_out)
-
-                loss += nn_model.normal_loss_eval
+                normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+                normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+                diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
+                    normal[mask], normal_target[mask])
                 # for plot purpose
-                normal_loss_total += nn_model.normal_loss_eval
-                loss_total += normal_loss_total
-
-            input, out, target, test_idx = input.to("cpu"), out.to("cpu"), target.to("cpu"), test_idx.to(
-                'cpu')
-
-            # draw_output(nn_model.args.exp, input[-1:, :], out[-1:, :],
-            #             target=target[-1:, :],
-            #             exp_path=nn_model.output_folder,
-            #             epoch=epoch,
-            #             i=j,
-            #             train_idx=test_idx[-1],
-            #             prefix=f"eval_epoch_{epoch}_{test_idx}_",
-            #             tranculate_threshold=nn_model.args.albedo_threshold,
-            #             args=nn_model.args)
-
-    return loss_total / (nn_model.test_loader.dataset.__len__() / nn_model.args.batch_size)
+                loss_total += diff
+    return loss_total / (nn_model.test_loader.dataset.__len__())
 
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
