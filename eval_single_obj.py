@@ -111,13 +111,14 @@ if __name__ == '__main__':
             else:
                 test_folder = config.real_data_dfki / "test"
             models = {
-                "SVD": None,
-                "NNNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
                 # "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
                 "Trip-Net-512-36": config.model_dfki / "checkpoint-36-trip-net-512.pth.tar",  # GCNN
+                "Trip-Net-512-41": config.model_dfki / "checkpoint-41-trip-net-512.pth.tar",  # GCNN
 
                 # "Real-train": config.model_dfki / "ccheckpoint-68-real-train.pth.tar",  # GCNN
                 # "Real-refine": config.model_dfki / "ccheckpoint-404-real-refine.pth.tar",  # GCNN
+                "SVD": None,
+                "NNNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
 
             }
 

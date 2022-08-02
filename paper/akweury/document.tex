@@ -87,12 +87,8 @@ For the training parameters, we set the training pipeline with batch size $ 8 $,
 \section{GCNN model based on Geometry Information}
 The GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. 
 
-In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
-Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. 
 
-We use Reversed Huber Loss as loss function during the training, since we found it gives a better final error compare to L2 loss. The model is evaluated after every epoch training and calculate the angle error on the test dataset. The training history is shown in Figure \ref{fig:gcnn-training-history}. We can see that all of these three models can learn the normal inference task where the model ``NOC" has the highest error, which is the effect of the missing of skip connection. The ``CNN" model has the skip connection but use standard convolution layer has a better performance. The GCNN model use the skip connection and the gated convolution layer further reduce the error.
-
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/gcnn_training_loss.png}
 	
@@ -101,18 +97,49 @@ We use Reversed Huber Loss as loss function during the training, since we found 
 	\label{fig:gcnn-training-history}
 \end{figure}
 
-\section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
-The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. For the sake of comparison, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture. Since it is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $F, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate.  we set $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
+In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
+Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. We use Reversed Huber Loss as loss function during the training, since we found it gives a better final error compare to L2 loss. The model is evaluated after every epoch training and calculate the angle error on the test dataset. The training history is shown in Figure \ref{fig:gcnn-training-history}. 
 
-Figure \ref{fig:trip-net-training-history} shows the training history of these models on BerHu Loss. As shown in the loss figure, all of the four models has a reasonable learning rate. Trip-Net with four times fusion converges faster than others and also achieve a lower loss. Trip-Net-F3F converges slower than Trip-Net but achieved to a similar evaluation loss. The evaluation loss in Trip-Net-F1F and Trip-Net-F2F are relative higher than 3 or 4 times fusions model. 
 
-\begin{figure}[th]
+%% TODO
+waiting for the experiment, then describe the chart...
+
+
+\begin{table}[H]
+	
 	\centering
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_training_loss.png}
-	\includegraphics[width=.45\textwidth]{./Figures/gcnn_eval_loss.png}
+	\begin{tabular}{l l l l l l }
+		\tabhead{Model} & $ \# $\textbf{Total} &\textbf{ V-P} & \textbf{L-P} & \textbf{I-P} & \tabhead{Size /MB}\\
+		\hline
+		CNN 					& 17 & 32 & 0 & 0 & 25.5 \\
+		\hline
+		NOC 					& 32 & 32 & 0 & 0 & 30.6 \\
+		\hline
+		GCNN 					& 32 & 32 & 0 & 0 & 45.8 \\
+	\end{tabular}
+	\caption{GCNN Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
+	\label{tab:gcnn-eval-mean}
+\end{table}
+
+
+
+
+\section{Trip-Net model based on Calibrated Illuminated RGB-D Image}
+The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. When we train this model, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture.
+ Since it is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate.  we set $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
+
+Figure \ref{fig:trip-net-training-history} shows the training history of Trip-Net models on BerHu Loss. As shown in the loss figure, all of the four models has a reasonable learning rate. 
+From the chart we can see that, trip-Net with four times fusion converges obviously faster than fewer fusion times model. However, model F3 with 3 times fusion converge slower than F4 but in the end it achieves a similar evaluation loss with F4. The F1 and F2 models are relatively weaker than the other two models. 
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/trip_net_training_loss.png}
+	\includegraphics[width=\textwidth]{./Figures/trip_net_eval_loss.png}
 	\caption{The training history of Trip-Net model. The line chart records the training BerHu loss of the model Trip-Net, Trip-Net-F1, Trip-Net-F2, Trip-Net-F3, GCNN.}
 	\label{fig:trip-net-training-history}
 \end{figure}
+
 
 However, the sacrifice of accuracy gives a relatively lighter model. Since we remove the fusions between different pipes, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
 
@@ -129,22 +156,13 @@ However, the sacrifice of accuracy gives a relatively lighter model. Since we re
 		Trip-Net-F3F 			& 96 & 40 & 28 & 28 & 167 &  7.35\\
 		\hline
 		Trip-Net 				& 100 & 40 & 30 & 30 & 198 & 9.15\\
-		\hline
-		GCNN 					& 32 & 32 & 0 & 0 & 46 & 2.18\\
 	\end{tabular}
-	\caption{Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
-	\label{tab:gcnn-eval-mean}
+	\caption{Trip-Net Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
+	\label{tab:trip-net-size-compare}
 \end{table}
 
 
-
-
-
-
-
-
-
-\section{Evaluation}
+\section{Quantitative Evaluation}
 
 Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robust to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
 
