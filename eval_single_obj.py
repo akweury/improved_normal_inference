@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 test_folder = config.real_data_dfki / "test"
             models = {
                 # "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
-                "Trip-Net-512-36": config.model_dfki / "checkpoint-36-trip-net-512.pth.tar",  # GCNN
+                "Trip-Net-512-36": config.model_dfki / "checkpoint-36.pth.tar",  # GCNN
                 "Trip-Net-512-41": config.model_dfki / "checkpoint-41.pth.tar",  # GCNN
 
                 # "Real-train": config.model_dfki / "ccheckpoint-68-real-train.pth.tar",  # GCNN
