@@ -39,7 +39,7 @@ def preprocessing(models):
     parser.add_argument('--combine', type=str, default='true', help="combine the output images in one")
     parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
     parser.add_argument('--data_type', type=str, default="normal_noise", help="choose data type")
-    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
+    parser.add_argument('--machine', type=str, default="local",
                         help="loading dataset from local or dfki machine")
     args = parser.parse_args()
 
