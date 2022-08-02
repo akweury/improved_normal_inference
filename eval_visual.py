@@ -462,6 +462,8 @@ if __name__ == '__main__':
 
         # "Trip-Net-512-36": config.ws_path / "an2" / "checkpoint-36.pth.tar",  # GCNN
         "Trip-Net-512": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
+        "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
+        "An2-real-resume": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
         "SVD": None,
         "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
         # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
