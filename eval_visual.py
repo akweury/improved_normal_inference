@@ -448,7 +448,6 @@ if __name__ == '__main__':
         #
         "SVD": None,
         # "SVD": None,
-
         "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-289.pth.tar",  # Trip Net
         "GCNN-512-226": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",  # Trip Net
         # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
