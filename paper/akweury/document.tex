@@ -832,17 +832,17 @@ We use the same settings and the same models for training work on dataset with $
 	\centering
 	\begin{tabular}{l l l l }
 		\tabhead{Metrics} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{Trip-Net} \\
-		Mean  					& 20 & 5.43 & \\ 
+		Mean  					& 8.88 & 5.43 & \\ 
 		\hline
-		Median					& 20 & 3.53 & \\ 
+		Median					& 3.66 & 3.53 & \\ 
 		\hline
-		$ 5^\circ $ 			& 20 & 0.67 & \\
+		$ 5^\circ $ 			& 0.63 & 0.67 & \\
 		\hline
-		$ 11.5^\circ $ 			& 20 & 0.89 & \\
+		$ 11.5^\circ $ 			& 0.79 & 0.89 & \\
 		\hline
-		$ 22.5^\circ $ 			& 20 & 0.97 & \\
+		$ 22.5^\circ $ 			& 0.89 & 0.97 & \\
 		\hline
-		$ 30^\circ $ 			& 20 & 0.98 & \\
+		$ 30^\circ $ 			& 0.92 & 0.98 & \\
 	\end{tabular}
 	\caption{Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.}	
 	\label{tab:high_resolution_eval}
@@ -852,6 +852,44 @@ We use the same settings and the same models for training work on dataset with $
 \section{Training on Real-Dataset}
 
 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_groundtruth.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_normal_SVD.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_normal_GCNN-512-269.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_normal_Trip-Net-512.png}
+	\end{subfigure}
+	
+	
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_img.png}
+		\caption{GT}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_error_SVD.png}
+		\caption{SVD}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_error_GCNN-512-269.png}
+		\caption{GCNN}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison/fancy_eval_14_error_Trip-Net-512.png}
+		\caption{Trip-Net}
+	\end{subfigure}
+	
+	
+	
+	\caption{Comparison between different SVD, GCNN and Trip-Net model on $ 512\times 512 $ dataset. The first row is surface normal, the second row is the corresponding errors. }
+	\label{fig:high_resolution_eval}
+\end{figure}
 
 \begin{table}[H]
 	\centering

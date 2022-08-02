@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description='Eval')
 # Machine selection
 parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
                     help="loading dataset from local or dfki machine")
-parser.add_argument('--data', type=str, default="real",
+parser.add_argument('--data', type=str, default="synthetic512",
                     help="choose dataset")
 parser.add_argument('--max_k', type=str, default="0",
                     help="loading dataset from local or dfki machine")
@@ -53,7 +53,7 @@ def convert2training_tensor(path, k, output_type='normal'):
         f = open(data_files[item])
         data = json.load(f)
         f.close()
-        light_pos = np.array(data['lightPos'])
+        light_pos = np.array(data['lightPos0'])
         light_pos = np.array(data['R']) @ light_pos.reshape(3, 1) - np.array(data['t']).reshape(3, 1)  # synthetic
         # light_pos = light_pos - (np.array(data['R']).T @ (- np.array(data['t']).reshape(3, 1))).reshape(3)  # real
 
@@ -275,7 +275,7 @@ def convert2training_tensor_resized(path, k, output_type='normal', resize_factor
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["selval"]:
+    for folder in ["test"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
