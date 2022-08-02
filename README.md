@@ -124,7 +124,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 #### evaluate the test dataset (no visualisation)
 
 ```
-CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_noise_dfki --datasize synthetic128
+CUDA_VISIBLE_DEVICES=0 python3 eval_single_obj.py --machine pc-2103 --data synthetic --datasize synthetic512
 
     srun \
       --job-name="INI-eval" \
