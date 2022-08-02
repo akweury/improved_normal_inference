@@ -26,6 +26,7 @@ synthetic_data_noise_pc2103 = Path("/datasets/sha/data_synthetic_noise")
 # real dataset path
 real_data = dataset / "data_real"
 real_data_dfki = Path("/netscratch/sha/data_real")
+real_data_pc2103 = Path("/datasets/sha/data_real")
 
 # model path
 model_dfki = Path("/netscratch/sha/models")

@@ -110,14 +110,14 @@ if __name__ == '__main__':
             if args.data == "synthetic":
                 test_folder = config.synthetic_data_noise_pc2103 / "synthetic512" / "test" / "tensor"
             else:
-                test_folder = config.real_data_dfki / "test"
+                test_folder = config.real_data_pc2103 / "test"
             models = {
-                # "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
-                # "Trip-Net-512-36": config.ws_path / "an2" / "checkpoint-36.pth.tar",  # GCNN
-                "Trip-Net-512-41": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
-                # "Trip-Net-512-32": config.ws_path / "an2" / "checkpoint-32.pth.tar",  # GCNN
-                "SVD": None,
-                "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
+                "An2-real-train": config.ws_path / "an2_real" / "checkpoint-train-82.pth.tar",
+                "An2-real-resume": config.ws_path / "an2_real" / "checkpoint-resume-444.pth.tar",
+
+                # "SVD": None,
+                # "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
+                # "Trip-Net-512-41": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
 
             }
         else:
