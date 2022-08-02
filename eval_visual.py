@@ -379,7 +379,7 @@ def start2(models_path_dict):
                         normal = xout[:, :, :3]
                         normal[normal > 1] = 1
                         normal[normal < -1] = -1
-                        normal[mask] = 0
+                        # normal[mask] = 0
                         diff_img, diff_angle = mu.eval_img_angle(normal, gt)
                         diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
