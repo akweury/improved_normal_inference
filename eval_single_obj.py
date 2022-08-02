@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
         elif args.machine == "pc-2103":
             if args.data == "synthetic":
-                test_folder = config.synthetic_data_noise_pc2103 / "synthetic512" / "test"
+                test_folder = config.synthetic_data_noise_pc2103 / "synthetic512" / "test" / "tensor"
             else:
                 test_folder = config.real_data_dfki / "test"
             models = {
