@@ -93,7 +93,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
     srun \
-      --job-name="INI-cnn" \
+      --job-name="INI-gcnn" \
       --time=7-00:00 \
       -p RTXA6000 \
       --ntasks=1 \
@@ -104,7 +104,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
       python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --print-freq 1 \
-      --net_type cnn
+      --net_type gcnn
 
 
     srun \
@@ -143,7 +143,7 @@ CUDA_VISIBLE_DEVICES=0 python3 eval_visual.py --machine remote --data synthetic_
         srun \
       --job-name="INI-eval" \
       --time=7-00:00 \
-      -p A100 \
+      -p RTXA6000 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=30G \
