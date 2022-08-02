@@ -92,8 +92,8 @@ if __name__ == '__main__':
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
             # test_folder = config.real_data / "test"
-            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
-            test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
+            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
                 "SVD": None,
                 # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",

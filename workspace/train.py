@@ -248,7 +248,8 @@ class TrainingModel():
         if epoch > 0:
             prev_checkpoint_filename = os.path.join(self.output_folder, 'checkpoint-' + str(epoch - 1) + '.pth.tar')
             if os.path.exists(prev_checkpoint_filename):
-                os.remove(prev_checkpoint_filename)
+                if epoch % 50 != 1:
+                    os.remove(prev_checkpoint_filename)
 
     def save_model(self):
         with open(str(Path(self.output_folder) / "param.json"), 'w') as f:
