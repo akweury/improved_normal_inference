@@ -1013,7 +1013,7 @@ def eval_img_angle(output, target):
     img[mask] = 0
 
     # img = image_resize(img, width=512, height=512)
-    diff = np.sum(np.abs(angle_matrix)) / np.count_nonzero(angle_matrix)
+    diff = np.sum(np.abs(angle_matrix)) / np.count_nonzero(~mask)
     img = image_resize(img, 512, 512)
     return img, diff
 

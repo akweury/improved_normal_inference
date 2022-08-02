@@ -96,8 +96,8 @@ if __name__ == '__main__':
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
                 "SVD": None,
-                # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
-                # Trip Net
+                "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
+                "Trip-Net": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
 
             }
         else:
@@ -106,14 +106,11 @@ if __name__ == '__main__':
             else:
                 test_folder = config.real_data_dfki / "test"
             models = {
-                # "SVD": None,
-                # "NNNN-512": config.model_dfki / "checkpoint-295-nnnn.pth.tar",  # GCNN
-
+                "SVD": None,
+                "NNNN-512": config.model_dfki / "checkpoint-226.pth.tar",  # GCNN
                 "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
-                # "Trip-Net-512-82": config.model_dfki / "checkpoint-82.pth.tar",  # GCNN
-                "Trip-Net-512-52": config.model_dfki / "an2_gnet-f4_2022-08-01_20_32_42" / "checkpoint-51.pth.tar",
+                "Trip-Net-512-36": config.model_dfki / "ccheckpoint-36-trip-net-512.pth.tar",  # GCNN
 
-                # "Trip-Net-refine-371": config.model_dfki / "checkpoint-371.pth.tar",  # GCNN
             }
 
         main(models, test_folder, args, folder_name)

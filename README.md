@@ -64,7 +64,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
     
     srun \
-      --job-name="INI-an2-512-resume" \
+      --job-name="INI-an2-f2" \
       --time=3-00:00 \
       -p A100 \
       --ntasks=1 \
@@ -74,7 +74,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an2 --dataset synthetic512 --batch_size 2 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f4 --resume /netscratch/sha/models/checkpoint-32.pth.tar 
+      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f2f 
 
     srun \
       --job-name="real_refine_gcnn" \

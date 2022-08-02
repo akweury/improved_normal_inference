@@ -471,21 +471,6 @@ def test_epoch(nn_model, epoch):
             out = nn_model.model(input)
 
             gt = target_tensor[:, :3, :, :].to(out.device)
-
-            if nn_model.args.normal_loss:
-                normal_out = out[:, :3, :, :]
-
-                nn_model.normal_loss_eval = loss_utils.weighted_unit_vector_loss(normal_out,
-                                                                                 target[:, :3, :, :],
-                                                                                 nn_model.args.penalty,
-                                                                                 epoch,
-                                                                                 nn_model.args.loss_type)
-
-                loss += nn_model.normal_loss_eval
-                # for plot purpose
-                normal_loss_total += nn_model.normal_loss_eval.detach().to('cpu')
-                loss_total += normal_loss_total
-
             if nn_model.args.normal_huber_loss:
                 normal_out = out[0, :3, :, :].permute(1, 2, 0).to('cpu').numpy()
                 gt = target[0, :3, :, :].permute(1, 2, 0).to("cpu").numpy()
