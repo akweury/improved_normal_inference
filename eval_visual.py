@@ -232,13 +232,13 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=1)
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=2)
 
                 #
 
                 normal = normal[:, :, :3]
-                normal[normal > 1] = 1
-                normal[normal < -1] = -1
+                # normal[normal > 1] = 1
+                # normal[normal < -1] = -1
                 normal[mask] = 0
                 diff_img, diff_angle = mu.eval_img_angle(normal, gt)
                 diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
@@ -446,8 +446,11 @@ if __name__ == '__main__':
         # "light-noc": config.paper_exp / "light" / "checkpoint-noc-499.pth.tar",
         # "light-cnn": config.paper_exp / "light" / "checkpoint-cnn-599.pth.tar",
         #
+        "SVD": None,
         # "SVD": None,
-        #
+
+        "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-289.pth.tar",  # Trip Net
+        "GCNN-512-226": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",  # Trip Net
         # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
         # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
         # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
@@ -455,7 +458,7 @@ if __name__ == '__main__':
         # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
         # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
         # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
-        "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
+        # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
         # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
 
         # "an-real": config.paper_exp / "an_real" / "checkpoint-499.pth.tar",

@@ -48,24 +48,28 @@ def radian_between_tensor(v1, v2):
 
 
 def avg_angle_between_tensor(v1, v2):
+    # deg_diff = angle_between(v1.to("cpu").detach().numpy(), v2.to("cpu").detach().numpy())
+    # deg_diff = np.sum(np.abs(deg_diff))
+    mask = v1.sum(dim=-1) != 0
     radian_diff = radian_between_tensor(v1, v2)
     deg_diff = torch.rad2deg(radian_diff)
+    deg_diff = torch.abs(deg_diff)
     deg_diff[deg_diff > 90] = 180 - deg_diff[deg_diff > 90]
 
     deg_diff_5 = deg_diff > 5
-    deg_diff_5 = deg_diff_5.sum() / deg_diff.count_nonzero()
+    deg_diff_5 = deg_diff_5.sum() / torch.count_nonzero(mask)
 
     deg_diff_11d25 = deg_diff > 11.25
-    deg_diff_11d25 = deg_diff_11d25.sum() / deg_diff.count_nonzero()
+    deg_diff_11d25 = deg_diff_11d25.sum() / torch.count_nonzero(mask)
 
     deg_diff_22d5 = deg_diff > 22.5
-    deg_diff_22d5 = deg_diff_22d5.sum() / deg_diff.count_nonzero()
+    deg_diff_22d5 = deg_diff_22d5.sum() / torch.count_nonzero(mask)
 
     deg_diff_30 = deg_diff > 30
-    deg_diff_30 = deg_diff_30.sum() / deg_diff.count_nonzero()
+    deg_diff_30 = deg_diff_30.sum() / torch.count_nonzero(mask)
 
     avg_angle = deg_diff.sum() / deg_diff.size()[0]
-    median_angle = deg_diff.median()
+    median_angle = torch.median(deg_diff)
 
     return avg_angle.to("cpu").detach().numpy(), \
            median_angle.to("cpu").detach().numpy(), \
@@ -73,6 +77,46 @@ def avg_angle_between_tensor(v1, v2):
            deg_diff_11d25.to("cpu").detach().numpy(), \
            deg_diff_22d5.to("cpu").detach().numpy(), \
            deg_diff_30.to("cpu").detach().numpy()
+
+
+def avg_angle_between_np(output, target):
+    mask = target.sum(axis=2) != 0
+    deg_diff = np.zeros(target.shape[:2])
+    deg_diff[mask] = angle_between(target[mask], output[mask])
+    # deg_diff = angle_between(v1.to("cpu").detach().numpy(), v2.to("cpu").detach().numpy())
+    # deg_diff = np.abs(deg_diff)
+    # radian_diff = radian_between_tensor(v1, v2)
+    # deg_diff = torch.rad2deg(radian_diff)
+    # deg_diff[deg_diff > 90] = 180 - deg_diff[deg_diff > 90]
+
+    deg_diff_5 = deg_diff > 5
+    deg_diff_5 = deg_diff_5.sum() / np.count_nonzero(mask)
+
+    deg_diff_11d25 = deg_diff > 11.25
+    deg_diff_11d25 = deg_diff_11d25.sum() / np.count_nonzero(mask)
+
+    deg_diff_22d5 = deg_diff > 22.5
+    deg_diff_22d5 = deg_diff_22d5.sum() / np.count_nonzero(mask)
+
+    deg_diff_30 = deg_diff > 30
+    deg_diff_30 = deg_diff_30.sum() / np.count_nonzero(mask)
+
+    avg_angle = deg_diff.sum() / np.count_nonzero(mask)
+    median_angle = np.median(deg_diff[mask])
+
+    return avg_angle, \
+           median_angle, \
+           deg_diff_5, \
+           deg_diff_11d25, \
+           deg_diff_22d5, \
+           deg_diff_30
+
+    # return avg_angle.to("cpu").detach().numpy(), \
+    #        median_angle.to("cpu").detach().numpy(), \
+    #        deg_diff_5.to("cpu").detach().numpy(), \
+    #        deg_diff_11d25.to("cpu").detach().numpy(), \
+    #        deg_diff_22d5.to("cpu").detach().numpy(), \
+    #        deg_diff_30.to("cpu").detach().numpy()
 
 
 def vertex2light_direction(vertex_map, light_sorce):

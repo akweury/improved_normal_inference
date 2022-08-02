@@ -14,20 +14,6 @@ from help_funs import chart
 from workspace import eval
 
 
-def get_args():
-    parser = argparse.ArgumentParser(description='Eval')
-
-    # Mode selection
-    parser.add_argument('--data', type=str, default='synthetic128', help="choose evaluate dataset")
-    parser.add_argument('--gpu', type=int, default=0, help="choose GPU index")
-    parser.add_argument('--data-type', type=str, default="normal_noise", help="choose data type")
-    parser.add_argument('--machine', type=str, default="local", choices=['local', 'remote'],
-                        help="loading dataset from local or dfki machine")
-    args = parser.parse_args()
-
-    return args
-
-
 def main(models, test_folder, args, name):
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
@@ -105,38 +91,25 @@ if __name__ == '__main__':
     # test_folder = config.synthetic_data_noise_local / "synthetic128"
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
-            # test_folder = config.real_data / "test"
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            test_folder = config.real_data / "test"
+            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
             models = {
-                # "SVD": None,
-
-                # "CNN": config.ws_path / "nnnn" / "output_2022-07-30_20_41_10" / "checkpoint-1414.pth.tar",  # Trip Net
-                # "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-1415.pth.tar",  # Trip Net
-                # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-883.pth.tar",  # Trip Net
-                # "GCNN-best": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "model_best.pth.tar",  # Trip Net
-                # "GCNN-l2": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_44_30" / "checkpoint-923.pth.tar",  # Trip Net
-                "CNN": config.ws_path / "nnnn" / "output_2022-07-30_20_41_10" / "checkpoint-1414.pth.tar",  # Trip Net
-                "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-1415.pth.tar",  # Trip Net
-                "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-992.pth.tar",
+                "SVD": None,
+                "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
                 # Trip Net
-                # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
-                # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
-                # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-662.pth.tar",
-                # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
-                # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
+
             }
         else:
             if args.data == "synthetic":
-
                 test_folder = config.synthetic_data_noise_dfki / "synthetic512" / "test"
             else:
                 test_folder = config.real_data_dfki / "test"
             models = {
-                # "SVD": None,
-                "GCNN-512-289": config.model_dfki / "checkpoint-289.pth.tar",  # GCNN
+                "SVD": None,
                 "Trip-Net-512-2": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
                 "Trip-Net-Finetune": config.model_dfki / "checkpoint-29.pth.tar",  # GCNN
                 "Trip-Net-refine": config.model_dfki / "checkpoint-276.pth.tar",  # GCNN
+                "Trip-Net-refine-371": config.model_dfki / "checkpoint-371.pth.tar",  # GCNN
             }
 
         main(models, test_folder, args, folder_name)

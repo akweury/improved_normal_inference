@@ -38,14 +38,14 @@ def eval(dataloader, farthest_neighbour):
         size_list[i] = np.sum(~mask)
 
         # start count the model time
-        normal, gpu_time = eval_single(vertex, ~mask, np.array([0, 0.8, 7.5]), farthest_neighbour=2)
+        normal, gpu_time = eval_single(vertex, ~mask, np.array([0, 0, -7]), farthest_neighbour=2)
 
         # evaluation
         # angle_loss = mu.angle_between(normal[~mask], target[~mask]).sum() / mask.sum()
-        normal_target = torch.from_numpy(target)[~mask]
-        normal = torch.from_numpy(normal)[~mask]
-        diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
-            normal, normal_target)
+        # normal_target = torch.from_numpy(target)
+        # normal = torch.from_numpy(normal)
+        diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_np(
+            normal, target)
 
         # record data load time
 
