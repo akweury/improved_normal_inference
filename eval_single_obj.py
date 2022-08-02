@@ -112,8 +112,8 @@ if __name__ == '__main__':
             else:
                 test_folder = config.real_data_pc2103 / "test"
             models = {
-                "An2-real-train": config.ws_path / "an2_real" / "checkpoint-train-82.pth.tar",
-                "An2-real-resume": config.ws_path / "an2_real" / "checkpoint-resume-444.pth.tar",
+                "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
+                "An2-real-resume": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
 
                 # "SVD": None,
                 # "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
