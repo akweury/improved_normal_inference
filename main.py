@@ -48,7 +48,7 @@ def paser():
                         help='Total number of epochs to run (default: 30)')
 
     parser.add_argument('--optimizer', '-o', default='adam')
-    parser.add_argument('--refine-net', type=str, default="GCNN")
+    parser.add_argument('--refine-net', type=str)
 
     parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='Initial learning rate (default 0.001)')
