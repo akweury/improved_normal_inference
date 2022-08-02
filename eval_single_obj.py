@@ -110,7 +110,8 @@ if __name__ == '__main__':
                 # "NNNN-512": config.model_dfki / "checkpoint-295-nnnn.pth.tar",  # GCNN
 
                 "Trip-Net-512": config.model_dfki / "checkpoint-32.pth.tar",  # GCNN
-                "Trip-Net-512-52": config.model_dfki / "an2_gnet-f4_2022-08-01_17_36_15" / "checkpoint-51.pth.tar",
+                "Trip-Net-512-82": config.model_dfki / "checkpoint-82.pth.tar",  # GCNN
+                "Trip-Net-512-52": config.model_dfki / "an2_gnet-f4_2022-08-01_20_32_42" / "checkpoint-51.pth.tar",
                 
                 "Trip-Net-refine-371": config.model_dfki / "checkpoint-371.pth.tar",  # GCNN
             }
