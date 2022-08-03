@@ -22,13 +22,13 @@ from torch.utils.data import DataLoader
 from workspace.train import SyntheticDepthDataset
 
 
-def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
+def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise", setname="individual"):
     print(f"---------- Start {name} Evaluation --------")
     print(f"load checkpoint... ", end="")
     # SVD model
     if model_path is None:
         # load dataset
-        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
+        dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname=setname)
         data_loader = DataLoader(dataset, shuffle=False, batch_size=1, num_workers=1)
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = svd.eval(data_loader,
                                                                                                             2)
@@ -47,7 +47,7 @@ def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise"):
     print("load dataset...", end="")
     # load dataset
 
-    dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname="individual")
+    dataset = SyntheticDepthDataset(dataset_path, 0, data_type, setname=setname)
     data_loader = DataLoader(dataset,
                              shuffle=True,
                              batch_size=1,

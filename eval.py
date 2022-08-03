@@ -41,7 +41,7 @@ def main(models, test_folder, args):
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
-            test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
+            test_folder, name, model, gpu=args.gpu, data_type=args.data_type, setname="test")
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
@@ -92,12 +92,15 @@ if __name__ == '__main__':
             # "NOC": config.ws_path / "nnnn" / "output_2022-07-30_20_39_43" / "checkpoint-899.pth.tar",  # Trip Net
             # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_39_24" / "checkpoint-407.pth.tar",  # Trip Net
             # "GCNN-l2": config.ws_path / "nnnn" / "nnnn_gcnn_2022-07-31_10_44_30" / "checkpoint-421.pth.tar",  # Trip Net
+            "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_00_15_34" / "checkpoint-200.pth.tar",
+            "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_00_07_32" / "checkpoint-200.pth.tar",
+            "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_00_02_37" / "checkpoint-200.pth.tar",
 
             # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
             # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-403.pth.tar",
             # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-380.pth.tar",
             # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "model_best.pth.tar",
-            "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
+            # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
         }
     else:
         test_folder = config.synthetic_data_noise_dfki / "synthetic512"
