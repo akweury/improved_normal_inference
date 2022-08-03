@@ -864,6 +864,47 @@ Another remarkable result is the SVD approach, which also gives a good result ($
 \section{Training on Real-Dataset}
 We also applied our model on a small dataset that captured by a light scanner in our laboratory in order to see the applicability of our approaches. For the geometry information based approach, we use the GCNN model that trained on high resolution synthetic dataset directly, since it only require the depth map as input, the scenarios of two dataset are the same. For the illuminated calibrated RGB-D image based approach, the model has to be refined based on the real-dataset, since the light intensity, camera matrix are different. We refined the Trip-Net based on a pre-trained GCNN model with the same settings in previous experiments, and observe the results. As shown in Figure \ref{fig:real_eval}
 
+
+\begin{figure}[th]
+	\centering
+	\begin{subfigure}[b]{0.48\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_11_normal_Trip-Net-512.png}
+		\caption{Trip-Net}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.48\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_11_groundtruth.png}
+		\caption{GT}
+	\end{subfigure}
+	
+	
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_11_point_cloud_noise.png}
+		\caption{Input}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_11_img.png}
+		\caption{Image}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_11_error_Trip-Net-512.png}
+		\caption{Error}
+	\end{subfigure}
+	
+	\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (10,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+	
+	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
+	\label{fig:trip-eval-real}
+\end{figure}
+
+
+
+
+%% real eval comparison
 \begin{figure}[th]
 	\centering
 
@@ -905,17 +946,17 @@ We also applied our model on a small dataset that captured by a light scanner in
 	\centering
 	\begin{tabular}{l l l l }
 		\tabhead{Metrics} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{Trip-Net} \\
-		Mean  					& 8.20 & 8.90 & 8.30\\ 
+		Mean  					& 8.20 & 8.74 & \textbf{8.09}\\ 
 		\hline
-		Median					& 4.87 & 5.82 & 5.14 \\ 
+		Median					& \textbf{4.87} & 5.70 & 5.00 \\ 
 		\hline
-		$ 5^\circ $ 			& 0.51 & 0.43 & 0.49 \\
+		$ 5^\circ $ 			& \textbf{0.51} & 0.44 & 0.50 \\
 		\hline
-		$ 11.5^\circ $ 			& 0.79 & 0.78 & 0.80 \\
+		$ 11.5^\circ $ 			& 0.79 & 0.79 & \textbf{0.81} \\
 		\hline
-		$ 22.5^\circ $ 			& 0.93 & 0.93 & 0.93 \\
+		$ 22.5^\circ $ 			& 0.93 & 0.93 & \textbf{0.94} \\
 		\hline
-		$ 30^\circ $ 			& 0.96 & 0.96 & 0.96\\
+		$ 30^\circ $ 			& 0.96 & 0.96 & 0.96 \\
 	\end{tabular}
 	\caption{Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.}	
 	\label{tab:high_resolution_eval}
