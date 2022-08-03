@@ -92,8 +92,8 @@ if __name__ == '__main__':
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
             # test_folder = config.real_data / "test"
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
-            # test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
+            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
                 # "SVD": None,
@@ -101,10 +101,10 @@ if __name__ == '__main__':
                 # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-01_22_55_21" / "checkpoint-435.pth.tar",
                 # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-01_21_50_45" / "checkpoint-460.pth.tar",
 
-                "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-03_00_01_56" / "checkpoint-150.pth.tar",
-                "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-03_00_01_07" / "checkpoint-150.pth.tar",
-                "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-02_23_59_25" / "checkpoint-150.pth.tar",
-                "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-02_23_58_31" / "checkpoint-100.pth.tar",
+                # "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-03_00_01_56" / "checkpoint-150.pth.tar",
+                # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-03_00_01_07" / "checkpoint-150.pth.tar",
+                # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-02_23_59_25" / "checkpoint-150.pth.tar",
+                # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-02_23_58_31" / "checkpoint-100.pth.tar",
                 #
                 "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_00_15_34" / "checkpoint-200.pth.tar",
                 "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_00_07_32" / "checkpoint-200.pth.tar",
@@ -126,11 +126,12 @@ if __name__ == '__main__':
             else:
                 test_folder = config.real_data_pc2103 / "test"
             models = {
-                "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
-                "An2-real-resume": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
+                "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-134.pth.tar",
+                "An2-real-resume-444": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
+                "An2-real-resume-616": config.ws_path / "an_real" / "checkpoint-resume-616.pth.tar",
 
-                # "SVD": None,
-                # "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
+                "SVD": None,
+                "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
                 # "Trip-Net-512-41": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
 
             }
