@@ -19,7 +19,7 @@ from help_funs import mu
 from workspace.svd import eval as svd
 from torch.utils.data import DataLoader
 
-from workspace.train import SyntheticDepthDataset
+from workspace.dataset_synthetic import SyntheticDepthDataset
 
 
 def eval(dataset_path, name, model_path, gpu=0, data_type="normal_noise", setname="individual"):

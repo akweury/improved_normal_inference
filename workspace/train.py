@@ -5,7 +5,6 @@ Created on Wed Mar 16 18:49:51 2022
 @Author: J. Sha
 """
 import datetime
-import glob
 import json
 import os
 import shutil
@@ -18,11 +17,12 @@ import torch
 from torch import nn
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
 
 import config
 from help_funs import mu
+from workspace import eval
 from workspace import loss_utils
+from workspace.dataset_synthetic import SyntheticDepthDataset
 
 date_now = datetime.datetime.today().date()
 time_now = datetime.datetime.now().strftime("%H_%M_%S")
@@ -76,31 +76,6 @@ def calc_TV_Loss(x):
 
 
 # ----------------------------------------- Dataset Loader -------------------------------------------------------------
-class SyntheticDepthDataset(Dataset):
-
-    def __init__(self, data_path, k=0, output_type="normal_noise", setname='train'):
-        if setname in ['train', 'selval', 'test']:
-            self.training_case = np.array(
-                sorted(
-                    glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
-        else:
-            self.training_case = np.array(
-                sorted(
-                    glob.glob(str(data_path / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))
-
-    def __len__(self):
-        return len(self.training_case)
-
-    def __getitem__(self, item):
-        if item < 0 or item >= self.__len__():
-            return None
-
-        training_case = torch.load(self.training_case[item])
-        input_tensor = training_case['input_tensor']
-        gt_tensor = training_case['gt_tensor']
-        scale_factors = training_case['scale_factors']
-
-        return input_tensor, gt_tensor, item
 
 
 # ----------------------------------------- Training model -------------------------------------------------------------
@@ -122,6 +97,8 @@ class TrainingModel():
         self.losses_eval = np.zeros((1, args.epochs))
         self.model = self.init_network(network)
         self.train_loader, self.test_loader = self.create_dataloader(dataset_path)
+        self.dataset_path = dataset_path
+        self.model_path = os.path.join(self.output_folder, 'checkpoint-0.pth.tar')
         self.val_loader = None
         self.albedo_loss = None
         self.normal_loss = None
@@ -240,7 +217,7 @@ class TrainingModel():
                  }
 
         torch.save(state, checkpoint_filename)
-
+        self.model_path = checkpoint_filename
         if is_best:
             best_filename = os.path.join(self.output_folder, 'model_best.pth.tar')
             shutil.copyfile(checkpoint_filename, best_filename)
@@ -453,29 +430,37 @@ def train_epoch(nn_model, epoch, eval_loss_best):
 
 
 def test_epoch(nn_model, epoch):
-    loss_list = np.zeros(nn_model.test_loader.dataset.__len__())
-    for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
+    test_dataset_path = nn_model.dataset_path / "test"
+    loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
+        test_dataset_path, nn_model.args.exp, nn_model.model_path, gpu=0,
+        data_type="normal_noise")
+    average_loss = np.array(loss_list).sum() / np.array(loss_list).shape[0]
+    print(f"\tevaluation loss : {average_loss:.2e}")
+    return average_loss
 
-        with torch.no_grad():
-            # put input and target to device
-            input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor([0.0]).to(0)
-            mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
-            mask = mask.permute(1, 2, 0).squeeze(-1)
-
-            print(test_idx)
-            torch.cuda.synchronize()
-            # Forward pass
-            out = nn_model.model(input)
-            out = mu.filter_noise(out, threshold=[-1, 1])
-
-            if nn_model.args.normal_huber_loss:
-                normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-                normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
-                diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
-                    normal[mask], normal_target[mask])
-                # for plot purpose
-                loss_list[j] = diff
-    return np.array(loss_list).sum() / np.array(loss_list).shape[0]
+    # loss_list = np.zeros(nn_model.test_loader.dataset.__len__())
+    # for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
+    #
+    #     with torch.no_grad():
+    #         # put input and target to device
+    #         input, target, loss = input_tensor.float().to(0), target_tensor.float().to(0), torch.tensor([0.0]).to(0)
+    #         mask = torch.sum(torch.abs(target[:, :3, :, :]), dim=1) > 0
+    #         mask = mask.permute(1, 2, 0).squeeze(-1)
+    #
+    #         print(test_idx)
+    #         torch.cuda.synchronize()
+    #         # Forward pass
+    #         out = nn_model.model(input)
+    #         out = mu.filter_noise(out, threshold=[-1, 1])
+    #
+    #         if nn_model.args.normal_huber_loss:
+    #             normal = out[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+    #             normal_target = target[:, :3, :, :].permute(0, 2, 3, 1).squeeze(0)
+    #             diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
+    #                 normal[mask], normal_target[mask])
+    #             # for plot purpose
+    #             loss_list[j] = diff
+    # return np.array(loss_list).sum() / np.array(loss_list).shape[0]
 
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
@@ -686,7 +671,7 @@ def main(args, exp_dir, network, train_dataset):
         nn_model.lr_decayer.step()
 
         # evaluation
-        if epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
+        if epoch > 0 and epoch % nn_model.args.print_freq == nn_model.args.print_freq - 1:
             eval_loss = test_epoch(nn_model, epoch)
             nn_model.losses_eval[0, epoch] = eval_loss
 
