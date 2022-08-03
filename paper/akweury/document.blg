@@ -5,6 +5,11 @@ Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: biblatex.bst
 Reallocating 'name_of_file' (item size: 1) to 13 items.
 Reallocating 'name_of_file' (item size: 1) to 8 items.
+This database file appears more than once: example.bib
+---line 6 of file document.aux
+ : \bibdata{document-blx,example,example
+ :                                      }
+I'm skipping whatever remains of this command
 Reallocating 'glb_str_end' (item size: 4) to 20 items.
 Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
 Reallocating 'global_strs' (item size: 1) to 4000000 items.
@@ -22,16 +27,12 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: document-blx.bib
 Database file #2: example.bib
-Warning--I didn't find a database entry for "data1"
-Warning--I didn't find a database entry for "data2"
-Warning--I didn't find a database entry for "data3"
-Warning--I didn't find a database entry for "data4"
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 You've used 1 entry,
             6393 wiz_defined-function locations,
-            1211 strings with 9051 characters,
+            1207 strings with 9031 characters,
 and the built_in function-call counts, 1522 in all, are:
 = -- 72
 > -- 70
@@ -70,4 +71,4 @@ warning$ -- 0
 while$ -- 64
 width$ -- 0
 write$ -- 20
-(There were 4 warnings)
+(There was 1 error message)

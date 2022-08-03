@@ -60,7 +60,7 @@ The dataset is created base on the work of this thesis and using for normal infe
 		\includegraphics[width=\linewidth]{./Figures/test-dataset/03.baoshanlu_texture.png}
 		\caption{baoshanlu}
 	\end{subfigure}
-	
+	\decoRule
 	\label{fig:dataset-demo}
 	\caption{Point clouds scanned by high resolution scanners}
 \end{figure}
@@ -81,6 +81,7 @@ During the data collection, the object is randomly selected and placed on the st
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=.99\textwidth]{./Figures/unity-workplace.PNG}
+	\decoRule
 	\caption{The layout of synthetic scenes generation in Unity.}
 	\label{fig:unity-workplace}
 \end{figure}
@@ -91,7 +92,9 @@ The main advantage using generated scenes is the availability of complete inform
 	\label{tab:data-files}
 	\centering
 	\begin{tabular}{l l}
+		\toprule
 		\tabhead{Data} & \tabhead{Size} \\
+		\midrule
 		Depth map & Width$ \times $Height$ \times $ 1 \\
 		\hline 
 		Depth range  & MinDepth, MaxDepth \\  
@@ -106,6 +109,7 @@ The main advantage using generated scenes is the availability of complete inform
 		\hline 
 		Camera Extrinsic Matrix &  $ 3\times 4 $  \\
 		\hline 
+		\bottomrule
 	\end{tabular}
 \end{table}
 
@@ -125,6 +129,7 @@ One important detail that we must care about is the camera exposure. Or we have 
 		\includegraphics[width=\textwidth]{./Figures/wrong_exposure.png}
 		\caption{Too bright}
 	\end{subfigure}
+	\decoRule
 	\caption{Different exposure to the objects.}
 	\label{fig:camera_exposure}
 \end{figure}
@@ -182,6 +187,7 @@ The depth map can be converted to 3D vertex point cloud as the input of the norm
 		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
 		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
 	\end{tikzpicture}	
+	\decoRule
 	\caption{Convert depth to point in camera coordinate system}
 	\label{fig:depth-triangulation}
 \end{figure}
@@ -234,26 +240,26 @@ It is calculated as the range in $ X $ axis, but theoretically can be used by $ 
 	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
 	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
 	\label{fig:data_range}
+	\decoRule
 	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
 \end{figure}
 
-\begin{table}[h!]
-	\caption{ The fluctuation of extreme values and their ranges in 100 random training items. 
-	}
+\begin{table}[th]
 	\label{tab:data-range}
 	\centering
 	\begin{tabular}{c | c c c}
-		\hline 
+		\toprule
 		\tabhead{Axis} & \tabhead{Scale} & \tabhead{Min} & \tabhead{Max}\\
-		\hline 
+		\midrule
 		X & 1.48 & -0.75 & 0.73\\
 		\hline 
 		Y & 1.56 & -0.76 & 0.80\\
 		\hline 
 		Z & 1.47 & 6.53 & 8.00\\
-		\hline 
+		\bottomrule
 		
 	\end{tabular}
+	\caption{ The fluctuation of extreme values and their ranges in 100 random training items. }
 \end{table}
 
 
@@ -267,6 +273,7 @@ Figure \ref{fig:noise-intensity} shows the noise effect with different $ \mu $.
 \begin{figure}[!h]
 	\centering
 	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
+	\decoRule
 	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
 	\label{fig:noise-intensity}
 \end{figure}
@@ -279,7 +286,9 @@ In order to saving the training time, the dataset is compressed in PyTorch forma
 	\label{tab:tensor-structure}
 	\centering
 	\begin{tabular}{l | l}
+		\toprule
 		\tabhead{Name} & \tabhead{Content} \\
+		\midrule
 		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
 		\hline
 		\multirow{3}{*}{output-tensor}  & GT-Normal \\ & Image \\ & GT-Light-Direction \\
@@ -289,5 +298,6 @@ In order to saving the training time, the dataset is compressed in PyTorch forma
 		Camera Matrix  & K,R,t\\
 		\hline 
 		Depth Range  & minDepth, maxDepth\\
+		\bottomrule
 	\end{tabular}
 \end{table}

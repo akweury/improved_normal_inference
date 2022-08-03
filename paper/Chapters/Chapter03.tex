@@ -2,170 +2,146 @@
 \chapter{Approaches} % Main chapter title
 
 \label{ch:03} %
-The normal inference task estimate the surface normal of a 3D object. There are two main approach to solve the task. Geometry based approach estimate the surface normal of an object based on the geometry principle. Point cloud is a common surface geometry information which samples the surface point position in 3D space. Another approach is photometric stereo based approach, which utilizes a set of images under different illumination conditions. In this chapter, geometry and photometric stereo based approach are introduced separately, then a deep learning based approach using geometry information is proposed. In the end, as the main work of the thesis, another deep learning method is proposed based on both geometry and photometric stereo information.
+The normal inference task estimate the surface normal of a 3D object, which is assumed that  object surface is mathematically unknown. It means we cannot simply use the cross product of two non-parallel surface vectors to find the normals. Instead, the surface is acquired from digital sensors under specific data types, which can be divided into two groups. The first is geometry data type, which use a point cloud to record the surface geometry information in the 3D space. 
+Another data type is the images, which record the surface reflectance and shading under a light condition. 
 
+In this chapter, geometry and photometric stereo based approach are introduced separately, then we introduce a method to estimate the surface normal that utilize both kind of data types based on deep learning approaches.
+
+\section{Notations}
+
+The following standard notations are adopted in the following chapters in this thesis. The boldface capital letters stand for matrices, whereas the boldface lowercase letters stand for vectors. The capital Greece letters stand for planes.
+We use the subscript $ i= \{1,2,...\} $ to denote the index of the  observations, whereas the superscript to denote the dimension of the matrices or vectors, e.g. $ \textbf{n}^{3\times 1} $ denotes vector with  dimension $ 3\times1 $. We use W stands for width, H stands for height, C stands for channel.
 
 \section{Geometry based normal estimation}
 
-
 \subsection{Approach}
-The geometry based normal estimation uses point cloud of the object surface as input.
-Given a structured point cloud $ V^{W\times H\times 3} $ to estimate the normal map  $ N^{W\times H \times 3} $, where each normal  $ \textbf{n}^{3\times 1} $ at point $ \textbf{v}^{3\times 1} \in N $ is a unit vector with its direction point outward of the surface and perpendicular to the tangent plane of the surface at point $ \textbf{p}^{3\times 1} $.
+The geometry based normal estimation uses point cloud of the object surface as input. The task can be stated as follows.
 
-The idea behind the neighbor based method is to fit a plane $ \Pi $ using the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, calculate the normal  $ \tilde{\textbf{n}} $ of the plane. 
+Given a structured point cloud $ \textbf{V}^{W\times H\times 3} $, whereas each point in the cloud corresponding a position on an object surface. estimates the corresponding normal map  $ \textbf{N}^{W\times H \times 3} $. The normal map is simply a matrix representation of the normals of all the points. A normal  $ \textbf{n}^{3\times 1} $ at point   $ \textbf{p}^{3\times 1} \in \textbf{N} $ is a unit vector with its direction point outward of the surface and perpendicular to the tangent plane of the surface at point $ \textbf{p} $.
 
-It is under the assumption that the point and its neighbors are located in the same plane. This is usually not hold for the most of the surface, but if $ k $ in a suitable scale and point cloud is dense enough, it is enough to get an accurate and sharp result. As shown in Figure \ref{fig:svd-normal}. 
 
-Specifically, it is not necessary to find the exact plane equation to solve the normal. Instead, the normal can be derived based on an equation system. 
-The normal $ \tilde{\textbf{n}} $ of plane $ \Pi $ is perpendicular to all the vector on the plane $ \Pi $, we can construct $ k $ vectors on plane $ \Pi $ use  $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of point $ \textbf{p} $. For the simplicity, we can choose $ \textbf{p}_1 $ as the base point, then $ k-1 $ vectors can be construct as follows
-\begin{equation}
-	\begin{array}{rr}
-		\displaystyle \textbf{v}_i = \textbf{p}_1 - \textbf{p}_i & \text{for}\ i= 2,...,k \\
-	\end{array}
-\end{equation}
-and each of them satisfied $ \textbf{v}_i \cdot \tilde{\textbf{n}} = 0$. Then, the equation system can be constructed as 
-\begin{equation}{\label{eq:normal-overdetermined-equation}}
-	A \cdot \textbf{n} = 0
-\end{equation}
-where $ A \in \mathbb{R}^{(k-1)\times 3} $ is the vector matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_{k-1} $.
-In order to avoid trivial solution, one more constraint should be added
-\[ \|  \bn_{3 \times 1} \|_2^2 = 1  \]
-which also let the normal to be a unit vector.
+The idea behind the neighbor based method is to fit a plane $ \tilde\Pi $, which use the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, then calculate the normal $ \tilde{\textbf{n}} $ of the plane $ \tilde\Pi $. The $ \tilde{\textbf{n}} $ is considered as an approximation of the normal $ \textbf{n} $ of the tangent plane $ \Pi $.
 
-To calculate a valid normal, at least 3 points are required to construct, i.e. $ k>=3 $. For the sake of robust, more points can be used to reduce the measuring error. For the case $ k>3 $, since the surface vectors are actually not in the same plane, the equation system is likely over-determined . Then the equation system mentioned above can be converted to follow optimization problem
+It is under the assumption that the point and its neighbors are located in the same plane $ \Pi $, which is exactly the tangent plane of the surface at point $\textbf{p}  $. 
+This is usually not hold for the most of the surface, since the surface is usually not flat but with a degree of curvature. But if $ k $ in a suitable scale and point cloud is dense enough, we can approximately consider all the $ k $ neighbor points in a small range on the same tangent plane. Then we have an approximation $ \textbf{n} \approx \tilde{\textbf{n}}$, where $ \tilde{\textbf{n}} $ denotes the estimated normal. Similarly, the estimated tangent plane $ \tilde{\Pi} \approx \Pi $. 
+
+Based on the assumption mentioned above, the normal inference task is trivial since then the surface is mathematically describable. We can generate the approximate tangent point of any point with its neighbors, then the normal $ \tilde{\textbf{n}} $ of the tangent plane can be derived from following equations
+
+\[\tilde{\textbf{n}} \cdot \textbf{v}_{ij}  = 0 \]
+where 
+\[ \textbf{v}_{ij} = \textbf{p}_i - \textbf{p}_j, \text{for } i, j \in \{ 1,2,...,k\}, i\neq j \]
+To find a normal, we need at least 3 neighbors which are not in the same line to solve the equation above. Calculate the normal for each point on the point cloud, we can get the corresponding normal maps. 
+
+If we consider more than 3 neighbors, the points are usually not locate on the same plane. In this case, the equation system is over-determined. In this case, we can use optimization approach to find a plane that has the minimum distance to all the points in the 3D space. Let  $ \textbf{A }\in \mathbb{R}^{(k-1)\times 3} $  denotes the vertor  matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_{k-1} $. 
+
+Then, the equation system is converted to a minimum problem 
 \begin{equation}
 	\begin{array}{rrclcl}
-		\displaystyle \min & \multicolumn{3}{l}{\| A  \bn \|^2} \\
+		\displaystyle \min & \multicolumn{3}{l}{\| A  \bn \|^2_2} \\
 		\\
-		\textrm{s.t.} & \| \bn \|^2 & = & 1 
+		\textrm{s.t.} & \| \bn \|^2_2 & = & 1 
 	\end{array}
 \end{equation}
-which can be solved by singular value decomposition(SVD). Let the decomposition of 
+where the extra constraint is added to avoid trivial solution and let the normal to be a unit vector.
+
+The problem mentioned above can be solved by singular value decomposition(SVD), where
 \[ A=U\Sigma V^T \]
-The solution i.e. normal is the last column of $ V $.
+The last column of $ V $ is the equation system solution and consequently the surface normal. 
 
+The optimization based approach using SVD is more robust compare to only choose 3 points for normal calculation, since the plane generated by 3 neighbors does not guarantee to be a good approximation to the actually tangent plane. However, the neighbor size $ k $ is a key parameters of this approach. For the smooth surface, a relative bigger $ k $ can help the equation system to fit a plane that closer to the tangent plane. For the sharp surface area, the $ k $ has to be small enough to ensure that the points it contains still approximately in the same plane, otherwise the more included points are only the outliers for the equation solving. 
 
-At last, all the normals should point ot view point $ \textbf{s} $, thus the direction of a normal should be inverted if 
+At last, after solving the equation mentioned above, we should convert all the normals to the view point $ \textbf{s} $ for a unitary reason. Thus the direction of a normal should be inverted if 
 \begin{equation}\label{eq:normal-invertion}
 	\textbf{n} \cdot (\textbf{p}  - \textbf{s}) > 0
 \end{equation}
-
-Repeat the procedure for all the points in the point cloud to get the entire normal map. 
-
-\subsection{Evaluation}
-The neighbor based method can predict the normal map in a good way when the given point cloud is dense, as shown in Figure \ref{fig:svd-normal}. It can successfully predict the smooth surface of the dragon object, especially the flakes and the tails of the dragon. 
-
-However, it failed in the areas such as hindleg, horn and the mouth, which consists mainly by sharp edges. This is because the neighbors points in these area do not hold the assumption of coplanarity well, the normals of these neighbors can be very different. 
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_groundtruth.png}
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_normal_SVD.png}
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_error_SVD.png}
-	
-	\label{fig:svd-normal}
-	\caption{Normal map of a dragon object predicted by neighbor based method. k=2, angle error=5 \textbf{Left}: ground-truth normal map \textbf{Middle}: predicted normal map, \textbf{Right}: Error map}
-\end{figure}
-The neighbor based method is depended on a well-chosen parameter $ k $. Figure \ref{fig:svd-k-eval} shows the evaluation on different $ k $ values. When $ k=1 $, the average error of the whole image is the lowest one, most of the normals are close to the ground-truth but the outline edges, which are the areas that surface normal changed extremely sever. For the case $ k=2 $, the sharp edges are more smooth and cause more error, like the eyes area of the dragon. Compare to the first case, the outline edge error goes better. Most of the edge errors are reduced when $ k=2 $, since more neighbor points join the evaluation and it reduces the effect of outliers. However, for the area of horn outline, hindleg outline, the error goes worse. In this case, most of the neighbors of these points are outliers and thus failed this approach.  $ k=3 $ and $ k=4 $ further increase the angle errors based on $ k=2 $.
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k1.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k2.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k3.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k4.png}	
-	\label{fig:svd-k-eval}
-	\caption{Error map of neighbor based method with different $ k $ values. From left to right, $ k=1,2,3,4 $ separately.}
-\end{figure}
-
-The performance of neighbor based method is good enough for a well chosen $ k $. However, for the case of noised point cloud as input, this approach will broken, since the noise will failed the neighbor assumption and also reduce the number of possible neighbors of each point for a fixed $ k $.
-\begin{figure}[th]
-	\centering
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_point_cloud_noise.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_groundtruth.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_normal_SVD.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_error_SVD.png}	
-	\label{fig:svd-noise}
-	\caption{Evaluation of neighbor based method on a noised dragon model}
-\end{figure}
-
-
-
-% ---------------------- gated convolution neural network ------------------------
-
+Since the approach mentioned above is basically solved by SVD, thus for the simplicity, this method will be named SVD in the rest of the thesis.
 
 
 \section{Photometric Stereo}
-Photometric stereo was initially introduced by \cite{photometric-stereo}, which estimates the surface normal of the object by observing the object in the same position but under different illuminated scenes. It based on the fact that the light reflected by a surface is dependent on the surface normal and the light direction. 
+Photometric stereo was initially introduced by \cite{photometric-stereo}, which is a completely a different approach compare to geometry information based approach like SVD. It estimates the surface normal of the object by observing the object in the same position under different illuminated scenes. It based on the fact that the light reflected by a surface is dependent on the surface normal and the light direction.
 
 \subsection{Approaches}
-Given an image $ I $, it can be decomposed in to two parts, the reflectance $ R $ and the shading $ S $,
-\[ I = R\oplus S\]
+The photometric stereo actually estimates the surface normal from images. Before we introduce the this approach, let us discuss what we can actually get from the images.
+Given an image $ \textbf{I} $, it can be decomposed into two parts, the reflectance $ \textbf{R} $ and the shading $ \textbf{S} $,
+\[ \textbf{I} = \textbf{R}\oplus \textbf{S}\]
 where $ \oplus $ denotes the element-wise product. This decomposition of the image is based on the intrinsic image model, which proposed by  \cite{intrinsic-image}. It interprets the observed image into reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
 %% insert a image for decompositions
 \begin{figure}[th]
 	\centering
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_reflectance.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_shading.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_light.png}}
-	{\includegraphics[width=.18\textwidth]{./Figures/intrinsic_image_normal.png}}
-	\caption{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image}
+	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image.png}}
+	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image_reflectance.png}}
+	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image_shading.png}}
+	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image_light.png}}
+	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image_normal.png}}
+	\decoRule
+	\caption{Intrinsic image analysis of the bus object. From left to right, original image, reflectance image, shading image, light image, normal image.}
 	\label{fig:intrinsic-image}
+	
 \end{figure}
 
-The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ N $ and the light source direction $ L $.
-\[ I = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
-note that the surface normal $ N $ and light direction $ L $ are unit vectors thus they have only two degrees of freedom. 
+The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, as shown in figure \ref{fig:lambertian-surface}, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ \textbf{N} $ and the light source direction $ \textbf{L} $.
+\[ \textbf{I} = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
+note that the each surface normal in the matrix$ \textbf{N} $ and light direction in matrix $ \textbf{L} $ is a unit vector thus they have only two degrees of freedom. 
 
 \begin{figure}[th]
 	\centering
-	\begin{tikzpicture} 
-		% reference lines
-		\coordinate (light) at (-1,3);
-		\coordinate (p) at (2,0);
-		\coordinate (normal) at (2,3);
-		\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
-		\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
-		\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
-		\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
-		\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
-		\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
-		\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
-	\end{tikzpicture}
-	\caption{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
+	\begin{subfigure}[b]{0.48\linewidth}
+		\includegraphics[width=\textwidth]{./Figures/Lambertian-Reflection-Lambertian-Surface.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.48\linewidth}
+			\begin{tikzpicture} 
+			% reference lines
+			\coordinate (light) at (-1,3);
+			\coordinate (p) at (2,0);
+			\coordinate (normal) at (2,3);
+			\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
+			\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
+			\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
+			\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
+			\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
+			\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
+			\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
+		\end{tikzpicture}
+	\end{subfigure}
+	\decoRule
+	\caption{Left: the light reflection on a lambertian surface. (image source \cite{lambertian-reflectance}). Right: The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
 	\label{fig:lambertian-surface}
 \end{figure}
 
 The equation can be further rearranged as follows
-\[ I = \textbf{g} \cdot \textbf{L} =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
-The shape from shading method employed the equation mentioned above to predict the both surface albedo $ \rho $ and the normal $ \textbf{N} $ with knowning light source direction $ \textbf{L} $. More specifically, a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in the image, an equation system can be set up 
-
+\[ I =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
+Let $ \textbf{G} = =L_0\rho \odot \textbf{N} $, the equation is simplified to 
+\[\textbf{I} = \textbf{G} \cdot \textbf{L}\]
+If we use a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in a scene, an equation system can be set up 
 \[ 
 \begin{pmatrix}
-	L_1^T \\
-	L_2^T \\
+	\textbf{l}_1^T \\
+	\textbf{l}_2^T \\
 	\cdots \\
-	L_k^T
-\end{pmatrix} g(x,y) = 
+	\textbf{l}_k^T
+\end{pmatrix} \textbf{G}(x,y) = 
 \begin{pmatrix}
-	I_1(x,y) \\
-	I_2(x,y) \\
+	\textbf{I}_1(x,y) \\
+	\textbf{I}_2(x,y) \\
 	\cdots \\
-	I_3(x,y)
+	\textbf{I}_k(x,y)
 \end{pmatrix}
 \]
-for the simplicity, $ L_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ 
-The equation can be solved based on least square methods. 
-Since normal $ N(x,y) $ is unit vector, thus we have 
+for the simplicity, $ \textbf{l}_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ . The equation can be solved based on least square methods. 
 
-\[ \|g(x,y)\|_2 = \|L_0\rho(x,y)N(x,y)\|_2 = L_0\rho(x,y) \]
+First we can get the albedo with the light intensity based on the fact that normal is an unit vector, thus we have 
 
-Then the normal can be obtained as follow
+\[ \|\textbf{G}(x,y)\|_2 = \|L_0\rho(x,y)\textbf{N}(x,y)\|_2 = L_0\rho(x,y) \]
+Then the normal can be obtained as follows
 
-\[  N(x,y) = \frac{g(x,y)}{L_0\rho(x,y)}\]
+\[ \textbf{ N}(x,y) = \frac{\textbf{G}(x,y)}{L_0\rho(x,y)}\]
+We calculate the surface normal for each point  to get the surface normal map. 
 
-In another word, the surface normal including the albedo can be obtained directly based on a set of images and light directions. 
+This approach is also called shape from shading (SFS)\cite{SFS}. It gets both normal maps and the corresponding albedo from a set of images under different light conditions. Since the light direction is used in the computation, the cameras and the light source position has to be calibrated beforehand. 
 
+Shape from shading approach takes at least three light positions into account for the normal on one pixel. Thus it is common to use more than three light sources to cover most of the surface points as much as possible. 
 
+\newpage 
 \section{Gated Convolution neural network for surface normal estimation}
 \label{sec:gcnn}
 
@@ -180,6 +156,7 @@ Recently,\cite{unet} proposed an architecture called UNet for biomedical image s
 \begin{figure}[th]
 	\centering
 	\includegraphics[width=.8\textwidth]{./Figures/u-net-illustration-correct-scale2.pdf}
+	\decoRule
 	\label{fig:u-net}
 	\caption{The structure of UNet. \cite{unet}}
 \end{figure}
@@ -243,6 +220,7 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 		\draw [arrow] (input) -|  node [text width=2.5cm, midway, below=1em]{Conv2D} (conv1);
 		\draw [arrow] (input) -- node [text width=2.5cm, midway, right=1em]{Conv2D} (conv2);
 	\end{tikzpicture}
+	\decoRule
 	\caption{Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication.}
 	\label{fig:gconvLayer}
 \end{figure}
@@ -327,6 +305,7 @@ The light map $ L $ can be derived from vertex map $ V $ and the light source po
 	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_vertex_input.png}}
 	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_light_input.png}}
 	\caption{The light map calculated from vertex map and the light source}
+	\decoRule
 	\label{fig:light-input}
 \end{figure}
 where $ (s_x,s_y) $ is the light source position and $ V $ is the vertices, both $  (s_x,s_y) $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. Using the equation above for all the pixels in the point cloud can obtain the corresponding light map, which is a matrix with same size as point clouds. However, it is important to note that due to the exist noise in the vertex map, the getting light map is only semi-dense, as shown in Figure \ref{fig:light-input}. 
@@ -374,6 +353,7 @@ The task of vertex pipe in the network is to predict the normal map directly. Th
 \begin{sidewaysfigure}[th]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/trignet} % Research group name and department name
+	\decoRule
 	\caption{The architecture of Trig-Net}
 	\label{fig:Trig-Net}
 \end{sidewaysfigure}

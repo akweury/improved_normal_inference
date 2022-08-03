@@ -510,6 +510,32 @@
     \field{year}{2012}
   \endentry
 
+  \entry{SFS}{article}{}
+    \name{author}{1}{}{%
+      {{hash=HB}{%
+         family={Horn},
+         familyi={H\bibinitperiod},
+         given={Berthold},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HB1}
+    \strng{fullhash}{HB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2004}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Shape from Shading: A Method for Obtaining the Shape of a
+  Smooth Opaque Object from One View}
+    \verb{url}
+    \verb http://hdl.handle.net/1721.1/6885
+    \endverb
+    \field{month}{10}
+    \field{year}{2004}
+  \endentry
+
   \entry{depth-enhance-guided}{inproceedings}{}
     \name{author}{2}{}{%
       {{hash=HJ}{%
@@ -772,6 +798,40 @@
     \verb https://arxiv.org/abs/2204.00987
     \endverb
     \field{year}{2022}
+  \endentry
+
+  \entry{lambertian-reflectance}{article}{}
+    \name{author}{3}{}{%
+      {{hash=LP}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Peng},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=WWL}{%
+         family={Woo},
+         familyi={W\bibinitperiod},
+         given={Wai\bibnamedelima Lok},
+         giveni={W\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=DS}{%
+         family={Dlay},
+         familyi={D\bibinitperiod},
+         given={S.s},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LPWWLDS1}
+    \strng{fullhash}{LPWWLDS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2009}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{title}{One colored image based 2.5D human face reconstruction}
+    \field{month}{01}
+    \field{year}{2009}
   \endentry
 
   \entry{data3}{online}{}

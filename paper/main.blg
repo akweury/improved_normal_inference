@@ -34,54 +34,55 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'field_info' (item size: 4) to 10180 items.
 Database file #1: main-blx.bib
 Database file #2: example.bib
-Repeated entry---line 793 of file example.bib
+Repeated entry---line 805 of file example.bib
  : @article{nconv
  :               ,
 I'm skipping whatever remains of this entry
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-You've used 35 entries,
+You've used 37 entries,
             6393 wiz_defined-function locations,
-            1413 strings with 16681 characters,
-and the built_in function-call counts, 235082 in all, are:
-= -- 16656
-> -- 4014
-< -- 1129
-+ -- 6234
-- -- 1600
-* -- 17576
-:= -- 26020
+            1422 strings with 16946 characters,
+and the built_in function-call counts, 245614 in all, are:
+= -- 17295
+> -- 4255
+< -- 1195
++ -- 6479
+- -- 1693
+* -- 18372
+:= -- 27084
 add.period$ -- 0
-call.type$ -- 35
-change.case$ -- 553
-chr.to.int$ -- 72
-cite$ -- 68
-duplicate$ -- 26149
-empty$ -- 21017
-format.name$ -- 2596
-if$ -- 47295
+call.type$ -- 37
+change.case$ -- 573
+chr.to.int$ -- 84
+cite$ -- 72
+duplicate$ -- 27319
+empty$ -- 21998
+format.name$ -- 2730
+if$ -- 49477
 int.to.chr$ -- 0
-int.to.str$ -- 88
+int.to.str$ -- 92
 missing$ -- 0
-newline$ -- 1420
-num.names$ -- 1578
-pop$ -- 12614
+newline$ -- 1479
+num.names$ -- 1660
+pop$ -- 13319
 preamble$ -- 1
-purify$ -- 793
+purify$ -- 823
 quote$ -- 0
-skip$ -- 6393
+skip$ -- 6748
 stack$ -- 0
-substring$ -- 27826
-swap$ -- 5963
-text.length$ -- 1009
-text.prefix$ -- 34
+substring$ -- 28833
+swap$ -- 6258
+text.length$ -- 1073
+text.prefix$ -- 36
 top$ -- 1
-type$ -- 1178
+type$ -- 1246
 warning$ -- 0
-while$ -- 3784
+while$ -- 3939
 width$ -- 0
-write$ -- 1386
+write$ -- 1443
 (There was 1 error message)

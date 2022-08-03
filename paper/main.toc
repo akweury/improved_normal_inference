@@ -23,94 +23,94 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {3}Approaches}{5}{chapter.20}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Geometry based normal estimation}{5}{section.21}%
+\contentsline {section}{\numberline {3.1}Notations}{5}{section.21}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1.1}Approach}{5}{subsection.22}%
+\contentsline {section}{\numberline {3.2}Geometry based normal estimation}{5}{section.22}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1.2}Evaluation}{6}{subsection.27}%
+\contentsline {subsection}{\numberline {3.2.1}Approach}{5}{subsection.23}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Photometric Stereo}{7}{section.31}%
+\contentsline {section}{\numberline {3.3}Photometric Stereo}{7}{section.26}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Approaches}{7}{subsection.32}%
+\contentsline {subsection}{\numberline {3.3.1}Approaches}{7}{subsection.27}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Gated Convolution neural network for surface normal estimation}{9}{section.35}%
+\contentsline {section}{\numberline {3.4}Gated Convolution neural network for surface normal estimation}{9}{section.30}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Gated Convolution}{10}{subsection.38}%
+\contentsline {subsection}{\numberline {3.4.1}Gated Convolution}{10}{subsection.33}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Architecture}{10}{subsection.41}%
+\contentsline {subsection}{\numberline {3.4.2}Architecture}{10}{subsection.36}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.3}Loss Function}{12}{subsection.43}%
+\contentsline {subsection}{\numberline {3.4.3}Loss Function}{12}{subsection.38}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L1 Loss}{12}{section*.44}%
+\contentsline {paragraph}{L1 Loss}{12}{section*.39}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L2 Loss}{12}{section*.45}%
+\contentsline {paragraph}{L2 Loss}{12}{section*.40}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{12}{section*.46}%
+\contentsline {paragraph}{Masked L2 Loss with penalty for outliers(mask-l2)}{12}{section*.41}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Reversed Huber Loss}{13}{section*.48}%
+\contentsline {paragraph}{Reversed Huber Loss}{12}{section*.43}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}Guided normal inference using GCNN}{13}{section.50}%
+\contentsline {section}{\numberline {3.5}Guided normal inference using GCNN}{13}{section.45}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.1}Light Map}{13}{subsection.51}%
+\contentsline {subsection}{\numberline {3.5.1}Light Map}{13}{subsection.46}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.2}VIL Net}{14}{subsection.54}%
+\contentsline {subsection}{\numberline {3.5.2}VIL Net}{13}{subsection.49}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.3}Trip-Net}{14}{subsection.55}%
+\contentsline {subsection}{\numberline {3.5.3}Trip-Net}{14}{subsection.50}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Side-Pipe(Light)}{15}{section*.56}%
+\contentsline {subsubsection}{Side-Pipe(Light)}{14}{section*.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Side-Pipe(Image)}{15}{section*.57}%
+\contentsline {subsubsection}{Side-Pipe(Image)}{15}{section*.52}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Main-Pipe(Vertex)}{15}{section*.58}%
+\contentsline {subsubsection}{Main-Pipe(Vertex)}{15}{section*.53}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{19}{chapter.60}%
+\contentsline {chapter}{\numberline {4}Dataset}{19}{chapter.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Resource}{19}{section.61}%
+\contentsline {section}{\numberline {4.1}Resource}{19}{section.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Synthesize Scenes using Unity}{20}{section.63}%
+\contentsline {section}{\numberline {4.2}Synthesize Scenes using Unity}{20}{section.58}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}Data preprocessing}{22}{section.67}%
+\contentsline {section}{\numberline {4.3}Data preprocessing}{22}{section.62}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.1}Convert to Point Cloud}{22}{subsection.68}%
+\contentsline {subsection}{\numberline {4.3.1}Convert to Point Cloud}{22}{subsection.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.2}Point Cloud Normalization}{23}{subsection.70}%
+\contentsline {subsection}{\numberline {4.3.2}Point Cloud Normalization}{23}{subsection.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.3}Noise}{24}{subsection.73}%
+\contentsline {subsection}{\numberline {4.3.3}Noise}{24}{subsection.68}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.4}Fit to PyTorch}{24}{subsection.75}%
+\contentsline {subsection}{\numberline {4.3.4}Fit to PyTorch}{24}{subsection.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{27}{chapter.77}%
+\contentsline {chapter}{\numberline {5}Experiments}{27}{chapter.72}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Training Details}{27}{section.78}%
+\contentsline {section}{\numberline {5.1}Training Details}{27}{section.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}GCNN model based on Geometry Information}{28}{section.80}%
+\contentsline {section}{\numberline {5.2}Quantitative Evaluation}{29}{section.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Trip-Net model based on Calibrated Illuminated RGB-D Image}{29}{section.82}%
+\contentsline {paragraph}{Average Angle Error Metric}{29}{section*.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Evaluation}{30}{section.85}%
+\contentsline {paragraph}{Median Angle Error Metric}{29}{section*.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Average Angle Error Metric}{30}{section*.86}%
+\contentsline {paragraph}{5 Degree Error Metric}{29}{section*.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Median Angle Error Metric}{30}{section*.87}%
+\contentsline {paragraph}{11.5 Degree Error Metric}{29}{section*.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{5 Degree Error Metric}{30}{section*.88}%
+\contentsline {paragraph}{22.5 Degree Error Metric}{29}{section*.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{11.5 Degree Error Metric}{31}{section*.89}%
+\contentsline {paragraph}{30 Degree Error Metric}{29}{section*.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{22.5 Degree Error Metric}{31}{section*.90}%
+\contentsline {section}{\numberline {5.3}Visualization evaluation on SVD}{31}{section.90}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{30 Degree Error Metric}{31}{section*.91}%
+\contentsline {section}{\numberline {5.4}Visualization evaluation on GCNN model}{33}{section.94}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}Visualization evaluation on GCNN model}{32}{section.98}%
+\contentsline {section}{\numberline {5.5}Visualized evaluation on Trip-Net models }{36}{section.99}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Surface Normal Inference based on Calibrated Illuminated RGBD images }{34}{section.102}%
+\contentsline {section}{\numberline {5.6}Trining on higher resolution}{39}{section.104}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}More Comparison}{34}{section.105}%
+\contentsline {section}{\numberline {5.7}Training on Real-Dataset}{41}{section.108}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{37}{chapter.108}%
+\contentsline {chapter}{\numberline {6}Conclusion}{43}{chapter.112}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{39}{appendix.109}%
+\contentsline {chapter}{\numberline {A}Dataset}{45}{appendix.113}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{39}{section.110}%
+\contentsline {section}{\numberline {A.1}Dataset}{45}{section.114}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{43}{appendix*.114}%
+\contentsline {chapter}{Bibliography}{49}{appendix*.118}%
