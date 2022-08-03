@@ -41,6 +41,6 @@ for model_idx, (name, model) in enumerate(models.items()):
     #                  y_label="Berhu Loss", log_y=True)
 
     chart.line_chart(np.array(normal_loss_avg), output_folder, labels=[name], title="Test_Loss_Comparison",
-                     y_label="Angle Error", log_y=True)
+                     y_label="Angle Error", log_y=False)
 
 plt.show()

@@ -453,7 +453,7 @@ def train_epoch(nn_model, epoch, eval_loss_best):
 
 
 def test_epoch(nn_model, epoch):
-    loss_total = torch.tensor([0.0])
+    loss_list = np.zeros(nn_model.test_loader.dataset.__len__())
     for j, (input_tensor, target_tensor, test_idx) in enumerate(nn_model.test_loader):
 
         with torch.no_grad():
@@ -474,8 +474,8 @@ def test_epoch(nn_model, epoch):
                 diff, median_err, deg_diff_5, deg_diff_11d25, deg_diff_22d5, deg_diff_30 = mu.avg_angle_between_tensor(
                     normal[mask], normal_target[mask])
                 # for plot purpose
-                loss_total += diff
-    return loss_total / (nn_model.test_loader.dataset.__len__())
+                loss_list[j] = diff
+    return np.array(loss_list).sum() / np.array(loss_list).shape[0]
 
 
 def draw_line_chart(data_1, path, title=None, x_label=None, y_label=None, show=False, log_y=False,
