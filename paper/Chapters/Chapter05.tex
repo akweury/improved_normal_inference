@@ -267,7 +267,7 @@ From the table we can see that all the learning based approaches achieves a bett
 
 
 %% svd evaluation
-\section{Visualization evaluation on SVD}
+\section{Visual evaluation on SVD}
 
 The SVD approach can predict the normal map in a good way when the given point cloud is dense. As shown in Figure \ref{fig:svd-normal}. It can successfully predict the smooth surface of the dragon object, especially the flakes and the tails of the dragon. 
 
@@ -305,7 +305,7 @@ The performance of neighbor based method is good enough for a well chosen $ k $.
 	\caption{Evaluation of neighbor based method on a noised dragon model}
 \end{figure}
 
-\section{Visualization evaluation on GCNN model}
+\section{Visual evaluation on GCNN model}
 A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure. \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg and the head area of dragon object, CNN model gives a much brighter error map (which means a higher angle error).
 
 Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we can get a good result from GCNN model but from model ``Washington" we still can see it lacks the sharpness in the detail area like the face and clothes area. 
@@ -428,7 +428,7 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 \end{figure}
 
 
-\section{Feature Maps Discussion on GCNN architecture models}
+\section{ Discussion about the feature maps of GCNN architecture models}
 
 As shown in figure \ref{fig:gcnn-cnn-feature map}, we also visualize the feature maps of the last gated convolution layer in the first up-sampling part for CNN and GCNN models, which corresponding the feature maps with size $ 32\times 32 $ in width and height. The input data is also same dragon object that we used for normal visualization. For each feature map, we map the minimum value to the left-most color in the color bar and the maximum value to the right-most color in the color bar. 
 We want to discuss the the different of the feature maps between CNN, NOC and GCNN models.
@@ -472,7 +472,7 @@ Actually, these missing areas can usually be found in the detail feature maps. T
 
 
 \newpage 
-\section{Visualized evaluation on Trip-Net models }
+\section{Visual evaluation on Trip-Net models }
 
 For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net introduced in \ref{sec:trip-net}. The Trip-Net uses illuminated information align with the geometry information achieves a sharper and more accurate result compare to the GCNN model.
 
@@ -769,6 +769,16 @@ We also applied our model on a dataset that captured by a light scanner in our l
 	\label{tab:high_resolution_eval}
 \end{table}
 
+
+
+
+
+Since in the real-dataset, we don't have a ground-truth for evaluation. But if we see directly from the visualization in figure \ref{fig:trip-eval-real}, we can see that Trip-Net approach has good ability to  ``mend" the missing pixels in the scenes and also gives a sharp result. The folds on the gowns are recognizable and even countable. \ref{fig:real_eval_compare} compares the Trip-Net with other approaches.
+
+
+But we also noted that the big holes in the base stage remains in the depth maps. These big holes corresponds to the shinny and dark texture area, which common exists in the depth map captured by the scanners. Since these big holes are related with only special feature areas and also has irregular shapes, we didn't simulate this type of noise in the synthetic dataset but only with a random binary mask. Thus our models failed to mend missing big holes in the estimated normal map. This can be a further direction of this topic, that find a way to generate high similar depth map noise to get a more robust training dataset. 
+
+
 \begin{figure}[th]
 	\centering
 	\begin{subfigure}[b]{0.30\linewidth}
@@ -804,16 +814,6 @@ We also applied our model on a dataset that captured by a light scanner in our l
 	\caption{Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)}
 	\label{fig:trip-eval-real}
 \end{figure}
-
-
-
-
-
-Since in the real-dataset, we don't have a ground-truth for evaluation. But if we see directly from the visualization in figure \ref{fig:trip-eval-real}, we can see that Trip-Net approach has good ability to  ``mend" the missing pixels in the scenes and also gives a sharp result. The folds on the gowns are recognizable and even countable. \ref{fig:real_eval_compare} compares the Trip-Net with other approaches.
-
-
-But we also noted that the big holes in the base stage remains in the depth maps. These big holes corresponds to the shinny and dark texture area, which common exists in the depth map captured by the scanners. Since these big holes are related with only special feature areas and also has irregular shapes, we didn't simulate this type of noise in the synthetic dataset but only with a random binary mask. Thus our models failed to mend missing big holes in the estimated normal map. This can be a further direction of this topic, that find a way to generate high similar depth map noise to get a more robust training dataset. 
-
 
 
 

@@ -575,6 +575,39 @@
     \field{year}{2018}
   \endentry
 
+  \entry{CNN-PS}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=IS}{%
+         family={Ikehata},
+         familyi={I\bibinitperiod},
+         given={Satoshi},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {arXiv}%
+    }
+    \keyw{Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and
+  information sciences, FOS: Computer and information sciences}
+    \strng{namehash}{IS1}
+    \strng{fullhash}{IS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{I}
+    \field{sortinithash}{I}
+    \verb{doi}
+    \verb 10.48550/ARXIV.1808.10093
+    \endverb
+    \field{title}{CNN-PS: CNN-based Photometric Stereo for General Non-Convex
+  Surfaces}
+    \verb{url}
+    \verb https://arxiv.org/abs/1808.10093
+    \endverb
+    \field{year}{2018}
+  \endentry
+
   \entry{adam}{misc}{}
     \name{author}{2}{}{%
       {{hash=KDP}{%
@@ -1523,6 +1556,61 @@
     \field{title}{Deep Surface Normal Estimation With Hierarchical RGB-D
   Fusion}
     \field{year}{2019}
+  \endentry
+
+  \entry{spline-net}{inproceedings}{}
+    \name{author}{6}{}{%
+      {{hash=ZQ}{%
+         family={Zheng},
+         familyi={Z\bibinitperiod},
+         given={Qian},
+         giveni={Q\bibinitperiod},
+      }}%
+      {{hash=JY}{%
+         family={Jia},
+         familyi={J\bibinitperiod},
+         given={Yiming},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=SB}{%
+         family={Shi},
+         familyi={S\bibinitperiod},
+         given={Boxin},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=JX}{%
+         family={Jiang},
+         familyi={J\bibinitperiod},
+         given={Xudong},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=DLY}{%
+         family={Duan},
+         familyi={D\bibinitperiod},
+         given={Ling-Yu},
+         giveni={L\bibinithyphendelim Y\bibinitperiod},
+      }}%
+      {{hash=KAC}{%
+         family={Kot},
+         familyi={K\bibinitperiod},
+         given={Alex\bibnamedelima C.},
+         giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ZQ+1}
+    \strng{fullhash}{ZQJYSBJXDLYKAC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{}
+    \field{sortinit}{Z}
+    \field{sortinithash}{Z}
+    \field{booktitle}{Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}
+    \field{title}{SPLINE-Net: Sparse Photometric Stereo Through Lighting
+  Interpolation and Normal Estimation Networks}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
   \endentry
 
   \entry{unstructed-pc-patch-stitching}{misc}{}
