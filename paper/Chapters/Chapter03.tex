@@ -142,16 +142,14 @@ This approach is also called shape from shading (SFS)\cite{SFS}. It gets both no
 Shape from shading approach takes at least three light positions into account for the normal on one pixel. Thus it is common to use more than three light sources to cover most of the surface points as much as possible. 
 
 \newpage 
-\section{Gated Convolution neural network for surface normal estimation}
+\section{Gated Convolution Neural Network for surface normal estimation}
 \label{sec:gcnn}
 
 
-Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks, like normal map inference, the output is demanded as the same shape as the input. Instead of predicting one or several classes for the whole input matrix, the class for each pixel requires for prediction. In this case, the traditional network architecture is not suitable anymore.
+Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks like normal map inference, the output is demanded as the same shape as the input, whereas each pixel in the output image requires a prediction. Therefore the output is not only one or several labels but a similar size matrix as the input. In this case, the traditional network architecture using fully connections as the last layers for label prediction is not suitable anymore.
 
-%% upsampling 
-It is worth to noticed that, the output of normal inference CNN model is not one or several labels but an entire image or normal map with same size. 
 %% talk about image upsampling, unet
-Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}.The first half network is a usual classification convolutional network, the second half replace the pooling layers and traditional fc layers in the traditional CNNs to upsampling layers, thus in the end of the second half, the output is able to back to the input size. The proposed network can successfully assigned each pixel a class for segmentation tasks. Under this symmetric network, an input image is downsampled 4 times and upsampled 4 times. Output image has exactly the same size as input image. The downsampling and upsampling both have large number of feature channels, which guarantee the network propagates the information to higher resolution layers.
+Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}. This network has a very regular architecture for the data processing whereas each resolution level has a similar design. For the feature extraction part, as known as down-sampling, the architecture follows the traditional CNN architecture. For the up-sampling part, the network use an architecture that similar like down-sampling operations, which replace the max pool layers for resize reduction to up-conv for super-resolution and remains other convolution layers. An important design is the skip connection in the up-sampling part. The feature maps that extracted in the down-sampling part will be concatenated to the feature maps in the up-sampling part. This helps the network to find the locations in the original image and use it to predict a sharp output.
 
 \begin{figure}[th]
 	\centering
@@ -161,23 +159,22 @@ Recently,\cite{unet} proposed an architecture called UNet for biomedical image s
 	\caption{The structure of UNet. \cite{unet}}
 \end{figure}
 
-
-The UNet is based on standard convolution layers to construct the network. This is reasonable for image processing task with full-dense input, since no missing pixels exist. 
-However, for the input of noised point cloud, the valid and invalid pixels will be treated equally if we still perform standard convolution layers. Since the aim of the network is not learning the pattern of noise, but the noise with eternally changing patterns will confuse the network, and it fails the normal inference, a mask is required to distinguish two kinds of pixels. 
-
 % why we need a mask
-\cite{pncnn0} use binary mask to indicate valid pixels, and further use normalized convolution to predict the output. The normalized convolution is shown as follows
+The UNet is based on standard convolution layers to construct the network. This is reasonable for image processing task with full-dense input, since no missing pixels exist. 
+However, some other input data like depth map captured from light scanner, they are not always fully-dense data, but equipped with lots of missing pixels and holes. In this case, we can still apply the standard convolution layers to extract the feature maps from the input, but then it will confused by the valid pixels and the invalid pixels (the missing pixels) during the training, and consequently leads to artifacts such as blurriness and color discrepancy, as mentioned by \cite{partial_conv}. Thus it is reasonable to find a way to distinguish the valid and invalid pixels during the training. 
+
+
+\cite{pncnn0} use binary mask to indicate valid pixels, and further use normalized convolution as a substitution for the standard convolution layer in the training network. The normalized convolution is shown as follows
 
 \begin{equation}
 	\begin{array}{rrclcl}
 		O(x,y) = 
 		\begin{cases}
-			\dfrac{\Sigma_i^k\Sigma_j^k W(i,j) \cdot I(x-i,y-j) \cdot M(x-i,y-j)}{\Sigma_i^k\Sigma_j^k W(i,j) \cdot M(x-i,y-j)}, & \text{if}\ \sum_{i}^k\sum_{j}^k M(i,j)>0 \\
+			\dfrac{\Sigma_i^k\Sigma_j^k W(i,j) \odot I(x-i,y-j) \odot M(x-i,y-j)}{\Sigma_i^k\Sigma_j^k W(i,j) \odot M(x-i,y-j)}, & \text{if}\ \sum_{i}^k\sum_{j}^k M(i,j)>0 \\
 			0, & \text{otherwise}
 		\end{cases}
 	\end{array}
 \end{equation}
-
 where $ k $ is the kernel size, $ (x,y) $ is the position in input, $ (i,j) $ is the displacement in kenel, $ M $ is the corresponding mask. A binary mask uses 1 to indicate valid pixels and 0 otherwise. $ \odot $ denotes element-wise multiplication.
 
 Normalized convolution layer added the weight to the mask. However, a initialization for the mask is still required, and the propagation of the mask remain a tricky task. 
@@ -185,11 +182,11 @@ Normalized convolution layer added the weight to the mask. However, a initializa
 \subsection{Gated Convolution}
 
 % introduce gconv
-\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. 
-\cite{gconv} employed the same gated unit solving for the free-form image inpainting task. The proposed network use 3 channel RGB images as input and estimate the missing pixels. 
+\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. \cite{gconv} employed the same gated unit and use it as gated convolution layer for training tasks with in-complete input data, such as image inpainting task. In this gated convolution layer design, the mask using to distinguish the valid and invalid pixels are not predetermined but learned during the training. 
 
+The structure is shown in Figure \ref{fig:gconvLayer}. Instead of using a mask as input to indicate valid pixels, it employs a standard convolution layer to learn this mask directly from data, and use a sigmoid function as the activation function to indicate the confidence of the pixel validation. Meanwhile, another standard convolution layer placed aside to learn the feature maps with a ReLU /LeakyReLU activation functions. Therefore the mask and the feature of the input are both learned during the training.  Then it imply element-wise multiplication with the feature map and the mask as the final feature map of this gated convolution layer. 
 
-The structure is shown in Figure \ref{fig:gconvLayer}. Instead of using a mask as input to indicate valid pixels, it employs a standard convolution layers to learn this mask directly from data. The valid pixels are then activated by a Sigmoid function. Then it imply element-wise multiplication with the feature map. Formally, the gated convolution is described as follows, the layer with input size $ (N, C_{in}, H, W) $ and output size $ (N, C_{out}, H_{out}, W_{out}) $:
+Formally, the gated convolution is described as follows, the layer with input size $ (N, C_{in}, H, W) $ and output size $ (N, C_{out}, H_{out}, W_{out}) $:
 \begin{equation}\label{gconv}
 	o(N_i, C_{o_j}) = \sigma(\sum_{k=0}^{C_{in}-1}w_g(C_{o_j}, k) \star i(N_i,k) + b_g(C_{o_j})) * 
 	\phi (\sum_{k=0}^{C_{in}-1}w_f(C_{o_j}, k) \star i(N_i,k) + b_f(C_{o_j}))
@@ -198,7 +195,7 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 
 
 % Gated Convolution Layer
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
 		\tikzstyle{rect} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!20]
@@ -225,130 +222,169 @@ where $ \phi $ is LeakyReLU function, $ \sigma $ is sigmoid function, thus the o
 	\label{fig:gconvLayer}
 \end{figure}
 
+Thus instead of use a hard-coded mask, the network is able to learn the mask during the training. 
 %\section{Canny Edge Detection for Detail Enhancement}
 %The inaccuracy part is usually concentrate in the coarse surface or drastic changed surface parts of the object. The corresponding part can be extracted separately via edge detector algorithms, like Canny Edge detector. Feed the edges to a special net for normal prediction might improve the accuracy further. 
 
-\subsection{Architecture}
+\subsection{Gated Convolution Neural Network (GCNN) Architecture}
 \label{sec:architecture}
-Based on the implementation mentioned above, the architecture roughly follows on UNet proposed by \cite{unet}, as shown in Figure \ref{fig:gcnn-archi}. 
 
-\begin{sidewaysfigure}[th]
+Based on the implementation mentioned above, we proposed a network that based on UNet \cite{unet} and gated convolution layers using for semi-dense input normal inference task, called gated convolution neural network (GCNN), as shown in Figure \ref{fig:gcnn-archi}. 
+
+
+\begin{sidewaysfigure}[h]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/gcnn}
 	\caption{The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.}
 	\label{fig:gcnn-archi}
 \end{sidewaysfigure}
+
 In order to describe the network in a common way, the parameters of the network are represented by letters.
-The network is constructed by a downsampling part and a upsampling part. In the downsampling part, the input is the $ X \in \mathbb{R}^{w\times w\times ch}$. The input matrix goes through 3 downsampling layer blocks, each block has two gated convolution layers with stride (1,1) and an extra gated convolution layers with stride (2,2) as a downsampling operation. 
-The total three times downsamplings extract the geometry features $ X_v $ from input matrix $ X $ (represented as a regression function $ f $)
-\[ f: X \rightarrow X_f \]
-After the feature extraction, the network upsampling the feature map 3 times to get the output matrix $ Y $. Each upsampling consists of an interpolation operation uses nearest neighboring interpolations for resolution upsamling, then a concatenate layer that concatenate the interpolated result and the corresponding high resolution feature map  $ X_{df_1, df_2, ...} $  from the downsampling part. This is also called skip connection. In the last, a gated convolution layer is utilized to reduce the channel size to fit the next upsampling block. After the three times upsampling, two standard convolution layer is added in the last without activation function to predict the surface normal. The whole upsampling branch can be represented as a regression function $ n $,
-\[ n: X_v, X_{df_1, df_2, ...} \rightarrow N \]
+The network is constructed by a downsampling part and a upsampling part. In the downsampling part, the input has shape $ X_{in} \in \mathbb{R}^{H\times W\times C_{in}}$ whereas output has shape $ X_{out} \in \mathbb{R}^{H\times W\times C_{out}}$
+The input matrix goes through 3 times down-sampling layer block, a down-sampling block has two gated convolution layers with stride (1,1) and an extra gated convolution layers with stride (2,2) as a downsampling operation. Thus there are in total 3 gated convolution layers in each down-sampling time.
+The total three times downsamplings extract the geometry features $ X_v $ from input matrix $ X_{in} $ (represented as a regression function $ f $)
+\[ f: X_{in} \rightarrow X_f \]
+After the feature extraction, the network upsampling the feature map 3 times to get the output matrix $ X_{out} $. Each upsampling consists of an interpolation operation uses nearest neighboring interpolations for resolution up-samling, then a concatenate layer that concatenate the interpolated result and the corresponding high resolution feature map  $ X_{df_1, df_2, ...} $  from the downsampling part. This is also called skip connection. In the last, a gated convolution layer is utilized to reduce the channel size to fit the next upsampling block. After the three times upsampling, the resolution goes back to the original size. Two standard convolution layer is added afterward without activation function to predict the surface normal. The whole upsampling branch can be represented as a regression function $ n $,
+\[ n: X_v, X_{df_1, df_2, ...} \rightarrow X_{out} \]
 All the convolution layers in the network use same kernel size $ 3\times 3 $. 
 
-One of the key feature of the network is the output has the same size as the input. This is achieved by the (1,1) padding and the same channel number in the convolution layers. Thus the surface normal can be achieved 1-1 estimation. Another key point of the network is the robustness of the noise. The network takes semi-dense matrix as input then predicts the fully-dense matrix as output. The last feature is the multi-purpose using scenarios. In the description, no specific input type has been indicated. In this thesis, two application scenarios have been verified. The first is the missing-pixel estimation but with out the transformation of the style of the input matrix, which takes the semi-dense matrix as input and simply fill the missing pixels in the output. The second is the missing pixel estimation with style-transferred of the matrix. In this case, the network takes the semi-dense matrix as input, the output matrix is fully-dense but each pixel has the different meaning as the input. Actually, the first scenario can be consider as the specially case of the second scenario which the style of output and the input remain the same. The network is test in Chapter \ref{ch:05}, which is shown the good performance on noise filtering task and also the normal surface estimation task.
-
-\subsection{Loss Function}
-
-\paragraph{L1 Loss}
-L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the median of the observations.
-
-\[ L_1(\tilde y - y) = |\tilde y - y | \]
-
-\paragraph{L2 Loss}
-The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value. It leads to the mean of the observations. 
-\[ L_2(\tilde y - y) = \|\tilde y - y \|_2^2 \]
+One of the key feature of the network is the output has the same size as the input. This is achieved by the (1,1) padding and the same channel number in the convolution layers. Thus the surface normal can be achieved 1-1 estimation. Another key point of the network is the robustness of the noise with the help of gated convolution layers. The network can take semi-dense matrix as input then predicts the fully-dense matrix as output. The last feature is the multi-purpose using scenarios. In the description, no specific input type has been indicated. 
+The network is also fully convoluted thus can accept different input resolutions. 
 
 
-\paragraph{Masked L2 Loss with penalty for outliers(mask-l2)}
-\label{par:maskl2}
-The background pixels of the input data are not considered in the normal inference task, they are saved as black pixels in the input data. These pixels should not considered in the loss function, i.e. invalid pixels. Therefore, a valid mask is required to distinguish the background and the main object. Specifically, using a matrix with the same width and height as the output, for each pixel, 0 is invalid, 1 is valid. 
-Furthermore, depends on the specific task, the output should be constraint in a range. For normal output, the range is $ [-1,1] $. Thus for the outliers out of this range, a outlier mask can be applied to give them a penalty.
-
-\begin{equation}\label{gcnn-loss}
-	\begin{array}{ll}
-		l(x,y)&= L  = \{l_1, ..., l_N\}^T\\ 
-		l_{n\in N} &= \| mask_{obj} \odot mask_{ol} \odot ( {\tilde y}_n - y_n) \|_2^2 + 	\| mask_{obj} \odot mask_{nol} \odot ( {\tilde y}_n - y_n) \|_2^2 \\
-	\end{array}
-\end{equation}
-
-where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is the mask of the object, i.e. 1 means it is an pixel on the object, 0 is an pixel on the background. $ mask_{ol} $ is the mask for the outliers, i.e. 1 means outliers, 0 means non outlier, $ mask_{nol} $ is exactly the inverse of $ mask_{ol} $. $ p $ is the penalty of the outliers, it is set as 1.4.
+\section{Illuminated Calibrated RGB-D image based normal inference}
+The GCNN architecture is designed for one type of input since it has only one pipe to deal with the data. In our thesis, the input is referred to structured point cloud. Thus it is suitable for geometry based approach that takes the point cloud from the input and estimate the corresponding surface normal. However, as we mentioned in the introduction, the goal of this paper is to discuss the improvement of normal inference based on illuminated calibrated RGB-D image, that is to say, we want to see if we can booster the performance of the normal estimation not only based on geometry information like point cloud or depth map, but also with illumination information, like the image and the light map. Thus we need to find an architecture to take all of these data types into account. 
 
 
-\paragraph{Reversed Huber Loss}
-
-\cite{berhu-loss} proposed Reversed Huber loss to combine both L1 and L2 loss. L1 loss is for small values whereas L2 for large values
-\begin{equation}\label{berhu-loss}
-	\begin{array}{ll}
-		\mathcal{B}(y)= \begin{cases}
-			|y| & |y| \le c \\
-			\dfrac{y^2 + c^2}{2d} & |x| > c\\
-		\end{cases}
-	\end{array}
-\end{equation}
-where $ c=0.2\max (|\tilde y - y|) $.
-
-
-\section{Guided normal inference using GCNN}
-The guided normal inference takes the light direction and the image into consideration. It is under the assumption that the scene image $ I $ is captured by a calibrated camera, i.e. knowing the intrinsic $ K $ and extrinsic camera matrix $ [R|t] $, and a the light position $ (s_x, s_y, s_z) $ of the single light source. The geometry based approach inference the surface normal from the point cloud, whereas the photometric stereo inference the surface normal from a set of calibrated illuminated images. The idea behind this chapter is that improve the geometry based approach with the help of one calibrated illuminated image. Since the calibrated illuminated image contains the information about the surface feature, it is supposed to help the geometry approach in a proper way. Based on this idea, two networks are proposed in this section.
-
-\subsection{Light Map}
+\subsection{Light Map, Gray-scale Image and Vertex Map}
 \label{sec:lightmap}
-The light map $ L $ can be derived from vertex map $ V $ and the light source position $ s $. As shown in Figure \ref{fig:lambertian-surface}, the incoming light direction is a vector point from light source to the surface point, therefor it can be calculated as follows
+We first introduce the required input types of the our network.
+
+\paragraph{Vertex Map}
+The vertex map $ \textbf{V} $ is converted from depth map as introduced in Chapter \ref{ch:04}, whereas the depth map is captured from a depth camera. It contains a structured group of surface point positions in 3D space. Each pixel in the vertex map corresponding a point position. These vertices contain the geometry information of the object surface, which can be used further for training on deep learning models. For each scene,  the cameras only take one shot, which consequently leaves only one vertex map. However, the vertex map is only semi-dense as we mentioned before. We take such semi-dense vertex map as input, for surface normal estimation.
+
+\paragraph{Gray-Scale Image}
+The gray-scale image $ \textbf{I} $ is captured align with the depth map based on the same calibrated camera equipment, thus the intrinsic matrix $ \textbf{K} $ and extrinsic camera matrix $ [\textbf{R}|\textbf{t}] $ are known. Different from vertex map, it is usually fully-dense.
+
+\paragraph{Light Map}
+The light map $ \textbf{L} $ can be derived from vertex map $ \textbf{V} $ and the light source position $ (s_x, s_y, s_z) $. As shown in Figure \ref{fig:lambertian-surface}, the incoming light direction is a vector point from light source to the surface point, therefor it can be calculated as follows
 \begin{equation}\label{light-direction}
 	\begin{array}{ll}
-		L(x,y)&= \dfrac{V(x,y)-(s_x,s_y)}{\|V(x,y)-(s_x,s_y)\|_2}\\ 
+		\textbf{L}(x,y,z)&= \dfrac{\textbf{V}(x,y,z)-(s_x,s_y, s_z)}{\|\textbf{V}(x,y,z)-(s_x,s_y, s_z)\|_2}\\ 
 	\end{array}
 \end{equation}
+where both $  (s_x,s_y, s_z) $ and  $ \textbf{V} $ are with respect to the camera space. The light direction map $ \textbf{L} $ is normalized since only the direction of the light is considered. Using the equation above for all the pixels in the point cloud can obtain the corresponding light map, which is a matrix with same size as point clouds. However, it is important to note that the light map is calcualted based on the vertex map, whereas in the training pipeline, the vertex map is only semi-dense, thus the light map is also semi-dense with the same noise feature as the vertex map, as shown in Figure \ref{fig:light-input}. 
 \begin{figure}[H]
 	\centering
 	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_vertex_input.png}}
 	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image_light_input.png}}
-	\caption{The light map calculated from vertex map and the light source}
+	{\includegraphics[width=.25\textwidth]{./Figures/intrinsic_image.png}}
 	\decoRule
+	\caption{Three kinds of input data. From left to right, vertex map, light map, gray-scale image.}
 	\label{fig:light-input}
 \end{figure}
-where $ (s_x,s_y) $ is the light source position and $ V $ is the vertices, both $  (s_x,s_y) $ and  $ V $ are with respect to the camera space. The light direction map $ L $ is normalized since only the direction of the light is considered. Using the equation above for all the pixels in the point cloud can obtain the corresponding light map, which is a matrix with same size as point clouds. However, it is important to note that due to the exist noise in the vertex map, the getting light map is only semi-dense, as shown in Figure \ref{fig:light-input}. 
 
 
-
-
-
-\subsection{VIL Net}
-Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). The structure is basically derived from GCNN model as mentioned in \ref{sec:gcnn}, which is shown in Figure 
-\ref{fig:VIL-Net}.
-
-As mentioned in the name, the \textbf{VIL}-Net utilizes \textbf{V}ertex map, \textbf{L}ight map and \textbf{I}mage map to accomplish the normal inference task. 
-
-The network can be consider in two parts. The first part extracts the feature maps from the input data. It deals with two kinds of input, the vertex map $ X_1 \in \mathbb{R}^{w\times h\times3}$, and the concatenation of light and image map $ X_2 \in \mathbb{R}^{w\times h\times4} $. The network extracts the geometry features $ X_v $ from vertex map $ X_1 $ (represented as a regression function v)
-\[ v: X_1 \rightarrow X_v \]
-and the photometric features $ X_l $ from image and the light map $ X_2 $ (represented as a regression function $ l $)
-\[ l: X_2 \rightarrow X_l \]
-where the two encoders have the same network architecture based on the downsampling part of GCNN model. After the feature extraction, 2 extra layers are added: 1, a concatenate layer is added to fuse the vertex feature, and the image and light map feature getting from the encoder. 
-2, a fused feature map is predicted from all the feature maps base on a single gated convolution layer. (represented as a regression function $ m $)
-\[ m: [X_v X_l] \rightarrow X_f \]
-Then the network interpolates the feature maps $ X_f $ 3 times using interpolation and gated convolution layers to inference the normal map $ N $. Meanwhile, the skip connections fuse the high resolution features $ X_{df_1, df_2, ...} $ from the downsampling part during the upsamplings. The upsampling is represented as a regression function $ n $:
-\[ n: X_f, X_{df_1, df_2, ...} \rightarrow N \]
-
-With the help of an extra image-light encoder, the network gained more information of the object surface, which is supposed to predict the surface normal more accurate. In this scenario, the output is still the surface normal, thus the training loss can be the same as GCNN model.
+%\subsection{VIL Net}
+%Based on above implementations, we propose a light and image guided network called Vertex-Image-Light Network (VIL-Net). The structure is basically derived from GCNN model as mentioned in \ref{sec:gcnn}, which is shown in Figure 
+%\ref{fig:VIL-Net}.
+%
+%As mentioned in the name, the \textbf{VIL}-Net utilizes \textbf{V}ertex map, \textbf{L}ight map and \textbf{I}mage map to accomplish the normal inference task. 
+%
+%The network can be consider in two parts. The first part extracts the feature maps from the input data. It deals with two kinds of input, the vertex map $ X_1 \in \mathbb{R}^{w\times h\times3}$, and the concatenation of light and image map $ X_2 \in \mathbb{R}^{w\times h\times4} $. The network extracts the geometry features $ X_v $ from vertex map $ X_1 $ (represented as a regression function v)
+%\[ v: X_1 \rightarrow X_v \]
+%and the photometric features $ X_l $ from image and the light map $ X_2 $ (represented as a regression function $ l $)
+%\[ l: X_2 \rightarrow X_l \]
+%where the two encoders have the same network architecture based on the downsampling part of GCNN model. After the feature extraction, 2 extra layers are added: 1, a concatenate layer is added to fuse the vertex feature, and the image and light map feature getting from the encoder. 
+%2, a fused feature map is predicted from all the feature maps base on a single gated convolution layer. (represented as a regression function $ m $)
+%\[ m: [X_v X_l] \rightarrow X_f \]
+%Then the network interpolates the feature maps $ X_f $ 3 times using interpolation and gated convolution layers to inference the normal map $ N $. Meanwhile, the skip connections fuse the high resolution features $ X_{df_1, df_2, ...} $ from the downsampling part during the upsamplings. The upsampling is represented as a regression function $ n $:
+%\[ n: X_f, X_{df_1, df_2, ...} \rightarrow N \]
+%
+%With the help of an extra image-light encoder, the network gained more information of the object surface, which is supposed to predict the surface normal more accurate. In this scenario, the output is still the surface normal, thus the training loss can be the same as GCNN model.
 
 
 \subsection{Trip-Net}
+We proposed an network that takes the vertex map, light map and gray-scale image into consideration for surface normal inference, which is called Triple-pipe-gated-Network (Trip-Net). 
+The Trip-Net employs GCNN architecture three times to accomplish the normal inference task, thus we call it ``triple-pipi-gated". The architecture is shown in Figure \ref{fig:Trig-Net}.
 
-We propose a light and image guided network called Triple-pipe-gated-Network (Trip-Net), which employs the GCNN architecture three times to accomplish the normal inference task. The architecture is shown in Figure \ref{fig:Trig-Net}.
-
-The network has three pipes combined with one main pipe and two side pipes. Each pipe deals with different task. The main pipe deals with the geometry information, which takes the vertex map as the input and used to predict the surface normal. The light map is fed into a side pipe and used to extract the light feature. The network forwards the features to the main pipe as a supplementary information for the normal estimation. The image pipe takes the image as the input and extracts the image features then forward the features to the main pipe as well. The supplementary pipes provide the illumination information which helps the main pipe to refine the inferred normals.
+The network has three pipes combined with one main pipe and two side pipes. Each pipe deals with different task. The main pipe deals with the geometry information, which takes the vertex map as the input and used to predict the surface normal. The light map input takes one side pipe and use it to extract the light feature, then forwards the features to the main pipe as a supplementary information for the normal estimation. The image map takes another side pipe to extract the image features then forward the features to the main pipe as well. The supplementary pipes provide the illumination information which helps the main pipe to refine the inferred normals.
 \subsubsection{Side-Pipe(Light)}
-The task of light pipe in the network is to predict the light feature from the photometric information using the light direction in the scene, which is calculated from the point cloud and the light position. The light map also inherits the noise from the point cloud, which lead to a semi-dense input map. Therefore this side pipe utilizes gated convolution layers for feature map extraction to handle the missing values. The input vertex map is downsampled three times in this part. Each downsampling utilizes three gated layers, the first two layers have stride (1,1) and the third one has stride (2,2) to reduce the feature scale. 
-In the upsampling part, the network also has three times upsampling as a symmetric design. In each upsampling, it first uses nearest neighbor interpolation algorithms to expend the feature map size. Then it concatenates the corresponding feature map from the downsampling part. In the last, the feature map goes through a gated convolution layer to reduce the channel size. 
+The structure of light pipe is almost identical to the GCNN architecture. It takes the light map $ \textbf{L} \in \mathbb{R}^{W\times H\times 3}$ as input, then takes it to gated convolution layers 3 times to get the the feature map,
+$ \textbf{X}_{L1D} \in \mathbb{R}^{{W}\times H\times C} $,
+ which has the same resolution as the input map. This is the first set of feature map in the down-sampling operation.
+ Then repeat what we did just now three times, that is for each time, 3 gated convolution layers are used to further extract the feature maps, but the different is in the last gated convolution layer, we change the stride from (1,1) to (2,2) in order to down-sampling the feature maps. Then we get
+$ \textbf{X}_{L2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
+$ \textbf{X}_{L3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
+$ \textbf{X}_{L4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $
+(represented as a regression function $ l_{down} $)
+\[ l_{down}: \textbf{L} \rightarrow  \textbf{X}_{L1D} , \textbf{X}_{L2D}, \textbf{X}_{L3D}, \textbf{X}_{L4D} \]
+For the up-sampling operation, it takes 3 times up-sampling to generate higher resolution light feature maps
+$ \textbf{X}_{L1U} \in \mathbb{R}^{{W}\times {H}\times C} $,
+$ \textbf{X}_{L2U} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
+$ \textbf{X}_{L3U} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $ respectively, whereas each up-sampling also considers the feature maps in the down-sampling part,
+(represented as a regression function $ l_{up1}, l_{up2}, l_{up3} $)
+\[ 
+\begin{matrix}
+	l_{up3} : \textbf{X}_{L3D}, \textbf{X}_{L4D} \rightarrow \textbf{X}_{L3U} \\
+	l_{up2} : \textbf{X}_{L2D}, \textbf{X}_{L3U} \rightarrow \textbf{X}_{L2U} \\
+	l_{up1} : \textbf{X}_{L1D}, \textbf{X}_{L2U} \rightarrow \textbf{X}_{L1U} \\
+\end{matrix}
+\]
+In our network, the actual up-sampling operation is done with three layers, 1, an interpolation layer based on nearest neighbor algorithm, 2, a concatenation layers to concate interpolated feature maps and the corresponding feature maps in the down-sampling part, 3, a gated convolution layer to reduce the channel size.
+The light pipe branch is finished in the last layer of third up-sampling.
+
+In this pipe, we take four kinds of feature maps $ \textbf{X}_{L4D}, \textbf{X}_{L3U},\textbf{X}_{L2U}, \textbf{X}_{L1U} $ as the guided information for the further operation.
+
 
 \subsubsection{Side-Pipe(Image)}
-The task of image pipe in the network is to predict the image feature. This pipe is a collaborate pipe with the light pipe. The architect is the same as light map pipe but only the input is the image matrix. 
-
+The task of image pipe in the network is to predict the image feature. This pipe is a collaborate pipe with the light pipe. The architect is the same as light map pipe but only the input is the image matrix $ \textbf{I}\in  \mathbb{R}^{W\times H\times 1}$. The first set of feature map is $ \textbf{X}_{I1D} \in \mathbb{R}^{{W}\times H\times C} $, note that it has the same channel with the light feature maps. Then down-sampling 3 times to extract the image feature maps
+$ \textbf{X}_{I2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
+$ \textbf{X}_{I3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
+$ \textbf{X}_{I4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $
+(represented as a regression function $ i_{down} $)
+\[ l_{down}: \textbf{I} \rightarrow  \textbf{X}_{I1D} , \textbf{X}_{I2D}, \textbf{X}_{I3D}, \textbf{X}_{I4D} \]
+For the up-sampling operation, it takes 3 times up-sampling to generate higher resolution image feature maps
+$ \textbf{X}_{I1U} \in \mathbb{R}^{{W}\times {H}\times C} $,
+$ \textbf{X}_{I2U} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
+$ \textbf{X}_{I3U} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $ respectively, whereas each up-sampling also considers the feature maps in the down-sampling part,
+(represented as a regression function $ i_{up1}, i_{up2}, i_{up3} $)
+\[ 
+\begin{matrix}
+	i_{up3} : \textbf{X}_{I3D}, \textbf{X}_{I4D} \rightarrow \textbf{X}_{I3U} \\
+	i_{up2} : \textbf{X}_{I2D}, \textbf{X}_{I3U} \rightarrow \textbf{X}_{I2U} \\
+	i_{up1} : \textbf{X}_{I1D}, \textbf{X}_{I2U} \rightarrow \textbf{X}_{I1U} \\
+\end{matrix}
+\]
+whereas the layers in the up-sampling part has the same architecture as light pipe. In the image pipe, we take four kinds of feature maps $ \textbf{X}_{I4D}, \textbf{X}_{I3U},\textbf{X}_{I2U}, \textbf{X}_{I1U} $ as the guided information for the further operation.
 
 \subsubsection{Main-Pipe(Vertex)}
-The task of vertex pipe in the network is to predict the normal map directly. The input is vertex map converted from point cloud. The downsampling part is still the same as the other two pipes. The different part is the upsampling, which has to consider the information coming from the other two pipes. After the downsampling, a concatenation layer fused the corresponding feature map from the other two pipes, then it takes 3 times upsampling. Each upsampling consists of 5 layers: 1, a interpolation layer to double size the resolution using nearest neighboring interpolation algorithm, 2, a gated layer to reduce the channel size to 1/3 of itself in order to fit the corresponding feature map in the downsampling part, 3, a concatenation layer to fuse the output with the corresponding feature map in the downsampling part, 4, a gated layer to reduce the channel size to 1/2, 5, a concatenation layer to fuse the corresponding upsamling feature map from the other two pipe altogether with the feature map in current pipe. These 5 layers consider both the information from other pipes and also keeps the high resolution from the downsampling part. A gated convolution layer is added afterwards to reduce the channel size and extra two standard convolution layers are used to predict the final surface normal map.
+The task of vertex pipe in the network is to predict the normal map directly, which is also takes the feature maps in the other channels into account. The input is vertex map $ \textbf{V} \in \mathbb{R}^{W\times H\times 3}$ converted from point cloud. 
+The downsampling part is still the same as the other two pipes. The feature maps in each down-sampling part has shape $ \textbf{X}_{V1D} \in \mathbb{R}^{{W}\times H\times C} $, 
+$ \textbf{X}_{V2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
+$ \textbf{X}_{V3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
+$ \textbf{X}_{V4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $, respectively, 
+(represented as a regression function $ i_{down} $)
+\[ v_{down}: \textbf{V} \rightarrow  \textbf{X}_{V1D} , \textbf{X}_{V2D}, \textbf{X}_{V3D}, \textbf{X}_{V4D} \]
+For the up-sampling operation, the situation is different compare to  the other two pipes.
+it fuses the corresponding resolution output feature maps altogether in three pipes to get a fused feature map 
+$ \textbf{X}_{F3U} \in \mathbb{R}^{W\times H\times C} $, 
+$\textbf{X}_{F2U} \in \mathbb{R}^{W\times H\times C} $, 
+$\textbf{X}_{F1U} \in \mathbb{R}^{W\times H\times C} $,
+in each up-sampling stage, (represented as regression functions $ f_{up1}, f_{up2}, f_{up3}, f_{up4}$)
+\[ 
+\begin{matrix}
+	f_{up4} : \textbf{X}_{I4D}, \textbf{X}_{L4D}, \textbf{X}_{V4D} \rightarrow \textbf{X}_{F4U} \\
+	f_{up3} : \textbf{X}_{I3U}, \textbf{X}_{L3U}, \textbf{X}_{F4U} \rightarrow \textbf{X}_{F3U} \\
+	f_{up2} : \textbf{X}_{I2U}, \textbf{X}_{L2U}, \textbf{X}_{F3U} \rightarrow \textbf{X}_{F2U} \\
+	f_{up1} : \textbf{X}_{I1U}, \textbf{X}_{L1U}, \textbf{X}_{F2U} \rightarrow \textbf{X}_{F1U} \\
+			
+\end{matrix}
+\]
+Each upsampling consists of 5 layers: 1, a interpolation layer to double size the resolution using nearest neighboring interpolation algorithm, 2, a gated layer to reduce the channel size to 1/3 of itself in order to fit the corresponding feature map in the downsampling part, 3, a concatenation layer to fuse the output with the corresponding feature map in the downsampling part, 4, a gated layer to reduce the channel size to 1/2, 5, a concatenation layer to fuse the corresponding upsamling feature map from the other two pipe altogether with the feature map in current pipe. These 5 layers consider both the information from other pipes and also keeps the high resolution from the downsampling part. 
 
+In the end of the network, in order to fit the normal inference task, two standard convolution layers are added to output normal map $ \textbf{X}_{N} \in  \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times 3} $ (represented as a regression function $ n $)
+\[n:\textbf{X}_{F1U} \rightarrow  \textbf{X}_{N} \] 
 
 \begin{sidewaysfigure}[th]
 	\centering
@@ -360,6 +396,65 @@ The task of vertex pipe in the network is to predict the normal map directly. Th
 
 
 
+%% loss function 
 
+\subsection{Loss Function}
+We explored different loss function for training work of our network. The most common losses are L1 loss and L2 loss for image upsamping task. In our experiments, we used a modified BerHu Loss to train our model, which gives a better lower error in the evaluation compare to purely L1 or L2 loss. 
+\paragraph{L1 Loss}
+L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the median of the observations.
+
+\[ L_1(\tilde y - y) = |\tilde y - y | \]
+
+\paragraph{L2 Loss}
+The standard loss function for optimization in regression problems is the L2 loss, also known as squared error loss, which minimize the squared difference between a prediction and the actual value. It leads to the mean of the observations. 
+\[ L_2(\tilde y - y) = \|\tilde y - y \|_2^2 \]
+
+
+%\paragraph{Masked L2 Loss with penalty for outliers(mask-l2)}
+%\label{par:maskl2}
+%The background pixels of the input data are not considered in the normal inference task, they are saved as black pixels in the input data. These pixels should not considered in the loss function, i.e. invalid pixels. Therefore, a valid mask is required to distinguish the background and the main object. Specifically, using a matrix with the same width and height as the output, for each pixel, 0 is invalid, 1 is valid. 
+%Furthermore, depends on the specific task, the output should be constraint in a range. For normal output, the range is $ [-1,1] $. Thus for the outliers out of this range, a outlier mask can be applied to give them a penalty.
+%
+%\begin{equation}\label{gcnn-loss}
+%	\begin{array}{ll}
+%		l(x,y)&= L  = \{l_1, ..., l_N\}^T\\ 
+%		l_{n\in N} &= \| mask_{obj} \odot mask_{ol} \odot ( {\tilde y}_n - y_n) \|_2^2 + 	\| mask_{obj} \odot mask_{nol} \odot ( {\tilde y}_n - y_n) \|_2^2 \\
+%	\end{array}
+%\end{equation}
+%
+%where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is the mask of the object, i.e. 1 means it is an pixel on the object, 0 is an pixel on the background. $ mask_{ol} $ is the mask for the outliers, i.e. 1 means outliers, 0 means non outlier, $ mask_{nol} $ is exactly the inverse of $ mask_{ol} $. $ p $ is the penalty of the outliers, it is set as 1.4.
+
+
+\paragraph{Reversed Huber Loss}
+Inspired by \cite{img2depth}, we use Reversed Huber loss that purposed by \cite{berhu-loss} for our model training, which indeed achieves a better error than a single L2 loss. It can be mathematically described as follows.
+
+\begin{equation}\label{berhu-loss}
+	\begin{array}{ll}
+		\mathcal{B}(y)= \begin{cases}
+			|y| & |y| \le c \\
+			\dfrac{y^2 + c^2}{2c} & |x| > c\\
+		\end{cases}
+	\end{array}
+\end{equation}
+where $ c=0.2\max (|\tilde y - y|) $. The shape of the loss is shown in figure \ref{fig:berhu-loss-shape}. The Reversed Huber loss, also called BerHu loss, is a combination with both L1 and L2 loss, where it is L1 loss in range $ [-c,c] $ and L2 loss outside of this range. The loss is also first order differentiable at the connection point of two section-functions. As mentioned in \cite{img2depth}, the parameter $ c=0.2 \max(|\tilde y - y|) $ corresponds the 20\% of the maximal per batch error. 
+
+The chosen of these combination loss error is reasonable since it also gives more weights to the errors compare to L2 loss but also keeps the outlier suppression features in the L2 loss. The output type in our model is surface normal,  which has a range between $ [-1,1] $, thus we need L2 loss to penalize larger errors, however, in the other hand, the L2 loss will suppress small values close to zero in a greater way compare to the values close to $ \pm 1 $, since it is use a quadratic curve. Thus flatten the range close to zero is a good balance choice. In our experiments, the BerHu loss gives a better performance on all of the models that we have trained.
+\begin{figure}[H]
+	\centering
+	
+	\begin{tikzpicture}
+		\pgfplotsset{ticks=none}
+		\begin{axis} [axis lines=center]
+			\addplot [domain=0:1, smooth, thick, width=5mm, color=red] { x };
+			\addplot [domain=1:2, smooth, width=5mm] { x };
+			\addplot [domain=-2:-1, smooth, width=3mm] { -x };
+			\addplot [domain=-1:0, smooth, thick, width=3mm, color=red] { -x };
+			\addplot [domain=-2:-1, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+			\addplot [domain=1:2, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+		\end{axis}
+	\end{tikzpicture}
+	\caption{The shape of Berhu Loss (show in red line). }
+	\label{fig:berhu-loss-shape}
+\end{figure}
 
 

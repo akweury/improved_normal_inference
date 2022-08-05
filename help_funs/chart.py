@@ -38,6 +38,7 @@ def line_chart(data, path, labels, x=None, title=None, x_scale=None, y_scale=Non
         plt.yscale('log')
 
     plt.legend()
+    plt.grid(True)
 
     if not os.path.exists(str(path)):
         os.mkdir(path)

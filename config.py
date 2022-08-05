@@ -37,9 +37,9 @@ light_c64 = paper_exp / "light" / "checkpoint-640.pth.tar"
 light_noc = paper_exp / "light" / "checkpoint-noc-499.pth.tar"
 light_cnn = paper_exp / "light" / "checkpoint-cnn-599.pth.tar"
 
-gcnn_cnn = paper_exp / "gcnn" / "checkpoint-cnn-473.pth.tar"
-gcnn_noc = paper_exp / "gcnn" / "checkpoint-noc-619.pth.tar"
-gcnn_gcnn = paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar"
+gcnn_cnn = ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar"
+gcnn_noc = ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar"
+gcnn_gcnn = ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar"
 
 an2_trip_net = ws_path / "an2" / "output_2022-07-30_16_35_38" / "checkpoint-32.pth.tar"
 an2_trip_net_remote = Path("/netscratch/sha/models/checkpoint-32.pth.tar")

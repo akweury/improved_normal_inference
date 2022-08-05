@@ -800,6 +800,63 @@
     \field{year}{2022}
   \endentry
 
+  \entry{partial_conv}{misc}{}
+    \name{author}{6}{}{%
+      {{hash=LG}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Guilin},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=RFA}{%
+         family={Reda},
+         familyi={R\bibinitperiod},
+         given={Fitsum\bibnamedelima A.},
+         giveni={F\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SKJ}{%
+         family={Shih},
+         familyi={S\bibinitperiod},
+         given={Kevin\bibnamedelima J.},
+         giveni={K\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=WTC}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Ting-Chun},
+         giveni={T\bibinithyphendelim C\bibinitperiod},
+      }}%
+      {{hash=TA}{%
+         family={Tao},
+         familyi={T\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CB}{%
+         family={Catanzaro},
+         familyi={C\bibinitperiod},
+         given={Bryan},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LG+1}
+    \strng{fullhash}{LGRFASKJWTCTACB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \verb{eprint}
+    \verb 1804.07723
+    \endverb
+    \field{title}{Image Inpainting for Irregular Holes Using Partial
+  Convolutions}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{cs.CV}
+    \field{year}{2018}
+  \endentry
+
   \entry{lambertian-reflectance}{article}{}
     \name{author}{3}{}{%
       {{hash=LP}{%

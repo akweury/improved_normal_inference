@@ -20,7 +20,7 @@ datasize = args.datasize
 font_scale = 1
 
 # read data
-test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[3])
+test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[7])  # 7
 
 # unpack model
 test_0_tensor = test_0['input_tensor'].unsqueeze(0)
@@ -38,7 +38,7 @@ img_8bit = cv.normalize(np.uint8(img_gt), None, 0, 255, cv.NORM_MINMAX, dtype=cv
 img = cv.merge((img_8bit, img_8bit, img_8bit))
 normal_no_mask_img = None
 FEATURE_MAP_NUM = 128
-CV_COLOR = cv.COLORMAP_RAINBOW
+CV_COLOR = cv.COLORMAP_TURBO
 
 # evaluate CNN models
 for model_idx, (name, model) in enumerate(models.items()):
@@ -141,10 +141,23 @@ for model_idx, (name, model) in enumerate(models.items()):
         feature_map = mu.visual_vertex(feature_map, str(idx))
         feature_map_uconv3.append(cv.applyColorMap(feature_map, CV_COLOR))
 
-    feature_map_list = [
-        # feature_map_dconv1, feature_map_dconv2, feature_map_dconv3, feature_map_dconv4,
-        feature_map_uconv1, feature_map_uconv2, feature_map_uconv3
-    ]
+    from itertools import islice
+
+
+    def convert(lst, var_lst):
+        it = iter(lst)
+        return [list(islice(it, i)) for i in var_lst]
+
+
+    feature_map_list = convert(feature_map_uconv3, [16, 16, 16, 16, 16, 16, 16, 16])
+
+    # feature_map_list = [
+    #     # feature_map_dconv1, feature_map_dconv2, feature_map_dconv3, feature_map_dconv4,
+    #     # feature_map_uconv1,
+    #     # feature_map_uconv2,
+    #     feature_map_uconv3
+    # ]
+
     xout[mask] = 0
     xout[xout > 1] = 1
     xout[xout < -1] = -1

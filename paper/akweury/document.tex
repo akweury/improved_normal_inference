@@ -23,6 +23,7 @@
 \usepackage{subcaption}
 \usepackage{multirow}
 \usepackage{pdfpages}
+\usepackage{pgfplots}
 \usepackage{rotating}
 \usetikzlibrary{fit}
 \usetikzlibrary{calc,patterns,angles,quotes}
@@ -51,23 +52,18 @@
 \begin{figure}[th]
 	\centering
 	
-	\begin{tikzpicture} 
-		% reference lines
-		\coordinate (light) at (-1,3);
-		\coordinate (p) at (2,0);
-		\coordinate (normal) at (2,3);
-		\draw [fill=blue!20] plot [smooth cycle] coordinates {(0,0) (1,1) (3,1) (5,0) (2,-1)}; %% surface element
-		\draw[thick, ->] (2,0) -- (2,3) node[midway, left] {$ \textbf{n} $}; %% normal
-		\draw[thick, ->] (2,0) -- (-1,3) node[midway, left] {$ \textbf{l} $}  ; %% source direction
-		\pic [draw, ->, "$\theta$", angle eccentricity=1.5] {angle = normal--p--light};
-		\draw[thick, ->] (2,0) -- (5,3) node[midway, left] {$ \textbf{v} $}; %% view direction
-		\filldraw[black] (-1,3) circle (2pt) node[anchor=south west]{light source}; %% light source
-		\filldraw[black] (5,3) circle (2pt) node[anchor=south west]{view point}; %% view point		
-	\end{tikzpicture}
-	\caption{The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
-	\label{fig:lambertian-surface}
+\begin{tikzpicture}
+	\pgfplotsset{ticks=none}
+	\begin{axis} [axis lines=center]
+		\addplot [domain=0:1, smooth, thick, width=5mm, color=red] { x };
+		\addplot [domain=1:2, smooth, width=5mm] { x };
+		\addplot [domain=-2:-1, smooth, width=3mm] { -x };
+		\addplot [domain=-1:0, smooth, thick, width=3mm, color=red] { -x };
+		\addplot [domain=-2:-1, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+		\addplot [domain=1:2, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+	\end{axis}
+\end{tikzpicture}
+	\caption{The shape of Berhu Loss (show in red line). }
+	\label{fig:berhu-loss-shape}
 \end{figure}
-
-
-
 \end{document}
