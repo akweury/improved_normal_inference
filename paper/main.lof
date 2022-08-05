@@ -49,36 +49,38 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.4}{\ignorespaces Evaluation of neighbor based method on a noised dragon model\relax }}{32}{figure.caption.94}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Normal inference based on GCNN. Test image has resolution $ 128\times 128 $\relax }}{33}{figure.caption.96}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Normal inference based on GCNN. ($ 128\times 128 $)\relax }}{33}{figure.caption.96}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{33}{figure.caption.97}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of some regions of Dragon object (GCNN models). Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{33}{figure.caption.97}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.\relax }}{34}{figure.caption.98}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Comparison of GCNN based models.\relax }}{33}{figure.caption.98}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{35}{figure.caption.99}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Feature maps of GCNN architecture based models at the first up-sampling gated convolution layer. All 128 feature maps are visualized for each model with normalization and filtered background.\relax }}{35}{figure.caption.100}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{36}{figure.caption.101}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{36}{figure.caption.102}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times 32 $ points in the original matrix.\relax }}{36}{figure.caption.102}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Zoom in of detail regions ( $ 32\times 32 $ ) of Dragon object (Trip-Net model).\relax }}{36}{figure.caption.103}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.11}{\ignorespaces Comparison between different fusion times for Trip-Net. The first row is surface normal, the second row is the corresponding errors. The number in ``F$ x $" represents the fusion times. \relax }}{37}{figure.caption.103}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Comparison between different fusion times for Trip-Net. \relax }}{37}{figure.caption.104}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.12}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{38}{figure.caption.104}%
+\contentsline {figure}{\numberline {5.12}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{38}{figure.caption.107}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.13}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 128\times 128 $\relax }}{39}{figure.caption.106}%
+\contentsline {figure}{\numberline {5.13}{\ignorespaces High resolution dataset ($ 512\times 512 $) comparison.\relax }}{39}{figure.caption.108}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.14}{\ignorespaces Comparison between different SVD, GCNN and Trip-Net model on $ 512\times 512 $ dataset. The first row is surface normal, the second row is the corresponding errors. \relax }}{40}{figure.caption.108}%
+\contentsline {figure}{\numberline {5.14}{\ignorespaces Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)\relax }}{40}{figure.caption.111}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.15}{\ignorespaces Normal inference based on Trip-Net. Test image has resolution $ 512\times 512 $\relax }}{41}{figure.caption.110}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.16}{\ignorespaces Comparison between different SVD, GCNN and Trip-Net model on $ 512\times 512 $ real dataset. The first row is surface normal, the second row is the corresponding errors. \relax }}{42}{figure.caption.112}%
+\contentsline {figure}{\numberline {5.15}{\ignorespaces Real dataset ($ 512\times 512 $) comparison.\relax }}{40}{figure.caption.112}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{45}{figure.caption.116}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in training dataset A \relax }}{44}{figure.caption.116}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B \relax }}{46}{figure.caption.117}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in training dataset B \relax }}{45}{figure.caption.117}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{47}{figure.caption.118}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in training dataset C\relax }}{46}{figure.caption.118}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {A.4}{\ignorespaces GCNN models evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{47}{figure.caption.120}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {A.5}{\ignorespaces Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).\relax }}{48}{figure.caption.121}%

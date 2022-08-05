@@ -33,9 +33,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {table}{\numberline {5.8}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{31}{table.caption.90}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.9}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.\relax }}{40}{table.caption.107}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.\relax }}{37}{table.caption.106}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.\relax }}{42}{table.caption.111}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.\relax }}{39}{table.caption.110}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

@@ -216,7 +216,10 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+We proposed a learning based approach for surface normal estimation based on illuminated calibrated RGB-D image. 
+Different with other methods, the approach not only base on geometry information, but also takes the photometric stereo approach into account, which use calibrated illuminated image to further improve the performance. The two types of data gives a superior performance on normal inference task. One of the key points of our approach is, the proposed method require only one light source for each scene capture instead of multiple light positions, which can be very easy to configure in the practice. 
+
+Our model is trained on a  gated convolution neural network called (Trip-Net). The gated convolution design is supposed to handle the semi-dense depth map input, which is a common artefact by the depth sensor. Furthermore, a dataset based on 55 point clouds called ``synthetic-50-5“ in created for training. We trained our model on this synthetic dataset then further applied it to real dataset. A qualitative and quantitative evaluation is reported in the end.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------

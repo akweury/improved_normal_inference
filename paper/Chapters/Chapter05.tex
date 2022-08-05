@@ -305,12 +305,8 @@ The performance of neighbor based method is good enough for a well chosen $ k $.
 	\caption{Evaluation of neighbor based method on a noised dragon model}
 \end{figure}
 
-
-
-
-\newpage 
 \section{Visualization evaluation on GCNN model}
-A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure. \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg, the head of dragon object, CNN model gives a much brighter error map (which lead to a higher angle error).
+A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure. \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg and the head area of dragon object, CNN model gives a much brighter error map (which means a higher angle error).
 
 Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we can get a good result from GCNN model but from model ``Washington" we still can see it lacks the sharpness in the detail area like the face and clothes area. 
 
@@ -342,7 +338,7 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Normal inference based on GCNN. Test image has resolution $ 128\times128 $}
+	\caption{Normal inference based on GCNN. ($ 128\times128 $)}
 	\label{fig:gcnn-eval}
 \end{figure}
 
@@ -387,7 +383,7 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
+	\caption{Zoom in of some regions of Dragon object (GCNN models). Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
 	\label{fig:gcnn-eval-synthetic-zoom-in}
 \end{figure}
 
@@ -427,127 +423,58 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Comparison of GCNN model with no skip connection version(NOC) and standard convolution layer only version (CNN). The second row is the corresponding mean average degree error.}
+	\caption{Comparison of GCNN based models.}
 	\label{fig:gcnn-eval-multi-model}
 \end{figure}
 
 
-%% gcnn-Visual-more
-\begin{figure}
+\section{Feature Maps Discussion on GCNN architecture models}
+
+As shown in figure \ref{fig:gcnn-cnn-feature map}, we also visualize the feature maps of the last gated convolution layer in the first up-sampling part for CNN and GCNN models, which corresponding the feature maps with size $ 32\times 32 $ in width and height. The input data is also same dragon object that we used for normal visualization. For each feature map, we map the minimum value to the left-most color in the color bar and the maximum value to the right-most color in the color bar. 
+We want to discuss the the different of the feature maps between CNN, NOC and GCNN models.
+
+In order to see the result clearly, we use one color for the feature map visualization and use the brightness to distinguish the scale of the vales, the white corresponds 1, the black corresponds 0, green color corresponds some value in between. 
+
+From the CNN feature maps, we can see that the brightness areas are distributed all around the feature maps. For the GCNN feature maps, the brightness areas are usually concentrate only in few pixels. If we map the brightness areas to the original image, they correspond to the dense sharp edges areas, which is usually the hardest areas for normal estimation task. We suspect that these feature maps are the detail feature maps that extract from sharp edges. Based on this assumption, we can say that gated convolution layer describes the detail features in a more accurate way compare to standard convolution layer, since the brightness areas is smaller. Most of the GCNN feature maps usually has only one bright pixel with a few set of dim green pixels whereas CNN feature maps has more bright pixels with a lot of dim pixels all around the image. This accurate feature extraction provides our GCNN model a better performance on the detail area.
+
+Second, for the GCNN model,  we observed that some feature maps have no  small bright areas but bright areas distributed evenly on the whole object. Some of the feature maps has a overall medium value some has a value close to 1. Nevertheless, these feature maps are different from the detail feature maps with only few pixels with high values(brightness). We suspect that these features maps provides an over-view of the objects for a coarse prediction. So that they can cooperate with detail feature maps to sharpen the prediction. It also holds for NOC model, since it does not equip with skip connection, most of the feature maps are global feature maps with an evenly bright feature maps, so that the corresponding normal maps predicted by NOC model are more coarse. For the CNN model, there also exists global feature maps, however, they are mostly incomplete, either missing the tails or missing the paws. 
+Actually, these missing areas can usually be found in the detail feature maps. This also explained why the CNN detail feature maps has too much brightness areas, the detail feature maps and global feature maps are mixed together. And this unclear feature map extractor leads to the weak performance on normal estimation.
+
+%% feature maps comparison
+\begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_point_cloud_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_error_GCNN-GCNN.png}
+	
+	\begin{subfigure}[b]{\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn.png}
+		\caption{CNN Feature Maps}
 	\end{subfigure}
 	
+	\begin{subfigure}[b]{\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc.png}
+		\caption{NOC Feature Maps}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn.png}
+	\caption{GCNN Feature Maps}
+\end{subfigure}
 	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_error_GCNN-GCNN.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_point_cloud_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_error_GCNN-GCNN.png}
-	\end{subfigure}
-	
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_error_GCNN-GCNN.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_point_cloud_noise.png}
-		\caption{Input}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_groundtruth.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_normal_GCNN-GCNN.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_error_GCNN-GCNN.png}
-		\caption{Error}
-	\end{subfigure}	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_normal_GCNN-GCNN.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_error_GCNN-CNN.png}
-	\end{subfigure}
-	
-	
-	
-	
-	\begin{tikzpicture}
+		\begin{tikzpicture}
 		\node[text width=0.1\textwidth] at (11,-1) {90};
 		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).}
-	\label{fig:gcnn-eval-more}
+	\caption{Feature maps of GCNN architecture based models at the first up-sampling gated convolution layer. All 128 feature maps are visualized for each model with normalization and filtered background.}
+	\label{fig:gcnn-cnn-feature map}
 \end{figure}
 
 
-
-
-
-\newpage
+\newpage 
 \section{Visualized evaluation on Trip-Net models }
 
 For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net introduced in \ref{sec:trip-net}. The Trip-Net uses illuminated information align with the geometry information achieves a sharper and more accurate result compare to the GCNN model.
-The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is 6 degree whereas the GCNN is 9. 
-
-As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and also close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN. It seems that the illumination helps the model to learn sharper features in the network.
 
 %% TripNet-eval
 \begin{figure}[H]
@@ -579,6 +506,11 @@ As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on th
 	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
 	\label{fig:trip-eval}
 \end{figure}
+
+
+
+The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is 6 degree whereas the GCNN is 9. 
+
 
 %% tripNet zoom in eval
 \begin{figure}[H]
@@ -621,14 +553,20 @@ As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on th
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Zoom in of some regions of Dragon object. The first row is surface normal, the second row is the corresponding errors. Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
+	\caption{Zoom in of detail regions ( $ 32\times32 $ ) of Dragon object (Trip-Net model).}
 	\label{fig:tripnet-eval-synthetic-zoom-in}
 \end{figure}
 
 
+As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and also close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN. It seems that the illumination helps the model to learn sharper features in the network.
+
+
+
+
+
 %% F1-F4 eval
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.18\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_7_groundtruth.png}
@@ -669,119 +607,49 @@ As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on th
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Comparison between different fusion times for Trip-Net. The first row is surface normal, the second row is the corresponding errors. The number in ``F$ x $" represents the fusion times. }
+	\caption{Comparison between different fusion times for Trip-Net. }
 	\label{fig:tripnet-eval-synthetic-zoom-in}
 \end{figure}
 
-%% trip-net-Visual-more
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_point_cloud_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_2_error_an2-8-1000.png}
-	\end{subfigure}
-	
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_2_error_an2-8-1000.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_point_cloud_noise.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_groundtruth.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_3_error_an2-8-1000.png}
-	\end{subfigure}
-	
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_3_error_an2-8-1000.png}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_point_cloud_noise.png}
-		\caption{Input}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_groundtruth.png}
-		\caption{GT}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_normal_an2-8-1000.png}
-		\caption{GCNN}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_9_error_an2-8-1000.png}
-		\caption{Error}
-	\end{subfigure}	
-	
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_input.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_normal_GT.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_normal_an2-8-1000.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_9_error_an2-8-1000.png}
-	\end{subfigure}
-	
-	
-	
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (11,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	\decoRule
-	\caption{Evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom).}
-	\label{fig:gcnn-eval-more}
-\end{figure}
+
+
 
 \section{Trining on higher resolution}
 We also prepared the dataset with resolution $ 512\times 512 $ for model evaluation. Higher resolution gives more information about the surface feature using the same model compare to lower resolution. The benefit is, if we extract a fixed sized patch from the normal map, say $ 32 \times 32 $, it might correspond a hindleg area of the dragon object in $ 128\times 128 $ resolution but maybe only a toe in $ 512\times 512 $ resolution. Therefore if we still use the same kernel size in the network for the same dataset, (like we did with $ 3\times 3 $) the higher the resolution it has, the less area it will cover. Thus the surface will more smooth and easy to calculate the surface normal. This is a good thing. Because then we might only need to use these $ 32\times 32 $ points to calculate a toe in $ 512\times512 $ resolution image. But in $ 128\times128 $ resolution image, the same area $ 32\times32 $ might corresponding to entire  hindleg of the dragon object. In another word, we can also say that the higher resolution ``smooth" the object surface. Thus the higher resolution helps the model to calculate a more accurate normal map. 
 
 
+%% 5 degree metric
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l | l l l }
+		\toprule
+		\tabhead{Metrics} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{Trip-Net} \\
+		\midrule
+		Mean  					& 8.88 & 5.82 & 5.33 \\ 
+		\hline
+		Median					& 3.66 & 3.98 & 3.67 \\ 
+		\hline
+		$ 5^\circ $ 			& 0.63 & 0.63 & 0.66 \\
+		\hline
+		$ 11.5^\circ $ 			& 0.79 & 0.89 & 0.91 \\
+		\hline
+		$ 22.5^\circ $ 			& 0.89 & 0.97 & 0.97 \\
+		\hline
+		$ 30^\circ $ 			& 0.92 & 0.98 & 0.99 \\
+		\bottomrule
+	\end{tabular}
+	\caption{High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.}	
+	\label{tab:high_resolution_eval}
+\end{table}
+
+
+
+Since our model is fully convolution network, the architecture keeps exactly same on the high resolution dataset. We use the same settings and the same models for training work on dataset with $ 512\times512 $ resolution. The training on high resolution network takes longer time but achieves a lower angle error. 
+
+
+
+
+\newpage 
 %% high resolution trip-net visualization
 \begin{figure}[th]
 	\centering
@@ -820,32 +688,8 @@ We also prepared the dataset with resolution $ 512\times 512 $ for model evaluat
 \end{figure}
 
 
-Since our model is fully convolution network, the architecture keeps exactly same on the high resolution dataset. We use the same settings and the same models for training work on dataset with $ 512\times512 $ resolution. The training on high resolution network takes longer time but achieves a lower angle error. 
 
 
-%% 5 degree metric
-\begin{table}
-	\centering
-	\begin{tabular}{l | l l l }
-		\toprule
-		\tabhead{Metrics} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{Trip-Net} \\
-		\midrule
-		Mean  					& 8.88 & 5.82 & 5.33 \\ 
-		\hline
-		Median					& 3.66 & 3.98 & 3.67 \\ 
-		\hline
-		$ 5^\circ $ 			& 0.63 & 0.63 & 0.66 \\
-		\hline
-		$ 11.5^\circ $ 			& 0.79 & 0.89 & 0.91 \\
-		\hline
-		$ 22.5^\circ $ 			& 0.89 & 0.97 & 0.97 \\
-		\hline
-		$ 30^\circ $ 			& 0.92 & 0.98 & 0.99 \\
-		\bottomrule
-	\end{tabular}
-	\caption{Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.}	
-	\label{tab:high_resolution_eval}
-\end{table}
 
 
 
@@ -894,7 +738,7 @@ Another remarkable result is the SVD approach, which also gives a good result ($
 		\caption{Trip-Net}
 	\end{subfigure}
 	\decoRule
-	\caption{Comparison between different SVD, GCNN and Trip-Net model on $ 512\times 512 $ dataset. The first row is surface normal, the second row is the corresponding errors. }
+	\caption{High resolution dataset ($ 512\times 512 $) comparison.}
 	\label{fig:trip-eval-compare}
 \end{figure}
 
@@ -902,45 +746,7 @@ Another remarkable result is the SVD approach, which also gives a good result ($
 \section{Training on Real-Dataset}
 We also applied our model on a dataset that captured by a light scanner in our laboratory in order to see the applicability of our approaches. For the geometry information based approach, we directly use the GCNN model that trained on synthetic dataset, since it only require the depth map as input, the scenarios of two dataset are the same. For the illuminated calibrated RGB-D image based approach, the model has to be refined based on the real-dataset, since the light intensity and position, camera matrix are different. We refined the Trip-Net based on a pre-trained GCNN model with the same settings in previous experiments, and observe the results. 
 
-
-\begin{figure}[th]
-	\centering
-	\begin{subfigure}[b]{0.48\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_normal_An2-real-resume-616.png}
-		\caption{Trip-Net}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.48\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_groundtruth.png}
-		\caption{GT}
-	\end{subfigure}
-	
-	
-	\begin{subfigure}[b]{0.32\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_point_cloud_noise.png}
-		\caption{Input}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.32\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_22_img.png}
-		\caption{Image}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.32\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_22_error_An2-real-resume.png}
-		\caption{Error}
-	\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (11,-1) {90};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
-	\end{tikzpicture}
-	\decoRule
-	\caption{Normal inference based on Trip-Net. Test image has resolution $ 512\times512 $}
-	\label{fig:trip-eval-real}
-\end{figure}
-
-
-\begin{table}
+\begin{table}[H]
 	\centering
 	\begin{tabular}{l | l l l }
 		\toprule
@@ -963,6 +769,44 @@ We also applied our model on a dataset that captured by a light scanner in our l
 	\label{tab:high_resolution_eval}
 \end{table}
 
+\begin{figure}[th]
+	\centering
+	\begin{subfigure}[b]{0.30\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_normal_An2-real-resume-616.png}
+		\caption{Trip-Net}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.30\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_groundtruth.png}
+		\caption{GT}
+	\end{subfigure}
+	
+	
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_point_cloud_noise.png}
+		\caption{Input}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_22_img.png}
+		\caption{Image}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.20\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_22_error_An2-real-resume.png}
+		\caption{Error}
+	\end{subfigure}
+	
+	\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
+	\decoRule
+	\caption{Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)}
+	\label{fig:trip-eval-real}
+\end{figure}
+
+
+
 
 
 Since in the real-dataset, we don't have a ground-truth for evaluation. But if we see directly from the visualization in figure \ref{fig:trip-eval-real}, we can see that Trip-Net approach has good ability to  ``mend" the missing pixels in the scenes and also gives a sharp result. The folds on the gowns are recognizable and even countable. \ref{fig:real_eval_compare} compares the Trip-Net with other approaches.
@@ -978,37 +822,37 @@ But we also noted that the big holes in the base stage remains in the depth maps
 \begin{figure}[th]
 	\centering
 	
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_groundtruth.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_SVD.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_NNNN-512.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_An2-real-resume.png}
 	\end{subfigure}
 	
 	
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/00008.image0.png}
 		\caption{GT}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_SVD.png}
 		\caption{SVD}
 	\end{subfigure}	
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_NNNN-512.png}
 		\caption{GCNN}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\linewidth}
+	\begin{subfigure}[b]{0.2\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_An2-real-resume.png}
 		\caption{Trip-Net}
 	\end{subfigure}	
 	\decoRule
-	\caption{Comparison between different SVD, GCNN and Trip-Net model on $ 512\times 512 $ real dataset. The first row is surface normal, the second row is the corresponding errors. }
+	\caption{Real dataset ($ 512\times 512 $) comparison.}
 	\label{fig:real_eval_compare}
 \end{figure}

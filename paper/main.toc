@@ -101,18 +101,22 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.3}Visualization evaluation on SVD}{31}{section.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Visualization evaluation on GCNN model}{33}{section.95}%
+\contentsline {section}{\numberline {5.4}Visualization evaluation on GCNN model}{32}{section.95}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}Visualized evaluation on Trip-Net models }{36}{section.100}%
+\contentsline {section}{\numberline {5.5}Feature Maps Discussion on GCNN architecture models}{34}{section.99}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Trining on higher resolution}{39}{section.105}%
+\contentsline {section}{\numberline {5.6}Visualized evaluation on Trip-Net models }{36}{section.101}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}Training on Real-Dataset}{41}{section.109}%
+\contentsline {section}{\numberline {5.7}Trining on higher resolution}{37}{section.105}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{43}{chapter.113}%
+\contentsline {section}{\numberline {5.8}Training on Real-Dataset}{39}{section.109}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{45}{appendix.114}%
+\contentsline {chapter}{\numberline {6}Conclusion}{41}{chapter.113}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Dataset}{45}{section.115}%
+\contentsline {chapter}{\numberline {A}Dataset}{43}{appendix.114}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{49}{appendix*.119}%
+\contentsline {section}{\numberline {A.1}Dataset}{43}{section.115}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}More Visualization}{43}{section.119}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{49}{appendix*.122}%
