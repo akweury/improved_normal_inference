@@ -76,7 +76,7 @@ A directional light with RGB color FFF4D6 \col{direction-light-color}  placed in
 A RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera is the sensor to capture the depth map and the grayscale image, which is random moved after a new scene. The moving range of the camera has 0.1m in both directions of X, Y, and Z axis and 1 degree random changed Euler angle. 
 A point light placed around 5 meters away as the illumination light, which is also randomly moved after a new scene. The moving range is 0.3m in both directions of X, Y, and Z axis and 1 degree random in Euler angle.
 
-During the data collection, the object is randomly selected and placed on the stage. The object has a random upto 30 degrees rotation align $ roll $-axis, 30-degrees rotation align $ pitch $-axis and 180-degrees align $ yaw $-axis. Thus the camera has the opportunity to capture every direction of the object and consequently abundant the dataset. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128\times3 $ and 5000 scenes with resolution $ 512\times512\times3 $.
+During the data collection, the object is randomly selected and placed on the stage. The object has a random upto 30 degrees rotation align $ roll $-axis, 30-degrees rotation align $ pitch $-axis and 180-degrees align $ yaw $-axis. Thus the camera has the opportunity to capture every direction of the object and consequently abundant the dataset. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128 $ and 5000 scenes with resolution $ 512\times512 $.
 
 \begin{figure}[h!]
 	\centering
@@ -142,7 +142,7 @@ The raw data captured from Unity required further preprocessing before feed them
 A depth map is captured by a depth camera in Unity, which is a 1 channel image that contains the information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit grayscale image, i.e. each pixel in range $0 - 65535$. 
 
 The grayscale image can be used as guided normal inference task and also as a readable scene for human. Since the image captured by camera is RGB format, we need to convert it to gray-color for our models. It based on following equation
-\[ gray: \frac{r+2g+b}{4}  \]
+\[ gray: \frac{R+2G+B}{4}  \]
 
 The normal map is the tangent surface normal, which is saved in 32-bit RGB color image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on following equation:
 \begin{dgroup*}

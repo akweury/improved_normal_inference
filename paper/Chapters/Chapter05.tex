@@ -302,7 +302,7 @@ The performance of neighbor based method is good enough for a well chosen $ k $.
 	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_error_SVD.png}	
 	\decoRule
 	\label{fig:svd-noise}
-	\caption{Evaluation of neighbor based method on a noised dragon model}
+	\caption{SVD visual evaluation on a noised dragon model ($ 128\times128 $)}
 \end{figure}
 
 \section{Visual evaluation on GCNN model}
@@ -338,7 +338,7 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Normal inference based on GCNN. ($ 128\times128 $)}
+	\caption{GCNN visual evaluation. Window size $ 128\times128 $}
 	\label{fig:gcnn-eval}
 \end{figure}
 
@@ -383,7 +383,7 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Zoom in of some regions of Dragon object (GCNN models). Zoom-in normal map corresponding $ 32\times32 $ points in the original matrix.}
+	\caption{Zoom in of some regions of Dragon object (GCNN models). Window size $ 32\times32 $.}
 	\label{fig:gcnn-eval-synthetic-zoom-in}
 \end{figure}
 
@@ -503,7 +503,7 @@ For the approach using illuminated calibrated RGBD image, the task is undertaken
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
+	\caption{Trip-Net visual evaluation on resolution $ 128\times128 $}
 	\label{fig:trip-eval}
 \end{figure}
 
@@ -607,7 +607,7 @@ As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on th
 	\end{subfigure}
 	
 	\decoRule
-	\caption{Comparison between different fusion times for Trip-Net. }
+	\caption{Comparison between different fusion times on Trip-Net Architecture ($ 128\times128 $). }
 	\label{fig:tripnet-eval-synthetic-zoom-in}
 \end{figure}
 
@@ -683,7 +683,7 @@ Since our model is fully convolution network, the architecture keeps exactly sam
 		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Normal inference based on Trip-Net. Test image has resolution $ 128\times128 $}
+	\caption{Trip-Net visual evaluation on high resolution dataset $ 512 \times 512 $.}
 	\label{fig:trip-eval-high-resolution}
 \end{figure}
 
@@ -738,7 +738,7 @@ Another remarkable result is the SVD approach, which also gives a good result ($
 		\caption{Trip-Net}
 	\end{subfigure}
 	\decoRule
-	\caption{High resolution dataset ($ 512\times 512 $) comparison.}
+	\caption{Comparison on high resolution dataset ($ 512\times 512 $) .}
 	\label{fig:trip-eval-compare}
 \end{figure}
 

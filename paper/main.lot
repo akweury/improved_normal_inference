@@ -9,33 +9,33 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{21}{table.caption.57}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in ``synthetic50-5".\relax }}{21}{table.caption.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{24}{table.caption.64}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{24}{table.caption.62}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{25}{table.caption.68}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces The structure of a single tensor in the dataset.\relax }}{25}{table.caption.66}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.1}{\ignorespaces GCNN Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{28}{table.caption.72}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces GCNN Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{28}{table.caption.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.2}{\ignorespaces Trip-Net Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{29}{table.caption.73}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Trip-Net Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. \relax }}{29}{table.caption.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.3}{\ignorespaces Average Angle Error of the evaluation dataset.\relax }}{30}{table.caption.81}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Average Angle Error of the evaluation dataset.\relax }}{30}{table.caption.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.4}{\ignorespaces Median Angle Error of the evaluation dataset.\relax }}{30}{table.caption.82}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Median Angle Error of the evaluation dataset.\relax }}{30}{table.caption.80}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.5}{\ignorespaces Percent of error less than 5 degree of the evaluation dataset.\relax }}{30}{table.caption.83}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Percent of error less than 5 degree of the evaluation dataset.\relax }}{30}{table.caption.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.6}{\ignorespaces Percent of error less than 11.5 degree of the evaluation dataset.\relax }}{30}{table.caption.84}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Percent of error less than 11.5 degree of the evaluation dataset.\relax }}{30}{table.caption.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.7}{\ignorespaces Percent of error less than 22.5 degree of the evaluation dataset.\relax }}{31}{table.caption.85}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Percent of error less than 22.5 degree of the evaluation dataset.\relax }}{31}{table.caption.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.8}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{31}{table.caption.86}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Percent of error less than 30 degree of the evaluation dataset.\relax }}{31}{table.caption.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.\relax }}{37}{table.caption.102}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes.\relax }}{37}{table.caption.100}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.\relax }}{39}{table.caption.106}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.\relax }}{39}{table.caption.104}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
