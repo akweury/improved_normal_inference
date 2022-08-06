@@ -1,116 +1,55 @@
 \boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
-\babel@toc {english}{}\relax 
-\defcounter {refsection}{0}\relax 
+\babel@toc {english}{}
 \contentsline {chapter}{Declaration of Authorship}{iii}{section*.1}%
-\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Abstract}{v}{section*.2}%
-\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Acknowledgements}{vii}{section*.3}%
-\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.8}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.10}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Unstructured Point Cloud Based}{3}{section*.11}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{RGB based}{4}{section*.12}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{RGB-D based}{4}{section*.13}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Approaches}{5}{chapter.14}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Notations}{5}{section.15}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Geometry based normal estimation}{5}{section.16}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Approach}{5}{subsection.17}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Photometric Stereo}{7}{section.20}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Approaches}{7}{subsection.21}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}Gated Convolution Neural Network for surface normal estimation}{9}{section.24}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.1}Gated Convolution}{10}{subsection.27}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.2}Gated Convolution Neural Network (GCNN) Architecture}{11}{subsection.30}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}Illuminated Calibrated RGB-D image based normal inference}{12}{section.32}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.5.1}Light Map, Gray-scale Image and Vertex Map}{12}{subsection.33}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Vertex Map}{12}{section*.34}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Gray-Scale Image}{13}{section*.35}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Light Map}{13}{section*.36}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.5.2}Trip-Net}{13}{subsection.39}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Side-Pipe(Light)}{13}{section*.40}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Side-Pipe(Image)}{14}{section*.41}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{Main-Pipe(Vertex)}{15}{section*.42}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.5.3}Loss Function}{15}{subsection.44}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L1 Loss}{15}{section*.45}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{L2 Loss}{15}{section*.46}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Reversed Huber Loss}{16}{section*.47}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Dataset}{19}{chapter.50}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Resource}{19}{section.51}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Synthesize Scenes using Unity}{20}{section.53}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}Data preprocessing}{22}{section.57}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.1}Convert to Point Cloud}{22}{subsection.58}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.2}Point Cloud Normalization}{23}{subsection.60}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.3}Noise}{24}{subsection.63}%
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.4}Fit to PyTorch}{24}{subsection.65}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{27}{chapter.67}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Training Details}{27}{section.68}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Quantitative Evaluation}{29}{section.72}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Average Angle Error Metric}{29}{section*.73}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Median Angle Error Metric}{29}{section*.74}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{5 Degree Error Metric}{29}{section*.75}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{11.5 Degree Error Metric}{29}{section*.76}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{22.5 Degree Error Metric}{29}{section*.77}%
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{30 Degree Error Metric}{29}{section*.78}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Visual evaluation on SVD}{31}{section.85}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Visual evaluation on GCNN model}{32}{section.89}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5} Discussion about the feature maps of GCNN architecture models}{34}{section.93}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Visual evaluation on Trip-Net models }{36}{section.95}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}Trining on higher resolution}{36}{section.99}%
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.8}Training on Real-Dataset}{39}{section.103}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{41}{chapter.107}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{43}{appendix.108}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {B}More Visualization}{47}{appendix.112}%
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{51}{appendix*.115}%
+\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.10}%
+\contentsline {chapter}{\numberline {3}Approaches}{7}{chapter.11}%
+\contentsline {section}{\numberline {3.1}Notations}{7}{section.12}%
+\contentsline {section}{\numberline {3.2}Geometry based normal estimation}{7}{section.13}%
+\contentsline {subsection}{\numberline {3.2.1}Approach}{7}{subsection.14}%
+\contentsline {section}{\numberline {3.3}Photometric Stereo}{9}{section.17}%
+\contentsline {subsection}{\numberline {3.3.1}Approaches}{9}{subsection.18}%
+\contentsline {section}{\numberline {3.4}Gated Convolution Neural Network for surface normal estimation}{11}{section.21}%
+\contentsline {subsection}{\numberline {3.4.1}Gated Convolution}{12}{subsection.24}%
+\contentsline {subsection}{\numberline {3.4.2}Gated Convolution Neural Network (GCNN) Architecture}{13}{subsection.27}%
+\contentsline {section}{\numberline {3.5}Illuminated Calibrated RGB-D image based normal inference}{14}{section.29}%
+\contentsline {subsection}{\numberline {3.5.1}Light Map, Gray-scale Image and Vertex Map}{14}{subsection.30}%
+\contentsline {paragraph}{Vertex Map}{14}{section*.31}%
+\contentsline {paragraph}{Gray-Scale Image}{15}{section*.32}%
+\contentsline {paragraph}{Light Map}{15}{section*.33}%
+\contentsline {subsection}{\numberline {3.5.2}Trip-Net}{15}{subsection.36}%
+\contentsline {subsubsection}{Side-Pipe(Light)}{15}{section*.37}%
+\contentsline {subsubsection}{Side-Pipe(Image)}{16}{section*.38}%
+\contentsline {subsubsection}{Main-Pipe(Vertex)}{17}{section*.39}%
+\contentsline {subsection}{\numberline {3.5.3}Loss Function}{17}{subsection.41}%
+\contentsline {paragraph}{L1 Loss}{17}{section*.42}%
+\contentsline {paragraph}{L2 Loss}{17}{section*.43}%
+\contentsline {paragraph}{Reversed Huber Loss}{18}{section*.44}%
+\contentsline {chapter}{\numberline {4}Dataset}{21}{chapter.47}%
+\contentsline {section}{\numberline {4.1}Resource}{21}{section.48}%
+\contentsline {section}{\numberline {4.2}Synthesize Scenes using Unity}{22}{section.50}%
+\contentsline {section}{\numberline {4.3}Data preprocessing}{24}{section.54}%
+\contentsline {subsection}{\numberline {4.3.1}Convert to Point Cloud}{24}{subsection.55}%
+\contentsline {subsection}{\numberline {4.3.2}Point Cloud Normalization}{25}{subsection.57}%
+\contentsline {subsection}{\numberline {4.3.3}Noise}{26}{subsection.60}%
+\contentsline {subsection}{\numberline {4.3.4}Fit to PyTorch}{26}{subsection.62}%
+\contentsline {chapter}{\numberline {5}Experiments}{29}{chapter.64}%
+\contentsline {section}{\numberline {5.1}Training Details}{29}{section.65}%
+\contentsline {section}{\numberline {5.2}Quantitative Evaluation}{31}{section.69}%
+\contentsline {paragraph}{Average Angle Error Metric}{31}{section*.70}%
+\contentsline {paragraph}{Median Angle Error Metric}{31}{section*.71}%
+\contentsline {paragraph}{5 Degree Error Metric}{31}{section*.72}%
+\contentsline {paragraph}{11.5 Degree Error Metric}{31}{section*.73}%
+\contentsline {paragraph}{22.5 Degree Error Metric}{31}{section*.74}%
+\contentsline {paragraph}{30 Degree Error Metric}{31}{section*.75}%
+\contentsline {section}{\numberline {5.3}Visual evaluation on SVD}{33}{section.82}%
+\contentsline {section}{\numberline {5.4}Visual evaluation on GCNN model}{34}{section.86}%
+\contentsline {section}{\numberline {5.5} Discussion about the feature maps of GCNN architecture models}{36}{section.90}%
+\contentsline {section}{\numberline {5.6}Visual evaluation on Trip-Net models }{38}{section.92}%
+\contentsline {section}{\numberline {5.7}Trining on higher resolution}{38}{section.96}%
+\contentsline {section}{\numberline {5.8}Training on Real-Dataset}{41}{section.100}%
+\contentsline {chapter}{\numberline {6}Conclusion}{43}{chapter.104}%
+\contentsline {chapter}{\numberline {A}Dataset}{45}{appendix.105}%
+\contentsline {chapter}{Bibliography}{49}{appendix*.109}%
