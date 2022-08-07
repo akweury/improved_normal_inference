@@ -2,37 +2,36 @@
 \chapter{Approaches} % Main chapter title
 
 \label{ch:03} %
-The normal inference task estimate the surface normal of a 3D object, which is assumed that  object surface is mathematically unknown. It means we cannot simply use the cross product of two non-parallel surface vectors to find the normals. Instead, the surface is acquired from digital sensors under specific data types, which can be divided into two groups. The first is geometry data type, which use a point cloud to record the surface geometry information in the 3D space. 
+The normal inference task estimates the surface normal of a 3D object, which is assumed that the object's surface is mathematically unknown. It means we cannot simply use the cross-product of two non-parallel surface vectors to find the normals. Instead, the surface is acquired from digital sensors under specific data types, which can be divided into two groups. The first is geometry data type, which uses a point cloud to record the surface geometry information in 3D space. 
 Another data type is the images, which record the surface reflectance and shading under a light condition. 
 
 In this chapter, geometry and photometric stereo based approach are introduced separately, then we introduce a method to estimate the surface normal that utilize both kind of data types based on deep learning approaches.
 
 \section{Notations}
 
-The following standard notations are adopted in the following chapters in this thesis. The boldface capital letters stand for matrices, whereas the boldface lowercase letters stand for vectors. The capital Greece letters stand for planes.
-We use the subscript $ i= \{1,2,...\} $ to denote the index of the  observations, whereas the superscript to denote the dimension of the matrices or vectors, e.g. $ \textbf{n}^{3\times 1} $ denotes vector with  dimension $ 3\times1 $. We use W stands for width, H stands for height, C stands for channel.
+The following standard notations are adopted in the following chapters of this thesis. The boldface capital letters stand for matrices, whereas the boldface lowercase letters stand for vectors. The Greek capital letters stand for planes.
+We use the subscript $ i= \{1,2,...\} $ to denote the index of the observations, whereas the superscript to denote the dimension of the matrices or vectors, e.g. $ \textbf{n}^{3\times 1} $ denotes a vector with dimension $ 3\times1 $. We use W stands for width, H stands for height, and C stands for the number of channels.
 
 \section{Geometry based normal estimation}
 
 \subsection{Approach}
-The geometry based normal estimation uses point cloud of the object surface as input. The task can be stated as follows.
+The geometry based normal estimation uses the point cloud of the object surface as input. The task can be stated as follows.
 
-Given a structured point cloud $ \textbf{V}^{W\times H\times 3} $, whereas each point in the cloud corresponding a position on an object surface. estimates the corresponding normal map  $ \textbf{N}^{W\times H \times 3} $. The normal map is simply a matrix representation of the normals of all the points. A normal  $ \textbf{n}^{3\times 1} $ at point   $ \textbf{p}^{3\times 1} \in \textbf{N} $ is a unit vector with its direction point outward of the surface and perpendicular to the tangent plane of the surface at point $ \textbf{p} $.
+Given a structured point cloud $ \textbf{V}^{W\times H\times 3} $, each point in the cloud corresponds to a position on an object surface. Estimates the corresponding normal map  $ \textbf{N}^{W\times H \times 3} $. The normal map is simply a matrix representation of the normals of all the points. A normal  $ \textbf{n}^{3\times 1} $ at point   $ \textbf{p}^{3\times 1} \in \textbf{N} $ is a unit vector with its direction point outward of the surface and perpendicular to the tangent plane of the surface at point $ \textbf{p} $.
 
-
-The idea behind the neighbor based method is to fit a plane $ \tilde\Pi $, which use the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, then calculate the normal $ \tilde{\textbf{n}} $ of the plane $ \tilde\Pi $. The $ \tilde{\textbf{n}} $ is considered as an approximation of the normal $ \textbf{n} $ of the tangent plane $ \Pi $.
+The idea behind the neighbor based method is to fit a plane $ \tilde\Pi $, which uses the $ k $ neighbors $ \textbf{p}_1, ..., \textbf{p}_k \in \mathbb{R}^3 $ of the point $ \textbf{p} $, then calculate the normal $ \tilde{\textbf{n}} $ of the plane $ \tilde\Pi $. The $ \tilde{\textbf{n}} $ is considered as an approximation of the normal $ \textbf{n} $ of the tangent plane $ \Pi $.
 
 It is under the assumption that the point and its neighbors are located in the same plane $ \Pi $, which is exactly the tangent plane of the surface at point $\textbf{p}  $. 
-This is usually not hold for the most of the surface, since the surface is usually not flat but with a degree of curvature. But if $ k $ in a suitable scale and point cloud is dense enough, we can approximately consider all the $ k $ neighbor points in a small range on the same tangent plane. Then we have an approximation $ \textbf{n} \approx \tilde{\textbf{n}}$, where $ \tilde{\textbf{n}} $ denotes the estimated normal. Similarly, the estimated tangent plane $ \tilde{\Pi} \approx \Pi $. 
+This is usually not held for most of the surface since the surface is usually not flat but with a degree of curvature. But if $ k $ in a suitable scale and the point cloud is dense enough, we can approximately consider all the $ k $ neighbor points in a small range on the same tangent plane. Then we have an approximation $ \textbf{n} \approx \tilde{\textbf{n}}$, where $ \tilde{\textbf{n}} $ denotes the estimated normal. Similarly, the estimated tangent plane $ \tilde{\Pi} \approx \Pi $. 
 
-Based on the assumption mentioned above, the normal inference task is trivial since then the surface is mathematically describable. We can generate the approximate tangent point of any point with its neighbors, then the normal $ \tilde{\textbf{n}} $ of the tangent plane can be derived from following equations
+Based on the assumption mentioned above, the normal inference task is trivial since then the surface is mathematically describable. We can generate the approximate tangent point of any point with its neighbors, then the normal $ \tilde{\textbf{n}} $ of the tangent plane can be derived from the following equations
 
 \[\tilde{\textbf{n}} \cdot \textbf{v}_{ij}  = 0 \]
 where 
 \[ \textbf{v}_{ij} = \textbf{p}_i - \textbf{p}_j, \text{for } i, j \in \{ 1,2,...,k\}, i\neq j \]
-To find a normal, we need at least 3 neighbors which are not in the same line to solve the equation above. Calculate the normal for each point on the point cloud, we can get the corresponding normal maps. 
+To find a normal, we need at least 3 neighbors which are not in the same line to solve the equation above. Calculate the normal for each point on the point cloud, and we can get the corresponding normal maps. 
 
-If we consider more than 3 neighbors, the points are usually not locate on the same plane. In this case, the equation system is over-determined. In this case, we can use optimization approach to find a plane that has the minimum distance to all the points in the 3D space. Let  $ \textbf{A }\in \mathbb{R}^{(k-1)\times 3} $  denotes the vertor  matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_{k-1} $. 
+If we consider more than 3 neighbors, the points are usually not located on the same plane. In this case, the equation system is over-determined. In this case, we can use the optimization approach to find a plane that has the minimum distance to all the points in the 3D space. Let  $ \textbf{A }\in \mathbb{R}^{(k-1)\times 3} $  denotes the vector  matrix vertically stacked by $ \textbf{v}_1, ..., \textbf{v}_{k-1} $. 
 
 Then, the equation system is converted to a minimum problem 
 \begin{equation}
@@ -42,30 +41,31 @@ Then, the equation system is converted to a minimum problem
 		\textrm{s.t.} & \| \bn \|^2_2 & = & 1 
 	\end{array}
 \end{equation}
-where the extra constraint is added to avoid trivial solution and let the normal to be a unit vector.
+where the extra constraint is added to avoid trivial solutions and let the normal be a unit vector.
 
 The problem mentioned above can be solved by singular value decomposition(SVD), where
 \[ A=U\Sigma V^T \]
 The last column of $ V $ is the equation system solution and consequently the surface normal. 
 
-The optimization based approach using SVD is more robust compare to only choose 3 points for normal calculation, since the plane generated by 3 neighbors does not guarantee to be a good approximation to the actually tangent plane. However, the neighbor size $ k $ is a key parameters of this approach. For the smooth surface, a relative bigger $ k $ can help the equation system to fit a plane that closer to the tangent plane. For the sharp surface area, the $ k $ has to be small enough to ensure that the points it contains still approximately in the same plane, otherwise the more included points are only the outliers for the equation solving. 
+The optimization-based approach using SVD is more robust compared to only choosing 3 points for normal calculation since the plane generated by 3 neighbors does not guarantee to be a good approximation to the actually tangent plane. However, the neighbor size $ k $ is a key parameter of this approach. For the smooth surface, a relatively bigger $ k $ can help the equation system to fit a plane that is closer to the tangent plane. For the sharp surface area, the $ k $ has to be small enough to ensure that the points it contains are still approximately in the same plane, otherwise the more included points are only the outliers for the equation solving. 
 
-At last, after solving the equation mentioned above, we should convert all the normals to the view point $ \textbf{s} $ for a unitary reason. Thus the direction of a normal should be inverted if 
+At last, after solving the equation mentioned above, we should convert all the normals to the viewpoint $ \textbf{s} $ for a unitary reason. Thus the direction of a normal should be inverted if 
+
 \begin{equation}\label{eq:normal-invertion}
 	\textbf{n} \cdot (\textbf{p}  - \textbf{s}) > 0
 \end{equation}
-Since the approach mentioned above is basically solved by SVD, thus for the simplicity, this method will be named SVD in the rest of the thesis.
+Since the approach mentioned above is basically solved by SVD, thus for simplicity, this method will be named SVD in the rest of the thesis.
 
 
 \section{Photometric Stereo}
-Photometric stereo was initially introduced by \cite{photometric-stereo}, which is a completely a different approach compare to geometry information based approach like SVD. It estimates the surface normal of the object by observing the object in the same position under different illuminated scenes. It based on the fact that the light reflected by a surface is dependent on the surface normal and the light direction.
+The photometric stereo was initially introduced by \cite{photometric-stereo}, which is a completely different approach compared to geometry information based approach like SVD. It estimates the surface normal of the object by observing the object in the same position under different illuminated scenes. It is based on the fact that the light reflected by a surface is dependent on the surface normal and the light direction.
 
 \subsection{Approaches}
 The photometric stereo actually estimates the surface normal from images. Before we introduce the this approach, let us discuss what we can actually get from the images.
 Given an image $ \textbf{I} $, it can be decomposed into two parts, the reflectance $ \textbf{R} $ and the shading $ \textbf{S} $,
 \[ \textbf{I} = \textbf{R}\oplus \textbf{S}\]
-where $ \oplus $ denotes the element-wise product. This decomposition of the image is based on the intrinsic image model, which proposed by  \cite{intrinsic-image}. It interprets the observed image into reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
-%% insert a image for decompositions
+where $ \oplus $ denotes the element-wise product. This decomposition of the image is based on the intrinsic image model, which was proposed by  \cite{intrinsic-image}. It interprets the observed image into a reflectance image and the shading image. As shown in Figure \ref{fig:intrinsic-image}
+%% insert an image for decompositions
 \begin{figure}[th]
 	\centering
 	{\includegraphics[width=.19\textwidth]{./Figures/intrinsic_image.png}}
@@ -79,9 +79,9 @@ where $ \oplus $ denotes the element-wise product. This decomposition of the ima
 	
 \end{figure}
 
-The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflect light in all directions, as shown in figure \ref{fig:lambertian-surface}, the shading image can be decomposed as the product of the  radiance of  incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ \textbf{N} $ and the light source direction $ \textbf{L} $.
-\[ \textbf{I} = \rho  \odot ( L_0 \textbf{L} \cdot  \textbf{N}) \]
-note that the each surface normal in the matrix$ \textbf{N} $ and light direction in matrix $ \textbf{L} $ is a unit vector thus they have only two degrees of freedom. 
+The equation can be further decomposed based on different surface models. If assume the object surfaces are Lambertian surfaces, i.e. the surface which reflects light in all directions, as shown in figure \ref{fig:lambertian-surface}, the shading image can be decomposed as the product of the radiance of incoming light $ L_0 $, the cosine of the angle of incidence, which is the dot product of the surface normal $ \textbf{N} $ and the light source direction $ \textbf{L} $.
+\[ \textbf{I} = \rho \odot ( L_0 \textbf{L} \cdot \textbf{N}) \]
+note that each surface normal in the matrix$ \textbf{N} $ and light direction in matrix $ \textbf{L} $ is a unit vector thus they have only two degrees of freedom. 
 
 \begin{figure}[th]
 	\centering
@@ -89,7 +89,7 @@ note that the each surface normal in the matrix$ \textbf{N} $ and light directio
 		\includegraphics[width=\textwidth]{./Figures/Lambertian-Reflection-Lambertian-Surface.png}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.48\linewidth}
-			\begin{tikzpicture} 
+		\begin{tikzpicture} 
 			% reference lines
 			\coordinate (light) at (-1,3);
 			\coordinate (p) at (2,0);
@@ -104,7 +104,7 @@ note that the each surface normal in the matrix$ \textbf{N} $ and light directio
 		\end{tikzpicture}
 	\end{subfigure}
 	\decoRule
-	\caption{Left: the light reflection on a lambertian surface. (image source \cite{lambertian-reflectance}). Right: The surface normal, source light direction and the view point direction, where $ \theta $ denotes the angle between light direction and the normal.}
+	\caption{Left: the light reflection on a Lambertian surface. (image source \cite{lambertian-reflectance}). Right: The surface normal, source light direction, and the viewpoint direction, where $ \theta $ denotes the angle between light direction and the normal.}
 	\label{fig:lambertian-surface}
 \end{figure}
 
@@ -112,7 +112,7 @@ The equation can be further rearranged as follows
 \[ I =(L_0\rho \odot \textbf{N}) \cdot  ( \textbf{L}) \]
 Let $ \textbf{G} = =L_0\rho \odot \textbf{N} $, the equation is simplified to 
 \[\textbf{I} = \textbf{G} \cdot \textbf{L}\]
-If we use a set of $ k $ image for the same scene have been captured based on different light projections. Then, for each pixel $ (x,y) $ in a scene, an equation system can be set up 
+If we use a set of $ k $ images for the same scene that have been captured based on different light projections. Then, for each pixel $ (x,y) $ in a scene, an equation system can be set up 
 \[ 
 \begin{pmatrix}
 	\textbf{l}_1^T \\
@@ -127,29 +127,28 @@ If we use a set of $ k $ image for the same scene have been captured based on di
 	\textbf{I}_k(x,y)
 \end{pmatrix}
 \]
-for the simplicity, $ \textbf{l}_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ . The equation can be solved based on least square methods. 
+For simplicity, $ \textbf{l}_i^T $ for $ 1\le i \le k $ denotes the light direction at position $ (x,y) $ in the image $ k $ . The equation can be solved based on the least square methods. 
 
-First we can get the albedo with the light intensity based on the fact that normal is an unit vector, thus we have 
+First, we can get the albedo with the light intensity based on the fact that normal is a unit vector, thus we have 
 
 \[ \|\textbf{G}(x,y)\|_2 = \|L_0\rho(x,y)\textbf{N}(x,y)\|_2 = L_0\rho(x,y) \]
 Then the normal can be obtained as follows
 
 \[ \textbf{ N}(x,y) = \frac{\textbf{G}(x,y)}{L_0\rho(x,y)}\]
-We calculate the surface normal for each point  to get the surface normal map. 
+We calculate the surface normal for each point to get the surface normal map. 
 
-This approach is also called shape from shading (SFS)\cite{SFS}. It gets both normal maps and the corresponding albedo from a set of images under different light conditions. Since the light direction is used in the computation, the cameras and the light source position has to be calibrated beforehand. 
+This approach is also called shape from shading (SFS)\cite{SFS}. It gets both normal maps and the corresponding albedo from a set of images under different light conditions. Since the light direction is used in the computation, the cameras and the light source position have to be calibrated beforehand. 
 
-Shape from shading approach takes at least three light positions into account for the normal on one pixel. Thus it is common to use more than three light sources to cover most of the surface points as much as possible. 
+The shape from shading approach takes at least three light positions into account for the normal on one pixel. Thus it is common to use more than three light sources to cover most of the surface points as much as possible. 
 
 \newpage 
 \section{Gated Convolution Neural Network for surface normal estimation}
 \label{sec:gcnn}
 
-
-Recently, deep learning based method achieved a great succeed for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Grayscale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and downsampling with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks like normal map inference, the output is demanded as the same shape as the input, whereas each pixel in the output image requires a prediction. Therefore the output is not only one or several labels but a similar size matrix as the input. In this case, the traditional network architecture using fully connections as the last layers for label prediction is not suitable anymore.
+Recently, deep learning based method achieved great success for image processing. ( \cite{yolov3}, \cite{efficientDet}) These network architectures use a batch of RGB / Gray-scale images as input and are employed for classification problems. Usually, the images are convoluted with a convolution layer and down-sampled with pooling layers. The outputs of the network consist of a single value to represent the index of the corresponding class (\cite{efficientDet}) or with a set of values to represent the position of bounding boxes.(\cite{yolov3}). However, in many other vision tasks like normal map inference, the output is demanded as the same shape as the input, whereas each pixel in the output image requires a prediction. Therefore the output is not only one or several labels but a similar size matrix as the input. In this case, the traditional network architecture using fully connections as the last layers for label prediction is not suitable anymore.
 
 %% talk about image upsampling, unet
-Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}. This network has a very regular architecture for the data processing whereas each resolution level has a similar design. For the feature extraction part, as known as down-sampling, the architecture follows the traditional CNN architecture. For the up-sampling part, the network use an architecture that similar like down-sampling operations, which replace the max pool layers for resize reduction to up-conv for super-resolution and remains other convolution layers. An important design is the skip connection in the up-sampling part. The feature maps that extracted in the down-sampling part will be concatenated to the feature maps in the up-sampling part. This helps the network to find the locations in the original image and use it to predict a sharp output.
+Recently,\cite{unet} proposed an architecture called UNet for biomedical image segmentations. The architecture is shown in Figure \ref{fig:u-net}. This network has a very regular architecture for the data processing whereas each resolution level has a similar design. For the feature extraction part, as known as down-sampling, the architecture follows the traditional CNN architecture. For the up-sampling part, the network uses an architecture that is similar to down-sampling operations, which replace the max pool layers for resize reduction to up-conv for super-resolution and remains other convolution layers. An important design is the skip connection in the up-sampling part. The feature maps extracted in the down-sampling part will be concatenated with the feature maps in the up-sampling part. This helps the network to find the locations in the original image and use it to predict a sharp output.
 
 \begin{figure}[th]
 	\centering
@@ -160,12 +159,11 @@ Recently,\cite{unet} proposed an architecture called UNet for biomedical image s
 \end{figure}
 
 % why we need a mask
-The UNet is based on standard convolution layers to construct the network. This is reasonable for image processing task with full-dense input, since no missing pixels exist. 
-However, some other input data like depth map captured from light scanner, they are not always fully-dense data, but equipped with lots of missing pixels and holes. In this case, we can still apply the standard convolution layers to extract the feature maps from the input, but then it will confused by the valid pixels and the invalid pixels (the missing pixels) during the training, and consequently leads to artifacts such as blurriness and color discrepancy, as mentioned by \cite{partial_conv}. Thus it is reasonable to find a way to distinguish the valid and invalid pixels during the training. 
+The UNet is based on standard convolution layers to construct the network. This is reasonable for image processing tasks with full-dense input since no missing pixels exist. 
+However, some other input data like depth maps captured from the light scanners, they are not always fully dense data but equipped with lots of missing pixels and holes. In this case, we can still apply the standard convolution layers to extract the feature maps from the input, but then it will be confused by the valid pixels and the invalid pixels (the missing pixels) during the training, and consequently leads to artifacts such as blurriness and color discrepancy, as mentioned by \cite{partial_conv}. Thus it is reasonable to find a way to distinguish the valid and invalid pixels during the training. 
 
 
-\cite{pncnn0} use binary mask to indicate valid pixels, and further use normalized convolution as a substitution for the standard convolution layer in the training network. The normalized convolution is shown as follows
-
+\cite{pncnn0} use a binary mask to indicate valid pixels and further use normalized convolution as a substitution for the standard convolution layer in the training network. The normalized convolution is shown as follows
 \begin{equation}
 	\begin{array}{rrclcl}
 		O(x,y) = 
@@ -175,14 +173,13 @@ However, some other input data like depth map captured from light scanner, they 
 		\end{cases}
 	\end{array}
 \end{equation}
-where $ k $ is the kernel size, $ (x,y) $ is the position in input, $ (i,j) $ is the displacement in kenel, $ M $ is the corresponding mask. A binary mask uses 1 to indicate valid pixels and 0 otherwise. $ \odot $ denotes element-wise multiplication.
+where $ k $ is the kernel size, $ (x,y) $ is the position in input, $ (i,j) $ is the displacement in kennel, $ M $ is the corresponding mask. A binary mask uses 1 to indicate valid pixels and 0 otherwise. $ \odot $ denotes element-wise multiplication.
 
-Normalized convolution layer added the weight to the mask. However, a initialization for the mask is still required, and the propagation of the mask remain a tricky task. 
-
+The normalized convolution layer added weight to the mask. However, initialization for the mask is still required, and the propagation of the mask remains a tricky task. 
 \subsection{Gated Convolution}
 
 % introduce gconv
-\cite{gated_activation} proposed a gated activation unit to model more complex interactions comparing to standard CNN layers, which mainly inspired by the multiplicative units exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. \cite{gconv} employed the same gated unit and use it as gated convolution layer for training tasks with in-complete input data, such as image inpainting task. In this gated convolution layer design, the mask using to distinguish the valid and invalid pixels are not predetermined but learned during the training. 
+\cite{gated_activation} proposed a gated activation unit to model more complex interactions compared to standard CNN layers, which was mainly inspired by the multiplicative units that exist in Long Short-Term Memory proposed by \cite{lstm} and Rated Recurrent Unit (GRU) proposed by \cite{gru}. \cite{gconv} employed the same gated unit and use it as a gated convolution layer for training tasks with in-complete input data, such as image inpainting tasks. In this gated convolution layer design, the mask used to distinguish the valid and invalid pixels are not predetermined but learned during the training. 
 
 The structure is shown in Figure \ref{fig:gconvLayer}. Instead of using a mask as input to indicate valid pixels, it employs a standard convolution layer to learn this mask directly from data, and use a sigmoid function as the activation function to indicate the confidence of the pixel validation. Meanwhile, another standard convolution layer placed aside to learn the feature maps with a ReLU /LeakyReLU activation functions. Therefore the mask and the feature of the input are both learned during the training.  Then it imply element-wise multiplication with the feature map and the mask as the final feature map of this gated convolution layer. 
 
