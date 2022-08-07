@@ -8,11 +8,12 @@
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
- In this thesis, we require two kinds of input data for model training. 
-First we need geometry information of the object surface. This can be collected by a depth camera, which records the Z-axis distance of the object surface point to the camera position. 
-Second we need illuminated information of the object surface, which considers as a help-information of the geometry based model to further improve the inference accuracy. This kind of information is collected by a light scanner, which usually has known intrinsic and extrinsic camera matrix, so that we can convert the point between camera coordinate system and the world coordinate system. Besides, an extra spot light will be placed in a known position to illuminate the object surface. Then, the light scanner can capture the scene as a grayscale/RGB image, save the camera matrix and light position. So we can based on the light position and the depth map acquired from depth camera to calculate light direction and further use image to estimate the surface normal.
+ In this thesis, we require two kinds of input data to train our models. 
+First we need geometry information of the object surface. This can be collected by a depth camera, which records the Z-axis distance of the object surface to the camera position and it can be further converted to a point cloud. 
+Second we need illuminated information of the object surface, which considers as a photometric-information of for the further accuracy improvement. 
+This kind of information requires an observed image of the object with the light directions that projected to the object surface. 
 
-In order to acquire these data, we can use a light scanner to scan the objects in laboratory. However, the scanner is failed to scan dark, shinny and transparent region, which leaves a plenty of missing pixels and holes in the depth map. Thus the corresponding surface points are incomplete for the object. It leads to the missing ground-truth in the normal map. Second, to train a deep learning based model usually require a huge dataset, especially for the network without backbone. To create a single depth map dataset for this thesis would be too much of work and resource requirement. A proper way for getting huge depth map data with illumination information can be considered using a game engine, which can simulate any number of data that we required.
+In order to acquire these data, we can use a light scanner to scan the objects in laboratory. However, the scanner is failed to scan dark, shiny and transparent region, which leaves a plenty of missing pixels and holes in the depth map. Thus the corresponding surface points are incomplete for the object. It leads to the missing ground-truth in the normal map. Second, to train a deep learning based model usually require a huge dataset, especially for the network without backbone. To create a single depth map dataset for this thesis would be too much of work and resource requirement. A proper way for getting huge depth map data with illumination information can be considered using a game engine, which can simulate any number of data that we required.
 
 In this thesis, we use Unity game engine for data generation. Based on a $ C\# $ script, we can set on a similar configuration in the laboratory. Then create a mount of data based on the collected object models. The dataset that we created for this thesis is called \textit{synthetic-50-5}, since it has 50 different object models for training and 5 object models for testing.
 
@@ -22,7 +23,7 @@ In this thesis, we use Unity game engine for data generation. Based on a $ C\# $
 The object model we used are searched from internet.
 \cite{data1}, \cite{data2}, \cite{data3} and \cite{data4} published a set of point cloud dataset for computer vision research. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. Each objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds makes the normal inference task trivial since the neighbor based method performs good enough for these kind of task. Some of the point cloud even equipped with pre-computed normal map based on more advanced methods. They all provides the accurate ground-truth for the supervised learning method.
 
-The \textit{synthetic50-5} is a datset we generated in this thesis with 50 point clouds as training set and 5 point clouds as test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. The category of the models include figure, animal, statue, toy, furniture, antique, car model, which include the smooth surface model like \textit{arm, bus, bunny, cat, zebra} and also the model with highly elaborate details, like \textit{Washington, Car-Engine, Armadillo}. 
+The \textit{synthetic50-5} is a datset we generated in this thesis with 50 point clouds as training set and 5 point clouds as test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. The category of the models include figure, animal, statue, toy, furniture, antique, car model, some of them correspond the smooth surface model like \textit{arm, bus, bunny, cat, zebra} and some of the model has highly elaborate details, like \textit{Washington, Car-Engine, Armadillo}. 
 The dataset is created base on the work of this thesis and using for normal inference task. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
 
 \begin{figure}[!h]
@@ -65,16 +66,17 @@ The dataset is created base on the work of this thesis and using for normal infe
 	\caption{Point clouds scanned by high resolution scanners}
 \end{figure}
 
-Besides, some of the objects also has its own texture, as shown in the second row of Figure \ref{fig:dataset-demo}. This is specially prepared for illuminated approach since they will take the image as account to evaluate the surface normal. The object surface gives a different reflectence with different surface texture, which further impact the model performance. 
+Besides, some of the objects also has colored texture, as shown in the second row of Figure \ref{fig:dataset-demo}. This is specially prepared for illuminated approach since they will take the image as account to evaluate the surface normal. The textured models are more likely to the real dataset and further gives a good robustness to our models.
+
 
 \definecolor{direction-light-color}{RGB}{255,244,214}
 \newcommand{\col}[1]{%
 	\textcolor{#1}{\vrule width 0.5cm}}
 \section{Synthesize Scenes using Unity}
-In order to simulate the the data collection scenario close to the real life in the laboratory as much as possible. We placed a flat cylinder called $ stage $ in the center in the 3D space as a platform to place objects. The stage is fixed in a determined position, which is not moved when the scene is captured. 
-A directional light with RGB color FFF4D6 \col{direction-light-color}  placed in a top-view direction around 25 meters away to provide as ambient light, which also has a fixed position.
-A RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera is the sensor to capture the depth map and the grayscale image, which is random moved after a new scene. The moving range of the camera has 0.1m in both directions of X, Y, and Z axis and 1 degree random changed Euler angle. 
-A point light placed around 5 meters away as the illumination light, which is also randomly moved after a new scene. The moving range is 0.3m in both directions of X, Y, and Z axis and 1 degree random in Euler angle.
+In order to simulate the data collection scenario close to the real life in the laboratory as much as possible. We did following settings. A flat cylinder called $ stage $ is placed in the center in the 3D space as a platform to place objects. The stage is fixed in a determined position, which is not moved when the images are captured. 
+A directional light with RGB color FFF4D6 \col{direction-light-color} is placed in a top-view direction around 25 meters away to provide as ambient light source, which also has a fixed position.
+A RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera is the sensor to capture the depth map and the grayscale image, which is random change the places after each scene. The moving range of the camera has 0.1m in both directions of X, Y, and Z axis and 1 degree random changed Euler angle. 
+A point light placed around 5 meters away as the illumination light, which is also randomly moved after each scene. The moving range is 0.3m in both directions of X, Y, and Z axis and 1 degree random in Euler angle.
 
 During the data collection, the object is randomly selected and placed on the stage. The object has a random upto 30 degrees rotation align $ roll $-axis, 30-degrees rotation align $ pitch $-axis and 180-degrees align $ yaw $-axis. Thus the camera has the opportunity to capture every direction of the object and consequently abundant the dataset. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128 $ and 5000 scenes with resolution $ 512\times512 $.
 
@@ -113,7 +115,7 @@ The main advantage using generated scenes is the availability of complete inform
 	\end{tabular}
 \end{table}
 
-One important detail that we must care about is the camera exposure. Or we have to control the light radiance on the object surface. As shown in figure \ref{fig:camera_exposure}, too less exposure on the object neutralizes the illumination information, which only left ambient light effect. Too much exposure makes the surface texture hard to recognize. When we did the experiments, we found that a suitable light setting is essential to the illuminated based approach. A too much or too less light effects won't improve the illuminated based approach.
+One important detail that we must care about is the camera exposure. Or we have to control the light radiance on the object surface. As shown in figure \ref{fig:camera_exposure}, too less exposure will neutralize the illumination information, which only left ambient light effect. Too much exposure makes the surface texture hard to recognize. When we did the experiments, we found that a suitable light setting is essential to the illuminated based approach. A too much or too less light effects won't improve the illuminated based approach.
 
 \begin{figure}[H]
 	\centering
