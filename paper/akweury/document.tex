@@ -49,21 +49,30 @@
 
 \begin{document}
 
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	
-\begin{tikzpicture}
-	\pgfplotsset{ticks=none}
-	\begin{axis} [axis lines=center]
-		\addplot [domain=0:1, smooth, thick, width=5mm, color=red] { x };
-		\addplot [domain=1:2, smooth, width=5mm] { x };
-		\addplot [domain=-2:-1, smooth, width=3mm] { -x };
-		\addplot [domain=-1:0, smooth, thick, width=3mm, color=red] { -x };
-		\addplot [domain=-2:-1, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
-		\addplot [domain=1:2, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
-	\end{axis}
-\end{tikzpicture}
-	\caption{The shape of Berhu Loss (show in red line). }
-	\label{fig:berhu-loss-shape}
+	\begin{tikzpicture}
+		\begin{axis} [axis lines=center]
+			\addplot [domain=-6:6, thick, smooth, width=5mm] { e^x/(e^x+1) };
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Sigmoid activation function. }
+	\label{fig:sigmoid-shape}
 \end{figure}
+
+\begin{figure}[H]
+	\centering
+	
+	\begin{tikzpicture}
+		\begin{axis} [axis lines=center]
+			\addplot [domain=0:5, thick, smooth, width=5mm] { x };
+			\addplot [domain=-5:0, thick, smooth, width=5mm] {0.05*x };
+		\end{axis}
+	\end{tikzpicture}
+	\caption{LeakyRelU activation function. }
+	\label{fig:leakyrelu-shape}
+\end{figure}
+
+
 \end{document}

@@ -16,7 +16,7 @@
   {}
 \endgroup
 
-\datalist[entry]{nyt/global//global/global}
+\datalist[entry]{nty/global//global/global}
   \entry{intrinsic-image}{article}{}
     \name{author}{2}{}{%
       {{hash=BH}{%
@@ -36,8 +36,6 @@
     \strng{fullhash}{BHTJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{1978}
-    \field{labeldatesource}{}
     \field{sortinit}{B}
     \field{sortinithash}{B}
     \field{title}{Recovering Intrinsic Scene Characteristics from Images}
@@ -45,43 +43,6 @@
   Images}
     \field{month}{01}
     \field{year}{1978}
-  \endentry
-
-  \entry{unstructed-pc}{inproceedings}{}
-    \name{author}{3}{}{%
-      {{hash=BSY}{%
-         family={Ben-Shabat},
-         familyi={B\bibinithyphendelim S\bibinitperiod},
-         given={Yizhak},
-         giveni={Y\bibinitperiod},
-      }}%
-      {{hash=LM}{%
-         family={Lindenbaum},
-         familyi={L\bibinitperiod},
-         given={Michael},
-         giveni={M\bibinitperiod},
-      }}%
-      {{hash=FA}{%
-         family={Fischer},
-         familyi={F\bibinitperiod},
-         given={Anath},
-         giveni={A\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{BSYLMFA1}
-    \strng{fullhash}{BSYLMFA1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2019}
-    \field{labeldatesource}{}
-    \field{sortinit}{B}
-    \field{sortinithash}{B}
-    \field{booktitle}{Proceedings of the IEEE/CVF Conference on Computer Vision
-  and Pattern Recognition (CVPR)}
-    \field{title}{Nesti-Net: Normal Estimation for Unstructured 3D Point Clouds
-  Using Convolutional Neural Networks}
-    \field{year}{2019}
-    \warn{\item Invalid format of field 'month'}
   \endentry
 
   \entry{gru}{misc}{}
@@ -122,8 +83,6 @@
     \strng{fullhash}{CKMBvBDBY1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2014}
-    \field{labeldatesource}{}
     \field{sortinit}{C}
     \field{sortinithash}{C}
     \verb{doi}
@@ -167,8 +126,6 @@
     \strng{fullhash}{EDPCFR1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2014}
-    \field{labeldatesource}{}
     \field{sortinit}{E}
     \field{sortinithash}{E}
     \verb{doi}
@@ -211,9 +168,6 @@
     \strng{fullhash}{EAFMKFS1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2020}
-    \field{extradate}{1}
-    \field{labeldatesource}{}
     \field{sortinit}{E}
     \field{sortinithash}{E}
     \verb{doi}
@@ -262,9 +216,6 @@
     \strng{fullhash}{EAFMKFS1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2020}
-    \field{extradate}{2}
-    \field{labeldatesource}{}
     \field{sortinit}{E}
     \field{sortinithash}{E}
     \verb{doi}
@@ -321,8 +272,6 @@
     \strng{fullhash}{EAFMHKPM1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2020}
-    \field{labeldatesource}{}
     \field{sortinit}{E}
     \field{sortinithash}{E}
     \verb{doi}
@@ -361,8 +310,6 @@
     \strng{fullhash}{FDFGAHM1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2013}
-    \field{labeldatesource}{}
     \field{sortinit}{F}
     \field{sortinithash}{F}
     \field{booktitle}{2013 IEEE International Conference on Computer Vision}
@@ -410,8 +357,6 @@
     \strng{fullhash}{HKZXRSSJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2015}
-    \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
     \verb{doi}
@@ -443,8 +388,6 @@
     \strng{fullhash}{HSSJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{1997}
-    \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
     \verb{doi}
@@ -495,8 +438,6 @@
     \strng{fullhash}{HSRRBDMGSNN1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2012}
-    \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
     \field{booktitle}{2012 IEEE/RSJ International Conference on Intelligent
@@ -523,8 +464,6 @@
     \strng{fullhash}{HB1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2004}
-    \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
     \field{title}{Shape from Shading: A Method for Obtaining the Shape of a
@@ -558,8 +497,6 @@
     \strng{fullhash}{HJGX1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{H}
     \field{sortinithash}{H}
     \field{booktitle}{Proceedings of the 27th International Joint Conference on
@@ -593,8 +530,6 @@
     \strng{fullhash}{IS1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{I}
     \field{sortinithash}{I}
     \verb{doi}
@@ -632,8 +567,6 @@
     \strng{fullhash}{KDPBJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2014}
-    \field{labeldatesource}{}
     \field{sortinit}{K}
     \field{sortinithash}{K}
     \verb{doi}
@@ -677,8 +610,6 @@
     \strng{fullhash}{KKADWDBM1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2009}
-    \field{labeldatesource}{}
     \field{sortinit}{K}
     \field{sortinithash}{K}
     \field{booktitle}{2009 IEEE International Conference on Robotics and
@@ -711,8 +642,6 @@
     \strng{fullhash}{KHWCF1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{1993}
-    \field{labeldatesource}{}
     \field{sortinit}{K}
     \field{sortinithash}{K}
     \field{booktitle}{Proceedings of IEEE Conference on Computer Vision and
@@ -767,8 +696,6 @@
     \strng{fullhash}{LIRCBVTFNN1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2016}
-    \field{labeldatesource}{}
     \field{sortinit}{L}
     \field{sortinithash}{L}
     \verb{doi}
@@ -818,8 +745,6 @@
     \strng{fullhash}{LZWXLXJJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2022}
-    \field{labeldatesource}{}
     \field{sortinit}{L}
     \field{sortinithash}{L}
     \verb{doi}
@@ -876,8 +801,6 @@
     \strng{fullhash}{LGRFASKJWTCTACB1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{L}
     \field{sortinithash}{L}
     \verb{eprint}
@@ -915,8 +838,6 @@
     \strng{fullhash}{LPWWLDS1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2009}
-    \field{labeldatesource}{}
     \field{sortinit}{L}
     \field{sortinithash}{L}
     \field{title}{One colored image based 2.5D human face reconstruction}
@@ -937,7 +858,6 @@
     \strng{fullhash}{MM1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labeldatesource}{nodate}
     \field{sortinit}{M}
     \field{sortinithash}{M}
     \field{title}{Artec3D}
@@ -959,8 +879,6 @@
     \strng{fullhash}{MM1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2017}
-    \field{labeldatesource}{}
     \field{sortinit}{M}
     \field{sortinithash}{M}
     \field{title}{Computer Graphics Archive}
@@ -1021,8 +939,6 @@
     \strng{fullhash}{OAvdKNVOELGAKK1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2016}
-    \field{labeldatesource}{}
     \field{sortinit}{O}
     \field{sortinithash}{O}
     \verb{doi}
@@ -1048,8 +964,6 @@
     \strng{fullhash}{OA1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2007}
-    \field{labeldatesource}{}
     \field{sortinit}{O}
     \field{sortinithash}{O}
     \verb{doi}
@@ -1100,8 +1014,6 @@
     \strng{fullhash}{QXLRLZURJJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{Q}
     \field{sortinithash}{Q}
     \field{booktitle}{Proceedings of the IEEE Conference on Computer Vision and
@@ -1136,8 +1048,6 @@
     \strng{fullhash}{RJFA1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{R}
     \field{sortinithash}{R}
     \verb{doi}
@@ -1175,8 +1085,6 @@
     \strng{fullhash}{ROFPBT1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2015}
-    \field{labeldatesource}{}
     \field{sortinit}{R}
     \field{sortinithash}{R}
     \verb{eprint}
@@ -1223,8 +1131,6 @@
     \strng{fullhash}{SNHDKPFR1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2012}
-    \field{labeldatesource}{}
     \field{sortinit}{S}
     \field{sortinithash}{S}
     \field{booktitle}{ECCV'12 Proceedings of the 12th European conference on
@@ -1244,7 +1150,6 @@
 
   \entry{data4}{online}{}
     \field{labeltitlesource}{title}
-    \field{labeldatesource}{nodate}
     \field{sortinit}{S}
     \field{sortinithash}{S}
     \field{title}{Smithsonian 3D Digitization}
@@ -1286,8 +1191,6 @@
     \strng{fullhash}{TMPRLQV1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2019}
-    \field{labeldatesource}{}
     \field{sortinit}{T}
     \field{sortinithash}{T}
     \verb{doi}
@@ -1302,7 +1205,6 @@
 
   \entry{data1}{online}{}
     \field{labeltitlesource}{title}
-    \field{labeldatesource}{nodate}
     \field{sortinit}{T}
     \field{sortinithash}{T}
     \field{title}{The Stanford 3D Scanning Repository}
@@ -1354,8 +1256,6 @@
     \strng{fullhash}{UJSNSLFUBTGA1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2017}
-    \field{labeldatesource}{}
     \field{sortinit}{U}
     \field{sortinithash}{U}
     \field{booktitle}{International Conference on 3D Vision (3DV)}
@@ -1376,8 +1276,6 @@
     \strng{fullhash}{WR1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{1992}
-    \field{labeldatesource}{}
     \field{sortinit}{W}
     \field{sortinithash}{W}
     \verb{doi}
@@ -1416,8 +1314,6 @@
     \strng{fullhash}{YNEKYGPRH1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2012}
-    \field{labeldatesource}{}
     \field{sortinit}{Y}
     \field{sortinithash}{Y}
     \field{booktitle}{2012 IEEE International Conference on Signal Processing,
@@ -1480,8 +1376,6 @@
     \strng{fullhash}{YJLZYJSXLXHT1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2018}
-    \field{labeldatesource}{}
     \field{sortinit}{Y}
     \field{sortinithash}{Y}
     \verb{doi}
@@ -1543,8 +1437,6 @@
     \strng{fullhash}{ZJTYHYYQSWCJWY1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2019}
-    \field{labeldatesource}{}
     \field{sortinit}{Z}
     \field{sortinithash}{Z}
     \field{booktitle}{2019 IEEE/CVF Conference on Computer Vision and Pattern
@@ -1601,8 +1493,6 @@
     \strng{fullhash}{ZQJYSBJXDLYKAC1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2019}
-    \field{labeldatesource}{}
     \field{sortinit}{Z}
     \field{sortinithash}{Z}
     \field{booktitle}{Proceedings of the IEEE/CVF International Conference on
@@ -1611,63 +1501,6 @@
   Interpolation and Normal Estimation Networks}
     \field{year}{2019}
     \warn{\item Invalid format of field 'month'}
-  \endentry
-
-  \entry{unstructed-pc-patch-stitching}{misc}{}
-    \name{author}{6}{}{%
-      {{hash=ZJ}{%
-         family={Zhou},
-         familyi={Z\bibinitperiod},
-         given={Jun},
-         giveni={J\bibinitperiod},
-      }}%
-      {{hash=JW}{%
-         family={Jin},
-         familyi={J\bibinitperiod},
-         given={Wei},
-         giveni={W\bibinitperiod},
-      }}%
-      {{hash=WM}{%
-         family={Wang},
-         familyi={W\bibinitperiod},
-         given={Mingjie},
-         giveni={M\bibinitperiod},
-      }}%
-      {{hash=LX}{%
-         family={Liu},
-         familyi={L\bibinitperiod},
-         given={Xiuping},
-         giveni={X\bibinitperiod},
-      }}%
-      {{hash=LZ}{%
-         family={Li},
-         familyi={L\bibinitperiod},
-         given={Zhiyang},
-         giveni={Z\bibinitperiod},
-      }}%
-      {{hash=LZ}{%
-         family={Liu},
-         familyi={L\bibinitperiod},
-         given={Zhaobin},
-         giveni={Z\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{ZJ+2}
-    \strng{fullhash}{ZJJWWMLXLZLZ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2021}
-    \field{labeldatesource}{}
-    \field{sortinit}{Z}
-    \field{sortinithash}{Z}
-    \verb{eprint}
-    \verb 2103.16066
-    \endverb
-    \field{title}{Fast and Accurate Normal Estimation for Point Cloud via Patch
-  Stitching}
-    \field{eprinttype}{arXiv}
-    \field{eprintclass}{cs.CV}
-    \field{year}{2021}
   \endentry
 \enddatalist
 \endinput

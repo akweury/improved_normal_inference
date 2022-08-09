@@ -4,81 +4,57 @@
 
 \label{ch:02} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-Surface normal inference is a widely researched topic and can be solved in multiple directions. Traditionally, it can be inferred from a point cloud. There exists many optimization based approaches to pixel-wise calculate surface normal using neighbor information of each point (\cite{optimized-methods}). \cite{Holzer.S} proposed a method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix. These approaches perform well on dense input data based on a well-chosen window size. However, in many practical dataset, like  (\cite{nyu} and \cite{kitti-depth}), the geometry information is provided as a depth map. The depth map can be used to convert to point cloud, but it is usually very noisy with many missing pixels and holes on dark, shiny or transparent regions. It gives more challenge on neighbor based approaches since no neighbor information exists in many of such areas. 
+Surface normal inference is a widely researched topic and can be solved in several ways. Traditionally, it can be derived from a point cloud. There are many optimization-based approaches to computing surface normals pixel-by-pixel using neighborhood information. \cite{optimized-methods} gives a comparison between some of these approaches. \cite{Holzer.S} proposed a method of using local neighbors with an interest parameter $ p $ and derives the surface normal from the eigenvectors of the corresponding covariance matrix. These approaches work well for dense input data based on a well-chosen window size.
+However, in many practical datasets such as NYU Depth Dataset V2 \cite{nyu} and KITTI-Depth\cite{kitti-depth}, the point clouds are often converted from depth maps.
+But the depth maps are usually very noisy and contains many missing pixels and holes in dark, shiny, or transparent areas. This poses more of a challenge for neighborhood-based approaches, as neighborhood information is not available in many of these areas. 
 
-In order to ease this problem, some of the approaches focus on depth map enhancement by estimating missing regions. \cite{depth-inpainting-distribution} proposed an approach considers the depth distributions of neighboring regions to fill the holes in the depth map. \cite{ncnn} use deep learning based approach for semi-dense depth map inpainting, which mainly utilized normalized convolution proposed by \cite{nconv}. This approach considers a 0-1 mask to distinguish valid and invalid data points. \cite{pncnn} improved this approach by proposing an input confidence estimation network to replace the binary mask with a estimated confidence mask. \cite{depth-enhance-guided} uses normalized convolution for depth map inpainting as well and also use RGB image as the guidance. 
-
-On the other hand, some of the approaches use RGB image to estimate depth map or surface normal or use RGB-D image to estimate surface normal. 
-\cite{Eigen} proposed a two staged network for depth map prediction based on RGB image, which consider the global features and the local features respectively. \cite{img2depth} also predicts the depth map from image, which employed Residual Network for the feature extraction and further designed a up-sampling part with the un-polling layers. 
-\cite{binsformer} proposed a method adaptively generate information to predict depth maps based on RGB image. 
-\cite{geometry_based_solution} uses RGB-D images to estimate surface normal. It proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
-\cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}. 
-\cite{hfm} based on UNet architecture for normal estimation using RGB-D image as input. 
-
-However, these approaches mainly rely on RGB images as input for normal estimation or depth inference and applied for indoor scenarios like bedroom or office, which does not focus on fine details of the surface but only main directions of the regions like direction of floor, walls, seats, etc.
-
-
-%% photometric stereo
-Photometric stereo is another approach that infer surface normal from BRDF based surface model. The surface normal is related with observed intensity, the incoming light direction, the outgoing viewing direction and the light intensity. It required multiple light conditions to get an optimal solution. \cite{CNN-PS} uses a CNN based approach to learn the relationship between photometric stereo input and the surface normal under hundreds of lights which also robust to the effect of global illuminations. \cite{spline-net} based on a lighting interpolation network to use only a sparse set of lights for photometric stereo task.
-
-
-Our approach utilizes a single light position as illumination information and further use RGB-D image to provide geometry information observed intensity for surface normal inference, which takes multiple input data type into consideration for normal estimation, which is supposed to improve single input data type approach under the same condition.
+To solve this problem, some approaches focus on improving the depth map by estimating missing regions. \cite{depth-inpainting-distribution} proposed an approach that considers the depth distributions of neighboring regions to fill the holes in the depth map. \cite{ncnn} uses a deep learning-based approach for painting semi-dense depth maps, which mainly uses the normalized convolution proposed by \cite{nconv}. This approach considers a 0-1 mask to distinguish valid and invalid data points. \cite{pncnn} improved this approach by proposing an input confidence estimation network to replace the binary mask with an estimated confidence mask. \cite{depth-enhance-guided} also uses a normalized convolution for inpainting the depth map and also uses an RGB image as a guidance. 
 
 
 
 
 
-%For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor (KNN) is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. To ease this problem, \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. To calculate the normals of multiple points in parallel \cite{unstructed-pc-patch-stitching} processes a series of overlapping patches for normal estimation. 
-%
-%
 
 
-%% depth map approach
+On the other hand, some of the approaches use RGB-D images to estimate the surface normal or use RGB images to estimate the fully dense depth map.
+\cite{Eigen} proposed a two-level network for predicting the depth map based on RGB images, where the global and local features of the object are considered separately. \cite{img2depth} also predicts the depth map from the image, using a residual network for feature extraction and developing an up-sampling part with the un-polling layers. 
+\cite{binsformer} proposed a method that adaptively generates depth map prediction information based on RGB images. 
+\cite{geometry_based_solution} uses RGB-D images to estimate surface normals. It proposes a method for learning discriminative and geometrically informative primitives from RGB-D images, which is then used to recover the surface normals of a scene from a single image. 
+\cite{GeoNet} uses ResNet \cite{resnet} to derive a coarse surface normal from an RGB image, and refines it using a depth map based on the \cite{geometry_based_solution} method. 
+\cite{hfm} derives surface normals based on an RGB-D image using the \textit{U-Net} architecture.
+
+However, these approaches mainly rely on RGB images as input for estimating the normal or the full depth map. The applied scenarios are mainly indoor scenes such as bedrooms or offices, where the focus is not on the fine details of the object surface, but only on the main directions of each area, such as the directions of the floor, walls, or seats, etc as shown in Figure \ref{fig:dataset-comparison}
+
+\begin{figure}[h!]
+	\centering
+	\captionsetup{width=\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/nyu_depth_v2_img.jpg}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/nyu_depth_v2_depth.jpg}
+	\caption{}
+\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/train-image.png}
+	\caption{}
+\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/train-depth-noise.png}
+	\caption{}
+\end{subfigure}
+	\decoRule
+	\caption{(a)-(b): Output from the RGB camera (a) and depth camera (b) of a scene in \textit{NYU Depth Dataset V2} \cite{nyu}. (c)-(d): Output from the gray-scale camera (c) and depth camera (d) of a scene in our proposed dataset \textit{synthetic-50-5}.}
+	\label{fig:dataset-comparison}
+\end{figure}
+%% Photometric Stereo
+Photometric stereo is another approach that derives the surface normal from the BRDF-based surface model. The surface normal is related to the observed intensity, the direction of incident light, the direction of outgoing light, and the light intensity. Several light conditions are required to obtain an optimal solution. \cite{CNN-PS} uses a CNN-based approach to learn the relationship between photometric stereo input and the surface normal under hundreds of lighting conditions, which is also robust to the effects of global illuminations. \cite{spline-net} is based on an illumination interpolation network to use only a sparse set of lights for photometric stereo tasks.
 
 
-%% photometric approach
+Our approach uses an RGB-D image but known light direction and calibrated information for surface normal inference, which considers multiple input data types into account for the estimation. 
 
-%
-%%% depth map approach
-%Surface normal inference is a widely researched topic and can be solved in multiple directions. Based on a structured point cloud, the surface normal can be derived from geometry information of the point cloud, which mainly utilizes the neighbor information and consider it as an optimization problem (\cite{optimized-methods} ). They can perform well on dense point cloud input data based on a well-chosen window size. However, the drawbacks are that the algorithms are highly noise sensitive. 
-%The point cloud is usually not fully dense and normally converted from depth map, which are usually with missing pixels and holes on dark, shinny or transparent regions (\cite{nyu}). The missing points destabilizes the geometry based solution. To ease this problem, \cite{Holzer.S} proposed method to use local neighbors with an interest parameter $ p $ and compute the eigenvectors of the corresponding covariance matrix, which is used to smooth the depth data in order to handle the noise of depth image.  \cite{depth-inpainting-distribution} proposed an approach considers the depth distributions of neighboring regions to fill the holes in the depth map. 
-%Some approaches use deep learning method to fill missing areas. \cite{nconv} introduces normalized convolution to deal with missing or uncertain depth data with an added mask on the standard convolution operation. \cite{ncnn} applied it and use it as normalized convolution layers in their networks, which aims to reconstruct the missing pixels from the sparse depth map sensed by cameras. \cite{pncnn} proposed an input confidence estimation network to estimate the confidence instead of using a binary mask.
-%
-%
-%%% photometric approach
-%Photometric stereo is another approach that infer surface normal from BRDF based surface model. The surface normal is related with observed intensity, the incoming light direction, the outgoing viewing direction and the light intensity. It required multiple light conditions to get an optimal solution. 
-%
-%
-%
-%
-%
-%
-%
-%%% fusion approach
-%
-%
-%%% talk about gated convolution, Unet
-%
-%%% in summary
-%
-%\paragraph{Unstructured Point Cloud Based}
-%For the unstructured point cloud, the neighbor information of each point is usually unknown. K-nearest neighbor (KNN) is a common algorithm for neighbor searching. With knowing this information, the neighbor based approaches can be used as a second step. However, KNN-method merely based on the Euclidean distance in the 3D space. Therefore, the points of the other surfaces but in a close distance will also be considered as neighbors. To ease this problem, \cite{unstructed-pc} proposed a method based on unstructured point cloud with selecting the optimal scale around each point for normal estimation. To calculate the normals of multiple points in parallel \cite{unstructed-pc-patch-stitching} processes a series of overlapping patches for normal estimation. 
-%
-%
-%
-%Deep learning based methods take single RGB image or RGB-D image as the input for normal estimation. It has a strong relationship with the depth inference tasks, two benchmarks are highly used in these area. (\cite{nyu} and \cite{kitti-depth}) Based on the input of training model, the methods can be roughly divided as follows: 
-%
-%
-%
-%\paragraph{RGB based} RGB based methods predict the depth map diretly from single RGB image.
-%\cite{Eigen} proposed a two staged network for depth map prediction based on RGB image, which consider the global features and the local features respectively. \cite{img2depth} employed Residual Network for the feature extraction and further designed a upsampling part which replace the fully-connected layer with the unpolling layers. 
-%\cite{geometry_based_solution} proposed a method to learn discriminative and geometrically informative primitives from RGBD images, which is further used to recover the surface normals of a scene from a single image. 
-%\cite{GeoNet} uses ResNet (\cite{resnet}) to infer a coarse surface normal based on RGB image, and further refine it with the help of depth map based on the methods based on \cite{geometry_based_solution}. \cite{binsformer} proposed a method achieved state of art in NYUv2 Dataset (\cite{nyu}), which adaptively generate information to predict depth maps based on RGB image.
-%
-%\paragraph{RGB-D based}
-%\cite{hfm} based on UNet architecture for normal estimation using RGB-D image as input. The RGB image and depth map are in the separate branches and imply a fusion module in four sections of the network to concatenate two branches. It also considers the confidence of the values in depth map.
-%
-%\cite{depth-enhance-guided} further integrated RGB image as the guidance to deal with the missing pixels in the depth map. 
+
 
 
 

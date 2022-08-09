@@ -42,10 +42,11 @@ headsepline, % Uncomment to get a line under the header
 %\usepackage[T1]{fontenc} % Output font encoding for international characters
 
 \usepackage{amssymb}
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles \left( APA)
+%\usepackage[backend=bibte,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles \left( APA)
+
+\usepackage[backend=bibtex,style=numeric]{biblatex}
 
 \addbibresource{example.bib} % The filename of the bibliography
-
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 \usepackage{import}
 \usepackage{float}
@@ -59,6 +60,10 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{pdfpages}
 \usepackage{pgfplots}
 \usepackage{rotating}
+\usepackage{caption}
+\captionsetup[figure]{font=normalsize,labelfont=normalsize}
+\captionsetup{justification   = raggedright,
+	singlelinecheck = false, width=\linewidth}
 \usetikzlibrary{fit}
 \usetikzlibrary{calc,patterns,angles,quotes}
 \usetikzlibrary {arrows.meta,graphs,shapes.misc}
@@ -112,9 +117,9 @@ headsepline, % Uncomment to get a line under the header
 \subject{Computer Science} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
 \keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
 \university{\href{https://www.uni-kl.de/}{Technische Universität Kaiserslautern}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\department{\href{https://www.informatik.uni-kl.de/}{German Research Center for Artificial Intelligence}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
+\department{\href{https://www.informatik.uni-kl.de/}{Department of Computer Science}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
 \group{\href{https://av.dfki.de/}{Augmented Vision}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-\faculty{\href{http://faculty.university.com}{Faculty Name}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+\faculty{\href{https://av.dfki.de/}{Augmented Vision}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
 
 \AtBeginDocument{
 \hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
@@ -152,7 +157,7 @@ headsepline, % Uncomment to get a line under the header
 \end{minipage}
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushright} \large
-\emph{Supervisor:} \\
+\emph{Supervisors:} \\
 \href{https://av.dfki.de/members/stricker/}{\supname}\\
 \href{https://av.dfki.de/members/fetzer/}{M. Sc. Torben \textsc{Fetzer}}
  % Supervisor name - remove the \href bracket to remove the link  
@@ -162,7 +167,8 @@ headsepline, % Uncomment to get a line under the header
 \vfill
 
 
-\groupname\\\deptname\\ % Research group name and department name
+\groupname\\
+\deptname\\ % Research group name and department name
 \includegraphics{Figures/TUK_LOGO_RGB}\\[2cm] % Research group name and department name
  
 \vfill
@@ -216,20 +222,23 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-We proposed a learning based approach for surface normal estimation based on illuminated calibrated RGB-D image. 
-Different with other methods, the approach not only base on geometry information, but also takes the photometric stereo approach into account, which use calibrated illuminated image to further improve the performance. The two types of data gives a superior performance on normal inference task. One of the key points of our approach is, the proposed method require only one light source for each scene capture instead of multiple light positions, which can be very easy to configure in the practice. 
+In this work, a learning based approach for surface normal estimation based on illuminiated calibrated RGB-D images is proposed.
 
-Our model is trained on a  gated convolution neural network called (Trip-Net). The gated convolution design is supposed to handle the semi-dense depth map input, which is a common artefact by the depth sensor. Furthermore, a dataset based on 55 point clouds called ``synthetic-50-5“ in created for training. We trained our model on this synthetic dataset then further applied it to real dataset. A qualitative and quantitative evaluation is reported in the end.
+This approach extends the geometry based approach by techniques of photometric stereo, which uses calibrated illuminated images for normal estimation. 
+The two types of data gives a superior performance on normal inference task. One of the key points of our approach is, the proposed method require only one light source for each scene capture instead of multiple light sources, which can be very easy to configure in the practice. 
+
+Our model is trained on a gated convolution neural network (Trip-Net). The gated convolution design is intended to handle the missing pixels in the depth map, which is a common defect of the depth sensor. We also created a dataset of 55 point clouds called \textit{Synthetic-50-5} for training. We trained our model on this synthetic dataset and then applied it to a real dataset. Finally, a qualitative and quantitative evaluation is performed.
+
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
 
-\begin{acknowledgements}
-\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
-\end{acknowledgements}
+%\begin{acknowledgements}
+%\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
+%The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
+%\end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES PAGES
@@ -237,9 +246,7 @@ The acknowledgments and the people to thank go here, don't forget to include you
 
 \tableofcontents % Prints the main table of contents
 
-\listoffigures % Prints the list of figures
 
-\listoftables % Prints the list of tables
 
 %----------------------------------------------------------------------------------------
 %	ABBREVIATIONS
@@ -269,8 +276,8 @@ The acknowledgments and the people to thank go here, don't forget to include you
 %----------------------------------------------------------------------------------------
 %	DEDICATION
 %----------------------------------------------------------------------------------------
-
-\dedicatory{To my fire} 
+%
+%\dedicatory{To my fire} 
 
 %----------------------------------------------------------------------------------------
 %	THESIS CONTENT - CHAPTERS
@@ -302,7 +309,8 @@ The acknowledgments and the people to thank go here, don't forget to include you
 \include{Appendices/AppendixA}
 \include{Appendices/AppendixB}
 %\include{Appendices/AppendixC}
-
+\listoffigures % Prints the list of figures
+\listoftables % Prints the list of tables
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------

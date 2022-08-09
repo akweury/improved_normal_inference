@@ -3,7 +3,7 @@
 
 \section{Training Details}
 
-The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 $ in height and width, an image with dimension $ 128\times 128 \times 1 $.  The depth map is converted to 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes has corresponding 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. 
+The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 $ in height and width, an image with dimension $ 128\times 128 $.  The depth map is converted from 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes correspond 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. Figure \ref{fig:test-scene} shows some of the training cases. Note that the position of objects are not placed always naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
 
 \begin{figure}[H]
 	\centering
@@ -44,13 +44,12 @@ The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{
 \end{figure}
 
 
-The training processes are evaluated in every epochs with 100 evaluation scenes that models never seen before, which contains the 5 different objects in the ``synthetic-50-5" test set. Figure \ref{fig:test-scene} shows some of the test scenes during the training work. Note that the position of objects are not placed always naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
+Besides the 3000 training scenes, 100 extra scenes containing 5 different object models are as evaluation dataset during the training. They are evaluated in each epoch. 
 
-For the training parameters, we set the training pipeline with batch size $ 8 $, we found that a higher batch size will reduce the final performance.  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, learning schedule [8,1000], learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTXA 6000. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the evaluation on the test dataset converged.
+For the training parameters, we set the training pipeline with batch size $ 8 $, we found that a higher batch size will reduce the final performance.  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, it will decay at epoch 8 with learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTXA 6000. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the angle error of the normal map stop decreasing.
 
-
-GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal based on geometry information. It uses vertex map as input to estimate the corresponding tangent surface normal map. In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to verify the performance the gated convolution layers. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
-Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. We use Reversed Huber Loss as loss function during the training, since we found it gives a better final error compare to L2 loss. 
+GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal as a geometry based approach. It uses vertex map as input to estimate the corresponding tangent surface normal map. In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to compare the performance between gated convolution layer and standard convolution layer for our normal inference task. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
+Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. We use Reversed Huber Loss as loss function during the training. We found it gives a better final error compare to L2 loss. 
 
 
 
@@ -75,11 +74,9 @@ Another model called ``NOC" is designed to verify the skip connection, which sim
 
 
 The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. When we train this model, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture.
-Since it is more complicate than GCNN, we also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate.  we set $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
+We also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate, we set it as $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
 
-We also found that, trip-Net with four times fusion converges obviously faster than fewer fusion times model. However, model F3 with 3 times fusion converge slower than F4 but in the end it achieves a similar evaluation loss with F4(see Qualitative evaluation). The F1 and F2 models are relatively weaker than the other two models. 
-
-However, the sacrifice of accuracy gives a relatively lighter model. Since we remove the fusions between different pipes, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
+During the training we found that trip-Net with four times fusion converges obviously faster than fewer fusion times model. However, model F3 with 3 times fusion converge slower than F4 but in the end it achieves a similar evaluation loss with F4(see Qualitative evaluation). The F1 and F2 models are relatively less accurate than the other two models, but the sacrifice of accuracy gives a relatively lighter model. Since they have less fusion times, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained in a faster way and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
 
 
 \begin{table}[H]
@@ -103,12 +100,12 @@ However, the sacrifice of accuracy gives a relatively lighter model. Since we re
 \end{table}
 
 
-\section{Quantitative Evaluation}
+\section{Quantitative Evaluation on 6 Metrics}
 We evaluated our models on synthetic dataset with resolution $ 128\times 128 $. 
-Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robust to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
+Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robustness to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
 
 \paragraph{Average Angle Error Metric}
-The metric calculate the average angle error for each point between the inferred normal and ground-truth normal. 
+The metric calculate the average angle error for each point between the inferred normal and ground-truth normal map. 
 \paragraph{Median Angle Error Metric}
 The metric calculate the median angle error of all the point in the normal map.
 \paragraph{5 Degree Error Metric}
@@ -120,11 +117,11 @@ The metric calculate the percentage of the predicted normals that has error less
 \paragraph{30 Degree Error Metric}
 The metric calculate the percentage of the predicted normals that has error less than 30 degrees comparing to ground-truth.
 
-We evaluate the trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
+We evaluated our trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
 
 When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline. 
 
-From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like $ dragon $ achieves 98\%. The best performance is around 90\%, 75 \%, 45 \% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metric respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the$ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the model.
+From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like $ dragon $ achieves 98\%. The best performance is around 90\%, 75 \%, 45 \% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metrics respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the$ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the models.
 
 
 %% mean metric
@@ -267,48 +264,48 @@ From the table we can see that all the learning based approaches achieves a bett
 
 
 %% svd evaluation
-\section{Visual evaluation on SVD}
+\section{Visual Evaluation on SVD}
 
 The SVD approach can predict the normal map in a good way when the given point cloud is dense. As shown in Figure \ref{fig:svd-normal}. It can successfully predict the smooth surface of the dragon object, especially the flakes and the tails of the dragon. 
 
 However, it failed in the areas such as hindleg, horn and the mouth, which consists mainly by sharp edges. This is because the neighbors points in these area do not hold the assumption of coplanarity well, the normals of these neighbors can be very different. 
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_groundtruth.png}
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_normal_SVD.png}
-	\includegraphics[width=.25\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_error_SVD.png}
+	\includegraphics[width=.32\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_groundtruth.png}
+	\includegraphics[width=.32\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_normal_SVD.png}
+	\includegraphics[width=.32\textwidth]{./Figures/svd-synthetic/no-noise/fancy_eval_2_error_SVD.png}
 	\decoRule
+	\caption{Normal map of a dragon object predicted by neighbor based method. k=2, angle error=5. \textbf{Left}: ground-truth normal map \textbf{Middle}: predicted normal map, \textbf{Right}: Error map}
 	\label{fig:svd-normal}
-	\caption{Normal map of a dragon object predicted by neighbor based method. k=2, angle error=5 \textbf{Left}: ground-truth normal map \textbf{Middle}: predicted normal map, \textbf{Right}: Error map}
 \end{figure}
-The neighbor based method is depended on a well-chosen parameter $ k $. Figure \ref{fig:svd-k-eval} shows the evaluation on different $ k $ values. When $ k=1 $, the average error of the whole image is the lowest one, most of the normals are close to the ground-truth but the outline edges, which are the areas that surface normal changed extremely sever. For the case $ k=2 $, the sharp edges are more smooth and cause more error, like the eyes area of the dragon. Compare to the first case, the outline edge error goes better. Most of the edge errors are reduced when $ k=2 $, since more neighbor points join the evaluation and it reduces the effect of outliers. However, for the area of horn outline, hindleg outline, the error goes worse. In this case, most of the neighbors of these points are outliers and thus failed this approach.  $ k=3 $ and $ k=4 $ further increase the angle errors based on $ k=2 $.
+The SVD approach is depended on a well-chosen parameter $ k $. Figure \ref{fig:svd-k-eval} shows the evaluation on different $ k $ values. When $ k=1 $, the average error of the whole image is the lowest one, most of the normals are close to the ground-truth but the outline edges, which are the areas that surface normal changed extremely sever. For the case $ k=2 $, the sharp edges are more smooth and cause more error, like the eyes area of the dragon. Compare to the first case, the outline edge error goes better. Most of the edge errors are reduced when $ k=2 $, since more neighbor points join the evaluation and it reduces the effect of outliers. However, for the area of horn outline, hindleg outline, the error goes worse. In this case, most of the neighbors of these points are outliers and thus failed this approach.  $ k=3 $ and $ k=4 $ further increase the angle errors based on $ k=2 $.
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k1.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k2.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k3.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/k-compare/k4.png}	
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/k-compare/k1.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/k-compare/k2.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/k-compare/k3.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/k-compare/k4.png}	
 	\decoRule
-	\label{fig:svd-k-eval}
 	\caption{Error map of neighbor based method with different $ k $ values. From left to right, $ k=1,2,3,4 $ separately.}
+	\label{fig:svd-k-eval}
 \end{figure}
 
 The performance of neighbor based method is good enough for a well chosen $ k $. However, for the case of noised point cloud as input, this approach will broken, since the noise will failed the neighbor assumption and also reduce the number of possible neighbors of each point for a fixed $ k $.
 \begin{figure}[th]
 	\centering
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_point_cloud_noise.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_groundtruth.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_normal_SVD.png}
-	\includegraphics[width=.2\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_error_SVD.png}	
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_point_cloud_noise.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_groundtruth.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_normal_SVD.png}
+	\includegraphics[width=.24\textwidth]{./Figures/svd-synthetic/noise/fancy_eval_2_error_SVD.png}	
 	\decoRule
-	\label{fig:svd-noise}
 	\caption{SVD visual evaluation on a noised dragon model ($ 128\times128 $)}
+	\label{fig:svd-noise}
 \end{figure}
 
-\section{Visual evaluation on GCNN model}
-A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure. \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg and the head area of dragon object, CNN model gives a much brighter error map (which means a higher angle error).
+\section{Visual Evaluation on GCNN}
+A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eval}. As shown in the figure, GCNN model achieved a mean angle error in 9 degrees on this dragon object. The image has an overall good performance on the whole object. A closer evaluation is shown in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy especially good on the smooth surface, like the body area. In the same case, NOC model as shown in Figure \ref{fig:gcnn-eval-multi-model} has a overall worse normal than GCNN model in the smooth area. CNN model keeps the skip connection thus gives a sharper result than NOC model, however, the overall smooth part of the model is still worse than GCNN. Besides, the sharp area like the hindleg and the head area of dragon object, CNN model gives a much brighter error map (which means a higher angle error). Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model.
 
-Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we can get a good result from GCNN model but from model ``Washington" we still can see it lacks the sharpness in the detail area like the face and clothes area. 
+We can get a good result from GCNN model, but from model ``Washington" we still can see it lacks the sharpness in the detail area like the face and clothes area. 
 
 
 %% GCNN-eval
@@ -428,17 +425,18 @@ Figure \ref{fig:gcnn-eval-more} shows more evaluation on GCNN model. Although we
 \end{figure}
 
 
-\section{ Discussion about the feature maps of GCNN architecture models}
+\section{Discussion on the Feature Maps in GCNN}
 
-As shown in figure \ref{fig:gcnn-cnn-feature map}, we also visualize the feature maps of the last gated convolution layer in the first up-sampling part for CNN and GCNN models, which corresponding the feature maps with size $ 32\times 32 $ in width and height. The input data is also same dragon object that we used for normal visualization. For each feature map, we map the minimum value to the left-most color in the color bar and the maximum value to the right-most color in the color bar. 
-We want to discuss the the different of the feature maps between CNN, NOC and GCNN models.
+As shown in figure \ref{fig:gcnn-cnn-feature map}, we also visualize the feature maps of the last gated convolution layer in the first up-sampling part for CNN and GCNN models, which corresponding the 128 feature maps with size $ 32\times 32 $ in width and height. The input data is also same dragon object that we used for normal visualization. For each feature map, we map the minimum value to the left-most color in the color bar and the maximum value to the right-most color in the color bar. 
+We want to discuss the the difference of the feature maps between CNN, NOC and GCNN models.
 
-In order to see the result clearly, we use one color for the feature map visualization and use the brightness to distinguish the scale of the vales, the white corresponds 1, the black corresponds 0, green color corresponds some value in between. 
+In order to see the result clearly, we use one color for the feature map visualization and use the brightness to distinguish the scale of the values, the white corresponds 1, the black corresponds 0, and the green-hue colors corresponds some values in between. 
 
-From the CNN feature maps, we can see that the brightness areas are distributed all around the feature maps. For the GCNN feature maps, the brightness areas are usually concentrate only in few pixels. If we map the brightness areas to the original image, they correspond to the dense sharp edges areas, which is usually the hardest areas for normal estimation task. We suspect that these feature maps are the detail feature maps that extract from sharp edges. Based on this assumption, we can say that gated convolution layer describes the detail features in a more accurate way compare to standard convolution layer, since the brightness areas is smaller. Most of the GCNN feature maps usually has only one bright pixel with a few set of dim green pixels whereas CNN feature maps has more bright pixels with a lot of dim pixels all around the image. This accurate feature extraction provides our GCNN model a better performance on the detail area.
+From the CNN feature maps, we can see that the high value areas are usually more than one in a single feature map. Many of them have more than two bright areas. 
+ For the GCNN feature maps, the brightness areas are usually concentrate only in one area or even one point. If we map the brightness areas to the original image, they correspond to the dense sharp edges areas, like mouse, horn, or tail of the dragon object, which is usually the hardest areas for normal estimation task. We suspect that these feature maps with few bright areas or only one bright area are the detail feature maps that for sharp edges inference. Based on this assumption, we can say that gated convolution layer describes the detail features in a more accurate way compare to standard convolution layer, since the brightness areas is smaller. Most of the GCNN feature maps usually has only one bright pixel with a few set of dim green pixels whereas CNN feature maps has more bright pixels with a lot of dim pixels all around the image. This accurate feature extraction provides our GCNN model a better performance on the detail area.
 
-Second, for the GCNN model,  we observed that some feature maps have no  small bright areas but bright areas distributed evenly on the whole object. Some of the feature maps has a overall medium value some has a value close to 1. Nevertheless, these feature maps are different from the detail feature maps with only few pixels with high values(brightness). We suspect that these features maps provides an over-view of the objects for a coarse prediction. So that they can cooperate with detail feature maps to sharpen the prediction. It also holds for NOC model, since it does not equip with skip connection, most of the feature maps are global feature maps with an evenly bright feature maps, so that the corresponding normal maps predicted by NOC model are more coarse. For the CNN model, there also exists global feature maps, however, they are mostly incomplete, either missing the tails or missing the paws. 
-Actually, these missing areas can usually be found in the detail feature maps. This also explained why the CNN detail feature maps has too much brightness areas, the detail feature maps and global feature maps are mixed together. And this unclear feature map extractor leads to the weak performance on normal estimation.
+Second, for the GCNN model,  we observed that some feature maps have very evenly bright areas distributed on the whole object. They are either overall dim or overall bright. Nevertheless, these feature maps are different from the detail feature maps with only few pixels with high values(brightness) but most of the other pixels with relatively low values. We suspect that these evenly value distributed features maps are the global feature maps that provide an over-view of the objects for a coarse prediction. So that they can cooperate with detail feature maps and further used to sharpen the prediction. It also holds for NOC model, since it does not equip with skip connections, most of the feature maps are global feature maps, so that the corresponding normal maps predicted by NOC model are more coarse than the GCNN model. For the CNN model, there also exists global feature maps, however, they are mostly incomplete, either missing the tails or missing the paws. 
+Actually, these missing areas can usually be found in the detail feature maps. This also explained why the CNN detail feature maps has several bright areas in their detail feature maps. The detail feature maps and global feature maps are mixed together. And this unclear feature map extractor leads to reduce the performance on normal estimation task.
 
 %% feature maps comparison
 \begin{figure}[H]
@@ -460,10 +458,10 @@ Actually, these missing areas can usually be found in the detail feature maps. T
 \end{subfigure}
 	
 		\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[text width=0.1\textwidth] at (11,-1) {1};
 		\node[inner sep=0pt] (input) at (8,-1)
 		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
-		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
 	\end{tikzpicture}
 	\decoRule
 	\caption{Feature maps of GCNN architecture based models at the first up-sampling gated convolution layer. All 128 feature maps are visualized for each model with normalization and filtered background.}
@@ -472,7 +470,7 @@ Actually, these missing areas can usually be found in the detail feature maps. T
 
 
 \newpage 
-\section{Visual evaluation on Trip-Net models }
+\section{Visual Evaluation on Trip-Net}
 
 For the approach using illuminated calibrated RGBD image, the task is undertaken by Trip-Net introduced in \ref{sec:trip-net}. The Trip-Net uses illuminated information align with the geometry information achieves a sharper and more accurate result compare to the GCNN model.
 
@@ -509,7 +507,7 @@ For the approach using illuminated calibrated RGBD image, the task is undertaken
 
 
 
-The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is 6 degree whereas the GCNN is 9. 
+The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to show the effectiveness of added illuminated information, the training settings for all the models are exact the same. We also use the same input as we did in GCNN evaluation. The error of Trip-Net is $ 6^\circ $ whereas the GCNN is $ 9^\circ $. 
 
 
 %% tripNet zoom in eval
@@ -558,9 +556,10 @@ The qualitative evaluation is shown in figure \ref{fig:trip-eval}. In order to s
 \end{figure}
 
 
-As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and also close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN. It seems that the illumination helps the model to learn sharper features in the network.
+As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on the dragon body is much easier to detect and also close to the ground-truth. The head region gives a sharper edge prediction. All of the five sampled zoom-in regions in the Trip-Net has a better performance than GCNN. 
 
 
+Figure \ref{fig:tripnet-fusion-eval} compares different fusion times on Trip-Net model. We can see that model F1 with one fusion and and F2 with two fusions did not achieve a better result compare to GCNN model, which means the illuminated information doesn't work if we only consider the lower resolution feature maps. F3 model with 3 times fusion and F4 model with 4 times fusion give a much better result and also beyond the GCNN model. These two times fusion include high resolution features in the last up-sampling and the final output-size features before the standard convolution layers. We can observe the dragon scale in the figures, they are much sharper in the last two images.
 
 
 
@@ -608,14 +607,14 @@ As shown in the figure \ref{fig:tripnet-eval-synthetic-zoom-in}, the scale on th
 	
 	\decoRule
 	\caption{Comparison between different fusion times on Trip-Net Architecture ($ 128\times128 $). }
-	\label{fig:tripnet-eval-synthetic-zoom-in}
+	\label{fig:tripnet-fusion-eval}
 \end{figure}
 
 
 
 
-\section{Trining on higher resolution}
-We also prepared the dataset with resolution $ 512\times 512 $ for model evaluation. Higher resolution gives more information about the surface feature using the same model compare to lower resolution. The benefit is, if we extract a fixed sized patch from the normal map, say $ 32 \times 32 $, it might correspond a hindleg area of the dragon object in $ 128\times 128 $ resolution but maybe only a toe in $ 512\times 512 $ resolution. Therefore if we still use the same kernel size in the network for the same dataset, (like we did with $ 3\times 3 $) the higher the resolution it has, the less area it will cover. Thus the surface will more smooth and easy to calculate the surface normal. This is a good thing. Because then we might only need to use these $ 32\times 32 $ points to calculate a toe in $ 512\times512 $ resolution image. But in $ 128\times128 $ resolution image, the same area $ 32\times32 $ might corresponding to entire  hindleg of the dragon object. In another word, we can also say that the higher resolution ``smooth" the object surface. Thus the higher resolution helps the model to calculate a more accurate normal map. 
+\section{Trining on Higher Resolution}
+We also trained our models on a higher resolution dataset with $ 512\times 512 $ in width and height for each scene. Higher resolution data gives more information about the surface feature using the same model compare to lower resolution. The benefit is, if we extract a fixed sized patch from the normal map, say $ 32 \times 32 $, it might correspond a hindleg area of the dragon object in $ 128\times 128 $ resolution but maybe only a toe in $ 512\times 512 $ resolution. Therefore if we still use the same kernel size in the network for the same dataset, (like we did with $ 3\times 3 $) the higher the resolution it has, the less area it will cover. Thus the surface in the same window size will more smooth and easy to be calculated the surface normal. This is a good thing. Because then we might only need to use these $ 32\times 32 $ points to calculate a toe in $ 512\times512 $ resolution image. But in $ 128\times128 $ resolution image, the same area $ 32\times32 $ might corresponding to entire  hindleg of the dragon object. In another word, we can also say that the higher resolution ``smooth" the object surface within the same size area. Thus the higher resolution helps the model to calculate a more accurate normal maps. 
 
 
 %% 5 degree metric
@@ -649,7 +648,6 @@ Since our model is fully convolution network, the architecture keeps exactly sam
 
 
 
-\newpage 
 %% high resolution trip-net visualization
 \begin{figure}[th]
 	\centering
@@ -693,9 +691,9 @@ Since our model is fully convolution network, the architecture keeps exactly sam
 
 
 
-A quantitative evaluation is shown in table \ref{tab:high_resolution_eval}. It follows the same performance rank compare to lower resolution, which is GCNN better than SVD approach and Trip-Net slightly better than GCNN. The accuracy is 99 \% in the $ 30^\circ $ metric for Trip-Net and $ 5^\circ $ mean error.  A qualitative evaluation is shown in figure \ref{fig:trip-eval-high-resolution}, this is a figure object with both smooth area (the belly and arm) and highly detailed area with sharp surface (the uneven surface of stone table). Our models gives an average degree area at $ 5^\circ $. A comparison with other models is shown in figure \ref{fig:trip-eval-compare}.
+A quantitative evaluation is shown in table \ref{tab:high_resolution_eval}. It follows the same performance ranking compares to lower resolution, which is GCNN better than SVD approach and Trip-Net slightly better than GCNN. The accuracy is 99 \% in the $ 30^\circ $ metric. In mean error metric, the error is  $ 5^\circ $.  A qualitative evaluation is shown in figure \ref{fig:trip-eval-high-resolution}. We use a figure object with both smooth area (the belly and arm) and highly detailed area with sharp surface (the uneven surface of stone table) for evaluation. Our models gives an  $ 5^\circ $ in mean degree metric. 
 
-Another remarkable result is the SVD approach, which also gives a good result ($ 8.88^\circ $ in mean degree metric). Like we discussed, the surface are relative more smooth if we keep the same window size for normal inference. In the high resolution scenes, although the percentage of missing pixels in a fixed windows are remain the same compare to small resolution scenes, but the remain valid pixels are mainly on a relatively flat plane thus they are good enough for an accurate normal inference. Consequently, we can see from the error map in Figure \ref{fig:high_resolution_eval}, the sharp edges of the dragon, like the horns and the hindlegs, the SVD approach still has high errors.
+A comparison with other models is shown in figure \ref{fig:trip-eval-compare}. Note that we use the same dragon object (but slightly moved the place since they have been captured in different time in high resolution dataset) for evaluation this time as a coherent comparison with low resolution dataset. The SVD based approach gives a good result ($ 8.88^\circ $ in mean degree metric). Like we discussed, the surface are relatively more smooth if we keep the same window size for normal inference. In the high resolution scenes, although the percentage of missing pixels in a fixed windows are remain the same compare to small resolution scenes, but the remain valid pixels in the same window size are on a relatively flat plane thus they are good enough for an accurate normal inference. However, as we expected, we can still see the high degree error in the sharp edges of the dragon object, like the horns and the hindleg areas as shown in \ref{fig:trip-eval-compare}.
 
 
 
@@ -744,7 +742,7 @@ Another remarkable result is the SVD approach, which also gives a good result ($
 
 
 \section{Training on Real-Dataset}
-We also applied our model on a dataset that captured by a light scanner in our laboratory in order to see the applicability of our approaches. For the geometry information based approach, we directly use the GCNN model that trained on synthetic dataset, since it only require the depth map as input, the scenarios of two dataset are the same. For the illuminated calibrated RGB-D image based approach, the model has to be refined based on the real-dataset, since the light intensity and position, camera matrix are different. We refined the Trip-Net based on a pre-trained GCNN model with the same settings in previous experiments, and observe the results. 
+We also applied our model on a dataset that captured by a light scanner in our laboratory in order to see our model's applicability to the real-dataset. For the geometry information based approach, we directly use the GCNN model that trained on synthetic dataset since it only require the depth map as input, the scenarios of two dataset are the same. For the illuminated calibrated RGB-D image based approach, the model has to be refined based on the real-dataset, since the light intensity and position, camera matrix are different. We refined the Trip-Net based on a pre-trained GCNN model with the same settings in previous experiments, and observe the results. 
 
 \begin{table}[H]
 	\centering
@@ -766,17 +764,17 @@ We also applied our model on a dataset that captured by a light scanner in our l
 		\bottomrule
 	\end{tabular}
 	\caption{Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in real dataset.}	
-	\label{tab:high_resolution_eval}
+	\label{tab:real_eval}
 \end{table}
 
 
 
 
 
-Since in the real-dataset, we don't have a ground-truth for evaluation. But if we see directly from the visualization in figure \ref{fig:trip-eval-real}, we can see that Trip-Net approach has good ability to  ``mend" the missing pixels in the scenes and also gives a sharp result. The folds on the gowns are recognizable and even countable. \ref{fig:real_eval_compare} compares the Trip-Net with other approaches.
+Since in the real-dataset, we don't have a ground-truth for evaluation. But if we see directly from the visualization in figure \ref{fig:trip-eval-real}, we can see that Trip-Net approach has good ability to  ``mend" the missing pixels in the scenes and also gives a sharp result. The folds on the gowns are recognizable and even countable. Figure \ref{fig:real_eval_compare} compares the Trip-Net with other approaches.
 
 
-But we also noted that the big holes in the base stage remains in the depth maps. These big holes corresponds to the shinny and dark texture area, which common exists in the depth map captured by the scanners. Since these big holes are related with only special feature areas and also has irregular shapes, we didn't simulate this type of noise in the synthetic dataset but only with a random binary mask. Thus our models failed to mend missing big holes in the estimated normal map. This can be a further direction of this topic, that find a way to generate high similar depth map noise to get a more robust training dataset. 
+But we also noted that the big holes in the base stage remains in the normal maps. These big holes corresponds to the shinny and dark texture area, which common exist in the depth map captured by the scanners. Since these big holes are related with only special feature areas and also has irregular shapes, we didn't simulate this type of noise in the synthetic dataset but only with a sparse binary mask. Thus our models failed to mend missing big holes in the estimated normal map. This can be a further work of this topic, that find a way to generate high similar depth map noise to get a more robust training dataset. 
 
 
 \begin{figure}[th]

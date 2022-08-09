@@ -19,9 +19,9 @@ In this thesis, we use the Unity game engine for data generation. By using a $ C
 
 
 
-\section{Resource}
+\section{Data Resources}
 The object model we used are searched from internet.
-A set of point cloud datasets for computer vision research has been published by /cite[data1], /cite[data2], /cite[data3] and /cite[data4]. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. All objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds make the normal inference task trivial since the neighbor based method performs adequately for this kind of task. Some of the point clouds even contain pre-computed normal maps based on more advanced methods. They all provide the accurate ground truth for the supervised learning method.
+A set of point cloud datasets for computer vision research has been published by \cite{data1}, \cite{data2}, \cite{data3} and \cite{data4}. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. All objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds make the normal inference task trivial since the neighbor based method performs adequately for this kind of task. Some of the point clouds even contain pre-computed normal maps based on more advanced methods. They all provide the accurate ground truth for the supervised learning method.
 
 The \textit{synthetic50-5} is a dataset we generated in this thesis based on 50 point clouds as a training set and 5 point clouds as a test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. There are various categories of models, such as figure, animal, statue, toy, furniture, antique, and car model, some of which have relatively smooth surfaces, such as /textit[arm, bus, bunny, cat, zebra], and some of which have highly complicated details, such as \textit{Washington, Car-Engine, Armadillo}. 
 We created this dataset for normal inference tasks. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
@@ -62,8 +62,8 @@ We created this dataset for normal inference tasks. Figure \ref{fig:dataset-demo
 		\caption{baoshanlu}
 	\end{subfigure}
 	\decoRule
-	\label{fig:dataset-demo}
 	\caption{Point clouds scanned by high resolution scanners}
+	\label{fig:dataset-demo}
 \end{figure}
 Besides, some objects also have colored textures, as shown in the second row of Figure \ref{fig:dataset-demo}. This is specially prepared for the illuminated approach since they will take the image into account to evaluate the surface normal. By using textured models, our models become closer to the real dataset and have improved robustness, which can apply to the real dataset further.
 
@@ -72,7 +72,7 @@ Besides, some objects also have colored textures, as shown in the second row of 
 \definecolor{direction-light-color}{RGB}{255,244,214}
 \newcommand{\col}[1]{%
 	\textcolor{#1}{\vrule width 0.5cm}}
-\section{Synthesize Scenes using Unity}
+\section{Synthesizing Scenes using Unity}
 In order to simulate the data collection scenario close to the real world as much as possible. We did the following settings. A flat cylinder called $ stage $ is placed in the center of the 3D space as a platform to place objects. We fixed the stage in a predetermined position, which is not changed when images are captured. 
 To provide ambient light, one directional light with RGB color FFF4D6 /col[direction-light-color] is placed in a top-view direction at a distance of 25 meters, which also has a fixed location.
 An RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera captures the depth map and the gray-scale image, which is randomly arranged after each scene. The moving range of the camera has 0.1m in both directions of the X, Y, and Z axis and a 1-degree random changed Euler angle. 
@@ -138,36 +138,25 @@ One critical detail that we must care about is camera exposure. Or we have to co
 
 
 
-\section{Data preprocessing}
+\section{Data Preprocessing}
 The raw data captured from Unity required further preprocessing before feeding them into the training models. 
-A depth map is captured by a depth camera in Unity, which is a 1 channel image that contains information relating to the distance of the surfaces of the scene objects from a viewpoint. It can be saved as a 16-bit gray-scale image, i.e. each pixel in the range $0 - 65535$. 
+\paragraph{Depth Map}
+A depth map is captured by the depth camera in Unity, which is a 1 channel image that contains information relating to the Z-axis distance from object surface to the camera. It is saved as a 16-bit gray-scale image, i.e. each pixel in the range $\mathtt{0 - 65535}$. 
+
+The raw depth maps in real data that captured by light scanners usually have missing pixels. In order to fit well with real data, the synthetic data has been added uniform distributed noise, which randomly removes the valid pixels in the maps.
+The simulated noise is distributed evenly around the whole map with specific noise intensity. A parameter $ \mu $ is used to control the intensity of noise. It denotes the $ \mu $-percent pixel drop-off. For example, $ \mu-10 $ removes 10\% pixels randomly. For each scene, the noise operation based on a random $ \mu $ in a range $ \left[0, 50\right]  $ is used. Some scenes have more missing pixels and some have fewer. The random noise intensity also enables the model to learn scenarios not only with noise but also with minor noise or even without noise.
+Figure \ref{fig:noise-intensity} shows the noise effect with different $ \mu $.
+%% add noise image
+\begin{figure}[!h]
+	\centering
+	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
+	\decoRule
+	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
+	\label{fig:noise-intensity}
+\end{figure}
 
 
-The gray-scale image can be used as a guided normal inference task and also as a readable scene for humans. Since the image captured by the camera is in RGB format, we need to convert it to gray colors for our models. It is based on the following equation.
-\[ gray: \frac{R+2G+B}{4}  \]
-
-The normal map is the tangent surface normal, which is saved in a 32-bit RGB color image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on the following equation:
-\begin{dgroup*}
-	\begin{dmath*}
-		n_x = \frac{R}{255} * 2 - 1
-	\end{dmath*}
-	\begin{dmath*}
-		n_y = \frac{G}{255}*2 - 1
-	\end{dmath*} 
-	\begin{dmath*}
-		n_z = 1-\frac{B}{255} * 2
-	\end{dmath*}
-\end{dgroup*}
-
-If consider the relation between Lambertian reflection and normal direction, the light source can be used to calculate the reflect direction of each point.
-
-The camera intrinsic and extrinsic matrix helps point cloud calculation.
-
-\subsection{Convert to Point Cloud}
-\label{sec:depth-map-to-point-cloud}
-
-The depth map can be converted to a 3D vertex point cloud as the input of the normal inference model. 
-
+The depth map is further converted to 3D vertex map after adding the noise.
 \begin{figure}[h!]
 	\centering
 	\begin{tikzpicture} 
@@ -195,7 +184,8 @@ The depth map can be converted to a 3D vertex point cloud as the input of the no
 	\label{fig:depth-triangulation}
 \end{figure}
 
-Consider a 3-dimensional Euclidean space. Use $ z $ axis to denote the depth. The $ x  $ and $ y $ axis are perpendicular to each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ regarding camera coordinate system. The $ X $ and $ Y $ can be calculated based on the triangle similarity.
+Consider a 3-dimensional Euclidean space. Use $ z $ axis to denote the depth. The $ x  $ and $ y $ axis are perpendicular to each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ regarding camera coordinate system. Knowing $ Z $, corresponding depth map pixel $ D(u,v) $ and the camera focal length in pixels $ fk_u, fk_v $, the other two component  $ X $ and $ Y $ in the 3D space can be calculated based on the triangle similarity.
+
 \begin{dgroup*}
 	
 	\begin{dmath*}
@@ -205,15 +195,13 @@ Consider a 3-dimensional Euclidean space. Use $ z $ axis to denote the depth. Th
 		Y = \frac{vZ}{fk_v}
 	\end{dmath*}
 \end{dgroup*}
-where $ fk_u, fk_v $ is the focal length in pixels align $ u $ and $ v $ axes.
-Converted a point from camera coordinate system to the world coordinate system, using extrinsic matrix $ R $ and $ t $
+Convert a point from camera coordinate system to the world coordinate system, using extrinsic matrix $ R $ and $ t $
 \[P_W = P_CR+t \]
 
-\subsection{Point Cloud Normalization}
-\label{sec:dataset-normalization}
+
 %% How to represent input tensor, to make it fast converse
-The sizes of each training object are various, whereas it should be as an invariant value for the training model. Thus normalization is required before feeding training objects into the models.
-We showed the data fluctuation in each axis in Figure \ref{fig:data-range}. Table \ref{tab:data-range} gives a quantitative evaluation of the corresponding average values. 
+The sizes of each training object are various, we normalized them to an unit scale thus they has relatively similar distance to the camera.
+We showed the value fluctuation in each axis in Figure \ref{fig:data_range} before normalization. Table \ref{tab:data_range} gives a quantitative evaluation of the corresponding average values. 
 
 The normalization has been performed as follows. First, translate the points to the original point as close as possible, then choose the range value of one axis as a scale factor, and normalize the points to unit vectors. The equation is shown as follows
 \begin{dgroup*}
@@ -235,19 +223,19 @@ where $ s $ is a scale factor,
 \begin{dmath*}
 	s = \max(X)-\min(X)
 \end{dmath*}
-It is calculated as the range of the $ X $ axis, but theoretically can be used by the $ Y $ or $ Z $ axes as well.
+which is calculated as the range of the $ X $ axis, but theoretically can be used by the $ Y $ or $ Z $ axes as well.
 
 \begin{figure}[!h]
 	\centering
 	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
 	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
-	\label{fig:data_range}
 	\decoRule
 	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
+	\label{fig:data_range}
 \end{figure}
 
 \begin{table}[th]
-	\label{tab:data-range}
+	
 	\centering
 	\begin{tabular}{c | c c c}
 		\toprule
@@ -259,29 +247,32 @@ It is calculated as the range of the $ X $ axis, but theoretically can be used b
 		\hline 
 		Z & 1.47 & 6.53 & 8.00\\
 		\bottomrule
-		
 	\end{tabular}
 	\caption{ The fluctuation of extreme values and their ranges in 100 random training items. }
+	\label{tab:data_range}
 \end{table}
 
 
 
-\subsection{Noise}
-\label{sec:noise}
-The raw depth maps captured by light scanners usually have missing pixels. In order to fit well with real data, the synthetic data has been added uniform distributed noise, which randomly removes the valid pixels in the maps.
-The simulated noise is distributed evenly around the whole map with specific noise intensity. A parameter $ \mu $ is used to control the intensity of noise. It denotes the $ \mu $-percent pixel drop-off. For example, $ \mu-10 $ removes 10\% pixels randomly. For each scene, the noise operation based on a random $ \mu $ in a range $ \left[0, 50\right]  $ is used. Some scenes have more missing pixels and some have fewer. The random noise intensity also enables the model to learn scenarios not only with noise but also with minor noise or even without noise.
-Figure \ref{fig:noise-intensity} shows the noise effect with different $ \mu $.
-%% add noise image
-\begin{figure}[!h]
-	\centering
-	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
-	\decoRule
-	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
-	\label{fig:noise-intensity}
-\end{figure}
 
+\paragraph{Image}
+The gray-scale image can be used for photometric stereo approach and also as a readable information for humans. Since the image captured by the camera is in RGB format, we need to convert it to gray colors to fit our models. It is based on the following equation.
+\[ gray: \frac{R+2G+B}{4}  \]
 
-\subsection{Fit to PyTorch}
+\paragraph{Normal Map}
+The normal map is the tangent surface normal, which is saved in a 8-bit/channel RGB image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on the following equation:
+\begin{dgroup*}
+	\begin{dmath*}
+		n_x = \frac{R}{255} * 2 - 1
+	\end{dmath*}
+	\begin{dmath*}
+		n_y = \frac{G}{255}*2 - 1
+	\end{dmath*} 
+	\begin{dmath*}
+		n_z = 1-\frac{B}{255} * 2
+	\end{dmath*}
+\end{dgroup*}
+
 In order to save training time, we compress the dataset in PyTorch format. The structure of a single item is shown in Table \ref{tab:tensor-structure}.
 \begin{table}[H]
 	\caption{The structure of a single tensor in the dataset.}

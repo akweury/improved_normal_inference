@@ -28,7 +28,7 @@ def load_a_training_tensor():
     test_0_data = np.array(
         sorted(glob.glob(str(config.synthetic_data_noise_local / "synthetic128" / "selval" / "tensor" /
                              f"*_0_*"), recursive=True)))
-    test_0 = torch.load(test_0_data[0])  # 0, 3, 5
+    test_0 = torch.load(test_0_data[3])  # 0, 3, 5
     test_0_tensor = test_0['input_tensor'].unsqueeze(0)
     gt_tensor = test_0['gt_tensor'].unsqueeze(0)
     return test_0_tensor, gt_tensor
@@ -69,19 +69,25 @@ if __name__ == '__main__':
     training_tensor, gt_tensor = load_a_training_tensor()
     vertex = training_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     light_input = training_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-    light_gt = gt_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    # light_input = training_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    light_gt = -gt_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
+    # light_gt = gt_tensor[:, 4:7, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     normal_gt = gt_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
-    img_gt = gt_tensor[:, 4:5, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
+    img_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
+    # img_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
     # g_gt = gt_tensor[:, 3:4, :, :].permute(2, 3, 1, 0).squeeze(-1).squeeze(-1).numpy()
 
-    img_gt_norm = img_gt / 255
-    # albedo_gt = img_gt_norm / (g_gt + 1e-20)
+    # img_gt_norm = img_gt / 255
+    # normal_gt = normal_gt / (np.linalg.norm(normal_gt, axis=-1, ord=2, keepdims=True) + 1e-20)
+    # light_gt = light_gt / (np.linalg.norm(light_gt, axis=-1, ord=2, keepdims=True) + 1e-20)
+    g_gt = np.sum(normal_gt * light_gt, axis=-1)
+    albedo_gt = img_gt / (g_gt + 1e-20)
 
     # tranculation
-    tranculate_threshold = 1
+    tranculate_threshold = 255
 
-    # albedo_gt[albedo_gt > tranculate_threshold] = tranculate_threshold
-    # albedo_gt[albedo_gt < -tranculate_threshold] = -tranculate_threshold
+    albedo_gt[albedo_gt > tranculate_threshold] = tranculate_threshold
+    albedo_gt[albedo_gt < -tranculate_threshold] = -tranculate_threshold
 
     # visual_albedo_histo(albedo_gt)
     # albedo_gt_aligned = (albedo_gt + tranculate_threshold) / (2 * tranculate_threshold)
@@ -94,18 +100,19 @@ if __name__ == '__main__':
 
     # show diff
     # albedo_gt_recon = np.expand_dims(albedo_gt_recon, axis=2)
-    # albedo_gt = np.expand_dims(albedo_gt, axis=2)
+    albedo_gt = mu.image_resize(albedo_gt, 512, 512)
+    albedo_gt = np.expand_dims(albedo_gt, axis=2)
     # diff_img, diff_avg = mu.eval_albedo_diff(albedo_gt_recon, albedo_gt)
-    mask = np.sum(normal_gt, axis=-1) == 0
-    # g_gt = mu.image_resize(g_gt, 512, 512)
-    # g_gt_img = mu.normalize2_16bit(g_gt)
+    g_gt = mu.image_resize(g_gt, 512, 512)
+    mask = np.sum(g_gt, axis=-1) == 0
+    g_gt_img = mu.normalize2_16bit(g_gt)
 
     cv.imwrite(str(config.ws_path / f"intrinsic_image.png"),
                cv.cvtColor(mu.visual_img(img_gt, ""), cv.COLOR_RGB2BGR))
-    # cv.imwrite(str(config.ws_path / f"intrinsic_image_reflectance.png"),
-    #            cv.cvtColor(mu.visual_albedo(albedo_gt * 255, mask, "", histo=False), cv.COLOR_RGB2BGR))
-    # cv.imwrite(str(config.ws_path / f"intrinsic_image_shading.png"),
-    #            cv.cvtColor(mu.visual_albedo(g_gt_img, mask, "", histo=False), cv.COLOR_RGB2BGR))
+    cv.imwrite(str(config.ws_path / f"intrinsic_image_reflectance.png"),
+               cv.cvtColor(mu.visual_albedo(albedo_gt, mask, "", histo=False), cv.COLOR_RGB2BGR))
+    cv.imwrite(str(config.ws_path / f"intrinsic_image_shading.png"),
+               cv.cvtColor(mu.visual_albedo(g_gt_img, mask, "", histo=False), cv.COLOR_RGB2BGR))
     cv.imwrite(str(config.ws_path / f"intrinsic_image_normal.png"),
                cv.cvtColor(mu.visual_normal(normal_gt, "", histogram=False), cv.COLOR_RGB2BGR))
     cv.imwrite(str(config.ws_path / f"intrinsic_image_light.png"),

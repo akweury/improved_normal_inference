@@ -36,7 +36,7 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'field_info' (item size: 4) to 10600 items.
+Reallocating 'field_info' (item size: 4) to 10320 items.
 Database file #1: main-blx.bib
 Database file #2: example.bib
 Repeated entry---line 853 of file example.bib
@@ -46,45 +46,45 @@ I'm skipping whatever remains of this entry
 Biblatex version: 3.16
 Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
-You've used 40 entries,
+You've used 38 entries,
             6393 wiz_defined-function locations,
-            1437 strings with 17591 characters,
-and the built_in function-call counts, 271318 in all, are:
-= -- 19310
-> -- 4578
-< -- 1273
-+ -- 7159
-- -- 1821
-* -- 20372
-:= -- 30126
+            1428 strings with 17134 characters,
+and the built_in function-call counts, 251133 in all, are:
+= -- 18007
+> -- 4311
+< -- 1214
++ -- 6676
+- -- 1707
+* -- 18314
+:= -- 27996
 add.period$ -- 0
-call.type$ -- 40
-change.case$ -- 609
-chr.to.int$ -- 85
-cite$ -- 78
-duplicate$ -- 30014
-empty$ -- 24308
-format.name$ -- 2982
-if$ -- 54543
+call.type$ -- 38
+change.case$ -- 552
+chr.to.int$ -- 84
+cite$ -- 74
+duplicate$ -- 27736
+empty$ -- 22311
+format.name$ -- 2790
+if$ -- 50389
 int.to.chr$ -- 0
-int.to.str$ -- 99
+int.to.str$ -- 93
 missing$ -- 0
-newline$ -- 1619
-num.names$ -- 1791
-pop$ -- 14484
+newline$ -- 1455
+num.names$ -- 1706
+pop$ -- 13592
 preamble$ -- 1
-purify$ -- 885
+purify$ -- 808
 quote$ -- 0
-skip$ -- 7259
+skip$ -- 6864
 stack$ -- 0
-substring$ -- 32602
-swap$ -- 6801
-text.length$ -- 1155
-text.prefix$ -- 39
+substring$ -- 30494
+swap$ -- 6026
+text.length$ -- 1090
+text.prefix$ -- 37
 top$ -- 1
-type$ -- 1348
+type$ -- 1280
 warning$ -- 0
-while$ -- 4356
+while$ -- 4069
 width$ -- 0
-write$ -- 1580
+write$ -- 1418
 (There was 1 error message)
