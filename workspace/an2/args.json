@@ -20,6 +20,7 @@
   "normal_loss": false,
   "light_loss": false,
   "normal_huber_loss": true,
+  "normal_berhu_loss": false,
   "loss_milestone": 15,
   "lr_decay_step": 1,
   "fast_train": false,

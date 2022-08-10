@@ -14,7 +14,7 @@ models = {
     # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-02_23_58_31" / "checkpoint-300.pth.tar",
     # "Trip-Net-2": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-1116.pth.tar",
     #
-    "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-146.pth.tar",
+    "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
 
     # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
     # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
