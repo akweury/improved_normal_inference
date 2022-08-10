@@ -127,7 +127,25 @@ class AngleHistoLoss(nn.Module):
         return loss + histo_loss
 
 
-def weighted_unit_vector_huber_loss(outputs, target, penalty, epoch, loss_type, scale_threshold=1):
+def weighted_unit_vector_huber_loss(outputs, target):
+    # give penalty to outliers
+    outputs = outputs[:, :3, :, :].permute(0, 2, 3, 1)
+    target = target[:, :3, :, :].permute(0, 2, 3, 1)
+    mask = torch.sum(torch.abs(target[:, :, :, :3]), dim=-1) > 0
+    mask = mask.unsqueeze(-1)
+    scale_threshold = 0.2 * torch.max(torch.abs(outputs - target))
+    mask_high = (torch.gt(torch.abs(outputs), scale_threshold).bool() * mask)
+    mask_low = (torch.lt(torch.abs(outputs), scale_threshold).bool() * mask)
+
+    loss = torch.abs(outputs[mask_high] - target[mask_high]).mean()
+
+    loss += ((torch.pow((outputs[mask_low] - target[mask_low]), 2) + scale_threshold ** 2) / (
+            2 * scale_threshold)).mean()
+
+    return loss.float()
+
+
+def weighted_unit_vector_berhu_loss(outputs, target):
     # give penalty to outliers
     outputs = outputs[:, :3, :, :].permute(0, 2, 3, 1)
     target = target[:, :3, :, :].permute(0, 2, 3, 1)

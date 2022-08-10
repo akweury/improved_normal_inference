@@ -312,10 +312,18 @@ def train_epoch(nn_model, epoch, eval_loss_best):
             normal_out = out[:, :3, :, :]
 
             nn_model.normal_loss = loss_utils.weighted_unit_vector_huber_loss(normal_out,
-                                                                              target[:, :3, :, :],
-                                                                              nn_model.args.penalty,
-                                                                              epoch,
-                                                                              nn_model.args.loss_type)
+                                                                              target[:, :3, :, :])
+
+            loss += nn_model.normal_loss
+            # for plot purpose
+            normal_loss_total += nn_model.normal_loss.detach().to('cpu')
+            loss_total += normal_loss_total
+
+        if nn_model.args.normal_berhu_loss:
+            normal_out = out[:, :3, :, :]
+
+            nn_model.normal_loss = loss_utils.weighted_unit_vector_berhu_loss(normal_out,
+                                                                              target[:, :3, :, :])
 
             loss += nn_model.normal_loss
             # for plot purpose
