@@ -11,19 +11,19 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Intrinsic image analysis of the Washington object. From left to right, original image, reflectance image, shading image, light image, normal image.\relax }}{7}{figure.caption.14}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Intrinsic image analysis of the Washington object. From left to right: original image, reflection image, shading image, light image, normal image.\relax }}{7}{figure.caption.14}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Left: the light reflection on a Lambertian surface. (image source \cite {lambertian-reflectance}). Right: The surface normal, source light direction, and the viewpoint direction, where $ \theta $ denotes the angle between light direction and the normal.\relax }}{8}{figure.caption.15}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Left: the reflection of light on a Lambertian surface. (Image source \cite {lambertian-reflectance}). Right: the surface normal, the light direction of the source and the viewing direction, where $ \theta $ denotes the angle between the light direction and the normal.\relax }}{8}{figure.caption.15}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.3}{\ignorespaces The structure of UNet. \cite {unet}\relax }}{9}{figure.caption.17}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Left: Gated Convolution Layer, where $ \oplus $ denotes element-wise multiplication. Right: standard convolution layer.\relax }}{11}{figure.caption.21}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Left: Gated Convolution Layer, where $ \odot $ denotes element-wise multiplication. Right: standard convolution layer.\relax }}{11}{figure.caption.21}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Three kinds of input data. From left to right, vertex map, light map, gray-scale image.\relax }}{13}{figure.caption.30}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.8}{\ignorespaces The shape of Berhu Loss (show in red line). \relax }}{16}{figure.caption.41}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.5}{\ignorespaces The architecture of Gated convolution neural network (GCNN) based on Gated convolution and UNet Architecture.\relax }}{17}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces The architecture of Gated convolution neural network (\textit {GCNN}) based on Gated convolution and \textit {U-Net} Architecture.\relax }}{17}{figure.caption.23}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.7}{\ignorespaces The architecture of Trig-Net\relax }}{18}{figure.caption.35}%
 \defcounter {refsection}{0}\relax 
