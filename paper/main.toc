@@ -29,17 +29,17 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Vertex Map}{12}{section*.26}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Gray-Scale Image}{13}{section*.27}%
+\contentsline {paragraph}{Grayscale Image}{12}{section*.27}%
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Light Map}{13}{section*.28}%
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.5.2}Trip-Net Architecture}{13}{subsection.31}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Side-Pipe (Light)}{14}{section*.32}%
+\contentsline {paragraph}{Side-Pipe (Light)}{13}{section*.32}%
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Side-Pipe (Image)}{14}{section*.33}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Main-Pipe (Vertex)}{15}{section*.34}%
+\contentsline {paragraph}{Main-Pipe (Vertex)}{14}{section*.34}%
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {3.5.3}Loss Functions}{15}{subsection.36}%
 \defcounter {refsection}{0}\relax 
@@ -59,44 +59,44 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Depth Map}{22}{section*.50}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Image}{23}{section*.55}%
+\contentsline {paragraph}{Image}{24}{section*.54}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Normal Map}{24}{section*.56}%
+\contentsline {paragraph}{Normal Map}{24}{section*.55}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Experiments}{25}{chapter.58}%
+\contentsline {chapter}{\numberline {5}Experiments}{25}{chapter.56}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Training Details}{25}{section.59}%
+\contentsline {section}{\numberline {5.1}Training Details}{25}{section.57}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}Quantitative Evaluation on 6 Metrics}{27}{section.63}%
+\contentsline {section}{\numberline {5.2}Quantitative Evaluation on 6 Metrics}{27}{section.61}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Average Angle Error Metric}{27}{section*.64}%
+\contentsline {paragraph}{Average Angle Error Metric}{27}{section*.62}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Median Angle Error Metric}{27}{section*.65}%
+\contentsline {paragraph}{Median Angle Error Metric}{27}{section*.63}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{5 Degree Error Metric}{27}{section*.66}%
+\contentsline {paragraph}{5 Degree Error Metric}{27}{section*.64}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{11.5 Degree Error Metric}{27}{section*.67}%
+\contentsline {paragraph}{11.5 Degree Error Metric}{27}{section*.65}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{22.5 Degree Error Metric}{27}{section*.68}%
+\contentsline {paragraph}{22.5 Degree Error Metric}{27}{section*.66}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{30 Degree Error Metric}{27}{section*.69}%
+\contentsline {paragraph}{30 Degree Error Metric}{27}{section*.67}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}Visual Evaluation on SVD}{29}{section.76}%
+\contentsline {section}{\numberline {5.3}Visual Evaluation on SVD}{29}{section.74}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Visual Evaluation on GCNN}{30}{section.80}%
+\contentsline {section}{\numberline {5.4}Visual Evaluation on GCNN}{30}{section.78}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}Discussion on the Feature Maps in GCNN}{32}{section.84}%
+\contentsline {section}{\numberline {5.5}Discussion on the Feature Maps in GCNN}{32}{section.82}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Visual Evaluation on Trip-Net}{34}{section.86}%
+\contentsline {section}{\numberline {5.6}Visual Evaluation on Trip-Net}{34}{section.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}Trining on Higher Resolution}{35}{section.90}%
+\contentsline {section}{\numberline {5.7}Trining on Higher Resolution}{35}{section.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.8}Training on Real-Dataset}{37}{section.94}%
+\contentsline {section}{\numberline {5.8}Training on Real-Dataset}{37}{section.92}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{39}{chapter.98}%
+\contentsline {chapter}{\numberline {6}Conclusion}{39}{chapter.96}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Dataset}{41}{appendix.99}%
+\contentsline {chapter}{\numberline {A}Dataset}{41}{appendix.97}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {B}More Visualization}{45}{appendix.103}%
+\contentsline {chapter}{\numberline {B}More Visualization}{45}{appendix.101}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{53}{appendix*.108}%
+\contentsline {chapter}{Bibliography}{53}{appendix*.106}%

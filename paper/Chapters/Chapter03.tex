@@ -295,10 +295,10 @@ First, we present the required input types for our network.
 \paragraph{Vertex Map}
 The vertex map $ \textbf{V} $ is converted from the depth map presented in chapter \ref{ch:04}, while the depth map is acquired from a depth camera. It contains a set of surface point locations in 3D space. Each pixel in the vertex map corresponds to a point position. These vertices contain the geometry information of the object surface, which can be further used for training deep learning models. For each scene, the camera takes only one image, leaving only one vertex map. However, as mentioned earlier, the vertex map is only semi-dense. We use such a semi-dense vertex map as input for the surface normal estimation.
 
-\paragraph{grayscale image}
+\paragraph{Grayscale Image}
 The grayscale image $ \textbf{I} $ is acquired in correspondence with the depth map using the same calibrated camera equipment, so the intrinsic matrix $ \textbf{K} $ and the extrinsic camera matrix $ [\textbf{R}|\textbf{t}] $ are known. Unlike the vertex map, it is usually completely dense.
 
-\paragraph{light map}
+\paragraph{Light Map}
 The light map $ \textbf{L} $ can be derived from the vertex map $ \textbf{V} $. The position of the light source $ (s_x, s_y, s_z) $ is given by the input data. As shown in Figure \ref{fig:lambertian-surface}, the direction of the incident light is a vector point from the light source to the surface point and can therefore be calculated as follows.
 
 \begin{equation}\label{light-direction}
@@ -318,6 +318,7 @@ where both $ (s_x, s_y, s_z) $ and $ \textbf{V} $ refer to the camera space. The
 	\caption{Three kinds of input data. From left to right, vertex map, light map, gray-scale image.}
 	\label{fig:light-input}
 \end{figure}
+See chapter \ref{ch:04} for more details on how to set up the dataset.
 
 
 %\subsection{VIL Net}
@@ -340,16 +341,17 @@ where both $ (s_x, s_y, s_z) $ and $ \textbf{V} $ refer to the camera space. The
 
 
 \subsection{Trip-Net Architecture}
-We proposed an network that takes the vertex map, light map and gray-scale image into consideration for surface normal inference, which is called Triple-pipe-gated-Network (Trip-Net). 
-The Trip-Net employs GCNN architecture three times to accomplish the normal inference task, thus we call it ``triple-pipi-gated". The architecture is shown in Figure \ref{fig:Trig-Net}.
+We proposed a network that considers the vertex map, the light map, and the grayscale image for surface normal inference, which is called the Triple-Pipe-Gated Network (\textit{Trip-Net}). 
+The \textit{Trip-Net} uses the GCNN architecture three times to perform the normal inference task, so we call it \textit{Triple-Pipe-Gated}. The architecture is shown in Figure \ref{fig:Trip-Net}.
 
-The network has three pipes combined with one main pipe and two side pipes. Each pipe deals with different task. The main pipe deals with the geometry information, which takes the vertex map as the input and used to predict the surface normal. The light map input takes one side pipe and use it to extract the light feature, then forwards the features to the main pipe as a supplementary information for the normal estimation. The image map takes another side pipe to extract the image features then forward the features to the main pipe as well. The supplementary pipes provide the illumination information which helps the main pipe to refine the inferred normals.
+The network consists of three pipes combined with one main pipe and two side pipes. Each pipe deals with a different task. The Main Pipe deals with the geometry information, which takes the vertex map as input and is used to predict the surface normal. The light map takes a Side Pipe as input, from which the light features are extracted and then passed to the Main Pipe as additional information for normal estimation. The image map takes another Side Pipe to extract the image features, and then forwards the features to the Main Pipe as well. The additional pipes provide the illumination information that helps the Main Pipe refine the inferred normals.
 
 \paragraph{Side-Pipe (Light)}
-The structure of light pipe is almost identical to the GCNN architecture. It takes the light map $ \textbf{L} \in \mathbb{R}^{W\times H\times 3}$ as input, then takes it to gated convolution layers 3 times to get the the feature map,
-$ \textbf{X}_{L1D} \in \mathbb{R}^{{W}\times H\times C} $,
- which has the same resolution as the input map. This is the first set of feature map in the down-sampling operation.
- Then repeat what we did just now three times, that is for each time, 3 gated convolution layers are used to further extract the feature maps, but the different is in the last gated convolution layer, we change the stride from (1,1) to (2,2) in order to down-sampling the feature maps. Then we get
+ The structure of the Light-Pipe is almost identical to the architecture of the GCNN. It takes the light map $ \textbf{L} \in \mathbb{R}^{W\times H\times 3}$ as input and then passes through gated convolution layers three times to obtain the feature maps,
+ $ \textbf{X}_{L1D} \in \mathbb{R}^{{W}\times H\times C} $,
+ which has the same resolution as the input map.
+ Then three downsampling operations are followed afterwards. In each downsampling, 3 gated convolution layers are used to further extract the feature maps, where the first two gated convolution layers have stride (1,1) and the third gated convolution layer has stride (2,2). Then we get
+  
 $ \textbf{X}_{L2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
 $ \textbf{X}_{L3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
 $ \textbf{X}_{L4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $
@@ -367,20 +369,21 @@ $ \textbf{X}_{L3U} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $ resp
 	l_{up1} : \textbf{X}_{L1D}, \textbf{X}_{L2U} \rightarrow \textbf{X}_{L1U} \\
 \end{matrix}
 \]
-In our network, the actual up-sampling operation is done with three layers, 1, an interpolation layer based on nearest neighbor algorithm, 2, a concatenation layers to concate interpolated feature maps and the corresponding feature maps in the down-sampling part, 3, a gated convolution layer to reduce the channel size.
-The light pipe branch is finished in the last layer of third up-sampling.
+In our network, each up-sampling is done in three layers, an interpolation layer based on the nearest neighbor algorithm, a concatenation layer to concatenate the interpolated feature maps and the corresponding feature maps in the down-sampling part, and a gated convolution layer to reduce the channel size.
+The light pipe branch is completed in the last layer of the third up-sampling.
 
-In this pipe, we take four kinds of feature maps $ \textbf{X}_{L4D}, \textbf{X}_{L3U},\textbf{X}_{L2U}, \textbf{X}_{L1U} $ as the guided information for the further operation.
-
+In this branch, four kinds of feature maps $ \textbf{X}_{L4D}, \textbf{X}_{L3U}, \textbf{X}_{L2U}, \textbf{X}_{L1U} $ are used as guided information for further operation.
 
 \paragraph{Side-Pipe (Image)}
-The task of image pipe in the network is to predict the image feature. This pipe is a collaborate pipe with the light pipe. The architect is the same as light map pipe but only the input is the image matrix $ \textbf{I}\in  \mathbb{R}^{W\times H\times 1}$. The first set of feature map is $ \textbf{X}_{I1D} \in \mathbb{R}^{{W}\times H\times C} $, note that it has the same channel with the light feature maps. Then down-sampling 3 times to extract the image feature maps
+
+The task of the Image-Pipe in the network is to predict the image features. This pipe is a pipe cooperating with the Light-Pipe. The architect is the same as that of the Light-Pipe, but only the input is the image matrix $ \textbf{I}\in \mathbb{R}^{W\times H\times 1}$. The first set of the feature maps are $ \textbf{X}_{I1D} \in \mathbb{R}^{{W}\times H\times C} $, noting that it has the same channel as the light feature maps. Then, the down-sampling is performed three times to extract the image feature maps
+
 $ \textbf{X}_{I2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
 $ \textbf{X}_{I3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
 $ \textbf{X}_{I4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $
 (represented as a regression function $ i_{down} $)
 \[ l_{down}: \textbf{I} \rightarrow  \textbf{X}_{I1D} , \textbf{X}_{I2D}, \textbf{X}_{I3D}, \textbf{X}_{I4D} \]
-For the up-sampling operation, it takes 3 times up-sampling to generate higher resolution image feature maps
+It requires three times upsampling to produce higher resolution image feature maps.
 $ \textbf{X}_{I1U} \in \mathbb{R}^{{W}\times {H}\times C} $,
 $ \textbf{X}_{I2U} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
 $ \textbf{X}_{I3U} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $ respectively, whereas each up-sampling also considers the feature maps in the down-sampling part,
@@ -392,18 +395,20 @@ $ \textbf{X}_{I3U} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $ resp
 	i_{up1} : \textbf{X}_{I1D}, \textbf{X}_{I2U} \rightarrow \textbf{X}_{I1U} \\
 \end{matrix}
 \]
-whereas the layers in the up-sampling part has the same architecture as light pipe. In the image pipe, we take four kinds of feature maps $ \textbf{X}_{I4D}, \textbf{X}_{I3U},\textbf{X}_{I2U}, \textbf{X}_{I1U} $ as the guided information for the further operation.
+whereas the layers in the upsampling part have the same architecture as the Light Pipe. In the Image Pipe, four types of feature maps $ \textbf{X}_{I4D}, \textbf{X}_{I3U}, \textbf{X}_{I2U}, \textbf{X}_{I1U} $ are used as guided information for further operation.
+
 
 \paragraph{Main-Pipe (Vertex)}
-The task of vertex pipe in the network is to predict the normal map directly, which is also takes the feature maps in the other channels into account. The input is vertex map $ \textbf{V} \in \mathbb{R}^{W\times H\times 3}$ converted from point cloud. 
-The downsampling part is still the same as the other two pipes. The feature maps in each down-sampling part has shape $ \textbf{X}_{V1D} \in \mathbb{R}^{{W}\times H\times C} $, 
+The task of the vertex pipe in the network is to predict the normal map directly, also taking into account the feature maps in the other channels. The input is the vertex map $ \textbf{V} \in \mathbb{R}^{W\times H\times 3}$ converted from the point cloud. 
+The downsampling part is still the same as for the other two pipes. The feature maps in each downsampling part are of the form
+$ \textbf{X}_{V1D} \in \mathbb{R}^{{W}\times H\times C} $, 
 $ \textbf{X}_{V2D} \in \mathbb{R}^{\frac{W}{2}\times \frac{H}{2}\times C} $,
 $ \textbf{X}_{V3D} \in \mathbb{R}^{\frac{W}{4}\times \frac{H}{4}\times C} $,
 $ \textbf{X}_{V4D} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times C} $, respectively, 
 (represented as a regression function $ i_{down} $)
 \[ v_{down}: \textbf{V} \rightarrow  \textbf{X}_{V1D} , \textbf{X}_{V2D}, \textbf{X}_{V3D}, \textbf{X}_{V4D} \]
-For the up-sampling operation, the situation is different compare to  the other two pipes.
-it fuses the corresponding resolution output feature maps altogether in three pipes to get a fused feature map 
+The up-sampling operation has a different situation than the other two pipes.
+It merges the output feature maps with the corresponding resolution from three pipes to get a merged feature map 
 $ \textbf{X}_{F3U} \in \mathbb{R}^{W\times H\times C} $, 
 $\textbf{X}_{F2U} \in \mathbb{R}^{W\times H\times C} $, 
 $\textbf{X}_{F1U} \in \mathbb{R}^{W\times H\times C} $,
@@ -417,17 +422,18 @@ in each up-sampling stage, (represented as regression functions $ f_{up1}, f_{up
 			
 \end{matrix}
 \]
-Each upsampling consists of 5 layers: 1, a interpolation layer to double size the resolution using nearest neighboring interpolation algorithm, 2, a gated layer to reduce the channel size to 1/3 of itself in order to fit the corresponding feature map in the downsampling part, 3, a concatenation layer to fuse the output with the corresponding feature map in the downsampling part, 4, a gated layer to reduce the channel size to 1/2, 5, a concatenation layer to fuse the corresponding upsamling feature map from the other two pipe altogether with the feature map in current pipe. These 5 layers consider both the information from other pipes and also keeps the high resolution from the downsampling part. 
+Each upsampling consists of 5 layers: An interpolation layer to double the resolution using the nearest interpolation algorithm, a gated layer to reduce the channel size to 1/3 of itself for inter-pipes feature reduction, a concatenation layer to connect the output with the corresponding feature map in the downsampling part (skip connection), a gated layer to reduce the channel size to 1/2 of itself for skip-connection feature reduction, a concatenation layer to merge the corresponding upsampling feature map from the other two pipes with the feature map in the current pipe altogether. These 5 layers take into account both the information from the other pipes and the feature maps from the downsampling part. 
 
-In the end of the network, in order to fit the normal inference task, two standard convolution layers are added to output normal map $ \textbf{X}_{N} \in  \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times 3} $ (represented as a regression function $ n $)
-\[n:\textbf{X}_{F1U} \rightarrow  \textbf{X}_{N} \] 
+At the end of the network, to fit the task of normal inference, two standard convolutional layers are added to convert the normal map $ \textbf{X}_{N} \in \mathbb{R}^{\frac{W}{8}\times \frac{H}{8}\times 3} $ (represented as a regression function $ n $)
+\[n:\textbf{X}_{F1U} \rightarrow \textbf{X}_{N} \] 
 
 \begin{sidewaysfigure}[h]
 	\centering
+	\captionsetup{width=\linewidth}
 	\includegraphics[width=\textwidth]{Figures/trignet} % Research group name and department name
 	\decoRule
-	\caption{The architecture of Trig-Net}
-	\label{fig:Trig-Net}
+	\caption{The architecture of the \textit{Trip-Net}.}
+	\label{fig:Trip-Net}
 \end{sidewaysfigure}
 
 
@@ -435,10 +441,10 @@ In the end of the network, in order to fit the normal inference task, two standa
 %% loss function 
 
 \subsection{Loss Functions}
-We explored different loss function for training work of our network. The most common losses are L1 loss and L2 loss for image upsamping task. In our experiments, we used a modified BerHu Loss to train our model, which gives a better lower error in the evaluation compare to purely L1 or L2 loss. 
-\paragraph{L1 Loss}
-L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the median of the observations.
+We have investigated different loss functions for training our network. The most common loss functions are the L1 loss and the L2 loss for image simulation. In our experiments, we used a modified BerHu loss function to train our model, which yields a lower error in the evaluation compared to a pure L1 or L2 loss function. 
 
+\paragraph{L1 Loss}
+L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the mean value of the absolute errors of the observations.
 \[ L_1(\tilde y - y) = |\tilde y - y | \]
 
 \paragraph{L2 Loss}
@@ -462,7 +468,8 @@ The standard loss function for optimization in regression problems is the L2 los
 
 
 \paragraph{Reversed Huber Loss}
-Inspired by \cite{img2depth}, we use Reversed Huber loss that purposed by \cite{berhu-loss} for our model training, which indeed achieves a better error than a single L2 loss. It can be mathematically described as follows.
+Inspired by \cite{img2depth}, we use the reversed Huber loss provided by \cite{berhu-loss} for our model training, which indeed achieves a better error than a simple L2 loss. It can be described mathematically as follows.
+
 
 \begin{equation}\label{berhu-loss}
 	\begin{array}{ll}
@@ -472,12 +479,13 @@ Inspired by \cite{img2depth}, we use Reversed Huber loss that purposed by \cite{
 		\end{cases}
 	\end{array}
 \end{equation}
-where $ c=0.2\max (|\tilde y - y|) $. The shape of the loss is shown in figure \ref{fig:berhu-loss-shape}. The Reversed Huber loss, also called BerHu loss, is a combination with both L1 and L2 loss, where it is L1 loss in range $ [-c,c] $ and L2 loss outside of this range. The loss is also first order differentiable at the connection point of two section-functions. As mentioned in \cite{img2depth}, the parameter $ c=0.2 \max(|\tilde y - y|) $ corresponds the 20\% of the maximal per batch error. 
+where $ c=0.2\max (|\tilde y - y|) $. The shape of the loss is shown in Figure \ref{fig:berhu-loss-shape}. Reversed Huber loss, also called BerHu loss, is a combination of L1 and L2 loss, being L1 loss in the range $ [-c,c] $ and L2 loss outside this range. The loss is also differentiable at the junction of two first order intersection functions. As mentioned in \cite{img2depth}, the parameter $ c=0.2 \max(|\tilde y - y|) $ corresponds to the 20\% of the maximum error per batch. 
 
-The chosen of these combination loss error is reasonable since it also gives more weights to the errors compare to L2 loss but also keeps the outlier suppression features in the L2 loss. The output type in our model is surface normal,  which has a range between $ [-1,1] $, thus we need L2 loss to penalize larger errors, however, in the other hand, the L2 loss will suppress small values close to zero in a greater way compare to the values close to $ \pm 1 $, since it is use a quadratic curve. Thus flatten the range close to zero is a good balance choice. In our experiments, the BerHu loss gives a better performance on all of the models that we have trained.
+The choice of the combination losses is reasonable because they give more weight to the errors compared to the L2 loss, but also preserve the outlier suppression features in the L2 loss. The output type in our model is the surface normal, which has a range between $[-1,1] $, so we need the L2 loss to penalize larger errors. On the other hand, the L2 loss suppresses small values near zero more than the values greater than $ 1 $ or smaller than $ -1 $, because it uses a quadratic curve. Therefore, flattening the region near zero is a good choice for equilibrium. In our experiments, the BerHu loss shows better performance for all the models we trained.
+
 \begin{figure}[H]
 	\centering
-	
+	\captionsetup{width=\linewidth}
 	\begin{tikzpicture}
 		\pgfplotsset{ticks=none}
 		\begin{axis} [axis lines=center]

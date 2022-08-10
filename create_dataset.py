@@ -275,7 +275,7 @@ def convert2training_tensor_resized(path, k, output_type='normal', resize_factor
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["test"]:
+    for folder in ["test", "train"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder

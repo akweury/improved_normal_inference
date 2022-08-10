@@ -8,26 +8,26 @@
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
- In this thesis, we require two kinds of input data to train our models. 
-First, we need to know the geometry of the object surface. This can be collected by a depth camera, which records the Z-axis distance of the object surface to the camera position and it can be further converted to a point cloud. 
-Second, we need illuminated information of the object surface, which considers a photometric-information used for further improvement. 
-This kind of information requires an observed image of the object with the light directions projected onto the object surface. 
+In this work, we need two types of input data to train our models. 
+First, we need to know the geometry of the object surface. This can be captured by a depth camera, which records the distance of the object surface from the optical center of the camera and can be converted into a point cloud. 
+Second, we need information about the illumination of the object surface, which is used as photometric information for further improvements. 
+This type of information requires an observed image of the object with the light directions projected onto the object surface. 
 
-In order to gain these data, we can use a light scanner to scan the objects in the laboratory. However, the scanner usually can not scan the dark, shiny, and transparent regions, which leaves plenty of missing pixels and holes in the depth map. This incomplete surface information raises the difficulty for our model training since the ground-truth corresponding to the depth map will be incomplete as well. Second, training a deep learning-based model usually requires a huge dataset, especially for a network without a backbone. To create a single depth map dataset for this thesis would be too much work and resource requirements. A proper way for getting huge depth map data with illumination information can be considered using a game engine, which can simulate any number of data that we require.
+To obtain this data, we can use a structured light scanner to scan the objects in the laboratory. However, the scanner usually cannot scan the dark, shiny, and transparent areas, resulting in many missing pixels and holes in the depth map. This incomplete surface information makes it difficult to train our model because the ground truth corresponding to the depth map is also incomplete. Second, training a deep learning-based model usually requires a large dataset, especially for a network without a backbone. Creating a single deep map dataset for this work would require too much work and resources. A suitable way to obtain huge depth map data with illumination information is to use a game engine that can simulate an arbitrary number of data.
 
-In this thesis, we use the Unity game engine for data generation. By using a $ C\# $ script, we can set up a similar configuration in the laboratory. Then create a mount of data based on the collected objects. The dataset that we created for this thesis is called \textit{synthetic-50-5} since it has 50 different object models for training and 5 object models for testing.
-
-
+We use the Unity game engine for data generation. Using a $ C\# $ script, we can set up a similar configuration in the lab. We then create a dataset based on the collected objects. The dataset we created for this work is called \textit{synthetic-50-5} because it contains 50 different object models for training and 5 object models for testing.
 
 \section{Data Resources}
-The object model we used are searched from internet.
-A set of point cloud datasets for computer vision research has been published by \cite{data1}, \cite{data2}, \cite{data3} and \cite{data4}. These point clouds are scanned from real objects using high resolution scanners like Cyberware 3030 MS+ and calibrated with post processing. All objects has been scanned for hundreds of times with an exhaustive completion for the origin objects, which is up to millions points. (\cite{data1}). The dense point clouds make the normal inference task trivial since the neighbor based method performs adequately for this kind of task. Some of the point clouds even contain pre-computed normal maps based on more advanced methods. They all provide the accurate ground truth for the supervised learning method.
+The object models we used were collected from the Internet.
+A number of point cloud datasets for image processing research have been published by \cite{data1}, \cite{data2}, \cite{data3}, and \cite{data4}. Some of these point clouds were scanned from real objects using high-resolution scanners such as the Cyberware 3030 MS+ and calibrated with post-processing. These objects were scanned hundreds of times, fully capturing the original objects with up to millions of points\cite{data1}. Some of them are fully digitally synthesized. The dense point clouds make the normal inference task trivial, as the neighborhood-based method works adequately for this type of task. Some of the point clouds even contain precomputed normal maps based on more advanced methods. They all provide the accurate ground truth for the supervised learning method.
 
-The \textit{synthetic50-5} is a dataset we generated in this thesis based on 50 point clouds as a training set and 5 point clouds as a test set. When we create the dataset, we tried to make the object types as many as possible to give a robust and wide range covered training scenarios. There are various categories of models, such as figure, animal, statue, toy, furniture, antique, and car model, some of which have relatively smooth surfaces, such as /textit[arm, bus, bunny, cat, zebra], and some of which have highly complicated details, such as \textit{Washington, Car-Engine, Armadillo}. 
-We created this dataset for normal inference tasks. Figure \ref{fig:dataset-demo} gives the illustrations of some objects. Appendix \ref{AppendixA} gives a full version of dataset models.
+The \textit{synthetic-50-5} is a dataset we created in this work based on 50 point clouds as the training set and 5 point clouds as the test set. In creating the dataset, we tried to use as many object types as possible to cover a robust and wide range of training scenarios. There are several categories of models, such as figurines, animals, statues, toys, furniture, antiques, and car models, some of which have relatively smooth surfaces, such as model \textit{arm, bus, rabbit, cat, zebra}, and some of which have very intricate details, such as model \textit{Washington, Car-Engine, Armadillo}. 
+We created this dataset for normal inference tasks. Figure \ref{fig:dataset-demo} shows illustrations of some objects. Appendix \ref{AppendixA} contains a complete version of the models of the dataset.
+
 
 \begin{figure}[!h]
 	\centering
+	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/train-dataset/00.apoll.png}
 		\caption{apoll}
@@ -62,10 +62,10 @@ We created this dataset for normal inference tasks. Figure \ref{fig:dataset-demo
 		\caption{baoshanlu}
 	\end{subfigure}
 	\decoRule
-	\caption{Point clouds scanned by high resolution scanners}
+	\caption{Some of the objects used for \textit{Synthetic-50-5}}
 	\label{fig:dataset-demo}
 \end{figure}
-Besides, some objects also have colored textures, as shown in the second row of Figure \ref{fig:dataset-demo}. This is specially prepared for the illuminated approach since they will take the image into account to evaluate the surface normal. By using textured models, our models become closer to the real dataset and have improved robustness, which can apply to the real dataset further.
+In addition, some objects also have colored textures, as shown in the second line of Figure \ref{fig:dataset-demo}. This is specifically prepared for the illuminated approach, since the image is used to evaluate the surface normals. By using textured models, our models get closer to the real dataset and have improved robustness that can be further applied to the real dataset.
 
 
 
@@ -73,24 +73,24 @@ Besides, some objects also have colored textures, as shown in the second row of 
 \newcommand{\col}[1]{%
 	\textcolor{#1}{\vrule width 0.5cm}}
 \section{Synthesizing Scenes using Unity}
-In order to simulate the data collection scenario close to the real world as much as possible. We did the following settings. A flat cylinder called $ stage $ is placed in the center of the 3D space as a platform to place objects. We fixed the stage in a predetermined position, which is not changed when images are captured. 
-To provide ambient light, one directional light with RGB color FFF4D6 /col[direction-light-color] is placed in a top-view direction at a distance of 25 meters, which also has a fixed location.
-An RGB-D camera is placed in a top-view direction around 10m away from the stage. The camera captures the depth map and the gray-scale image, which is randomly arranged after each scene. The moving range of the camera has 0.1m in both directions of the X, Y, and Z axis and a 1-degree random changed Euler angle. 
-As an illumination light, a point light is placed around 5 meters away, which is also randomly moved after each scene. The moving range is 0.3m in both directions of the X, Y, and Z axis and 1 degree random in the Euler angle.
 
-During the data collection, the object is randomly selected and placed on the stage. The object has a random up to 30 degrees rotation align $ roll $-axis, 30-degrees rotation aligns $ pitch $-axis, and 180-degrees rotation aligns $ yaw $-axis. Thus the camera has the opportunity to capture every direction of the object and consequently abundant the dataset. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128 $ and 5000 scenes with resolution $ 512\times512 $.
+To simulate the data acquisition scenario as realistically as possible. We made the following settings. A flat cylinder, called \textit{stage} , is placed in the center of the 3D space as a platform for placing objects. We fixed the \textit{stage} in a predetermined position that will not be changed when images are captured. 
+A directional light with RGB color FFF4D6 \col{direction-light-color} is placed 25 m away in the top view direction as an ambient light, which also has a fixed position.
+An RGB-D camera is placed about 10 m away from the stage in the top-view direction. The camera captures the depth map and the grayscale image, which are randomly arranged after each scene. The movement range of the camera is 0.1 m in both directions of the X, Y and Z axes and a randomly changed Euler angle of $ 1^\circ $. 
+A point light is placed about 5 m away as the illumination light, which is also moved randomly after each scene. The range of motion is 0.3 m in both directions of the X, Y and Z axes and $ 1^\circ $ randomly in the Euler angle.
+
+During data acquisition, the object is randomly selected and placed on the stage. The object has a random rotation of up to $ 30^\circ $ in the $roll $ axis direction, a $ 30^\circ $ rotation in the $pitch $ axis direction, and a $ 180^\circ $ degree rotation in the $yaw $ axis direction. This gives the camera the ability to capture most directions of the objects. The layout in the Unity game engine is shown in Figure \ref{fig:unity-workplace}. We generate 3000 scenes with resolution $ 128\times128 $ and 5000 scenes with resolution $ 512\times512 $.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=.99\textwidth]{./Figures/unity-workplace.PNG}
+		\captionsetup{width=\linewidth}
+	\includegraphics[width=\linewidth]{./Figures/unity-workplace.PNG}
 	\decoRule
-	\caption{The layout of synthetic scenes generation in Unity.}
+	\caption{The layout of synthetic scene generation in Unity.}
 	\label{fig:unity-workplace}
 \end{figure}
 The main advantage of generated scenes is the availability of complete information. We can capture the depth map in a lossless way. The corresponding normal map can also be safely considered as ground truth. And the scale of the dataset is easy to control. Table \ref{tab:data-files} gives more dataset information.
 \begin{table}
-	\caption{The information saved for each scene in ``synthetic50-5".}
-	\label{tab:data-files}
 	\centering
 	\begin{tabular}{l l}
 		\toprule
@@ -112,15 +112,19 @@ The main advantage of generated scenes is the availability of complete informati
 		\hline 
 		\bottomrule
 	\end{tabular}
+	\caption{The information saved for each scene in \textit{synthetic-50-5}.}
+	\label{tab:data-files}
 \end{table}
 
-One critical detail that we must care about is camera exposure. Or we have to control the light radiance on the object surface. As shown in figure \ref{fig:camera_exposure}, too little exposure will neutralize the illumination information, resulting in an ambient light effect. Too much exposure makes the surface texture hard to recognize. When we did the experiments, we found that a suitable light setting is essential to the illumination-based approach. Too much or too few light effects won't improve the illumination-based approach.
+
+A critical detail we need to pay attention to is the exposure of the camera. Or we need to control the light emission on the object surface. As can be seen in Figure \ref{fig:camera_exposure}, too much exposure causes the surface texture to be difficult to see, resulting in clipping. In our experiments, we found that an appropriate light setting is essential for the illumination-based approach. Too much or too little lighting effects do not improve the illumination-based approach.
 
 \begin{figure}[H]
 	\centering
+	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.32\linewidth}
 		\includegraphics[width=\textwidth]{./Figures/wrong_exposure_2.png}
-		\caption{Too dim}
+		\caption{Insufficient light}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.32\linewidth}
 		\includegraphics[width=\textwidth]{./Figures/right_exposure.png}
@@ -128,7 +132,7 @@ One critical detail that we must care about is camera exposure. Or we have to co
 	\end{subfigure}
 	\begin{subfigure}[b]{0.32\linewidth}
 		\includegraphics[width=\textwidth]{./Figures/wrong_exposure.png}
-		\caption{Too bright}
+		\caption{Too much light}
 	\end{subfigure}
 	\decoRule
 	\caption{Different exposure to the objects.}
@@ -139,73 +143,83 @@ One critical detail that we must care about is camera exposure. Or we have to co
 
 
 \section{Data Preprocessing}
-The raw data captured from Unity required further preprocessing before feeding them into the training models. 
+The raw data collected by Unity required further processing before it could be fed into the training models. 
 \paragraph{Depth Map}
-A depth map is captured by the depth camera in Unity, which is a 1 channel image that contains information relating to the Z-axis distance from object surface to the camera. It is saved as a 16-bit gray-scale image, i.e. each pixel in the range $\mathtt{0 - 65535}$. 
+A depth map is a 1-channel image that contains information about the distance from the object surface to the camera center. It is stored as a 16-bit grayscale image, meaning that each pixel is in the range $\mathtt{0 - 65535}$. 
 
-The raw depth maps in real data that captured by light scanners usually have missing pixels. In order to fit well with real data, the synthetic data has been added uniform distributed noise, which randomly removes the valid pixels in the maps.
-The simulated noise is distributed evenly around the whole map with specific noise intensity. A parameter $ \mu $ is used to control the intensity of noise. It denotes the $ \mu $-percent pixel drop-off. For example, $ \mu-10 $ removes 10\% pixels randomly. For each scene, the noise operation based on a random $ \mu $ in a range $ \left[0, 50\right]  $ is used. Some scenes have more missing pixels and some have fewer. The random noise intensity also enables the model to learn scenarios not only with noise but also with minor noise or even without noise.
-Figure \ref{fig:noise-intensity} shows the noise effect with different $ \mu $.
+The raw depth maps in real data acquired by light scanners usually have missing pixels. To achieve a good match to the real data, a uniformly distributed noise was added to the synthetic data to randomly remove the valid pixels in the depth maps.
+The simulated noise is uniformly distributed over the entire map with a certain noise intensity. A parameter $ \mu $ is used to control the intensity of the noise. It specifies the $ \mu $ pixel drop in percent. For example, at $ \mu-10 $, 10\% of the pixels are randomly removed. For each scene, the noise operation is based on a random $ \mu $ in a range $ \left[0, 50\right] $. In some scenes there are more missing pixels, in others less. The random noise intensity also allows the model to learn scenarios not only with noise, but also with low noise or even no noise.
+Figure \ref{fig:noise-intensity} shows the noise effect at different $ \mu $.
+
+
+
 %% add noise image
 \begin{figure}[!h]
 	\centering
-	{\includegraphics[width=.9\textwidth]{./Figures/add_noise_depth.png}}
+	\captionsetup{width=\linewidth}
+	{\includegraphics[width=\textwidth]{./Figures/add_noise_depth.png}}
 	\decoRule
-	\caption{Noise-intensity on $ \mu-0, \mu-10,\mu-20, \mu-30, \mu-40, \mu-50,$. Object Name: elephant-zun-lid.}
+	\caption{From left to right: Noise-intensity on $ \mu-0$, $\mu-10$, $\mu-20$, $\mu-30$, $\mu-40$, $\mu-50$. Object Name: \textit{elephant-zun-lid}.}
 	\label{fig:noise-intensity}
 \end{figure}
 
+%\begin{figure}[h!]
+%	\centering
+%	\begin{tikzpicture} 
+%		% reference lines
+%		\node[inner sep=10pt] (input) at (0,0)
+%		{\includegraphics[width=\linewidth]{./Figures/ply_config.png}};
+%		
+%		%		\draw[thick,dashed]	(0,0) -- (10,0) ; % bottom
+%		%		\draw[thick,dashed]	(0,3) -- (10,3) node[pos=0.9, above] {image plane}; % middle
+%		%		\draw[thick,dashed]	(0,6) -- (10,6); % top
+%		% camera 
+%		%		\filldraw[black] (5,0) circle (2pt) node[anchor=south west]{Camera Position};
+%		% world point 
+%		%		\filldraw[black] (2,2) circle (2pt) node[anchor=north west]{Point};
+%		% image point
+%		%		\filldraw[black] (6,3) circle (2pt) node[anchor=north west]{Pixel};
+%		% similiar triangles
+%		%		\draw[thick] (0,0) -- (2,6); % AB
+%		%		\draw[thick] (5,0) -- (7,6); % AC
+%		%		\draw[thick] (5,6) -- (7,6) node[midway, below] {$ X $}; % BC
+%		%		\draw[thick] (5,3) -- (6,3) node[midway, below] {$ u $};
+%		%		% measure arrows
+%		%		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
+%		%		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
+%	\end{tikzpicture}	
+%	\caption{Data Collection configuration}
+%	\label{fig:depth-triangulation}
+%\end{figure}
+The depth map is converted to a 3D vertex map after adding the noise.
+Consider a 3-dimensional Euclidean space. The $ X $ and $ Y $ axes are perpendicular to each other align with the direction of width and height of the depth map separately. The $ Z $ axis is point inward (i.e., from view point to the depth map). The depth provided in the depth map is the distance from camera center to the object surface. Thus, in order to find the corresponding 3D vertex map $ \textbf{V}_C $ with respect to the camera coordinate system, we only need to multiple the depth matrix $ \textbf{Depth} $ with the point direction matrix $ \textbf{Dir} $.
 
-The depth map is further converted to 3D vertex map after adding the noise.
-\begin{figure}[h!]
-	\centering
-	\begin{tikzpicture} 
-		% reference lines
-		\draw[thick,dashed]	(0,0) -- (10,0) ; % bottom
-		\draw[thick,dashed]	(0,3) -- (10,3) node[pos=0.9, above] {image plane}; % middle
-		\draw[thick,dashed]	(0,6) -- (10,6); % top
-		% camera 
-		\filldraw[black] (5,0) circle (2pt) node[anchor=south west]{Camera Position};
-		% world point 
-		\filldraw[black] (7,6) circle (2pt) node[anchor=north west]{Point};
-		% image point
-		\filldraw[black] (6,3) circle (2pt) node[anchor=north west]{Pixel};
-		% similiar triangles
-		\draw[thick] (5,0) -- (5,6); % AB
-		\draw[thick] (5,0) -- (7,6); % AC
-		\draw[thick] (5,6) -- (7,6) node[midway, below] {$ X $}; % BC
-		\draw[thick] (5,3) -- (6,3) node[midway, below] {$ u $};
-		% measure arrows
-		\draw[thick, <->] (4,0) -- (4,3) node[midway, left] {$ fk_u $};
-		\draw[thick, <->] (3,0) -- (3,6) node[pos=0.3, left] {$ Z $};
-	\end{tikzpicture}	
-	\decoRule
-	\caption{Convert depth to point in camera coordinate system}
-	\label{fig:depth-triangulation}
-\end{figure}
+\begin{dgroup*}
+	\begin{dmath*}
+		\textbf{V}_C = \textbf{Depth} \odot \textbf{Dir}
+	\end{dmath*}
+\end{dgroup*}
 
-Consider a 3-dimensional Euclidean space. Use $ z $ axis to denote the depth. The $ x  $ and $ y $ axis are perpendicular to each other. For a pixel $ (u,v) $ on depth map, its depth $ D(u,v) $ is the $ Z $ component of the corresponding point $P_C = (X,Y,Z) $ regarding camera coordinate system. Knowing $ Z $, corresponding depth map pixel $ D(u,v) $ and the camera focal length in pixels $ fk_u, fk_v $, the other two component  $ X $ and $ Y $ in the 3D space can be calculated based on the triangle similarity.
+For the direction $ \textbf{Dir}(x,y,z) $ of a point $ \textbf{V}(x,y,z) $, it's X and Y components can be mapped from the corresponding pixel position $ (u,v) $ on the depth map, whereas the Z component is the focal length $ fk $ in pixels. Then we have to further normalize it to an unit vector.
 
 \begin{dgroup*}
 	
 	\begin{dmath*}
-		X = \frac{uZ}{fk_u}
+		\textbf{Dir}(x, y, z) = \dfrac{(u, v, fk)}{\|(u, v, fk) \|^2_2}
 	\end{dmath*}
-	\begin{dmath*}
-		Y = \frac{vZ}{fk_v}
-	\end{dmath*}
+
 \end{dgroup*}
-Convert a point from camera coordinate system to the world coordinate system, using extrinsic matrix $ R $ and $ t $
-\[P_W = P_CR+t \]
+Conversion of a point from the camera coordinate system to the world coordinate system using the extrinsic matrix $ R $ and $ t $
+\[\textbf{V}_W = \textbf{V}_C R+t \]
 
 
 %% How to represent input tensor, to make it fast converse
-The sizes of each training object are various, we normalized them to an unit scale thus they has relatively similar distance to the camera.
-We showed the value fluctuation in each axis in Figure \ref{fig:data_range} before normalization. Table \ref{tab:data_range} gives a quantitative evaluation of the corresponding average values. 
+The sizes of the individual training objects are different. We normalized them to a unit scale so that they have a relatively similar distance from the camera.
+In Figure \ref{fig:data_range} we have plotted the variations in value in each axis before normalization. Table \ref{tab:data_range} gives a quantitative evaluation of the corresponding average values. 
 
-The normalization has been performed as follows. First, translate the points to the original point as close as possible, then choose the range value of one axis as a scale factor, and normalize the points to unit vectors. The equation is shown as follows
+The normalization was performed as follows. First, the points are translated to the original point as much as possible, then the range value of an axis is chosen as the scaling factor, and the points are normalized to unit vectors. The equation is represented as follows
+
 \begin{dgroup*}
-	
 	\begin{dmath*}
 		X_n =\frac{X-\min(X)}{s}
 	\end{dmath*}
@@ -216,19 +230,18 @@ The normalization has been performed as follows. First, translate the points to 
 	\begin{dmath*}
 		Z_n = \frac{Z-\min(Z)}{s}
 	\end{dmath*}
+	\begin{dmath*}
+		s = \max(X)-\min(X)
+	\end{dmath*}
 \end{dgroup*}
+where $ s $ is a scaling factor calculated as the range of the $ X $ axis, but theoretically it can also be the range of $ Y $ or $ Z $ axis.
 
-where $ s $ is a scale factor, 
-
-\begin{dmath*}
-	s = \max(X)-\min(X)
-\end{dmath*}
-which is calculated as the range of the $ X $ axis, but theoretically can be used by the $ Y $ or $ Z $ axes as well.
 
 \begin{figure}[!h]
 	\centering
-	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Extreme.png}}
-	{\includegraphics[width=0.45\textwidth]{./Figures/Data_Range.png}}
+	\captionsetup{width=\linewidth}
+	{\includegraphics[width=0.49\textwidth]{./Figures/Data_Extreme.png}}
+	{\includegraphics[width=0.49\textwidth]{./Figures/Data_Range.png}}
 	\decoRule
 	\caption{Left: Extreme value in 3 axis; Right: Vertex range in 3 axis}
 	\label{fig:data_range}
@@ -256,41 +269,44 @@ which is calculated as the range of the $ X $ axis, but theoretically can be use
 
 
 \paragraph{Image}
-The gray-scale image can be used for photometric stereo approach and also as a readable information for humans. Since the image captured by the camera is in RGB format, we need to convert it to gray colors to fit our models. It is based on the following equation.
+
+The grayscale image can be used for the photometric stereo method and also as readable information for humans. Since the image captured by the camera is in RGB format, we need to convert it to grayscale to fit our models. This is done using the following equation.
 \[ gray: \frac{R+2G+B}{4}  \]
 
 \paragraph{Normal Map}
-The normal map is the tangent surface normal, which is saved in a 8-bit/channel RGB image. The surface normal $ (n_x, n_y, n_z) $ and its corresponding RGB color $ (R,G,B) $ can be converted based on the following equation:
+The normal map is the tangential surface normal stored in an 8-bit/channel RGB image. The surface normal $ (n_x, n_y, n_z) $ and the corresponding RGB color $ (R,G,B) $ can be converted using the following equation:
+
 \begin{dgroup*}
 	\begin{dmath*}
-		n_x = \frac{R}{255} * 2 - 1
+		n_x = \frac{R}{255} \cdot 2 - 1
 	\end{dmath*}
 	\begin{dmath*}
-		n_y = \frac{G}{255}*2 - 1
+		n_y = \frac{G}{255} \cdot 2 - 1
 	\end{dmath*} 
 	\begin{dmath*}
-		n_z = 1-\frac{B}{255} * 2
+		n_z = 1-\frac{B}{255} \cdot 2
 	\end{dmath*}
 \end{dgroup*}
 
-In order to save training time, we compress the dataset in PyTorch format. The structure of a single item is shown in Table \ref{tab:tensor-structure}.
-\begin{table}[H]
-	\caption{The structure of a single tensor in the dataset.}
-	\label{tab:tensor-structure}
-	\centering
-	\begin{tabular}{l | l}
-		\toprule
-		\tabhead{Name} & \tabhead{Content} \\
-		\midrule
-		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
-		\hline
-		\multirow{3}{*}{output-tensor}  & GT-Normal \\ & Image \\ & GT-Light-Direction \\
-		\hline
-		Light position & light position \\
-		\hline 
-		Camera Matrix  & K,R,t\\
-		\hline 
-		Depth Range  & minDepth, maxDepth\\
-		\bottomrule
-	\end{tabular}
-\end{table}
+%In order to save training time, we compress the dataset in PyTorch format. The structure of a single item is shown in Table \ref{tab:tensor-structure}.
+%\begin{table}[H]
+%	\centering
+%	\captionsetup{width=\linewidth}
+%	\begin{tabular}{l | l}
+%		\toprule
+%		\tabhead{Name} & \tabhead{Content} \\
+%		\midrule
+%		\multirow{3}{*}{input-tensor}  & Vertex \\  & Image \\  & Light Direction \\
+%		\hline
+%		\multirow{3}{*}{output-tensor}  & GT-Normal \\ & Image \\ & GT-Light-Direction \\
+%		\hline
+%		Light position & light position \\
+%		\hline 
+%		Camera Matrix  & K,R,t\\
+%		\hline 
+%		Depth Range  & minDepth, maxDepth\\
+%		\bottomrule
+%	\end{tabular}
+%	\caption{The structure of a single tensor in the dataset.}
+%	\label{tab:tensor-structure}
+%\end{table}
