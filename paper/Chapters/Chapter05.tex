@@ -572,17 +572,20 @@ The \textit{GCNN} model gives a good result, but for the \textit{Washington} mod
 
 \section{Discussion on the Feature Maps in GCNN}
 
-As shown in Figure \ref{fig:gcnn-cnn-feature map}, we visualize the feature maps of the last gated convolution layer in the first upsampling part for \textit{GCNN}, \textit{NOC} and \textit{CNN} models corresponding to the 128 feature maps with size $ 32\times 32 $ in width and height. 
-The input data is also the same dragon object that we used for the normal visualization. For each feature map, we assign the minimum value to the leftmost color in the color bar and the maximum value to the rightmost color in the color bar. 
-We want to discuss the difference of feature maps between these three models.
+As shown in the figure, we visualize the feature maps of the last gated convolution layer in the first upsampling part for the models \textit{GCNN}, \textit{NOC} and \textit{CNN}, which correspond to 128 feature maps with size $ 32\times 32 $ in width and height. 
+The input data is also the same dragon object we used for the visualization. For each feature map, we assign the minimum value to the color on the far left of the color bar and the maximum value to the color on the far right of the color bar. 
+We will now discuss the differences between these models.
 
-To see the result clearly, we use green hue to visualize the feature maps and use brightness to distinguish the scale of the values: White corresponds to 1, Black corresponds to 0, and the colors with green hue correspond to some values in between. 
+To make the result clear, we use the green hue to visualize the feature maps and the brightness to distinguish the value scale: White corresponds to 1, Black corresponds to 0, and the colors with green hue correspond to some values in between. 
 
+
+
+%% CNN detail
 \begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_normal_gcnn-cnn.png}
+		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-cnn.png}
 		\caption{Normal Map}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.19\linewidth}
@@ -610,11 +613,11 @@ To see the result clearly, we use green hue to visualize the feature maps and us
 	\end{tikzpicture}
 	\decoRule
 	\caption{Some of feature maps of CNN model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:detail-feature-maps}
+	\label{fig:cnn-detail-feature-maps}
 \end{figure}
 
 
-
+%% NOC Detail
 \begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
@@ -647,12 +650,23 @@ To see the result clearly, we use green hue to visualize the feature maps and us
 	\end{tikzpicture}
 	\decoRule
 	\caption{Some of feature maps of NOC model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:detail-feature-maps}
+	\label{fig:noc-detail-feature-maps}
 \end{figure}
 
 
 
+We roughly distinguish feature maps into two types. The first type of feature maps learns the details of the target object that correspond to the feature map with sparse high values. In our example, the detail areas are the tail, head, paw, etc. Using the CNN feature maps, we could see that several detail areas in a feature map have high values. For example, in Figure \ref{fig:cnn-detail-feature-maps} (b), the values in the tail, hind leg, and front leg areas of the dragon object are especially high than other areas. These high valued areas are exactly the detailed areas and the areas with higher errors in the evaluation. These feature maps show that the CNN model assigns high value to several detailed parts in a single feature map. 
+In the case of the NOC model, one detailed part instead of several detailed parts is usually highly valued in a single feature map, as shown in Figure \ref{fig:noc-detail-feature-maps} (e). We can see that the hind legs are light, while other detailed areas such as the head or tail are dark. The NOC model uses one feature map to deal with only one specific detailed area. 
+The GCNN model follows the patterns we found in NOC, each feature map has only one specific area that is very bright, and the rest of the areas are relatively dark. In addition, the bright area in the GCNN model is more concentrated than in the NOC model because of the skip connection, as can be seen in Figure \ref{fig:gcnn-detail-feature-maps}. 
 
+
+
+
+
+
+
+
+%% GCNN detail
 \begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
@@ -685,9 +699,12 @@ To see the result clearly, we use green hue to visualize the feature maps and us
 	\end{tikzpicture}
 	\decoRule
 	\caption{Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:detail-feature-maps}
+	\label{fig:gcnn-detail-feature-maps}
 \end{figure}
 
+
+
+%% global compare
 \begin{figure}[H]
 		\centering
 		\captionsetup{width=\linewidth}
@@ -754,19 +771,12 @@ To see the result clearly, we use green hue to visualize the feature maps and us
 \end{figure}
 
 
+The second type of feature maps learns the global features of the target object corresponding to the feature map with dense, uniformly bright values. This type of feature maps provides an overview of the objects for rough prediction. As can be seen in Figure \ref{fig:global-feature-maps}, the global feature maps have much bigger bright areas compared to the detailed feature maps. In the CNN model, the bright areas are seen in most parts of the object, but usually one or more specific areas are missing, such as the front or back legs. The global feature maps in the NOC model are either incomplete or blurry, so the global features are not learned properly. The GCNN model provides more complete global feature maps. The outline of the dragon is particularly easy to see compared to the other two models.
+
+A complete version of the feature maps in this layer is shown in Figure \ref{fig:gcnn-cnn-feature map} in Appendix \ref{AppendixC}.
 
 
 
-From the CNN feature maps, we can see that the high-value areas usually represent more than one in a single feature map. Many of them have more than two bright areas. 
-In the GCNN feature maps, the bright areas are usually concentrated in only one area or even one point. When we map the bright areas onto the original image, they correspond to the dense, sharp areas, such as the mouse, horn, or tail of the kite object, which are usually the most difficult areas for the normal estimation task. We assume that these feature maps with few bright areas or only one bright area are the detail feature maps from which sharp edges can be inferred. Based on this assumption, we can say that the gated convolution layer describes the detail features more accurately compared to the standard convolution layer because the brightness regions are smaller. Most GCNN feature maps have only one bright pixel with a few green pixels, while CNN feature maps have more bright pixels with many dark pixels around the image. This accurate feature extraction gives our GCNN model better performance in the detailed areas.
-
-Second, with the GCNN model, we found that some feature maps have very uniformly bright areas across the entire object. They are either dark overall or bright overall. Nevertheless, these feature maps differ from the detail feature maps with only a few pixels with high values (brightness), but most other pixels with relatively low values. We suspect that these uniformly distributed feature maps are the global feature maps that provide an overview of the objects for rough prediction. Thus, they can cooperate with detailed feature maps to further refine the prediction. This is also true for the NOC model since it does not have skip connections and most of the feature maps are global feature maps, so the corresponding normal maps predicted by the NOC model are coarser than those of the GCNN model. For the CNN model, there are also global feature maps, but most of them are incomplete because either the tails or the paws are missing. 
-These missing areas are usually found in the detail feature maps. This also explains why the CNN detail feature maps have several bright areas in their detail feature maps. The detail feature maps and the global feature maps are mixed together. And this unclear feature map extractor leads to a decrease in performance in normal estimation tasks.
-
-
-
-
-\newpage 
 \section{Visual Evaluation on Trip-Net}
 In the approach that uses an illuminated, calibrated RGBD image, the task is performed by the Trip-Net presented in \ref{sec:trip-net}. Based on illumination and geometry information, the Trip-Net achieves a sharper and more accurate result compared to the GCNN model.
 
@@ -1060,12 +1070,9 @@ We also applied our model to a dataset acquired with a structured light scanner 
 \end{table}
 
 
-We do not have a ground truth for evaluation in the Real-Dataset. But if we look directly at the visualization in Figure \ref{fig:trip-eval-real}, we can see that the Trip-Net approach is well able to ``enhance'' the missing pixels in the scenes and also gives a sharp result. The wrinkles on the clothes are detectable and even countable. Figure \ref{fig:real_eval_compare} compares the trip net with other approaches.
 
 
-However, we also noticed that the large holes in the base level are preserved in the Normal Maps. These large holes correspond to the shiny and dark texture regions that are often present in the depth map captured by the scanners. Since these large holes are only related to specific feature areas and also have irregular shapes, we did not simulate this type of noise in the synthetic dataset, but only with a sparse binary mask. Therefore, our models could not fill in missing large holes in the estimated normal map. Further work on this topic could be to find a way to generate a very similar depth map noise to obtain a more robust training dataset. 
-
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.32\linewidth}
@@ -1109,36 +1116,36 @@ However, we also noticed that the large holes in the base level are preserved in
 
 
 %% real eval comparison
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_groundtruth.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_SVD.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_NNNN-512.png}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_normal_An2-real-resume.png}
 	\end{subfigure}
 	
 	
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/00008.image0.png}
 		\caption{GT}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_SVD.png}
 		\caption{SVD}
 	\end{subfigure}	
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_NNNN-512.png}
 		\caption{GCNN}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.2\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_An2-real-resume.png}
 		\caption{Trip-Net}
 	\end{subfigure}	
@@ -1146,3 +1153,10 @@ However, we also noticed that the large holes in the base level are preserved in
 	\caption{Real dataset ($ 512\times 512 $) comparison.}
 	\label{fig:real_eval_compare}
 \end{figure}
+
+
+We do not have a ground truth for evaluation in the Real-Dataset. But if we look directly at the visualization in Figure \ref{fig:trip-eval-real}, we can see that the Trip-Net approach is well able to ``enhance'' the missing pixels in the scenes and also gives a sharp result. The wrinkles on the clothes are detectable and even countable. Figure \ref{fig:real_eval_compare} compares the trip net with other approaches.
+
+
+However, we also noticed that the large holes in the base level are preserved in the Normal Maps. These large holes correspond to the shiny and dark texture regions that are often present in the depth map captured by the scanners. Since these large holes are only related to specific feature areas and also have irregular shapes, we did not simulate this type of noise in the synthetic dataset, but only with a sparse binary mask. Therefore, our models could not fill in missing large holes in the estimated normal map. Further work on this topic could be to find a way to generate a very similar depth map noise to obtain a more robust training dataset. 
+
