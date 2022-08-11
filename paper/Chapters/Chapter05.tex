@@ -3,11 +3,12 @@
 
 \section{Training Details}
 
-The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{ch:04} with 3000 scenes. Each scene has a depth map with dimension $ 128\times 128 $ in height and width, an image with dimension $ 128\times 128 $.  The depth map is converted from 3D vertex map as introduced in Chapter \ref{ch:04}. The light map is calculated based on vertex map and the known light position. We create a tensor in PyTorch that includes vertex map, image and the light direction for each scene and considered it as one training case. Thus 3000 scenes correspond 3000 training cases. Each scene has a corresponding ground-truth normal map for loss calculation and the evaluation. Figure \ref{fig:test-scene} shows some of the training cases. Note that the position of objects are not placed always naturally on the stage but with a random rotation in X, Y, Z axes, respectively.
+The models are trained on the dataset \textit{synthetic-50-5} with 3000 scenes mentioned in chapter \ref{ch:04}. Each scene has a depth map with dimension $ 128\times 128 $ in height and width, an image with dimension $ 128\times 128 $. The depth map is converted from the 3D vertex map as introduced in chapter \ref{ch:04}. The light map is computed from the vertex map and the known light position. We create a tensor in PyTorch containing the vertex map, image, and light direction for each scene and consider it as a training case. Thus, 3000 scenes correspond to 3000 training cases. For each scene, there is a corresponding ground truth normal map for loss calculation and evaluation. Figure \ref{fig:test-scene} shows some of the training cases. Note that the position of the objects is not always placed naturally on the stage, but with a random rotation in the X, Y and Z axes.
 
+% test scene
 \begin{figure}[H]
 	\centering
-	
+	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/03094.depth0.png}
 	\end{subfigure}
@@ -28,7 +29,7 @@ The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{
 	\end{subfigure}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.depth0_noise.png}
-		\caption{Add noise}
+		\caption{Added noise}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.image0.png}
@@ -36,52 +37,55 @@ The models are trained on dataset "synthetic-50-5" as mentioned in Chapter \ref{
 	\end{subfigure}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/test_scenes/05126.normal0.png}
-		\caption{Normal}
+		\caption{Normal Map}
 	\end{subfigure}
 	\decoRule
-	\caption{Some of the test scenes during the training. From top to bottom, baoshanlu, Washington, Garfield, Dragon, Bus}
+	\caption{Some of the evaluation scenes during the training. The objects from top to bottom rows: \textit{ Washington}, \textit{Bus}}
 	\label{fig:test-scene}
 \end{figure}
 
 
-Besides the 3000 training scenes, 100 extra scenes containing 5 different object models are as evaluation dataset during the training. They are evaluated in each epoch. 
+Besides the 3000 training scenes, 100 additional scenes with 5 different object models are used as evaluation dataset during the training. They are evaluated in each epoch. 
 
-For the training parameters, we set the training pipeline with batch size $ 8 $, we found that a higher batch size will reduce the final performance.  Adam optimizer (\cite{adam}), learning rate start from  $ 1\times10^{-3} $, it will decay at epoch 8 with learning decay factor 0.5. The model is trained with PyTorch 1.10.0a0, CUDA 11.4.1, GPU with single NVIDIA GEFORCE RTXA 6000. It takes 14 hours to train GCNN and 35 hours to train the Trip-Net. We terminate the training when the angle error of the normal map stop decreasing.
+For the training parameters, we set the training pipeline with a batch size of 8, since we found that a higher batch size decreases the final performance.  Adam Optimizer (\cite{adam}), learning rate starting at $ 1\times10^{-3} $, it will decrease at epoch 8 with learning decay factor 0.5. The model is trained using PyTorch 1.10.0a0, CUDA 11.4.1, GPU with an NVIDIA GEFORCE RTXA 6000. It takes 14 hours to train the GCNN and 35 hours to train the Trip-Net. We stop training when the angular error of the normal map stops decreasing.
 
-GCNN model is the base model of the whole thesis. The architecture is described in \ref{sec:gcnn}. We use a single GCNN to estimate the surface normal as a geometry based approach. It uses vertex map as input to estimate the corresponding tangent surface normal map. In order to verify the applicability of the skip connection and the gated convolution layers, we trained two extra models as a comparison. The first model, we replace all of the gated layer to standard convolution layers in the network but keeps all of the other settings same, and give it a name ``CNN". It is used to compare the performance between gated convolution layer and standard convolution layer for our normal inference task. As mentioned in chapter \ref{ch:03}, the gated layer is designed to deal with noised input. Since all of the vertex map in the dataset has been added noise, the GCNN is supposed to over-perform ``CNN". 
-Another model called ``NOC" is designed to verify the skip connection, which simply removes the skip connections in the network but keeps other settings same. Is is designed to show to which content will skip connection help the model performance. We use Reversed Huber Loss as loss function during the training. We found it gives a better final error compare to L2 loss. 
+
+The \textit{GCNN} is the base model of the whole work. The architecture is described in \ref{sec:gcnn}. We use a single \textit{GCNN} to estimate surface normals as a geometry-based approach. It uses a vertex map as input. To verify the applicability of the skip-connection and gated-convolution layers, we trained two additional models for comparison. 
+In the first model, we replace all gated layers with default convolutional layers in the network, but keep all other settings and give it the name \textit{CNN}. It is used to compare the performance between the gated layer and the default convolutional layer for our normal inference task. As mentioned in \ref{ch:03}, the gated layer is designed to process noisy input. Since the entire vertex map in the dataset was noisy, the \textit{GCNN} should outperform \textit{CNN}. 
+Another model called \textit{NOC} is used to check skip connections, which simply removes the skip connections in the network but leaves the other settings unchanged. Its purpose is to show to what extent the performance of the model is improved by skipping connections. We use Reversed Huber Loss as a loss function during training. We have found that it gives a better final error compared to L2 loss. 
 
 
 
 \begin{table}[H]
-	
 	\centering
+	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l l l l l }
 		\toprule
 		\tabhead{Model} & $ \# $\textbf{Total} &\textbf{ V-P} & \textbf{L-P} & \textbf{I-P} & \tabhead{Size /MB}\\
 		\midrule
 		\hline
-		CNN 					& 17 & 32 & 0 & 0 & 25.5 \\
+		CNN 					& 17 & 32 & - & - & 25.5 \\
 		\hline
-		NOC 					& 32 & 32 & 0 & 0 & 30.6 \\
+		NOC 					& 32 & 32 & - & - & 30.6 \\
 		\hline
-		GCNN 					& 32 & 32 & 0 & 0 & 45.8 \\
+		GCNN 					& 32 & 32 & - & - & 45.8 \\
 		\bottomrule
 	\end{tabular}
-	\caption{GCNN Model information. Columns V-P, L-P and I-P represent the number of convolution layers in vertex pipe, light pipe and image pipe respectively. Note that one gated convolution layer is constructed with 2 standard layers, thus it is counted as 2. }	
+	\caption{GCNN model information. The V-P, L-P, and I-P columns indicate the number of convolutional layers in the vertex pipe, light pipe, and image pipe, respectively. Note that a gated convolution layer consists of 2 standard layers and is therefore counted as 2.}	
 	\label{tab:gcnn-eval-mean}
 \end{table}
 
 
-The Trip-Net model uses three times GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. When we train this model, we take the GCNN model as a baseline, to observe the beneficial of illuminated information using with Trip-Net architecture.
-We also explored the optimum fusion times of the Trip-Net to see any possibility for the model simplification. A set of similar models have been trained with same settings but different fusion times, denotes by Trip-Net-F$ x $, where $ x $ denotes the fusion times. We evaluate the fusion times from 1 to 4. For the learning rate, we set it as $ 1e-3 $. It goes well with GCNN model but lead to loss explosion in Trip-Net. Thus we set a learning rate schedule with an extra decay step at epoch 8. The decay factor is $ 0.5$. The batch size is chosen as 8.
+The trip-net model uses a triple GCNN architecture with 4 times fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. When we train this model, we take the GCNN model as the baseline to observe the advantages of the illuminated information with the trip-net architecture.
+We also examined the optimal fusion times of the Trip-Net to determine a possible simplification of the model. A set of similar models was trained with the same settings but different fusion times, denoted Trip-Net-F$ x $, where $ x $ denotes the fusion times. We score the fusion times from 1 to 4. For the learning rate, we initially set $ 1e-3 $. This fits the GCNN model well, but leads to a loss explosion in the trip-net. Therefore, we set a learning rate schedule with an additional decay step at epoch 8. The decay factor is $ 0.5$. The batch size is set to 8.
 
-During the training we found that trip-Net with four times fusion converges obviously faster than fewer fusion times model. However, model F3 with 3 times fusion converge slower than F4 but in the end it achieves a similar evaluation loss with F4(see Qualitative evaluation). The F1 and F2 models are relatively less accurate than the other two models, but the sacrifice of accuracy gives a relatively lighter model. Since they have less fusion times, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained in a faster way and the size is reduced as well. Table \ref{tab:trip-net-size-compare} gives a comparison of the size and training time among different models.
+During training, we found that the trip-net with 4 fusions converges significantly faster than models with fewer fusion times. However, model F3 with three times fusion converges slower than F4, but ends up with a similar loss of score as F4 (see Qualitative Evaluation). Models F1 and F2 are relatively less accurate than the other two models, but the sacrifice of accuracy results in a relatively lighter model. Since they have fewer fusion times, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster, and the size is also smaller. Table \ref{tab:trip-net-size-compare} contains a comparison of the size of different models.
+
 
 
 \begin{table}[H]
-	
 	\centering
+	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l l l l l }
 		\toprule
 		\tabhead{Model} & $ \# $\textbf{Total} &\textbf{ V-P} & \textbf{L-P} & \textbf{I-P} & \tabhead{Size /MB}\\
@@ -102,26 +106,74 @@ During the training we found that trip-Net with four times fusion converges obvi
 
 \section{Quantitative Evaluation on 6 Metrics}
 We evaluated our models on synthetic dataset with resolution $ 128\times 128 $. 
-Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robustness to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. 
+Based on metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for evaluation. Note that the input vertex map is only semi-dense. One of the benefit of GCNN architecture is the robustness to the noisy input, thus in the evaluation, all the points including missing points in the input vertex map are taken into account. We use $\tilde{\textbf{N}}$ denotes the estimated normal map, $ \textbf{N} $ denotes the ground-truth normal map, $ P $ denotes the \textit{set} of valid points, \textit{ValidNum} denotes the number of valid points. \textit{abs} is a function to calculate the absolute value of the given value, \textit{median} is a function calculate the median value of a given set.
 
-\paragraph{Average Angle Error Metric}
-The metric calculate the average angle error for each point between the inferred normal and ground-truth normal map. 
-\paragraph{Median Angle Error Metric}
-The metric calculate the median angle error of all the point in the normal map.
+\paragraph{Average Angle Error Metric (AAE)}
+The metric calculates the average angle error for each point between the inferred normal and ground-truth normal map. 
+%% https://www.cuemath.com/geometry/angle-between-vectors/
+\[ 
+AAE = \frac
+{1}
+{ValidNum} \cdot \sum_{i\in P}  \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) 
+\]
+
+\paragraph{Median Angle Error Metric (MED)}
+The metric calculates the median angle error of all of the points in the normal map.
+\[ 
+MED = 
+\text{Median}   \left( \Bigg\{ i \in P \Bigg |  \text{abs}\left(\arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \right)   \Bigg\}\right)
+\]
+
 \paragraph{5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 5 degrees comparing to ground-truth.
+The metric calculates the percentage of the predicted normals that has error less than $ 5^\circ $ comparing to ground-truth. It first calculates the number of normals that have error less than $ 5^\circ $
+\[
+D_5 = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 5 \right)
+\]
+Then it calculate the percentage of the normals that error less than $ 5^\circ $.
+\[ 
+E_5 = \frac{D_5}{ValidNum}\times 100\%
+\]
+
+
 \paragraph{11.5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 11.5 degrees comparing to ground-truth.
+The metric calculates the percentage of the predicted normals that has error less than $ 11.5^\circ $ comparing to ground-truth. It first calculates the number of normals that have error less than $ 11.5^\circ $.
+
+\[
+D_{11.5} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 11.5 \right)
+\]
+Then it calculate the percentage of the normals that error less than $ 11.5^\circ $.
+\[ 
+E_{11.5} = \frac{D_{11.5}}{ValidNum}\times 100\%
+\]
+
 \paragraph{22.5 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 22.5 degrees comparing to ground-truth.
+The metric calculates the percentage of the predicted normals that has error less than $ 22.5^\circ $ comparing to ground-truth. It first calculates the number of normals that have error less than $ 22.5^\circ $.
+
+\[
+D_{22.5} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 22.5 \right)
+\]
+Then it calculate the percentage of the normals that error less than $ 22.5^\circ $.
+\[ 
+E_{22.5} = \frac{D_{22.5}}{ValidNum}\times 100\%
+\]
+
+
 \paragraph{30 Degree Error Metric}
-The metric calculate the percentage of the predicted normals that has error less than 30 degrees comparing to ground-truth.
+The metric calculates the percentage of the predicted normals that has error less than $ 30^\circ $ comparing to ground-truth. It first calculates the number of normals that have error less than $ 30^\circ $.
 
-We evaluated our trained models on ``synthetic-50-5". 5 objects are considered in the test dataset. They are: $ Baoshanlu $, $ Bus $, $ Dragon $, $ Garfield $, and $ Washington $. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each models are simplified. $ SVD $ model use SVD optimization method, $ NOC $ model is the no skip connection version of $ GCNN $, $ CNN $ is the CNN version of $ GCNN $. $ F1 $, $ F2 $, $ F3 $,$ F4 $ means the fusion times in the Trip-Net. 
+\[
+D_{30} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 30 \right)
+\]
+Then it calculate the percentage of the normals that error less than $ 30^\circ $.
+\[ 
+E_{30} = \frac{D_{30}}{ValidNum}\times 100\%
+\]
 
-When evaluate the $ GCNN $ models, we can take $ SVD $ model as baseline, $ NOC $ and $ CNN $ are used to verify the performance of $ GCNN $ model. When evaluate the $ F1-F4 $ models, we can take $ GCNN $ model as baseline. 
+We evaluated our trained models on \textit{synthetic-50-5}. 5 objects are considered in the test dataset. They are: \textit{Baoshanlu}, \textit{Bus},  \textit{Dragon}, \textit{Garfield} , and \textit{Washington}. Each object has 20 scenes with total 100 scenes for 5 objects. The test objects do not exist in the training dataset. We evaluate all the presented models on the test dataset, in order to fit them in one table, the name of each model are simplified. \textit{SVD}  model use SVD optimization method, \textit{NOC} model is the no skip connection version of \textit{GCNN}, \textit{CNN} is the CNN version of \textit{GCNN}. \textit{F1}, \textit{F2}, \textit{F3}, \textit{F4} means the fusion times in the Trip-Net. 
 
-From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like $ dragon $ achieves 98\%. The best performance is around 90\%, 75 \%, 45 \% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metrics respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the$ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the models.
+When evaluating the \textit{GCNN} models, we take \textit{SVD} model with an optimal neighbor size as baseline. \textit{NOC} and \textit{CNN} are used to verify the performance of \textit{GCNN} model. When evaluate the \textit{F1}-\textit{F4} models, we can take \textit{GCNN} model as baseline. 
+
+From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like \textit{dragon} achieves 98\%. The best performance is around 90\%, 75 \%, 45 \% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metrics respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the $ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the models.
 
 
 %% mean metric
@@ -142,7 +194,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 42.83 & 13.43 & 17.59 & 18.71 & 13.32 & 13.40 & 12.62 &\textbf{ 12.60}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Average Angle Error of the evaluation dataset.}	
+	\caption{Average Angle Error of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-mean}
 \end{table}
 
@@ -164,7 +216,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 36.89 & 7.64 & 11.38 & 13.64& 7.49 & 7.60 &\textbf{ 7.03 }& 7.25\\
 		\bottomrule
 	\end{tabular}
-	\caption{Median Angle Error of the evaluation dataset.}	
+	\caption{Median Angle Error of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-median}
 \end{table}
 
@@ -187,7 +239,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 0.00 & 0.38 & 0.26 & 0.10 & 0.36 & 0.36 & \textbf{0.40 }& 0.37\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percent of error less than 5 degree of the evaluation dataset.}	
+	\caption{Percent of error less than 5 degree of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-5d}
 \end{table}
 
@@ -210,7 +262,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 0.02 & 0.62 & 0.50 & 0.40 & 0.63 & 0.62 & 0.64 & \textbf{0.65}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percent of error less than 11.5 degree of the evaluation dataset.}	
+	\caption{Percent of error less than 11.5 degree of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-11d}
 \end{table}
 
@@ -234,7 +286,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 0.14 & 0.81 & 0.72 & 0.72 & 0.81 & 0.81 & \textbf{0.83} &\textbf{ 0.83}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percent of error less than 22.5 degree of the evaluation dataset.}	
+	\caption{Percent of error less than 22.5 degree of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-22d}
 \end{table}
 
@@ -257,7 +309,7 @@ From the table we can see that all the learning based approaches achieves a bett
 		Washington 		& 20 & 0.28 & 0.88 & 0.81 & 0.82 & 0.88 & 0.88 & \textbf{0.89} & \textbf{0.89}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percent of error less than 30 degree of the evaluation dataset.}	
+	\caption{Percent of error less than 30 degree of the evaluation dataset. \textit{SVD} neighbor size $ k=2 $}	
 	\label{tab:eval-30d}
 \end{table}
 
