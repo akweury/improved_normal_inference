@@ -29,8 +29,8 @@ args = parser.parse_args()
 
 
 def convert2training_tensor(path, k, output_type='normal'):
-    width = 512
-    light_num = 1
+    width = 128
+    light_num = 10
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -58,7 +58,8 @@ def convert2training_tensor(path, k, output_type='normal'):
         light_pos_list = []
         for i in range(light_num):
             if output_type == "normal":
-                light_posi = np.array(data[f'lightPos'])
+                # light_posi = np.array(data[f'lightPos'])
+                light_posi = np.array(data[f'lightPos{str(i)}'])
             else:
                 light_posi = np.array(data[f'lightPos{str(i)}'])
             # light_posi = np.array(data[f'lightPos'])
@@ -173,14 +174,17 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
-    for folder in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
+    # for folder in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
+    for folder in ["selval"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
             dataset_folder = config.synthetic_data_noise_dfki / args.data / folder
         elif args.machine == 'local':
-            original_folder = config.synthetic_data / args.data / "seperate" / folder
-            dataset_folder = config.synthetic_data_noise_local / args.data / "seperate" / folder
+            # original_folder = config.synthetic_data / args.data / "seperate" / folder
+            original_folder = config.synthetic_data / args.data / folder
+            # dataset_folder = config.synthetic_data_noise_local / args.data / "seperate" / folder
+            dataset_folder = config.synthetic_data_noise_local / args.data / folder
         else:
             raise ValueError
 

@@ -195,7 +195,7 @@ def start2(models_path_dict):
     #     font_scale = 1
     # else:
     #     raise ValueError
-    font_scale = 1
+    font_scale = 2
 
     # read data
     test_0_data = np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))
@@ -236,22 +236,24 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -7]), farthest_neighbour=2)
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -10]), farthest_neighbour=1)
 
                 #
 
                 normal = normal[:, :, :3]
-                # normal[normal > 1] = 1
-                # normal[normal < -1] = -1
-                # normal[mask] = 0
+                normal[normal > 1] = 1
+                normal[normal < -1] = -1
+                normal[mask] = 0
                 diff_img, diff_angle = mu.eval_img_angle(normal, gt)
                 diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
                 cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
                            cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
                 cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
-                    mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
-                    cv.COLOR_RGB2BGR))
+                    mu.visual_diff(gt, normal, "angle"), cv.COLOR_RGB2BGR))
+                # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
+                #     mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
+                #     cv.COLOR_RGB2BGR))
 
             else:
                 checkpoint = torch.load(model)
@@ -379,7 +381,7 @@ def start2(models_path_dict):
                         normal = xout[:, :, :3]
                         normal[normal > 1] = 1
                         normal[normal < -1] = -1
-                        # normal[mask] = 0
+                        normal[mask] = 0
                         diff_img, diff_angle = mu.eval_img_angle(normal, gt)
                         diff = np.sum(np.abs(diff_angle)) / np.count_nonzero(diff_angle)
 
@@ -392,9 +394,12 @@ def start2(models_path_dict):
 
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_normal_{name}.png"),
                                    cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+
                         cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
-                            mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
-                            cv.COLOR_RGB2BGR))
+                            mu.visual_diff(gt, normal, "angle"), cv.COLOR_RGB2BGR))
+                        # cv.imwrite(str(folder_path / f"fancy_eval_{i}_error_{name}.png"), cv.cvtColor(
+                        #     mu.visual_img(diff_img, "", upper_right=int(diff), font_scale=font_scale),
+                        #     cv.COLOR_RGB2BGR))
 
                         eval_res[model_idx, i] = diff
 
@@ -454,9 +459,9 @@ if __name__ == '__main__':
         # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-289.pth.tar",  # Trip Net
 
         # "GCNN-512-226": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",  # Trip Net
-        # "GCNN-GCNN": config.paper_exp / "gcnn" / "checkpoint-gcnn-1099.pth.tar",  # GCNN
-        # "GCNN-NOC": config.paper_exp / "gcnn" / "checkpoint-noc-807.pth.tar",
-        # "GCNN-CNN": config.paper_exp / "gcnn" / "checkpoint-cnn-695.pth.tar",
+        "GCNN-GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",  # GCNN
+        "GCNN-NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
+        "GCNN-CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
         #
         # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
         # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-655.pth.tar",
@@ -466,8 +471,8 @@ if __name__ == '__main__':
         # "Trip-Net-512": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN
         # "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-82.pth.tar",
         # "An2-real-resume": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
-        "An2-real-resume-616": config.ws_path / "an_real" / "checkpoint-resume-616.pth.tar",
-        "SVD": None,
+        # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
+        # "SVD": None,
         # "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
         # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "checkpoint-168.pth.tar",
         # "f4": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net

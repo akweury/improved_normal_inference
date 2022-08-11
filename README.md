@@ -64,9 +64,9 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
     
     srun \
-      --job-name="INI-an2-f2f-huber" \
+      --job-name="INI-an2-f1f-huber" \
       --time=3-00:00 \
-      -p A100 \
+      -p RTX3090 \
       --ntasks=1 \
       --gpus-per-task=1 \
       --mem=32G \
@@ -74,7 +74,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.08-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f2f
+      python3 main.py --machine remote --exp an2 --dataset synthetic128 --batch_size 8 --lightNumUse 1 --lr-scheduler 8,1000 --print-freq 1 --net_type gnet-f1f
 
     srun \
       --job-name="real_refine_gcnn" \
@@ -93,7 +93,7 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
 
 
     srun \
-      --job-name="INI-noc-Huber" \
+      --job-name="INI-gcnn-Huber-b32" \
       --time=3-00:00 \
       -p A100 \
       --ntasks=1 \
@@ -103,8 +103,8 @@ CUDA_VISIBLE_DEVICES=2 python3 main.py --machine remote --exp albedoGated --data
       --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_21.10-py3.sqsh \
       --container-workdir="`pwd`" \
       --container-mounts=/netscratch/$USER:/netscratch/$USER,/ds:/ds:ro,"`pwd`":"`pwd`" \
-      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 8 --lr-scheduler 8,1000 --print-freq 1 \
-      --net_type gcnn_noc
+      python3 main.py --machine remote --exp nnnn --dataset synthetic128 --batch_size 32 --lr-scheduler 8,1000 --print-freq 1 \
+      --net_type gcnn
 
 
     srun \

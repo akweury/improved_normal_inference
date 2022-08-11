@@ -76,7 +76,7 @@ def noisy_a_folder(folder_path, output_path):
             # get noise mask
             # img = np.expand_dims(file_io.load_16bitImage(img_files[idx]), axis=2)
             # img[img < 20] = 0
-            depth, noise_factor = noisy_1channel(depth)
+            depth, noise_factor = noisy_1channel(depth, noise_factor=0.5)
 
             # save files to the new folders
             file_io.save_scaled16bitImage(depth,

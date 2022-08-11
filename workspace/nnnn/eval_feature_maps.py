@@ -20,7 +20,7 @@ datasize = args.datasize
 font_scale = 1
 
 # read data
-test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[7])  # 7
+test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[2])  # 7
 
 # unpack model
 test_0_tensor = test_0['input_tensor'].unsqueeze(0)
@@ -87,6 +87,12 @@ for model_idx, (name, model) in enumerate(models.items()):
     feature_map_conv1 = []
     feature_map_conv2 = []
 
+    feature_maps = []
+
+    p50 = 0
+    p75 = 0
+    p95 = 0
+
     model.normal_net.dconv1.register_forward_hook(get_activation('dconv1'))
     model.normal_net.dconv2.register_forward_hook(get_activation('dconv2'))
     model.normal_net.dconv3.register_forward_hook(get_activation('dconv3'))
@@ -144,6 +150,7 @@ for model_idx, (name, model) in enumerate(models.items()):
         feature_map[-1, :] = 255
         feature_map[:, 0] = 255
         feature_map[:, -1] = 255
+        cv.imwrite(str(folder_path / f"feature_map_{name}_{idx}.png"), cv.applyColorMap(feature_map, CV_COLOR))
         feature_map_uconv1.append(cv.applyColorMap(feature_map, CV_COLOR))
 
     act = activation['uconv2'].squeeze().to("cpu")

@@ -66,6 +66,16 @@ def visual_albedo_histo(albedo_gt):
 
 
 if __name__ == '__main__':
+    normal_file = str(config.paper_pic / "comparison_real" / "fancy_eval_20_normal_An2-real-resume-616.png")
+    gt_file = str(config.paper_pic / "comparison_real" / "fancy_eval_20_groundtruth.png")
+
+    normal = file_io.load_24bitNormal(normal_file)
+    gt = file_io.load_24bitNormal(gt_file)
+    mask = gt.sum(axis=-1) == 0
+    normal[mask] = 0
+    cv.imwrite(str(config.paper_pic / "comparison_real" / "fancy_eval_20_normal_An2_no_mask.png"),
+               cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
+
     training_tensor, gt_tensor = load_a_training_tensor()
     vertex = training_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
     light_input = training_tensor[:, 13:16, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()
