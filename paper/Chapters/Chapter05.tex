@@ -49,7 +49,9 @@ Besides the 3000 training scenes, 100 additional scenes with 5 different object 
 
 For the training parameters, we set the training pipeline with a batch size of 8, since we found that a higher batch size decreases the final performance.  Adam Optimizer (\cite{adam}), learning rate starting at $ 1\times10^{-3} $, it will decrease at epoch 8 with learning decay factor 0.5. The model is trained using PyTorch 1.10.0a0, CUDA 11.4.1, GPU with an NVIDIA GEFORCE RTXA 6000. It takes 14 hours to train the GCNN and 35 hours to train the Trip-Net. We stop training when the angular error of the normal map stops decreasing.
 
-
+\begin{flushright}
+	
+\end{flushright}
 The \textit{GCNN} is the base model of the whole work. The architecture is described in \ref{sec:gcnn}. We use a single \textit{GCNN} to estimate surface normals as a geometry-based approach. It uses a vertex map as input. To verify the applicability of the skip-connection and gated-convolution layers, we trained two additional models for comparison. 
 In the first model, we replace all gated layers with default convolutional layers in the network, but keep all other settings and give it the name \textit{CNN}. It is used to compare the performance between the gated layer and the default convolutional layer for our normal inference task. As mentioned in \ref{ch:03}, the gated layer is designed to process noisy input. Since the entire vertex map in the dataset was noisy, the \textit{GCNN} should outperform \textit{CNN}. 
 Another model called \textit{NOC} is used to check skip connections, which simply removes the skip connections in the network but leaves the other settings unchanged. Its purpose is to show to what extent the performance of the model is improved by skipping connections. We use Reversed Huber Loss as a loss function during training. We have found that it gives a better final error compared to L2 loss. 
