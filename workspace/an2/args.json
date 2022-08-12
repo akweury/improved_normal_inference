@@ -4,7 +4,7 @@
   "exp": "an2",
   "num_channels": 128,
   "resume": null,
-  "lightNum": 1,
+  "lightNum": 10,
   "epochs": 999,
   "init_net": null,
   "init_light_net": null,
