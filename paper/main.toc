@@ -47,7 +47,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{L2 Loss}{15}{section*.38}%
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Reversed Huber Loss}{16}{section*.39}%
+\contentsline {paragraph}{Huber Loss}{16}{section*.39}%
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}Dataset}{19}{chapter.42}%
 \defcounter {refsection}{0}\relax 

@@ -92,8 +92,8 @@ if __name__ == '__main__':
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
             # test_folder = config.real_data / "test"
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
-            # test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
+            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
                 # "SVD": None,
@@ -108,13 +108,12 @@ if __name__ == '__main__':
 
                 # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
                 # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
-                # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
+                # "GCNN-BerHu": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
                 # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-
+                # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+                # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
                 "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-                "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
-                "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
-                "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1250.pth.tar",
+                "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1000.pth.tar",
 
                 # Trip Net
 

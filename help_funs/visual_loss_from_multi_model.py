@@ -15,13 +15,8 @@ models = {
     # "Trip-Net-2": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-1116.pth.tar",
     #
 
-    "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-10_23_31_53" / "checkpoint-500.pth.tar",
-    "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-11_02_37_42" / "checkpoint-550.pth.tar",
-    "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-10_23_29_16" / "checkpoint-50.pth.tar",
-    "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-08-10_23_28_52" / "checkpoint-900.pth.tar",
-
-    # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-    # "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1250.pth.tar",
+    "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+    "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1499.pth.tar",
     # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
     # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
     # "GCNN-Berhu": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",

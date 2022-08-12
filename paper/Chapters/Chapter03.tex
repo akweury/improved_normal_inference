@@ -441,7 +441,7 @@ At the end of the network, to fit the task of normal inference, two standard con
 %% loss function 
 
 \subsection{Loss Functions}
-We have investigated different loss functions for training our network. The most common loss functions are the L1 loss and the L2 loss for image simulation. In our experiments, we used a modified BerHu loss function to train our model, which yields a lower error in the evaluation compared to a pure L1 or L2 loss function. 
+We have investigated different loss functions for training our network. The most common loss functions are the L1 loss and the L2 loss for image simulation. In our experiments, we used a modified Huber loss function to train our model, which yields a lower error in the evaluation compared to a pure L1 or L2 loss function. 
 
 \paragraph{L1 Loss}
 L1 loss, also known as absolute error loss, which calculates the absolute difference between the prediction and the ground truth. It leads to the mean value of the absolute errors of the observations.
@@ -467,21 +467,19 @@ The standard loss function for optimization in regression problems is the L2 los
 %where $ x $ is input, $ y $ is target, $ N $ is the batch size.$ mask_{obj} $ is the mask of the object, i.e. 1 means it is an pixel on the object, 0 is an pixel on the background. $ mask_{ol} $ is the mask for the outliers, i.e. 1 means outliers, 0 means non outlier, $ mask_{nol} $ is exactly the inverse of $ mask_{ol} $. $ p $ is the penalty of the outliers, it is set as 1.4.
 
 
-\paragraph{Reversed Huber Loss}
-Inspired by \cite{img2depth}, we use the reversed Huber loss provided by \cite{berhu-loss} for our model training, which indeed achieves a better error than a simple L2 loss. It can be described mathematically as follows.
+\paragraph{Huber Loss}
+Inspired by \cite{img2depth}, we use the Huber loss provided by \cite{berhu-loss} for our model training, which indeed achieves a better error than a simple L2 loss. It can be described mathematically as follows.
 
 
 \begin{equation}\label{berhu-loss}
 	\begin{array}{ll}
 		\mathcal{B}(y)= \begin{cases}
-			|y| & |y| \le c \\
-			\dfrac{y^2 + c^2}{2c} & |x| > c\\
+			|y| & |y| \ge c \\
+			\dfrac{y^2 + c^2}{2c} & |x| < c\\
 		\end{cases}
 	\end{array}
 \end{equation}
-where $ c=0.2\max (|\tilde y - y|) $. The shape of the loss is shown in Figure \ref{fig:berhu-loss-shape}. Reversed Huber loss, also called BerHu loss, is a combination of L1 and L2 loss, being L1 loss in the range $ [-c,c] $ and L2 loss outside this range. The loss is also differentiable at the junction of two first order intersection functions. As mentioned in \cite{img2depth}, the parameter $ c=0.2 \max(|\tilde y - y|) $ corresponds to the 20\% of the maximum error per batch. 
-
-The choice of the combination losses is reasonable because they give more weight to the errors compared to the L2 loss, but also preserve the outlier suppression features in the L2 loss. The output type in our model is the surface normal, which has a range between $[-1,1] $, so we need the L2 loss to penalize larger errors. On the other hand, the L2 loss suppresses small values near zero more than the values greater than $ 1 $ or smaller than $ -1 $, because it uses a quadratic curve. Therefore, flattening the region near zero is a good choice for equilibrium. In our experiments, the BerHu loss shows better performance for all the models we trained.
+where $ c=0.2\max (|\tilde y - y|) $. The shape of the loss is shown in Figure \ref{fig:berhu-loss-shape}. Huber loss is a combination of L1 and L2 loss, being L2 loss in the range $ [-c,c] $ and L1 loss outside this range. The loss is also differentiable at the junction of two first order intersection functions. As mentioned in \cite{img2depth}, the parameter $ c=0.2 \max(|\tilde y - y|) $ corresponds to the 20\% of the maximum error per batch. 
 
 \begin{figure}[H]
 	\centering
@@ -489,15 +487,15 @@ The choice of the combination losses is reasonable because they give more weight
 	\begin{tikzpicture}
 		\pgfplotsset{ticks=none}
 		\begin{axis} [axis lines=center]
-			\addplot [domain=0:1, smooth, thick, width=5mm, color=red] { x };
-			\addplot [domain=1:2, smooth, width=5mm] { x };
-			\addplot [domain=-2:-1, smooth, width=3mm] { -x };
-			\addplot [domain=-1:0, smooth, thick, width=3mm, color=red] { -x };
-			\addplot [domain=-2:-1, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
-			\addplot [domain=1:2, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+			\addplot [domain=1:2, smooth, thick, width=5mm, color=red] { x };
+			\addplot [domain=0:1, smooth, width=5mm] { x };
+			\addplot [domain=-1:0, smooth, width=3mm] { -x };
+			\addplot [domain=-2:-1, smooth, thick, width=3mm, color=red] { -x };
+			\addplot [domain=-1:0, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
+			\addplot [domain=0:1, smooth, thick, color=red] { (x^2+1^2)/(2*1) };
 		\end{axis}
 	\end{tikzpicture}
-	\caption{The shape of Berhu Loss (show in red line). }
+	\caption{The shape of Huber Loss (show in red line). }
 	\label{fig:berhu-loss-shape}
 \end{figure}
 

@@ -9,9 +9,14 @@ from eval_visual import preprocessing, evaluate_epoch
 from help_funs import mu
 
 models = {
-    "gcnn-cnn": config.gcnn_cnn,
-    "gcnn-noc": config.gcnn_noc,
-    "gcnn-gcnn": config.gcnn_gcnn,
+    # "gcnn-cnn": config.gcnn_cnn,
+    # "gcnn-noc": config.gcnn_noc,
+    # "gcnn-gcnn": config.gcnn_gcnn,
+
+    "gcnn-cnn": config.gcnn_cnn_huber,
+    "gcnn-noc": config.gcnn_noc_huber,
+    "gcnn-gcnn": config.gcnn_gcnn_huber,
+
 }
 
 models, dataset_path, folder_path, eval_res, eval_date, eval_time, all_names, args = preprocessing(
@@ -20,7 +25,7 @@ datasize = args.datasize
 font_scale = 1
 
 # read data
-test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[2])  # 7
+test_0 = torch.load(np.array(sorted(glob.glob(str(dataset_path / f"*_0_*"), recursive=True)))[7])  # 7
 
 # unpack model
 test_0_tensor = test_0['input_tensor'].unsqueeze(0)

@@ -21,7 +21,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Three kinds of input data. From left to right, vertex map, light map, gray-scale image.\relax }}{13}{figure.caption.30}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces The shape of Berhu Loss (show in red line). \relax }}{16}{figure.caption.41}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces The shape of Huber Loss (show in red line). \relax }}{16}{figure.caption.41}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.5}{\ignorespaces The architecture of Gated convolution neural network (\textit {GCNN}) based on Gated convolution and \textit {U-Net} Architecture.\relax }}{17}{figure.caption.23}%
 \defcounter {refsection}{0}\relax 
