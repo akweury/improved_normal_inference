@@ -348,15 +348,19 @@ However, it fails in the areas such as the hind leg, horn, and mouth, which are 
 \begin{figure}[th]
 	\centering
 	\captionsetup{width=\linewidth}
-	\begin{subfigure}[b]{0.32\linewidth}
+		\begin{subfigure}[b]{0.24\linewidth}
+		\includegraphics[width=\linewidth]{./Figures/svd-synthetic/no-noise/fancy_eval_22_point_cloud_no_noise.png}
+		\caption{Vertex}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/svd-synthetic/no-noise/fancy_eval_22_groundtruth.png}
 		\caption{GT}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.32\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/svd-synthetic/no-noise/fancy_eval_22_normal_SVD.png}
 		\caption{SVD}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.32\linewidth}
+	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/svd-synthetic/no-noise/fancy_eval_22_error_SVD.png}
 		\caption{Error}
 	\end{subfigure}
@@ -523,9 +527,14 @@ The \textit{GCNN} model gives a good result, but for the \textit{Washington} mod
 		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/eval_7_12_-48_error.png}
 		\caption{Tail}
 	\end{subfigure}
-	
+		\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
 	\decoRule
-	\caption{Zoom in of some regions of Dragon object (GCNN models). (Resolution: $ 32\times32 $)}
+	\caption{Zoom in of some regions of Dragon object based on GCNN. (Resolution: $ 32\times32 $)}
 	\label{fig:gcnn-eval-synthetic-zoom-in}
 \end{figure}
 
@@ -563,7 +572,12 @@ The \textit{GCNN} model gives a good result, but for the \textit{Washington} mod
 		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_7_error_GCNN-CNN.png}
 		\caption{CNN}
 	\end{subfigure}
-	
+		\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
 	\decoRule
 	\caption{Comparison of GCNN based models. (Resolution: $ 128\times 128 $)}
 	\label{fig:gcnn-eval-multi-model}
@@ -579,31 +593,60 @@ We will now discuss the differences between these models.
 To make the result clear, we use the green hue to visualize the feature maps and the brightness to distinguish the value scale: White corresponds to 1, Black corresponds to 0, and the colors with green hue correspond to some values in between. 
 
 
-
-%% CNN detail
+%% global compare
 \begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-cnn.png}
-		\caption{Normal Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_46.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_11.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_4.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_2.png}
-		\caption{Feature Map}
-	\end{subfigure}
+	\begin{minipage}{0.32\linewidth}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_2.png}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_46.png}
+		\end{subfigure}
+		
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_11.png}
+			\caption{CNN}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_4.png}
+		\end{subfigure}
+	\end{minipage}
+	\begin{minipage}{0.32\linewidth}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_39.png}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_45.png}
+		\end{subfigure}
+		
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_93.png}
+			\caption{NOC}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_104.png}
+		\end{subfigure}
+		
+	\end{minipage}
+	\begin{minipage}{0.32\linewidth}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_4.png}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_5.png}
+		\end{subfigure}
+		
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_15.png}
+			\caption{GCNN}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\linewidth}
+			\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_127.png}
+		\end{subfigure}
+		
+	\end{minipage}
 	
 	\begin{tikzpicture}
 		\node[text width=0.1\textwidth] at (11,-1) {1};
@@ -612,96 +655,133 @@ To make the result clear, we use the green hue to visualize the feature maps and
 		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
 	\end{tikzpicture}
 	\decoRule
-	\caption{Some of feature maps of CNN model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:cnn-detail-feature-maps}
+	\caption{Some of detail feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times32 $}
+	\label{fig:detail-feature-maps}
 \end{figure}
+
+
+%% CNN detail
+%\begin{figure}[H]
+%	\centering
+%	\captionsetup{width=\linewidth}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-cnn.png}
+%		\caption{Normal Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_46.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_11.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_4.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-cnn_2.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	
+%	\begin{tikzpicture}
+%		\node[text width=0.1\textwidth] at (11,-1) {1};
+%		\node[inner sep=0pt] (input) at (8,-1)
+%		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
+%		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
+%	\end{tikzpicture}
+%	\decoRule
+%	\caption{Some of feature maps of CNN model in up-sampling part on resolution $ 32\times32 $}
+%	\label{fig:cnn-detail-feature-maps}
+%\end{figure}
 
 
 %% NOC Detail
-\begin{figure}[H]
-	\centering
-	\captionsetup{width=\linewidth}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-noc.png}
-		\caption{Normal Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_39.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_45.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_93.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_104.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (11,-1) {1};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
-		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
-	\end{tikzpicture}
-	\decoRule
-	\caption{Some of feature maps of NOC model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:noc-detail-feature-maps}
-\end{figure}
+%\begin{figure}[H]
+%	\centering
+%	\captionsetup{width=\linewidth}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-noc.png}
+%		\caption{Normal Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_39.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_45.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_93.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-noc_104.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	
+%	\begin{tikzpicture}
+%		\node[text width=0.1\textwidth] at (11,-1) {1};
+%		\node[inner sep=0pt] (input) at (8,-1)
+%		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
+%		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
+%	\end{tikzpicture}
+%	\decoRule
+%	\caption{Some of feature maps of NOC model in up-sampling part on resolution $ 32\times32 $}
+%	\label{fig:noc-detail-feature-maps}
+%\end{figure}
+%
 
 
-
-We roughly distinguish feature maps into two types. The first type of feature maps learns the details of the target object that correspond to the feature map with sparse high values. In our example, the detail areas are the tail, head, paw, etc. Using the CNN feature maps, we could see that several detail areas in a feature map have high values. For example, in Figure \ref{fig:cnn-detail-feature-maps} (b), the values in the tail, hind leg, and front leg areas of the dragon object are especially high than other areas. These high valued areas are exactly the detailed areas and the areas with higher errors in the evaluation. These feature maps show that the CNN model assigns high value to several detailed parts in a single feature map. 
-In the case of the NOC model, one detailed part instead of several detailed parts is usually highly valued in a single feature map, as shown in Figure \ref{fig:noc-detail-feature-maps} (e). We can see that the hind legs are light, while other detailed areas such as the head or tail are dark. The NOC model uses one feature map to deal with only one specific detailed area. 
-The GCNN model follows the patterns we found in NOC, each feature map has only one specific area that is very bright, and the rest of the areas are relatively dark. In addition, the bright area in the GCNN model is more concentrated than in the NOC model because of the skip connection, as can be seen in Figure \ref{fig:gcnn-detail-feature-maps}. 
-
-
-
-
+We roughly distinguish feature maps into two types. The first type of feature maps learns the details of the target object that correspond to the feature map with sparse high values. In our example, the detail areas are the tail, head, paw, etc. Using the CNN feature maps, we could see that several detail areas in a feature map have high values. For example, if we observe one feature map in Figure \ref{fig:detail-feature-maps} (a), the values in the tail, hind leg, and front leg areas of the dragon object are especially high than other areas. These high valued areas are exactly the detailed areas and the areas with higher errors in the evaluation. These feature maps show that the CNN model assigns high value to several detailed parts in a single feature map. 
+In the case of the NOC model, one detailed part instead of several detailed parts is usually highly valued in a single feature map, as shown in Figure \ref{fig:detail-feature-maps} (b). We can see that the hind legs are light, while other detailed areas such as the head or tail are dark. The NOC model uses one feature map to deal with only one specific detailed area. 
+The GCNN model follows the patterns we found in NOC, each feature map has only one specific area that is very bright, and the rest of the areas are relatively dark. In addition, the bright area in the GCNN model is more concentrated than in the NOC model because of the skip connection, as can be seen in Figure \ref{fig:detail-feature-maps} (c). 
 
 
 
 
-%% GCNN detail
-\begin{figure}[H]
-	\centering
-	\captionsetup{width=\linewidth}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-gcnn.png}
-		\caption{Normal Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_4.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_5.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_15.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.19\linewidth}
-		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_127.png}
-		\caption{Feature Map}
-	\end{subfigure}
-	
-	\begin{tikzpicture}
-		\node[text width=0.1\textwidth] at (11,-1) {1};
-		\node[inner sep=0pt] (input) at (8,-1)
-		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
-		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
-	\end{tikzpicture}
-	\decoRule
-	\caption{Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times32 $}
-	\label{fig:gcnn-detail-feature-maps}
-\end{figure}
 
+
+
+%
+%%% GCNN detail
+%\begin{figure}[H]
+%	\centering
+%	\captionsetup{width=\linewidth}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_out_gcnn-gcnn.png}
+%		\caption{Normal Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_4.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_5.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_15.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.19\linewidth}
+%		\includegraphics[width=\linewidth]{./Figures/feature_map_gcnn/feature_map_gcnn-gcnn_127.png}
+%		\caption{Feature Map}
+%	\end{subfigure}
+%	
+%	\begin{tikzpicture}
+%		\node[text width=0.1\textwidth] at (11,-1) {1};
+%		\node[inner sep=0pt] (input) at (8,-1)
+%		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_deepgreen.jpg}};
+%		\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
+%	\end{tikzpicture}
+%	\decoRule
+%	\caption{Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times32 $}
+%	\label{fig:gcnn-detail-feature-maps}
+%\end{figure}
+%
 
 
 %% global compare
@@ -766,7 +846,7 @@ The GCNN model follows the patterns we found in NOC, each feature map has only o
 			\node[text width=0.3\textwidth] at (7,-1) {Value: 0};
 		\end{tikzpicture}
 		\decoRule
-		\caption{Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times32 $}
+		\caption{Some of global feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times32 $}
 		\label{fig:global-feature-maps}
 \end{figure}
 
@@ -854,7 +934,12 @@ The qualitative evaluation is shown in Figure \ref{fig:trip-eval}. To show the e
 		\includegraphics[width=\linewidth]{./Figures/trip_net_zoom_in/eval_7_12_-48_error.png}
 		\caption{Tail}
 	\end{subfigure}
-	
+		\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
 	\decoRule
 	\caption{Zoom in of detail regions ($ 32\times32 $) of \textit{Dragon} object (Trip-Net).}
 	\label{fig:tripnet-eval-synthetic-zoom-in}
@@ -907,7 +992,12 @@ Figure \ref{fig:tripnet-fusion-eval} compares different fusion times on the Trip
 		\includegraphics[width=\linewidth]{./Figures/gcnn_synthetic/fancy_eval_7_error_f4.png}
 		\caption{F4}
 	\end{subfigure}
-	
+		\begin{tikzpicture}
+		\node[text width=0.1\textwidth] at (11,-1) {90};
+		\node[inner sep=0pt] (input) at (8,-1)
+		{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+		\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+	\end{tikzpicture}
 	\decoRule
 	\caption{Comparison between different fusion times on Trip-Net Architecture ($ 128\times128 $). }
 	\label{fig:tripnet-fusion-eval}
@@ -989,20 +1079,9 @@ Since our model is a fully convolutional network, the architecture remains exact
 \end{figure}
 
 
-
-
-
-
-
-A quantitative evaluation is shown in Table \ref{tab:high_resolution_eval}. It follows the same performance ranking compared to lower resolutions, i.e. GCNN is better than the SVD approach and Trip-Net is slightly better than GCNN. The accuracy is 99\% in the $30^\circ $ metric. In the average error metric, the error is $ 5^\circ $.  A qualitative evaluation is shown in Figure \ref{fig:trip-eval-high-resolution}. We use a figure object with smooth regions (belly and arm) and highly detailed regions with sharp surfaces (the uneven surface of the stone table) for the evaluation. Our models yield a $ 5^\circ $ in the middle degree of the metric. 
-
-A comparison with other models is shown in Figure \ref{fig:trip-eval-compare}. Note that we use the same dragon object (with slightly shifted location since they were collected at different times in the high-resolution dataset) for the assessment to allow a coherent comparison with the low-resolution dataset. The \textit{SVD} approach yields a good result ($8.88^\circ $ in the average degree metric). As mentioned earlier, the surfaces are relatively smoother when we keep the same window size for normal inference. In the high-resolution scenes, the percentage of missing pixels in a fixed window is the same as in the low-resolution scenes, but the remaining valid pixels in the same window size are on a relatively flat plane and are therefore good enough for accurate normal inference. However, as expected, we can still see the high-level error in the sharp edges of the dragon object, such as the horns and the hind leg areas, as shown in Figure \ref{fig:trip-eval-compare}.
-
-
-
 %& trip-net evaluation with other models
 
-\begin{figure}[th]
+\begin{figure}[H]
 	\centering
 	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.24\linewidth}
@@ -1035,10 +1114,24 @@ A comparison with other models is shown in Figure \ref{fig:trip-eval-compare}. N
 		\includegraphics[width=\linewidth]{./Figures/comparison_512/fancy_eval_14_error_Trip-Net-512.png}
 		\caption{Trip-Net}
 	\end{subfigure}
+	\begin{tikzpicture}
+	\node[text width=0.1\textwidth] at (11,-1) {90};
+	\node[inner sep=0pt] (input) at (8,-1)
+	{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+	\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+\end{tikzpicture}
 	\decoRule
 	\caption{Comparison on high resolution dataset ($ 512\times 512 $).}
 	\label{fig:trip-eval-compare}
 \end{figure}
+
+
+
+A quantitative evaluation is shown in Table \ref{tab:high_resolution_eval}. It follows the same performance ranking compared to lower resolutions, i.e. GCNN is better than the SVD approach and Trip-Net is slightly better than GCNN. The accuracy is 99\% in the $30^\circ $ metric. In the average error metric, the error is $ 5^\circ $.  A qualitative evaluation is shown in Figure \ref{fig:trip-eval-high-resolution}. We use a figure object with smooth regions (belly and arm) and highly detailed regions with sharp surfaces (the uneven surface of the stone table) for the evaluation. Our models yield a $ 5^\circ $ in the middle degree of the metric. 
+
+A comparison with other models is shown in Figure \ref{fig:trip-eval-compare}. Note that we use the same dragon object (with slightly shifted location since they were collected at different times in the high-resolution dataset) for the assessment to allow a coherent comparison with the low-resolution dataset. The \textit{SVD} approach yields a good result ($8.88^\circ $ in the average degree metric). As mentioned earlier, the surfaces are relatively smoother when we keep the same window size for normal inference. In the high-resolution scenes, the percentage of missing pixels in a fixed window is the same as in the low-resolution scenes, but the remaining valid pixels in the same window size are on a relatively flat plane and are therefore good enough for accurate normal inference. However, as expected, we can still see the high-level error in the sharp edges of the dragon object, such as the horns and the hind leg areas, as shown in Figure \ref{fig:trip-eval-compare}.
+
+
 
 
 \section{Training on Real-Dataset}
@@ -1149,6 +1242,12 @@ We also applied our model to a dataset acquired with a structured light scanner 
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_An2-real-resume.png}
 		\caption{Trip-Net}
 	\end{subfigure}	
+	\begin{tikzpicture}
+	\node[text width=0.1\textwidth] at (11,-1) {90};
+	\node[inner sep=0pt] (input) at (8,-1)
+	{\includegraphics[width=.2\textwidth]{./Figures/colorscale_blue.png}};
+	\node[text width=0.3\textwidth] at (7,-1) {Error: 0};
+\end{tikzpicture}
 	\decoRule
 	\caption{Real dataset ($ 512\times 512 $) comparison.}
 	\label{fig:real_eval_compare}

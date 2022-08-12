@@ -240,17 +240,23 @@ where $ s $ is a scaling factor calculated as the range of the $ X $ axis, but t
 \begin{figure}[!h]
 	\centering
 	\captionsetup{width=\linewidth}
-	{\includegraphics[width=0.49\textwidth]{./Figures/Data_Extreme.png}}
-	{\includegraphics[width=0.49\textwidth]{./Figures/Data_Range.png}}
+	\begin{subfigure}[b]{0.49\linewidth}
+		\includegraphics[width=\textwidth]{./Figures/Data_Extreme.png}
+		\caption{Extreme Values in each axis }
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\linewidth}
+		\includegraphics[width=\textwidth]{./Figures/Data_Range.png}
+		\caption{Vertex Range in each axis}
+	\end{subfigure}
 	\decoRule
 	\caption{The position fluctuation of the points in 100 Vertex Maps. 
-		Left: Extreme values in 3 axes; Right: Vertex range in 3 axes.}
+		Left: Extreme values in 3 axes; Right: Vertex range in 3 axis.}
 	\label{fig:data_range}
 \end{figure}
 
 \begin{table}[th]
-	
 	\centering
+	\captionsetup{width=\linewidth}
 	\begin{tabular}{c | c c c}
 		\toprule
 		\tabhead{Axis} & \tabhead{Scale} & \tabhead{Min} & \tabhead{Max}\\

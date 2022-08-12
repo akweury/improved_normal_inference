@@ -11,7 +11,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {table}{\numberline {4.1}{\ignorespaces The information saved for each scene in \textit {synthetic-50-5}.\relax }}{21}{table.caption.47}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{24}{table.caption.53}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces The fluctuation of extreme values and their ranges in 100 random training items. \relax }}{23}{table.caption.53}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
@@ -31,9 +31,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {table}{\numberline {5.8}{\ignorespaces Percentage of error of less than 30 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $\relax }}{30}{table.caption.73}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes. (Resolution: $ 512\times 512 $)\relax }}{37}{table.caption.92}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes. (Resolution: $ 512\times 512 $)\relax }}{37}{table.caption.90}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in Real-Dataset.\relax }}{39}{table.caption.96}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in Real-Dataset.\relax }}{39}{table.caption.94}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

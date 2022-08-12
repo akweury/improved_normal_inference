@@ -37,7 +37,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.4}{\ignorespaces From left to right: Noise-intensity on $ \mu -0$, $\mu -10$, $\mu -20$, $\mu -30$, $\mu -40$, $\mu -50$. Object Name: \textit {elephant-zun-lid}.\relax }}{22}{figure.caption.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.5}{\ignorespaces The position fluctuation of the points in 100 Vertex Maps. Left: Extreme values in 3 axes; Right: Vertex range in 3 axes.\relax }}{23}{figure.caption.52}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces The position fluctuation of the points in 100 Vertex Maps. Left: Extreme values in 3 axes; Right: Vertex range in 3 axis.\relax }}{24}{figure.caption.52}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
@@ -49,50 +49,46 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.4}{\ignorespaces \textit {SVD} visual evaluation on a noised dragon model, $ k=1 $, noise factor $ \mu $=50. (Resolution: $ 512\times 512 $) \relax }}{31}{figure.caption.77}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.5}{\ignorespaces GCNN visual evaluation. (Resolution: $ 128\times 128 $)\relax }}{33}{figure.caption.79}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces GCNN visual evaluation. (Resolution: $ 128\times 128 $)\relax }}{32}{figure.caption.79}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of some regions of Dragon object (GCNN models). (Resolution: $ 32\times 32 $)\relax }}{33}{figure.caption.80}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of some regions of Dragon object based on GCNN. (Resolution: $ 32\times 32 $)\relax }}{33}{figure.caption.80}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.7}{\ignorespaces Comparison of GCNN based models. (Resolution: $ 128\times 128 $)\relax }}{33}{figure.caption.81}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Some of feature maps of CNN model in up-sampling part on resolution $ 32\times 32 $\relax }}{34}{figure.caption.83}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Some of detail feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times 32 $\relax }}{34}{figure.caption.83}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Some of feature maps of NOC model in up-sampling part on resolution $ 32\times 32 $\relax }}{34}{figure.caption.84}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Some of global feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times 32 $\relax }}{35}{figure.caption.84}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times 32 $\relax }}{35}{figure.caption.85}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Trip-Net visual evaluation on resolution $ 128\times 128 $\relax }}{35}{figure.caption.86}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.11}{\ignorespaces Some of feature maps of GCNN model in up-sampling part on resolution $ 32\times 32 $\relax }}{35}{figure.caption.86}%
+\contentsline {figure}{\numberline {5.12}{\ignorespaces Comparison between different fusion times on Trip-Net Architecture ($ 128\times 128 $). \relax }}{36}{figure.caption.88}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.12}{\ignorespaces Trip-Net visual evaluation on resolution $ 128\times 128 $\relax }}{36}{figure.caption.88}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Zoom in of detail regions ($ 32\times 32 $) of \textit {Dragon} object (Trip-Net).\relax }}{36}{figure.caption.87}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.13}{\ignorespaces Zoom in of detail regions ($ 32\times 32 $) of \textit {Dragon} object (Trip-Net).\relax }}{36}{figure.caption.89}%
+\contentsline {figure}{\numberline {5.13}{\ignorespaces Trip-Net visual evaluation on high resolution dataset $ 512 \times 512 $.\relax }}{38}{figure.caption.91}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.14}{\ignorespaces Comparison between different fusion times on Trip-Net Architecture ($ 128\times 128 $). \relax }}{37}{figure.caption.90}%
+\contentsline {figure}{\numberline {5.14}{\ignorespaces Comparison on high resolution dataset ($ 512\times 512 $).\relax }}{38}{figure.caption.92}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.15}{\ignorespaces Trip-Net visual evaluation on high resolution dataset $ 512 \times 512 $.\relax }}{38}{figure.caption.93}%
+\contentsline {figure}{\numberline {5.15}{\ignorespaces Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)\relax }}{40}{figure.caption.95}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.16}{\ignorespaces Comparison on high resolution dataset ($ 512\times 512 $).\relax }}{39}{figure.caption.94}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.17}{\ignorespaces Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)\relax }}{40}{figure.caption.97}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.18}{\ignorespaces Real dataset ($ 512\times 512 $) comparison.\relax }}{40}{figure.caption.98}%
+\contentsline {figure}{\numberline {5.16}{\ignorespaces Real dataset ($ 512\times 512 $) comparison.\relax }}{40}{figure.caption.96}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in dataset A \relax }}{46}{figure.caption.101}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in dataset A \relax }}{46}{figure.caption.99}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in dataset B \relax }}{47}{figure.caption.102}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in dataset B \relax }}{47}{figure.caption.100}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in dataset C\relax }}{48}{figure.caption.103}%
-\defcounter {refsection}{0}\relax 
-\addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {B.1}{\ignorespaces GCNN evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus. \relax }}{50}{figure.caption.105}%
-\defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {B.2}{\ignorespaces Trip-Net evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus.\relax }}{51}{figure.caption.106}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in dataset C\relax }}{48}{figure.caption.101}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {C.1}{\ignorespaces All 128 Feature maps of model GCNN, NOC, CNN at the first up-sampling. (Resolution $ 32\times 32 $)\relax }}{54}{figure.caption.108}%
+\contentsline {figure}{\numberline {B.1}{\ignorespaces GCNN evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus. \relax }}{50}{figure.caption.103}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {B.2}{\ignorespaces Trip-Net evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus.\relax }}{51}{figure.caption.104}%
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {C.1}{\ignorespaces All 128 Feature maps of model GCNN, NOC, CNN at the first up-sampling. (Resolution $ 32\times 32 $)\relax }}{54}{figure.caption.106}%
