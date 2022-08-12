@@ -14,11 +14,20 @@ models = {
     # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-02_23_58_31" / "checkpoint-300.pth.tar",
     # "Trip-Net-2": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-1116.pth.tar",
     #
-    "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+
+    "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-10_23_31_53" / "checkpoint-500.pth.tar",
+    "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-11_02_37_42" / "checkpoint-550.pth.tar",
+    "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-10_23_29_16" / "checkpoint-50.pth.tar",
+    "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-08-10_23_28_52" / "checkpoint-900.pth.tar",
+
+    # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+    # "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1250.pth.tar",
+    # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+    # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
+    # "GCNN-Berhu": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
 
     # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
     # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
-    "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
 
 }
 
@@ -32,18 +41,18 @@ for model_idx, (name, model) in enumerate(models.items()):
     start_epoch = checkpoint['epoch']
     batch_size = args.batch_size
 
-    loss = checkpoint['losses']
-    normal_loss_avg = np.sum(loss[:3], axis=0, keepdims=True) / 3
+    # loss = checkpoint['losses']
+    # normal_loss_avg = np.sum(loss[:3], axis=0, keepdims=True) / 3
 
-    # normal_loss_avg = checkpoint['eval_losses']
+    normal_loss_avg = checkpoint['eval_losses']
 
     # for idx in range(normal_loss_avg.shape[1]):
     #     if normal_loss_avg[0, idx] == 0:
     #         normal_loss_avg[0, idx] = normal_loss_avg[0, idx - 1]
-    chart.line_chart(np.array(normal_loss_avg), output_folder, labels=[name], title="Training_Loss_Comparison",
-                     y_label="Berhu Loss", log_y=True)
+    # chart.line_chart(np.array(normal_loss_avg), output_folder, labels=[name], title="Training_Loss_Comparison",
+    #                  y_label="Berhu Loss", log_y=True)
     #
-    # chart.line_chart(np.array(normal_loss_avg[:, 1:]), output_folder, labels=[name], title="Test_Loss_Comparison",
-    #                  y_label="Angle Error", log_y=False)
+    chart.line_chart(np.array(normal_loss_avg[:, 1:]), output_folder, labels=[name], title="Test_Loss_Comparison",
+                     y_label="Angle Error", log_y=False)
 
 plt.show()

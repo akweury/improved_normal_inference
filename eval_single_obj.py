@@ -108,8 +108,13 @@ if __name__ == '__main__':
 
                 # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
                 # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
-                "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
+                # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
+                # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+
                 "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+                "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+                "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
+                "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1250.pth.tar",
 
                 # Trip Net
 
@@ -130,7 +135,6 @@ if __name__ == '__main__':
                 "An2-real-train": config.ws_path / "an_real" / "checkpoint-train-134.pth.tar",
                 "An2-real-resume-444": config.ws_path / "an_real" / "checkpoint-resume-444.pth.tar",
                 "An2-real-resume-616": config.ws_path / "an_real" / "checkpoint-resume-616.pth.tar",
-
                 "SVD": None,
                 "NNNN-512": config.ws_path / "nnnn" / "checkpoint-226.pth.tar",  # GCNN
                 # "Trip-Net-512-41": config.ws_path / "an2" / "checkpoint-41.pth.tar",  # GCNN

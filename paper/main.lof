@@ -37,7 +37,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.4}{\ignorespaces From left to right: Noise-intensity on $ \mu -0$, $\mu -10$, $\mu -20$, $\mu -30$, $\mu -40$, $\mu -50$. Object Name: \textit {elephant-zun-lid}.\relax }}{22}{figure.caption.51}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Left: Extreme value in 3 axis; Right: Vertex range in 3 axis\relax }}{23}{figure.caption.52}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces The position fluctuation of the points in 100 Vertex Maps. Left: Extreme values in 3 axes; Right: Vertex range in 3 axes.\relax }}{23}{figure.caption.52}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
@@ -89,9 +89,9 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {B.1}{\ignorespaces GCNN evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom). ($ 128\times 128 $)\relax }}{50}{figure.caption.105}%
+\contentsline {figure}{\numberline {B.1}{\ignorespaces GCNN evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus. \relax }}{50}{figure.caption.105}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {B.2}{\ignorespaces Trip-Net evaluation on objects Baoshanlu, Washington statue, Bus(from top to bottom). ($ 128\times 128 $)\relax }}{51}{figure.caption.106}%
+\contentsline {figure}{\numberline {B.2}{\ignorespaces Trip-Net evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus.\relax }}{51}{figure.caption.106}%
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
