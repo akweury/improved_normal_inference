@@ -42,13 +42,13 @@ def main(models, test_folder, args, name):
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
             test_folder, name, model, gpu=args.gpu, data_type=args.data_type)
 
-        loss_avg[name] = ("%.2f" % (np.array(loss_list).sum() / np.array(loss_list).shape[0]))
-        time_avg[name] = ("%.2f" % (np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]))
-        median_avg[name] = ("%.2f" % (np.array(median_loss_list).sum() / np.array(median_loss_list).shape[0]))
-        d5_avg[name] = ("%.2f" % (1 - np.array(d5_list).sum() / np.array(d5_list).shape[0]))
-        d11_avg[name] = ("%.2f" % (1 - np.array(d11_list).sum() / np.array(d11_list).shape[0]))
-        d22_avg[name] = ("%.2f" % (1 - np.array(d22_list).sum() / np.array(d22_list).shape[0]))
-        d30_avg[name] = ("%.2f" % (1 - np.array(d30_list).sum() / np.array(d30_list).shape[0]))
+        loss_avg[name] = ("%.4f" % (np.array(loss_list).sum() / np.array(loss_list).shape[0]))
+        time_avg[name] = ("%.4f" % (np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]))
+        median_avg[name] = ("%.4f" % (np.array(median_loss_list).sum() / np.array(median_loss_list).shape[0]))
+        d5_avg[name] = ("%.4f" % (1 - np.array(d5_list).sum() / np.array(d5_list).shape[0]))
+        d11_avg[name] = ("%.4f" % (1 - np.array(d11_list).sum() / np.array(d11_list).shape[0]))
+        d22_avg[name] = ("%.4f" % (1 - np.array(d22_list).sum() / np.array(d22_list).shape[0]))
+        d30_avg[name] = ("%.4f" % (1 - np.array(d30_list).sum() / np.array(d30_list).shape[0]))
         losses.append(loss_list)
         times.append(time_list[5:])
         sizes.append(size_list)
@@ -92,11 +92,11 @@ if __name__ == '__main__':
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
             # test_folder = config.real_data / "test"
-            # test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
-            test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
+            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            # test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
-                # "SVD": None,
+                "SVD": None,
                 # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-01_22_55_17" / "checkpoint-456.pth.tar",
                 # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-01_22_55_21" / "checkpoint-435.pth.tar",
                 # "GCNN": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-01_21_50_45" / "checkpoint-460.pth.tar",
@@ -104,24 +104,24 @@ if __name__ == '__main__':
                 # "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-03_00_01_56" / "checkpoint-150.pth.tar",
                 # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-03_00_01_07" / "checkpoint-150.pth.tar",
                 # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-01_22_32_35" / "checkpoint-1117.pth.tar",
-                # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-929.pth.tar",
 
                 # "CNN": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-03_09_59_25" / "checkpoint-900.pth.tar",
                 # "NOC": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-03_10_00_37" / "checkpoint-894.pth.tar",
                 # "GCNN-BerHu": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
+
                 # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-                # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
-                # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
+                # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
+
+                ######################################## Final #######################################
+
                 "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-                "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1000.pth.tar",
+                "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+                "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
 
-                # Trip Net
-
-                # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-01_22_32_35" / "checkpoint-577.pth.tar",
-                # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-469.pth.tar",
-
-                # "GCNN-512": config.ws_path / "nnnn" / "output_2022-07-30_16_43_11" / "checkpoint-226.pth.tar",
-                # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-234.pth.tar",
+                "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
+                "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
+                "Trip-Net-F3F-350": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-350.pth.tar",
+                "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
 
             }
 

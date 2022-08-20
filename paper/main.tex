@@ -220,16 +220,16 @@ headsepline, % Uncomment to get a line under the header
 %	ABSTRACT PAGE
 %----------------------------------------------------------------------------------------
 
-\begin{abstract}
-\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-In this work, a learning based approach for surface normal estimation based on illuminiated calibrated RGB-D images is proposed.
+\chapter*{Abstract}
+In this paper, a learning-based approach for surface normal estimation based on illuminated calibrated RGB-D images is proposed.
 
-This approach extends the geometry based approach by techniques of photometric stereo, which uses calibrated illuminated images for normal estimation. 
-The two types of data gives a superior performance on normal inference task. One of the key points of our approach is, the proposed method require only one light source for each scene capture instead of multiple light sources, which can be very easy to configure in the practice. 
+This approach extends the geometry-based approach with photometric stereo analysis techniques using calibrated illuminated RGB-D images for normality estimation. 
+Based on photometric and geometric information as input, our model can improve the accuracy of the geometry-based approach on our dataset by 10\% (mean angular error). One of the most important points of our approach is that the proposed method requires only one light source for each scene detection instead of multiple light sources, which is very easy to configure in practice. 
 
-Our model is trained on a gated convolution neural network (Trip-Net). The gated convolution design is intended to handle the missing pixels in the depth map, which is a common defect of the depth sensor. We also created a dataset of 55 point clouds called \textit{Synthetic-50-5} for training. We trained our model on this synthetic dataset and then applied it to a real dataset. Finally, a qualitative and quantitative evaluation is performed.
+Our model is trained on a neural network with gated convolution (trip-net). The gated convolution design is intended to handle the missing pixels in the depth map, which are a common noise of the depth sensor. The network has a full convolutional architecture, so it can handle data with different resolutions as input. The output of our model is the corresponding normal map with a 1:1 correspondence to the input data.  To train our models, we also created a dataset of $ 55 $ highly detailed 3D objects called \textit{Synthetic-50-5}. We trained our model on this synthetic dataset and then applied it to a real dataset. As our qualitative evaluation shows, the performance of the presented method can be observed especially in detailed regions. Finally, a quantitative evaluation with 6 metrics is performed in this thesis. 
 
-\end{abstract}
+
+
 
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS

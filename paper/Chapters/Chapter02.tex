@@ -8,7 +8,7 @@ Surface normal inference is a widely researched topic and can be solved in sever
 However, in many practical datasets such as NYU Depth Dataset V2 \cite{nyu} and KITTI-Depth\cite{kitti-depth}, the point clouds are often converted from depth maps.
 But the depth maps are usually very noisy and contains many missing pixels and holes in dark, shiny, or transparent areas. This poses more of a challenge for neighborhood-based approaches, as neighborhood information is not available in many of these areas. 
 
-To solve this problem, some approaches focus on improving the depth map by estimating missing regions. \cite{depth-inpainting-distribution} proposed an approach that considers the depth distributions of neighboring regions to fill the holes in the depth map. \cite{ncnn} uses a deep learning-based approach for painting semi-dense depth maps, which mainly uses the normalized convolution proposed by \cite{nconv}. This approach considers a 0-1 mask to distinguish valid and invalid data points. \cite{pncnn} improved this approach by proposing an input confidence estimation network to replace the binary mask with an estimated confidence mask. \cite{depth-enhance-guided} also uses a normalized convolution for inpainting the depth map and also uses an RGB image as a guidance. 
+To solve this problem, some approaches focus on improving the depth map by estimating missing regions. \cite{depth-inpainting-distribution} proposed an approach that considers the depth distributions of neighboring regions to fill the holes in the depth map. \cite{ncnn} uses a deep learning-based approach for painting semi-dense depth maps, which mainly uses the normalized convolution proposed by \cite{nconv}. This approach considers a $ 0-1 $ mask to distinguish valid and invalid data points. \cite{pncnn} improved this approach by proposing an input confidence estimation network to replace the binary mask with an estimated confidence mask. \cite{depth-enhance-guided} also uses a normalized convolution for inpainting the depth map and also uses an RGB image as a guidance. 
 
 
 
@@ -23,7 +23,7 @@ On the other hand, some of the approaches use RGB-D images to estimate the surfa
 \cite{GeoNet} uses ResNet \cite{resnet} to derive a coarse surface normal from an RGB image, and refines it using a depth map based on the \cite{geometry_based_solution} method. 
 \cite{hfm} derives surface normals based on an RGB-D image using the \textit{U-Net} architecture.
 
-However, these approaches mainly rely on RGB images as input for estimating the normal or the full depth map. The applied scenarios are mainly indoor scenes such as bedrooms or offices, where the focus is not on the fine details of the object surface, but only on the main directions of each area, such as the directions of the floor, walls, or seats, etc as shown in Figure \ref{fig:dataset-comparison}
+However, these approaches mainly rely on RGB images as input for estimating the normal or the fully dense depth map. The applied scenarios are mainly indoor scenes such as bedrooms or offices, where the focus is not on the fine details of the object surface, but only on the main directions of each area, such as the directions of the floor, walls, or seats, etc as shown in Figure \ref{fig:dataset-comparison}
 
 \begin{figure}[h!]
 	\centering

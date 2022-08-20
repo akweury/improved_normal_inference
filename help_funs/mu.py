@@ -452,7 +452,9 @@ def compute_normal(vertex, cam_pos, mask, k):
                             max(0, j - k): min(j + k + 1, vertex.shape[0] - 1)]  # get its k neighbors
                 # neighbors = vertex[i - k:i + k, j - k:j + k]
                 neighbors = neighbors.reshape(neighbors.shape[0] * neighbors.shape[1], 3)
-                neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)  # delete center vertex
+
+                # neighbors = np.delete(neighbors, np.where(neighbors == vertex[i, j]), axis=0)  # delete center vertex
+
                 # delete background vertex
                 if neighbors.ndim == 2 and neighbors.shape[0] > 2:
                     neighbors = np.delete(neighbors, np.where(neighbors == np.zeros(3)), axis=0)
@@ -468,8 +470,8 @@ def compute_normal(vertex, cam_pos, mask, k):
                 u, s, vh = np.linalg.svd(plane_vectors)
                 normal = vh.T[:, -1]
                 normal = normal_point2view_point(normal, vertex[i][j], cam_pos)
-                if np.linalg.norm(normal) != 1:
-                    normal = normal / np.linalg.norm(normal)
+                # if np.linalg.norm(normal) != 1:
+                #     normal = normal / np.linalg.norm(normal)
                 normals[i, j] = normal
 
     return normals

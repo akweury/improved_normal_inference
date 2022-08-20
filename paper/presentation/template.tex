@@ -89,21 +89,41 @@
 
 % Beamer comes with several font themes to easily change the fonts used in various parts of the presentation. Review the comments beside each one to decide if you would like to use it. Note that additional options can be specified for several of these font themes, consult the beamer documentation for more information.
 
-%\usefonttheme{default} % Typeset using the default sans serif font
-%\usefonttheme{serif} % Typeset using the default serif font (make sure a sans font isn't being set as the default font if you use this option!)
+\usefonttheme{default} % Typeset using the default sans serif font
+\usefonttheme{serif} % Typeset using the default serif font (make sure a sans font isn't being set as the default font if you use this option!)
 %\usefonttheme{structurebold} % Typeset important structure text (titles, headlines, footlines, sidebar, etc) in bold
 %\usefonttheme{structureitalicserif} % Typeset important structure text (titles, headlines, footlines, sidebar, etc) in italic serif
-\usefonttheme{structuresmallcapsserif} % Typeset important structure text (titles, headlines, footlines, sidebar, etc) in small caps serif
+%\usefonttheme{structuresmallcapsserif} % Typeset important structure text (titles, headlines, footlines, sidebar, etc) in small caps serif
 
 %------------------------------------------------
 
-%\usepackage{mathptmx} % Use the Times font for serif text
-\usepackage{palatino} % Use the Palatino font for serif text
+\usepackage{mathptmx} % Use the Times font for serif text
+%\usepackage{palatino} % Use the Palatino font for serif text
 
 %\usepackage{helvet} % Use the Helvetica font for sans serif text
 \usepackage[default]{opensans} % Use the Open Sans font for sans serif text
 %\usepackage[default]{FiraSans} % Use the Fira Sans font for sans serif text
 %\usepackage[default]{lato} % Use the Lato font for sans serif text
+
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{breqn}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage[figuresleft]{rotating}
+\usepackage{caption}
+\captionsetup[figure]{font=normalsize,labelfont=normalsize}
+\captionsetup{justification   = raggedright,
+	singlelinecheck = false, width=\linewidth}
+\usetikzlibrary{fit}
+\usetikzlibrary{calc,patterns,angles,quotes}
+\usetikzlibrary {arrows.meta,graphs,shapes.misc}
+\usetikzlibrary {positioning}
+
 
 %----------------------------------------------------------------------------------------
 %	SELECT INNER THEME
@@ -188,10 +208,58 @@
 
 \begin{frame}
 	\frametitle{Surface Normal Inference}
+		\begin{figure}
+			\begin{tikzpicture} 
+				\tikzstyle{rect} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=1cm,text centered, draw=black, fill=blue!20]
+				\tikzstyle{arrow} = [thick,->,>=stealth]
+				\node (img) at (0,0)  {\includegraphics[width=.25\textwidth]{./real_img.png}};
+				\node (img-t) [below of=img, yshift=-1cm] {3D Object};
+				
+				\node (normal) at (6,0)
+				{\includegraphics[width=.25\textwidth]{./real_normal.png}};
+				\node (normal-t) [below of=normal, yshift=-1cm] {Normal Map};
+				
+				\draw[thick, ->] (2,0) -- (4,0) node[midway, above] {$ \textbf{n} $}; %% normal
+			\end{tikzpicture}
+	\end{figure}
+\begin{itemize}
+	\item Surface normals of a scene is presented as a normal map
+	\item Surface normal is shown in RGB color
+	\item We want to find the surface normal map of the corresponding scene.
+\end{itemize}
+
 \end{frame}
 
 
-
+\begin{frame}
+	\frametitle{Surface Normal Inference}
+	\begin{figure}
+		\begin{tikzpicture} 
+			\tikzstyle{rect} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=1cm,text centered, draw=black, fill=blue!20]
+			\tikzstyle{arrow} = [thick,->,>=stealth]
+			
+			\node (img) at (0,0)  {\includegraphics[width=.2\textwidth]{./real_img.png}};
+			\node (img-t) [below of=img, yshift=-1cm] {3D Object};
+			
+			\node (depth) at (3.5,0)  {\includegraphics[width=.2\textwidth]{./real_depth.png}};
+			\node (depth-t) [below of=depth, yshift=-1cm] {Depth Map};
+			
+			\node (pc) at (6,-1)  {\includegraphics[width=.2\textwidth]{./real_point.png}};
+			\node (pc-t) [below of=pc, yshift=-1.5cm] {Point Cloud};
+			
+			\node (normal) at (9,0) {\includegraphics[width=.2\textwidth]{./real_normal.png}};
+			\node (normal-t) [below of=normal, yshift=-1cm] {Normal Map};
+			
+			\draw[thick, blue] (1.7,2) -- (1.7,-2) node[midway, above] {$ \textbf{n} $}; %% normal
+		\end{tikzpicture}
+	\end{figure}
+	\begin{itemize}
+		\item Surface normals of a scene is presented as a normal map
+		\item Surface normal is shown in RGB color
+		\item We want to find the surface normal map of the corresponding scene.
+	\end{itemize}
+	
+\end{frame}
 
 %----------------------------------------------------------------------------------------
 %	PRESENTATION BODY SLIDES
@@ -316,16 +384,6 @@
 
 %------------------------------------------------
 
-\subsection{Figure}
-
-\begin{frame}
-	\frametitle{Figure}
-	
-	\begin{figure}
-		\includegraphics[width=0.8\linewidth]{creodocs_logo.pdf}
-		\caption{Creodocs logo.}
-	\end{figure}
-\end{frame}
 
 %------------------------------------------------
 

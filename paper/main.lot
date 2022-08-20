@@ -25,11 +25,11 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {table}{\numberline {5.5}{\ignorespaces Percentage of error of less than 5 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $\relax }}{29}{table.caption.70}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.6}{\ignorespaces Percentage of error of less than 11.5 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $\relax }}{30}{table.caption.71}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Percentage of error of less than 11.5 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $.\relax }}{30}{table.caption.71}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.7}{\ignorespaces Percentage of error of less than 22.5 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $\relax }}{30}{table.caption.72}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Percentage of error of less than 22.5 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $.\relax }}{30}{table.caption.72}%
 \defcounter {refsection}{0}\relax 
-\contentsline {table}{\numberline {5.8}{\ignorespaces Percentage of error of less than 30 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $\relax }}{30}{table.caption.73}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Percentage of error of less than 30 degrees of the evaluation data set. \textit {SVD} Neighborhood size $ k=2 $.\relax }}{30}{table.caption.73}%
 \defcounter {refsection}{0}\relax 
 \contentsline {table}{\numberline {5.9}{\ignorespaces High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes. (Resolution: $ 512\times 512 $)\relax }}{37}{table.caption.90}%
 \defcounter {refsection}{0}\relax 

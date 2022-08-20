@@ -3,8 +3,6 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Declaration of Authorship}{iii}{section*.1}%
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Abstract}{v}{section*.2}%
-\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.4}%
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.6}%

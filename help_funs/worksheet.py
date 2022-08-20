@@ -26,9 +26,9 @@ def gau_histo(gt_normal, sigma):
 
 def load_a_training_tensor():
     test_0_data = np.array(
-        sorted(glob.glob(str(config.synthetic_data_noise_local / "synthetic128" / "selval" / "tensor" /
+        sorted(glob.glob(str(config.synthetic_data_noise_local / "synthetic128" / "train" / "tensor" /
                              f"*_0_*"), recursive=True)))
-    test_0 = torch.load(test_0_data[3])  # 0, 3, 5
+    test_0 = torch.load(test_0_data[4])  # 0, 3, 5
     test_0_tensor = test_0['input_tensor'].unsqueeze(0)
     gt_tensor = test_0['gt_tensor'].unsqueeze(0)
     return test_0_tensor, gt_tensor
@@ -66,15 +66,9 @@ def visual_albedo_histo(albedo_gt):
 
 
 if __name__ == '__main__':
-    normal_file = str(config.paper_pic / "comparison_real" / "fancy_eval_20_normal_An2-real-resume-616.png")
     gt_file = str(config.paper_pic / "comparison_real" / "fancy_eval_20_groundtruth.png")
 
-    normal = file_io.load_24bitNormal(normal_file)
     gt = file_io.load_24bitNormal(gt_file)
-    mask = gt.sum(axis=-1) == 0
-    normal[mask] = 0
-    cv.imwrite(str(config.paper_pic / "comparison_real" / "fancy_eval_20_normal_An2_no_mask.png"),
-               cv.cvtColor(mu.visual_normal(normal, "", histogram=False), cv.COLOR_RGB2BGR))
 
     training_tensor, gt_tensor = load_a_training_tensor()
     vertex = training_tensor[:, :3, :, :].permute(2, 3, 1, 0).squeeze(-1).numpy()

@@ -47,7 +47,7 @@ The models are trained on the dataset \textit{synthetic-50-5} with 3000 scenes m
 
 Besides the 3000 training scenes, 100 additional scenes with 5 different object models are used as evaluation dataset during the training. They are evaluated in each epoch. 
 
-For the training parameters, we set the training pipeline with a batch size of 8, Adam Optimizer (\cite{adam}), learning rate starting at $ 1\times10^{-3} $, it will decrease at epoch 8 with learning decay factor 0.5. The model is trained using PyTorch 1.10.0a0, CUDA 11.4.1, GPU with an NVIDIA GEFORCE RTXA 6000. We stop training when the angular error of the normal map stops decreasing.
+For the training parameters, we set the training pipeline with a batch size of 8, Adam Optimizer\cite{adam}, learning rate starting at $ 1\times10^{-3} $, it will decrease at epoch 8 with learning decay factor 0.5. The model is trained using PyTorch 1.10.0a0, CUDA 11.4.1, GPU with an NVIDIA A100 Tensor Core GPU. We stop training when the angular error of the normal map stops decreasing.
 
 The \textit{GCNN} is the base model of the whole work. The architecture is described in \ref{sec:gcnn}. We use a single \textit{GCNN} to estimate surface normals as a geometry-based approach. It uses a vertex map as input. To verify the applicability of the skip-connection and gated-convolution layers, we trained two additional models for comparison. 
 In the first model, we replace all gated layers with default convolutional layers in the network, but keep all other settings and give it the name \textit{CNN}. It is used to compare the performance between the gated layer and the default convolutional layer for our normal inference task. As mentioned in \ref{ch:03}, the gated layer is designed to process noisy input. Since the entire vertex map in the dataset was noisy, the \textit{GCNN} should outperform \textit{CNN}. 
@@ -76,7 +76,7 @@ Another model called \textit{NOC} is used to check skip connections, which simpl
 
 
 The trip-net model uses a triple GCNN architecture with 4 fusions, which is more difficult to train. It takes the calibrated illuminated RGB-D images as input to estimate the surface normal map. When we train this model, we take the GCNN model as the baseline to observe the advantages of the illuminated information with the trip-net architecture.
-We also examined the optimal fusion times of the Trip-Net to determine a possible simplification of the model. A set of similar models was trained with the same settings but different fusion times, denoted Trip-Net-F$ x $, where $ x $ denotes the fusion times. We score the fusion times from 1 to 4. For the learning rate, we initially set $ 1e-3 $. This fits the GCNN model well, but leads to a loss explosion in the trip-net. Therefore, we set a learning rate schedule with an additional decay step at epoch 8. The decay factor is $ 0.5$. The batch size is set to 8.
+We also examined the optimal fusion times of the Trip-Net to determine a possible simplification of the model. A set of similar models was trained with the same settings but different fusion times, denoted Trip-Net-F$ x $, where $ x $ denotes the fusion times. We score the fusion times from 1 to 4. For the learning rate, we initially set $ 0.001 $. This fits the GCNN model well, but leads to a loss explosion in the trip-net. Therefore, we set a learning rate schedule with an additional decay step at epoch 8. The decay factor is $ 0.5$. The batch size is set to 8.
 
 During training, we found that the trip-net with 4 fusions converges significantly faster than models with fewer fusion times. However, model F3 with three times fusion converges slower than F4, but ends up with a similar loss of score as F4 (see Qualitative Evaluation). Models F1 and F2 are relatively less accurate than the other two models, but the sacrifice of accuracy results in a relatively lighter model. Since they have fewer fusion times, the corresponding upsampling layers in the image and light pipes can also be removed. The model can be trained faster, and the size is also smaller. Table \ref{tab:trip-net-size-compare} contains a comparison of the size of different models.
 
@@ -104,8 +104,8 @@ During training, we found that the trip-net with 4 fusions converges significant
 
 
 \section{Quantitative Evaluation on 6 Metrics}
-We evaluated our models on a synthetic dataset with a resolution of $ 128 by $ 128. 
-Based on the metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for the evaluation. Note that the vertex map input is only semi-dense. One of the advantages of the GCNN architecture is that it is robust to noisy input, so all points, including missing points in the input vertex map, are considered in the evaluation. We use $\tilde{\textbf{N}}$ for the estimated normal map, $ \textbf{N} $ for the ground-truth normal map, $ P $ for the \textit{set} of valid points, \textit{ValidNum} for the number of valid points. \textit{abs} is a function to calculate the absolute value of the given values, \textit{median} is a function to calculate the median value of a given \textit{set}.
+We evaluated our models on a synthetic dataset with a resolution of $ 128 \times $ 128. 
+Based on the metrics proposed by \cite{geometry_based_solution}, 6 different metrics are used for the evaluation. Note that the vertex map input is only semi-dense. One of the advantages of the GCNN architecture is that it is robust to noisy input, so all points, including missing points in the input vertex map, are considered in the evaluation. We use $\tilde{\textbf{N}}$ for the estimated normal map, $ \textbf{N} $ for the ground-truth normal map, $ P $ for the \textit{set} of valid points, \textit{K} for the number of valid points. \textit{median} is a function to calculate the median value of a given \textit{set}.
 
 
 
@@ -115,7 +115,7 @@ The metric calculates the average absolute angular error for each point between 
 \[ 
 AAE = \frac
 {1}
-{ValidNum} \cdot \sum_{i\in P}  \left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| 
+{K} \cdot \sum_{i\in P}  \left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| 
 \]
 
 \paragraph{Median Angle Error Metric (MED)}
@@ -123,17 +123,17 @@ The metric calculates the median of the absolute angular error of all points in 
 
 \[ 
 MED = 
-\text{Median}   \left( \Bigg\{ \left|\arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \right| \text{for}\ i \in P   \Bigg\}\right)
+\text{median}   \left( \Bigg\{ \left|\arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \right| \text{for}\ i \in P   \Bigg\}\right)
 \]
 
 \paragraph{5 Degree Error Metric ($ E_5 $)}
 The metric calculates the percentage of predicted normals that have an error less than $ 5^\circ $ compared to ground truth. First, the number of normals that have an error less than $ 5^\circ $ ($ D_5 $) is calculated.
 \[
-D_5 = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 5 \right)
+D_5 = \sum_{i\in P} \left( \left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| < 5 \right)
 \]
 Then the percentage of normals that have error less than $ 5^\circ $ ($ E_5 $) is calculated.
 \[ 
-E_5 = \frac{D_5}{ValidNum}\times 100\%
+E_5 = \frac{D_5}{K}\cdot 100\%
 \]
 
 
@@ -141,22 +141,22 @@ E_5 = \frac{D_5}{ValidNum}\times 100\%
 The metric calculates the percentage of predicted normals that have an error less than $ 11.5^\circ $ compared to ground truth. First, the number of normals that have an error less than $ 11.5^\circ $ ($ D_{11.5} $) is calculated.
 
 \[
-D_{11.5} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 11.5 \right)
+D_{11.5} = \sum_{i\in P} \left( \left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| < 11.5 \right)
 \]
 Then the percentage of normals that have error less than $ 11.5^\circ $ ($ E_{11.5} $) is calculated.
 \[ 
-E_{11.5} = \frac{D_{11.5}}{ValidNum}\times 100\%
+E_{11.5} = \frac{D_{11.5}}{K}\cdot 100\%
 \]
 
 \paragraph{22.5 Degree Error Metric ($ E_{22.5} $)}
 The metric calculates the percentage of predicted normals that have an error less than $ 22.5^\circ $ compared to ground truth. First, the number of normals that have an error less than $ 22.5^\circ $ ($ D_{22.5} $) is calculated.
 
 \[
-D_{22.5} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 22.5 \right)
+D_{22.5} = \sum_{i\in P} \left( \left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| < 22.5 \right)
 \]
 Then the percentage of normals that have error less than $ 22.5^\circ $ ($ E_{22.5} $) is calculated.
 \[ 
-E_{22.5} = \frac{D_{22.5}}{ValidNum}\times 100\%
+E_{22.5} = \frac{D_{22.5}}{K}\cdot 100\%
 \]
 
 
@@ -164,28 +164,27 @@ E_{22.5} = \frac{D_{22.5}}{ValidNum}\times 100\%
 The metric calculates the percentage of predicted normals that have an error less than $ 30^\circ $ compared to ground truth. First, the number of normals that have an error less than $ 30^\circ $ ($ D_{30} $) is calculated.
 
 \[
-D_{30} = \sum_{i\in P} \left( \text{abs}\left(   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right) < 30 \right)
+D_{30} = \sum_{i\in P} \left(\left|   \arccos \frac{\textbf{N}_{i}\cdot \tilde{\textbf{N}}_{i}} {| \textbf{N}_{i} |  |\tilde{\textbf{N}}_{i}|  } \cdot  \frac{180}{\pi}   \right| < 30 \right)
 \]
 Then the percentage of normals that have error less than $ 30^\circ $ ($ E_{30} $) is calculated.
 \[ 
-E_{30} = \frac{D_{30}}{ValidNum}\times 100\%
+E_{30} = \frac{D_{30}}{K}\cdot 100\%
 \]
 
-We evaluated our trained models on \textit{synthetic-50-5}. In the test dataset, 5 objects are considered. They are: \textit{Baoshanlu}, \textit{Bus}, \textit{Dragon}, \textit{Garfield} and \textit{Washington}. Each object has 20 scenes with a total of 100 scenes for 5 objects. The test objects are not present in the training dataset. We evaluate all the presented models on the test dataset, to fit them into a table, the names of each model are simplified. The model \textit{SVD} uses the SVD optimization method, the model \textit{NOC} is the no-skip connection version of \textit{GCNN}, \textit{CNN} is the CNN version of \textit{GCNN}. \textit{F1}, \textit{F2}, \textit{F3}, \textit{F4} are the fusion times in the \textit{Trip-Net}. 
+We evaluated our trained models on \textit{synthetic-50-5}. In the test dataset, 5 objects are considered. They are: \textit{Baoshanlu} (BL), \textit{Bus} (BS), \textit{Dragon} (DG), \textit{Garfield} (GF) and \textit{Washington} (WS). Each object has 20 scenes with a total of 100 scenes for 5 objects. The test objects are not present in the training dataset. We evaluate all the presented models on the test dataset, to fit them into a table, the names of each model are simplified. The model \textit{SVD} uses the SVD optimization method, the model \textit{NOC} is the no-skip connection version of \textit{GCNN}, \textit{CNN} is the CNN version of \textit{GCNN}. \textit{F1}, \textit{F2}, \textit{F3}, \textit{F4} are the fusion times in the \textit{Trip-Net}. 
 
 
 
 
 When evaluating the \textit{GCNN} models, we take \textit{SVD} model with an optimal neighborhood size as baseline. \textit{NOC} and \textit{CNN} are used to verify the performance of \textit{GCNN} model. When evaluate the \textit{F1}-\textit{F4} models, we can take \textit{GCNN} model as baseline. 
 
-From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like \textit{dragon} achieves 98\%. The best performance is around 90\%, 75 \%, 45 \% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metrics respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the $ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the models.
-
-
+From the table we can see that all the learning based approaches achieves a better result than SVD approach. In the 30 degrees error metric, GCNN based approach achieves 95 \% accuracy whereas Trip-Net is even higher, some of the models like \textit{dragon} achieves 98\%. The best performance is around 90\%, 75\%, 45\% in $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degrees error metrics respectively. Another notable result is the close performance of F3 and F4 models, where they achieves a very comparable performance. We also found that during the training, F4 model converges faster than F3, but F3 in the end achieves a similar loss with model F4. However, based on the $ 30^\circ $, $ 22.5^\circ $, $ 11.5^\circ $ metrics, we can still see that F4 model gives a more stable performance with less high error normals. This is reasonable since the last fusion in the original resolution provides more high resolution information to the models.
 
 In evaluating the \textit{GCNN} models, we take the \textit{SVD} model with an optimal neighborhood size as the baseline. \textit{NOC} and \textit{CNN} are used to check the performance of the \textit{GCNN} model. When evaluating the \textit{F1}-\textit{F4} models, we can take the \textit{GCNN} model as a baseline. 
 
-From the table, it can be seen that all learning-based approaches achieve a better result than the \textit{SVD} approach. In the 30-degree error metric, the GCNN-based approach achieves 95\% accuracy, while Trip-Net is even higher and some models such as \textit{dragon} achieve 98\%. 
-The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degree error metric, respectively. Another notable result is the close relationship between the F3 and F4 models, which achieve very comparable performance. We also found that model F4 converges faster than F3 during training, but F3 ends up achieving a similar loss as model F4. However, using the metrics $ 30^\circ $, $ 22.5^\circ $ and $ 11.5^\circ $, we can see that the F4 model has a more stable performance with less high error normals. This is reasonable since the last fusion at the original resolution provides more high-resolution information to the models.
+
+From the table, it can be seen that all learning-based approaches achieve a better result than the \textit{SVD} approach. In the 30-degree error metric, the GCNN-based approach achieves 93.53\% accuracy in average, while Trip-Net is 94.81\%. Some models such as \textit{dragon} achieve 97.61\%. 
+The Trip-Net achieves around 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ and $ 5^\circ $ degree error metric, respectively. We also found that model F4 converges faster than less fusion models during training. This is reasonable since the last fusion at the original resolution provides more high-resolution information to the models.
 
 
 %% mean metric
@@ -194,17 +193,17 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l | l l l l }
 		\toprule
-		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 35.66 & 11.09 & 13.58 & 15.55 & 11.22 & 10.36 &\textbf{ 9.77 }& 9.80 \\ 
+		BL  		& 35.66 & 11.08 & 13.13 & 13.71 & 10.14 & 10.66 & 10.66 & \textbf{10.09} \\ 
 		\hline
-		Bus 			& 31.93 & 7.79 & 8.95 & 11.93 & 7.49 & 7.85 & \textbf{7.30} & 7.62\\ 
+		BS 			& 31.93 & 7.17 & 8.67 & 11.71 & \textbf{6.85} & 7.52 & 7.93 & 7.09 \\ 
 		\hline
-		Dragon 			& 39.57 & 10.60 & 15.29 & 16.03 & 10.47 & 10.23 & 8.16 &\textbf{ 7.79} \\
+		DG 			& 39.57 & 10.58 & 15.02 & 14.78 & 10.03 & 10.34 & 8.52 & \textbf{7.58} \\
 		\hline
-		Garfield 		& 39.69 & 10.20 & 12.50 & 14.46 & 9.94 & 10.36 & 9.71 &\textbf{ 9.39} \\
+		GF 		& 39.69 & 9.82 & 12.26 & 14.70 & 9.82 & 9.65 & 9.88 &\textbf{9.50} \\
 		\hline
-		Washington 		& 42.83 & 13.43 & 17.59 & 18.71 & 13.32 & 13.40 & 12.62 &\textbf{ 12.60}\\
+		WS 		& 42.83 & 13.46 & 17.60 & 17.92 & 13.42 & 13.15 & 12.81 &\textbf{12.51}\\
 		\bottomrule
 	\end{tabular}
 	\caption{Average angular error of the evaluation dataset. \textit{SVD} Neighborhood size $ k=2 $}	
@@ -217,17 +216,17 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l | l l l l }
 		\toprule
-		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 34.06 & 8.86 & 10.82 & 13.25 & 8.95 & 8.02 & 7.54 &\textbf{ 7.50} \\ 
+		BL  		& 34.06 & 8.74 & 10.29 & 11.36 & \textbf{7.69} & 8.27 & 8.37 & 7.83 \\ 
 		\hline
-		Bus 			& 34.14 & 4.44 & 5.02 & 8.69 & 4.11 & 4.58 & \textbf{3.65 }& 4.47 \\ 
+		BS 			& 34.14 & 3.54 & 4.70 & 8.55 & \textbf{3.01} & 4.01 & 4.69 & 3.56 \\ 
 		\hline
-		Dragon 			& 36.43 & 7.62 & 11.10 & 13.26 & 7.60 & 7.12 & 5.87 &\textbf{ 5.52} \\
+		DG 			& 36.43 & 7.53 & 10.68 & 11.85 & 6.74 & 7.47 & 6.17 &\textbf{5.18} \\
 		\hline
-		Garfield 		& 37.60 & 6.40 & 8.90 &11.31 & 6.30 & 6.72 & 6.21 & \textbf{6.04 }\\
+		GF 		& 37.60 & 6.14 & 8.54 & 11.71 & 6.08 & \textbf{5.86} & 6.38 & 5.96\\
 		\hline
-		Washington 		& 36.89 & 7.64 & 11.38 & 13.64& 7.49 & 7.60 &\textbf{ 7.03 }& 7.25\\
+		WS 		& 36.89 & 7.45 & 11.19 & 12.70 & 7.43 & 7.19 & 7.28 & \textbf{6.93} \\
 		\bottomrule
 	\end{tabular}
 	\caption{Median angular error of the evaluation dataset. \textit{SVD} Neighborhood size $ k=2 $}	
@@ -241,17 +240,17 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l |l l l l }
 		\toprule
-		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 0.01 & 0.25 & 0.18 & 0.11 & 0.24 & 0.31 &\textbf{ 0.33 }& 0.32\\ 
+		BL  		& 0.59\% & 24.75\% & 20.45\% & 15.86\% & \textbf{34.04\%} & 27.93\% & 26.46\% & 29.41\%\\ 
 		\hline
-		Bus 			& 0.00 & 0.56 & 0.50 & 0.23 & 0.59 & 0.54 & \textbf{0.63 }& 0.55 \\ 
+		BS 			& 0.36\% & 62.28\% & 52.70\% & 24.30\% & \textbf{65.98\%} & 59.50\% &  52.56\% & 62.08\% \\ 
 		\hline
-		Dragon 			& 0.00 & 0.31 & 0.17 & 0.10 & 0.31 & 0.34 & 0.43 &\textbf{ 0.46}\\
+		DG 			& 0.32\% & 31.05\% & 18.02\% & 13.64\% & 36.64\% & 30.20\% & 40.26\% &\textbf{49.04\%}\\
 		\hline
-		Garfield 		& 0.00 & 0.41 & 0.27 & 0.14 & 0.42 & 0.39 & 0.42 & \textbf{0.43}\\
+		GF 		& 0.38\% & 43.56\% & 29.39\% & 13.78\% & 43.86\% & \textbf{44.85\%} & 40.42\% & 44.09\%\\
 		\hline
-		Washington 		& 0.00 & 0.38 & 0.26 & 0.10 & 0.36 & 0.36 & \textbf{0.40 }& 0.37\\
+		WS 		& 0.18\% & 37.25\% & 27.56\% & 14.42\% & 36.15\% & 38.55\% & 37.76\% & \textbf{39.15\%} \\
 		\bottomrule
 	\end{tabular}
 	\caption{Percentage of error of less than 5 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $}	
@@ -265,20 +264,20 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l | l l l l }
 		\toprule
-		\tabhead{Object}  & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.}  & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 0.03 & 0.62 & 0.52 & 0.41 &  0.62 & 0.66 &\textbf{ 0.69 }& \textbf{0.69}\\ 
+		BL  		& 3.48\% & 63.27\% & 54.23\% & 49.93\% &  66.76\% & 65.36\% & 65.12\% & \textbf{68.29\%} \\ 
 		\hline
-		Bus 			& 0.05 & 0.81 & 0.78 & 0.65 & 0.83 & 0.82 & \textbf{0.83 }&\textbf{ 0.83 }\\ 
+		BS 			& 5.19\% & 83.23\% & 79.37\% & 66.58\% & \textbf{83.62\%} & 82.43\% & 82.04\% & 83.15\%\\ 
 		\hline
-		Dragon 			& 0.02 & 0.69 & 0.51 & 0.40 & 0.70 & 0.71 & 0.79 & \textbf{0.81}\\
+		DG 			& 2.25\% & 69.75\% & 52.93\% & 48.19\% & 72.64\% & 71.07\% & 77.83\% & \textbf{81.52\%}\\
 		\hline
-		Garfield 		& 0.03 & 0.72 & 0.62 & 0.51 &0.73 & 0.71  & 0.74 &\textbf{ 0.75}\\
+		GF 		& 2.50\% & 73.48\% & 63.11\% & 48.81\% & 73.28\% & 74.21\%  & 72.98\% &\textbf{74.48\%}\\
 		\hline
-		Washington 		& 0.02 & 0.62 & 0.50 & 0.40 & 0.63 & 0.62 & 0.64 & \textbf{0.65}\\
+		WS 		& 1.95\% & 62.63\% & 50.17\% & 44.74\% & 62.65\% & 63.73\% & 63.88\% & \textbf{65.07\%} \\
 		\bottomrule
 	\end{tabular}
-	\caption{Percentage of error of less than 11.5 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $}	
+	\caption{Percentage of error of less than 11.5 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $.}	
 	\label{tab:eval-11d}
 \end{table}
 
@@ -290,20 +289,20 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l | l l l l }
 		\toprule
-		\tabhead{Object}  & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.}  & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 0.18 & 0.90 & 0.84 & 0.79 & 0.90 & 0.91 &\textbf{ 0.92} &\textbf{ 0.92}\\ 
+		BL  		& 18.18\% & 90.02\% & 84.28\% & 83.93\% & 90.68\% & 90.59\% & 90.96\% & \textbf{92.04\%} \\ 
 		\hline
-		Bus 			& 0.26 & 0.93 & 0.91 & 0.89 & 0.93 & 0.93 & 0.93 & \textbf{0.94}\\ 
+		BS 			& 26.26\% & 93.26\% & 91.39\% & 88.58\% & 93.25\% & 93.22\% & 93.26\% & \textbf{93.47\%}\\ 
 		\hline
-		Dragon 			& 0.14 & 0.90 & 0.79 & 0.80 & 0.90 & 0.90 & 0.94 & \textbf{0.95}\\
+		DG 			& 13.58\% & 90.11\% & 79.72\% & 82.45\% & 90.33\% & 90.99\% & 93.95\% & \textbf{94.78\%}\\
 		\hline
-		Garfield 		& 0.13 & 0.89 & 0.86 & 0.84 & 0.90 & 0.89 &\textbf{ 0.91} &\textbf{ 0.91}\\
+		GF 		& 13.02\% & 89.83\% & 86.63\% & 83.47\% & 89.90\% & 90.18\% & 90.46\% &\textbf{90.72\%}\\
 		\hline
-		Washington 		& 0.14 & 0.81 & 0.72 & 0.72 & 0.81 & 0.81 & \textbf{0.83} &\textbf{ 0.83}\\
+		WS 		& 14.29\% & 81.03\% & 71.81\% & 73.11\% & 81.13\% & 81.72\% & 82.68\% &\textbf{83.37\%}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percentage of error of less than 22.5 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $}	
+	\caption{Percentage of error of less than 22.5 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $.}	
 	\label{tab:eval-22d}
 \end{table}
 
@@ -314,20 +313,20 @@ The best performance is 90\%, 75\%, 45\% in the $ 22.5^\circ $, $ 11.5^\circ $ a
 	\captionsetup{width=\linewidth}
 	\begin{tabular}{l | l | l l l | l l l l }
 		\toprule
-		\tabhead{Object} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
+		\tabhead{Obj.} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{NOC} & \tabhead{CNN} & \tabhead{F1}& \tabhead{F2}& \tabhead{F3}& \tabhead{F4}\\
 		\midrule
-		Baoshanlu  		& 0.37 & 0.96 & 0.93 & 0.90 & 0.96 & 0.96 &\textbf{ 0.97 }&\textbf{ 0.97} \\ 
+		BL  		& 37.22\% & 95.92\% & 92.88\% & 93.20\% & 96.28\% & 96.06\% & 96.51\% &\textbf{96.85\%} \\ 
 		\hline
-		Bus 			& 0.43 & 0.96 & 0.94 & 0.93 & 0.96 & \textbf{0.96} &\textbf{ 0.96} &\textbf{ 0.96 }\\ 
+		BS 			& 43.03\% & 95.80\% & 94.38\% & 93.22\% & 95.74\% & 95.76\% & 95.86\% &\textbf{96.00\% }\\ 
 		\hline
-		Dragon 			& 0.30 & 0.95 & 0.88 & 0.90 & 0.95 & 0.95 & 0.97 & \textbf{0.98} \\
+		DG 			& 29.87\% & 94.69\% & 87.86\% & 90.61\% & 94.61\% & 95.10\% & 97.15\% & \textbf{97.61\%} \\
 		\hline
-		Garfield 		& 0.27 & 0.94 & 0.92 & 0.91 & 0.94 & 0.94 & 0.94 & \textbf{0.95 }\\
+		GF 		& 27.03\% & 93.76\% & 91.94\% & 90.96\% & 93.75\% & 94.04\% & 94.26\% & \textbf{94.29\%}\\
 		\hline
-		Washington 		& 0.28 & 0.88 & 0.81 & 0.82 & 0.88 & 0.88 & \textbf{0.89} & \textbf{0.89}\\
+		WS 		& 27.67\% & 87.48\% & 80.57\% & 82.72\% & 87.80\% & 87.90\% & 89.02\% & \textbf{89.30\%}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Percentage of error of less than 30 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $}	
+	\caption{Percentage of error of less than 30 degrees of the evaluation data set. \textit{SVD} Neighborhood size $ k=2 $.}	
 	\label{tab:eval-30d}
 \end{table}
 
@@ -447,8 +446,8 @@ A qualitative evaluation on object "dragon" is shown in Figure \ref{fig:gcnn-eva
 We can get a good result from GCNN model, but from model ``Washington" we still can see it lacks the sharpness in the detail area like the face and clothes area. 
 
 
-A qualitative evaluation of the object \textit{Dragon} is shown in figure \ref{fig:gcnn-eval}. As can be seen in the figure, the \textit{GCNN} model achieves an average angular error of 9 degrees for this object. The image shows an overall good performance for the whole object. A more detailed evaluation can be seen in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy is especially good on the smooth surface, such as the body area. In the same case, as shown in Figure \ref{fig:gcnn-eval-multi-model}, the \textit{NOC} model has an overall worse normal than the \textit{GCNN} model in the smooth area. The \textit{CNN} model retains the skip connection and thus yields a sharper result than the \textit{NOC} model, however, the smooth region of the model is still worse overall than the \textit{GCNN} model. In addition, the \textit{CNN} model yields a much brighter error map (implying a higher angular error) in the sharp regions such as the hind leg and the head region of the dragon object. Figure \ref{fig:gcnn-eval-more} shows further evaluation of the \textit{GCNN} model on other objects.
-The \textit{GCNN} model gives a good result, but for the \textit{Washington} model there is still a lack of sharpness in the detail areas such as the face and clothing. 
+A qualitative evaluation of the object \textit{Dragon} is shown in figure \ref{fig:gcnn-eval}. As can be seen in the figure, the GCNN model achieves an average angular error of 9 degrees for this object. The image shows an overall good performance for the whole object. A more detailed evaluation can be seen in Figure \ref{fig:gcnn-eval-synthetic-zoom-in}, the normal accuracy is especially good on the smooth surface, such as the body area. In the same case, as shown in Figure \ref{fig:gcnn-eval-multi-model}, the NOC model has an overall worse normal than the GCNN model in the smooth area. The CNN model retains the skip connection and thus yields a sharper result than the NOC model, however, the smooth region of the model is still worse overall than the GCNN model. In addition, the CNN model yields a much brighter error map (implying a higher angular error) in the sharp regions such as the hind leg and the head region of the dragon object. Figure \ref{fig:gcnn-eval-more} shows further evaluation of the GCNN model on other objects.
+The GCNN model gives a good result, but for the \textit{Washington} model there is still a lack of sharpness in the detail areas such as the face and clothing. 
 
 
 
@@ -1016,17 +1015,17 @@ Thus, for the higher resolution, the surface becomes smoother and the surface no
 		\toprule
 		\tabhead{Metrics} & \tabhead{SVD} & \tabhead{GCNN} & \tabhead{Trip-Net} \\
 		\midrule
-		Mean  					& 8.88 & 5.82 & 5.33 \\ 
+		Mean  					& 8.88 & 5.82 & \textbf{5.33} \\ 
 		\hline
-		Median					& 3.66 & 3.98 & 3.67 \\ 
+		Median					& \textbf{3.66} & 3.98 & 3.67 \\ 
 		\hline
-		$ 5^\circ $ 			& 0.63 & 0.63 & 0.66 \\
+		$ 5^\circ $ 			& 63\% & 63\% & \textbf{66\%} \\
 		\hline
-		$ 11.5^\circ $ 			& 0.79 & 0.89 & 0.91 \\
+		$ 11.5^\circ $ 			& 79\% & 89\% & \textbf{91\%} \\
 		\hline
-		$ 22.5^\circ $ 			& 0.89 & 0.97 & 0.97 \\
+		$ 22.5^\circ $ 			& 89\% & \textbf{97\%} & \textbf{97\%} \\
 		\hline
-		$ 30^\circ $ 			& 0.92 & 0.98 & 0.99 \\
+		$ 30^\circ $ 			& 92\% & 98\% & \textbf{99\%} \\
 		\bottomrule
 	\end{tabular}
 	\caption{High resolution dataset evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes. (Resolution: $ 512\times512 $)}	
@@ -1146,13 +1145,13 @@ We also applied our model to a dataset acquired with a structured light scanner 
 		\hline
 		Median					& \textbf{4.87} & 5.70 & 5.00 \\ 
 		\hline
-		$ 5^\circ $ 			& \textbf{0.51} & 0.44 & 0.50 \\
+		$ 5^\circ $ 			& \textbf{51\%} & 44\% & 50\% \\
 		\hline
-		$ 11.5^\circ $ 			& 0.79 & 0.79 & \textbf{0.81} \\
+		$ 11.5^\circ $ 			& 79\% & 79\% & \textbf{81\%} \\
 		\hline
-		$ 22.5^\circ $ 			& 0.93 & 0.93 & \textbf{0.94} \\
+		$ 22.5^\circ $ 			& 93\% & 93\% & \textbf{94\%} \\
 		\hline
-		$ 30^\circ $ 			& 0.96 & 0.96 & 0.96 \\
+		$ 30^\circ $ 			& 96\% & 96\% & 96\% \\
 		\bottomrule
 	\end{tabular}
 	\caption{Evaluation of SVD, GCNN and Trip-Net models on 6 different metrics based on 100 test scenes in Real-Dataset.}	
@@ -1167,7 +1166,7 @@ We also applied our model to a dataset acquired with a structured light scanner 
 	\captionsetup{width=\linewidth}
 	\begin{subfigure}[b]{0.32\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_groundtruth.png}
-		\caption{GT}
+		\caption{Reference}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.32\linewidth}
 	\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_20_normal_An2_no_mask.png}
@@ -1225,7 +1224,7 @@ We also applied our model to a dataset acquired with a structured light scanner 
 	
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/00008.image0.png}
-		\caption{GT}
+		\caption{Reference}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.24\linewidth}
 		\includegraphics[width=\linewidth]{./Figures/comparison_real/fancy_eval_0_error_SVD.png}
@@ -1251,7 +1250,7 @@ We also applied our model to a dataset acquired with a structured light scanner 
 \end{figure}
 
 
-We do not have a ground truth for evaluation in the Real-Dataset. But if we look directly at the visualization in Figure \ref{fig:trip-eval-real}, we can see that the Trip-Net approach is well able to ``enhance'' the missing pixels in the scenes and also gives a sharp result. The wrinkles on the clothes are detectable and even countable. Figure \ref{fig:real_eval_compare} compares the trip net with other approaches.
+We do not have a ground truth for evaluation in the Real-Dataset but we provide a normal map that calculated from another approach as reference. If we look directly at the visualization in Figure \ref{fig:trip-eval-real}, we can see that the Trip-Net approach is well able to ``enhance'' the missing pixels in the scenes and also gives a sharp result. The wrinkles on the clothes are detectable and even countable. Figure \ref{fig:real_eval_compare} compares the trip net with other approaches.
 
 
 However, we also noticed that the large holes in the base level are preserved in the Normal Maps. These large holes correspond to the shiny and dark texture regions that are often present in the depth map captured by the scanners. Since these large holes are only related to specific feature areas and also have irregular shapes, we did not simulate this type of noise in the synthetic dataset, but only with a sparse binary mask. Therefore, our models could not fill in missing large holes in the estimated normal map. Further work on this topic could be to find a way to generate a very similar depth map noise to obtain a more robust training dataset. 

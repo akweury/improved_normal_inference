@@ -14,7 +14,6 @@ from help_funs import chart
 from workspace import eval
 
 
-
 def main(models, test_folder, args):
     eval_time = datetime.datetime.now().strftime("%H_%M_%S")
     eval_date = datetime.datetime.today().date()
@@ -41,7 +40,7 @@ def main(models, test_folder, args):
     for model_idx, (name, model) in enumerate(models.items()):
         # start the evaluation
         loss_list, time_list, size_list, median_loss_list, d5_list, d11_list, d22_list, d30_list = eval.eval(
-            test_folder, name, model, gpu=args.gpu, data_type=args.data_type, setname="test")
+            test_folder, name, model, gpu=args.gpu, data_type=args.data_type, setname="val")
 
         loss_avg[name] = np.array(loss_list).sum() / np.array(loss_list).shape[0]
         time_avg[name] = np.array(time_list)[5:].sum() / np.array(time_list)[5:].shape[0]
@@ -100,16 +99,30 @@ if __name__ == '__main__':
             # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
             # "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1250.pth.tar",
 
-            "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-10_23_31_53" / "checkpoint-500.pth.tar",
-            "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-11_02_37_42" / "checkpoint-550.pth.tar",
-            "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-10_23_29_16" / "checkpoint-50.pth.tar",
-            "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-08-10_23_28_52" / "checkpoint-900.pth.tar",
+            # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-10_23_31_53" / "checkpoint-500.pth.tar",
+            # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-11_02_37_42" / "checkpoint-550.pth.tar",
+            # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-10_23_29_16" / "checkpoint-50.pth.tar",
+            # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-08-10_23_28_52" / "checkpoint-900.pth.tar",
+
+            # "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
+            # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
+            # "Trip-Net-F3F-450": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-450.pth.tar",
+            # "Trip-Net-F4-8-1000": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_12" / "checkpoint-400.pth.tar",
 
             # "an2-8-1000": config.paper_exp / "an2" / "checkpoint-8-1000-655.pth.tar",  # Trip Net
             # "f1": config.ws_path / "an2" / "an2_gnet-f1f_2022-07-30_22_33_05" / "checkpoint-403.pth.tar",
             # "f2": config.ws_path / "an2" / "an2_gnet-f2f_2022-07-30_22_33_53" / "checkpoint-380.pth.tar",
             # "f3": config.ws_path / "an2" / "an2_gnet-f3f_2022-07-30_22_34_22" / "model_best.pth.tar",
             # "f4": config.ws_path / "an2" / "an2_gnet-f4_2022-07-30_22_32_25" / "checkpoint-309.pth.tar",
+            # "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
+
+            # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
+            # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+            "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+            # "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
+            # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
+            # "Trip-Net-F3F-350": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-350.pth.tar",
+            # "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
         }
     else:
         test_folder = config.synthetic_data_noise_dfki / "synthetic512"
@@ -119,6 +132,5 @@ if __name__ == '__main__':
             "Trip-Net-512": config.model_dfki / "checkpoint-42.pth.tar",  # GCNN
             "Trip-Net-512-2": config.model_dfki / "an2_gnet-f4_2022-07-31_18_24_59" / "checkpoint-11.pth.tar",  # GCNN
         }
-
 
     main(models, test_folder, args)

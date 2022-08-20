@@ -15,8 +15,19 @@ models = {
     # "Trip-Net-2": config.ws_path / "an2" / "an2_gnet-f4_2022-08-01_22_31_37" / "checkpoint-1116.pth.tar",
     #
 
-    "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-    "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1499.pth.tar",
+    # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+    # "GCNN-Huber-32": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-11_06_04_45" / "checkpoint-1499.pth.tar",
+    # "Trip-Net": config.ws_path / "an2" / "an2_gnet-f4_2022-08-12_12_08_17" / "checkpoint-76.pth.tar",
+
+    "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
+    "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-750.pth.tar",
+    "Trip-Net-F3F-450": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-500.pth.tar",
+
+    "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
+
+    # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
+    # "Trip-Net-F3F": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-500.pth.tar",
+
     # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
     # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
     # "GCNN-Berhu": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-03_10_04_18" / "checkpoint-850.pth.tar",
@@ -47,7 +58,7 @@ for model_idx, (name, model) in enumerate(models.items()):
     # chart.line_chart(np.array(normal_loss_avg), output_folder, labels=[name], title="Training_Loss_Comparison",
     #                  y_label="Berhu Loss", log_y=True)
     #
-    chart.line_chart(np.array(normal_loss_avg[:, 1:]), output_folder, labels=[name], title="Test_Loss_Comparison",
+    chart.line_chart(np.array(normal_loss_avg[:, 150:]), output_folder, labels=[name], title="Test_Loss_Comparison",
                      y_label="Angle Error", log_y=False)
 
 plt.show()

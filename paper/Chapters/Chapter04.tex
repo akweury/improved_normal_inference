@@ -109,7 +109,6 @@ The main advantage of generated scenes is the availability of complete informati
 		Camera Intrinsic Matrix &  $ 3\times 3 $  \\
 		\hline 
 		Camera Extrinsic Matrix &  $ 3\times 4 $  \\
-		\hline 
 		\bottomrule
 	\end{tabular}
 	\caption{The information saved for each scene in \textit{synthetic-50-5}.}
@@ -205,7 +204,7 @@ For the direction $ \textbf{Dir}(x,y,z) $ of a point $ \textbf{V}(x,y,z) $, it's
 \begin{dgroup*}
 	
 	\begin{dmath*}
-		\textbf{Dir}(x, y, z) = \dfrac{(u, v, fk)}{\|(u, v, fk) \|^2_2}
+		\textbf{Dir}(x, y, z) = \dfrac{(u, v, fk)}{\|(u, v, fk) \|_2}
 	\end{dmath*}
 
 \end{dgroup*}

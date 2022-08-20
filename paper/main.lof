@@ -15,7 +15,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Left: the reflection of light on a Lambertian surface. (Image source \cite {lambertian-reflectance}). Right: the surface normal, the light direction of the source and the viewing direction, where $ \theta $ denotes the angle between the light direction and the normal.\relax }}{8}{figure.caption.15}%
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces The structure of UNet. \cite {unet}\relax }}{9}{figure.caption.17}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces The structure of UNet. (Image source:\cite {unet})\relax }}{9}{figure.caption.17}%
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Left: Gated Convolution Layer, where $ \odot $ denotes element-wise multiplication. Right: standard convolution layer.\relax }}{11}{figure.caption.21}%
 \defcounter {refsection}{0}\relax 

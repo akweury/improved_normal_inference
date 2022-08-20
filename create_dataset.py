@@ -221,6 +221,9 @@ def convert2training_tensor_resized(path, k, output_type='normal', resize_factor
         light_direction_gt[mask_gt] = 0
         light_direction[mask] = 0
 
+        import cv2 as cv
+        cv.imwrite(str(f"fancy_eval_light{item}.png"), mu.visual_light(light_direction, "", histogram=False))
+
         # albedo
         G = np.sum(gt_normal * light_direction_gt, axis=-1)
         G[mask_gt] = 0

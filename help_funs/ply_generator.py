@@ -33,7 +33,7 @@ def generate_ply(file_idx, normal, data_path, param=0):
             data['R']).transpose() @ np.array(data['t'])
     lightPoints = lightVisualization()
     for i in range(len(lightPoints)):
-        lightPoints[i] = lightPoints[i] / 8 + np.array(data['lightPos0'])
+        lightPoints[i] = lightPoints[i] / 8 + np.array(data['lightPos'])
 
         # lightPoints[i] = np.array(data['R']) @ (lightPoints[i] - np.array(data['t']))
     writePLY(vertex, normal, image, mask, ply_file,
@@ -43,9 +43,19 @@ def generate_ply(file_idx, normal, data_path, param=0):
 
 
 if __name__ == '__main__':
-    file_idx = 3
-    data_path = config.synthetic_data / "synthetic512" / 'train'
+    file_idx = 8
+    data_path = config.real_data / 'test'
 
     image_file, ply_file, json_file, depth_file, depth_noise_file, normal_file = get_file_name(file_idx, data_path)
     normal = load_24bitNormal(normal_file)
+
+    f = open(json_file)
+    data = json.load(f)
+    f.close()
+
+    depth_noise = load_scaled16bitImage(depth_file,
+                                        data['minDepth'],
+                                        data['maxDepth'])
+    # mask = np.sum(depth_noise, axis=-1) == 0
+    # normal[mask] = 0
     generate_ply(file_idx, normal, data_path=data_path)

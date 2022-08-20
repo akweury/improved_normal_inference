@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 class SyntheticDepthDataset(Dataset):
 
     def __init__(self, data_path, k=0, output_type="normal_noise", setname='train'):
-        if setname in ['train', 'selval', 'test']:
+        if setname in ['train', 'selval', 'test', 'val']:
             self.training_case = np.array(
                 sorted(
                     glob.glob(str(data_path / setname / "tensor" / f"*_{k}_{output_type}.pth.tar"), recursive=True)))

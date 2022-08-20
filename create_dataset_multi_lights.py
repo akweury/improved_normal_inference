@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 def convert2training_tensor(path, k, output_type='normal'):
     width = 128
-    light_num = 10
+    light_num = 1
     if not os.path.exists(str(path)):
         raise FileNotFoundError
     if not os.path.exists(str(path / "tensor")):
@@ -175,7 +175,7 @@ def convert2training_tensor(path, k, output_type='normal'):
 
 if args.data in ["synthetic128", "synthetic256", "synthetic512", "synthetic64"]:
     # for folder in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
-    for folder in ["selval"]:
+    for folder in ["train", "test", "val", "selval"]:
 
         if args.machine == "remote":
             original_folder = config.synthetic_data_dfki / args.data / folder
