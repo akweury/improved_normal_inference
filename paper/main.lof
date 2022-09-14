@@ -1,94 +1,48 @@
 \boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
-\babel@toc {english}{}\relax 
-\defcounter {refsection}{0}\relax 
+\babel@toc {english}{}
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {1.1}{\ignorespaces Left: A portion of the point cloud of the \textit {dragon} object. Right: Zoom in of the point cloud.\relax }}{1}{figure.caption.5}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {2.1}{\ignorespaces (a)-(b): Output from the RGB camera (a) and depth camera (b) of a scene in \textit {NYU Depth Dataset V2} \cite {nyu}. (c)-(d): Output from the gray-scale camera (c) and depth camera (d) of a scene in our proposed dataset \textit {synthetic-50-5}.\relax }}{4}{figure.caption.7}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Intrinsic image analysis of the Washington object. From left to right: original image, reflection image, shading image, light image, normal image.\relax }}{7}{figure.caption.14}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Left: the reflection of light on a Lambertian surface. (Image source \cite {lambertian-reflectance}). Right: the surface normal, the light direction of the source and the viewing direction, where $ \theta $ denotes the angle between the light direction and the normal.\relax }}{8}{figure.caption.15}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.3}{\ignorespaces The structure of UNet. (Image source:\cite {unet})\relax }}{9}{figure.caption.17}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Left: Gated Convolution Layer, where $ \odot $ denotes element-wise multiplication. Right: standard convolution layer.\relax }}{11}{figure.caption.21}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Three kinds of input data. From left to right, vertex map, light map, gray-scale image.\relax }}{13}{figure.caption.30}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.8}{\ignorespaces The shape of Huber Loss (show in red line). \relax }}{16}{figure.caption.41}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.5}{\ignorespaces The architecture of Gated convolution neural network (\textit {GCNN}) based on Gated convolution and \textit {U-Net} Architecture.\relax }}{17}{figure.caption.23}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.7}{\ignorespaces The architecture of the \textit {Trip-Net}.\relax }}{18}{figure.caption.35}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Some of the objects used for \textit {Synthetic-50-5}\relax }}{20}{figure.caption.44}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.2}{\ignorespaces The layout of synthetic scene generation in Unity.\relax }}{21}{figure.caption.46}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Different exposure to the objects.\relax }}{22}{figure.caption.48}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.4}{\ignorespaces From left to right: Noise-intensity on $ \mu -0$, $\mu -10$, $\mu -20$, $\mu -30$, $\mu -40$, $\mu -50$. Object Name: \textit {elephant-zun-lid}.\relax }}{22}{figure.caption.51}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {4.5}{\ignorespaces The position fluctuation of the points in 100 Vertex Maps. Left: Extreme values in 3 axes; Right: Vertex range in 3 axis.\relax }}{24}{figure.caption.52}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.1}{\ignorespaces Some of the evaluation scenes during the training. The objects from top to bottom rows: \textit { Washington}, \textit {Bus}\relax }}{25}{figure.caption.58}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.2}{\ignorespaces Normal map of a dragon object predicted by \textit {SVD}. k=1. (Resolution: $ 512\times 512 $) \relax }}{31}{figure.caption.75}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.3}{\ignorespaces Error map of \textit {SVD} with different $ k $ values. (Resolution: $ 512\times 512 $) \relax }}{31}{figure.caption.76}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.4}{\ignorespaces \textit {SVD} visual evaluation on a noised dragon model, $ k=1 $, noise factor $ \mu $=50. (Resolution: $ 512\times 512 $) \relax }}{31}{figure.caption.77}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.5}{\ignorespaces GCNN visual evaluation. (Resolution: $ 128\times 128 $)\relax }}{32}{figure.caption.79}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.6}{\ignorespaces Zoom in of some regions of Dragon object based on GCNN. (Resolution: $ 32\times 32 $)\relax }}{33}{figure.caption.80}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.7}{\ignorespaces Comparison of GCNN based models. (Resolution: $ 128\times 128 $)\relax }}{33}{figure.caption.81}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.8}{\ignorespaces Some of detail feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times 32 $\relax }}{34}{figure.caption.83}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.9}{\ignorespaces Some of global feature maps of CNN, NOC, GCNN models in up-sampling part on resolution $ 32\times 32 $\relax }}{35}{figure.caption.84}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.10}{\ignorespaces Trip-Net visual evaluation on resolution $ 128\times 128 $\relax }}{35}{figure.caption.86}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.12}{\ignorespaces Comparison between different fusion times on Trip-Net Architecture ($ 128\times 128 $). \relax }}{36}{figure.caption.88}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.11}{\ignorespaces Zoom in of detail regions ($ 32\times 32 $) of \textit {Dragon} object (Trip-Net).\relax }}{36}{figure.caption.87}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.13}{\ignorespaces Trip-Net visual evaluation on high resolution dataset $ 512 \times 512 $.\relax }}{38}{figure.caption.91}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.14}{\ignorespaces Comparison on high resolution dataset ($ 512\times 512 $).\relax }}{38}{figure.caption.92}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.15}{\ignorespaces Real Dataset ($ 512\times 512 $) evaluation (Trip-Net)\relax }}{40}{figure.caption.95}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {5.16}{\ignorespaces Real dataset ($ 512\times 512 $) comparison.\relax }}{40}{figure.caption.96}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {A.1}{\ignorespaces Point clouds in dataset A \relax }}{46}{figure.caption.99}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {A.2}{\ignorespaces Point clouds in dataset B \relax }}{47}{figure.caption.100}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {A.3}{\ignorespaces Point clouds in dataset C\relax }}{48}{figure.caption.101}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {B.1}{\ignorespaces GCNN evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus. \relax }}{50}{figure.caption.103}%
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {B.2}{\ignorespaces Trip-Net evaluation ($ 128\times 128 $). From top to bottom: Baoshanlu, Washington statue, Bus.\relax }}{51}{figure.caption.104}%
-\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
-\defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {C.1}{\ignorespaces All 128 Feature maps of model GCNN, NOC, CNN at the first up-sampling. (Resolution $ 32\times 32 $)\relax }}{54}{figure.caption.106}%
