@@ -92,7 +92,7 @@ if __name__ == '__main__':
     for folder_name in ["baoshanlu", "bus", "dragon", "garfield", "washington"]:
         if args.machine == "local":
             # test_folder = config.real_data / "test"
-            test_folder = config.synthetic_data_noise_local / "synthetic128" / "seperate" / folder_name
+            test_folder = config.synthetic_data_noise_local / "synthetic128" / "separate" / folder_name
             # test_folder = config.dataset / "data_synthetic_noise" / "synthetic128" / "tensor"
             # test_folder = config.synthetic_data_noise_local / "synthetic512" / "test"
             models = {
@@ -114,14 +114,14 @@ if __name__ == '__main__':
 
                 ######################################## Final #######################################
 
-                "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
-                "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
-                "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
-
-                "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
-                "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
-                "Trip-Net-F3F-350": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-350.pth.tar",
-                "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
+                # "GCNN-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_2022-08-10_08_57_59" / "checkpoint-767.pth.tar",
+                # "NOC-Huber": config.ws_path / "nnnn" / "nnnn_gcnn_noc_2022-08-10_23_22_40" / "checkpoint-1499.pth.tar",
+                # "CNN-Huber": config.ws_path / "nnnn" / "nnnn_cnn_2022-08-10_23_22_02" / "checkpoint-1499.pth.tar",
+                #
+                # "Trip-Net-F1F": config.ws_path / "an2" / "an2_gnet-f1f_2022-08-12_20_25_31" / "checkpoint-580.pth.tar",
+                # "Trip-Net-F2F": config.ws_path / "an2" / "an2_gnet-f2f_2022-08-12_20_27_12" / "checkpoint-585.pth.tar",
+                # "Trip-Net-F3F-350": config.ws_path / "an2" / "an2_gnet-f3f_2022-08-12_20_28_34" / "checkpoint-350.pth.tar",
+                # "Trip-Net-F4-2-decay-738": config.ws_path / "an2" / "an2_gnet-f4_2022-08-13_16_56_42" / "checkpoint-738.pth.tar",
 
             }
 

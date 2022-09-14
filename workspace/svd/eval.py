@@ -39,7 +39,7 @@ def eval(dataloader, farthest_neighbour):
         size_list[i] = np.sum(~mask)
 
         # start count the model time
-        normal, gpu_time = eval_single(vertex, ~mask, np.array([0, 0, -7]), farthest_neighbour=1, data_idx=idx)
+        normal, gpu_time = eval_single(vertex, ~mask, np.array([0, 0, -7]), farthest_neighbour=2, data_idx=idx)
 
         # evaluation
         # angle_loss = mu.angle_between(normal[~mask], target[~mask]).sum() / mask.sum()

@@ -136,7 +136,7 @@ def start2(models_path_dict):
             # load model
             if name == "SVD":
                 print(f'- model {name} evaluation...')
-                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -5]), farthest_neighbour=3,
+                normal, gpu_time = svd.eval_single(vertex_0, ~mask, np.array([0, 0, -5]), farthest_neighbour=2,
                                                    data_idx=i)
 
                 normal = normal[:, :, :3]
